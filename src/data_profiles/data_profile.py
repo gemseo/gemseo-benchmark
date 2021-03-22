@@ -1,5 +1,6 @@
 from matplotlib import pyplot
-from matplotlib.pyplot import (figure, legend, plot, show, title, xlabel, xlim, ylabel,
+from matplotlib.pyplot import (axhline, figure, legend, plot, show, title, xlabel, xlim,
+                               ylabel,
                                ylim, yticks)
 from numpy import append, array, linspace, minimum, zeros
 from typing import Dict, Iterable, List
@@ -180,24 +181,32 @@ class DataProfile(object):
             data_profiles (Dict[str, List[Number]]): the data profiles
 
         """
-        color_cycle = pyplot.rcParams["axes.prop_cycle"].by_key()["color"]
-        max_profile_size = max([len(a_profile) for a_profile in data_profiles.values()])
-
         figure()
+
+        # Set the title and axes
         title("Data profile{}".format("s" if len(data_profiles) > 1 else ""))
+        max_profile_size = max([len(a_profile) for a_profile in data_profiles.values()])
         xlabel("Number of functions evaluations")
         xlim([1, max_profile_size])
         y_ticks = linspace(0.0, 1.0, 11)
         yticks(y_ticks, ("{:02.0f}%".format(ratio * 100.0) for ratio in y_ticks))
         ylabel("Ratios of targets reached")
-        ylim([0.0, 1.0])
+        ylim([0.0, 1.05])
+
+        # Plot the 100% line
+        axhline(1.0, linestyle=":", color="black")
+
+        # Plot the data profiles
+        color_cycle = pyplot.rcParams["axes.prop_cycle"].by_key()["color"]
         for a_color, (a_name, a_profile) in zip(color_cycle, data_profiles.items()):
             last_abscissa = len(a_profile)
             last_value = a_profile[-1]
+            # Extend the profile if necessary
             if last_abscissa < max_profile_size:
                 tail = [last_value] * (max_profile_size - last_abscissa)
                 a_profile = append(a_profile, tail)
             plot(range(1, max_profile_size + 1), a_profile, color=a_color, label=a_name)
             plot(last_abscissa + 1, last_value, marker="*")
+            
         legend()
         show()
