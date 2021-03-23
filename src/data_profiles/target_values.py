@@ -1,24 +1,28 @@
+from numbers import Number
+
 from numpy import linspace, minimum, ndarray, vstack
-from typing import Iterable
+from typing import Iterable, List, Optional
 
 
 class TargetValues(object):
     """Compute target values for an objective to minimize."""
 
     @staticmethod
-    def compute_target_values(values_histories, targets_number, budget_min=1):
-        """Compute target values for a function from a history of its values.
+    def compute_target_values(values_histories,  # type: Iterable[List[Number]]
+                              targets_number,  # type: int
+                              budget_min=1,  # type: Optional[int]
+                              ):  # type: (...) -> ndarray
+        """Compute target values for a function from histories of its values.
 
-        Arguments:
-            values_histories (Iterable[List[Number]]): The values history of the
-                function.
-                The value at index i is assumed to have obtained with i+1 evaluations.
-            targets_number (int): The number of targets to compute.
-            budget_min (int, optional): The evaluation budget to be used to define the
-                easiest target.
+        Args:
+            values_histories: The histories of the function values.
+                N.B. in a history the value at index i is assumed to have been obtained
+                with i+1 evaluations.
+            targets_number: The number of targets to compute.
+            budget_min: The evaluation budget to be used to define the easiest target.
 
-        Return:
-            (ndarray): Target values for the function.
+        Returns:
+            Target values for the function.
 
         """
         # Extend the histories to a common size by repeating their last value
@@ -42,20 +46,23 @@ class TargetValues(object):
         return target_values
 
     @staticmethod
-    def _compute_budget_scale(budget_min, budget_max, budgets_number):
+    def _compute_budget_scale(budget_min,  # type: int
+                              budget_max,  # type: int
+                              budgets_number  # type: int
+                              ):  # type: (...) -> ndarray
         """Compute a scale of evaluation budgets, whose progression relates to
         complexity in terms of evaluation cost.
 
         N.B. here the evaluation cost is assumed linear with respect to the number of
         evaluations.
 
-        Arguments:
-            budget_min (int): the minimum number of evaluations
-            budget_max (int): the maximum number of evaluations
-            budgets_number (int): the number of budgets
+        Args:
+            budget_min: The minimum number of evaluations
+            budget_max: The maximum number of evaluations
+            budgets_number: the number of budgets
 
         Returns:
-            ndarray: distribution of evaluation budgets
+            distribution of evaluation budgets
 
         """
         budget_scale = linspace(budget_min, budget_max, budgets_number, dtype=int)
