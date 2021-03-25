@@ -1,6 +1,6 @@
 from numbers import Number
 
-from numpy import linspace, minimum, ndarray, vstack
+from numpy import inf, linspace, minimum, ndarray, vstack
 from typing import Iterable, List, Optional
 
 
@@ -8,10 +8,12 @@ class TargetValues(object):
     """Compute target values for an objective to minimize."""
 
     @staticmethod
-    def compute_target_values(values_histories,  # type: Iterable[List[Number]]
-                              targets_number,  # type: int
-                              budget_min=1,  # type: Optional[int]
-                              ):  # type: (...) -> ndarray
+    def compute_target_values(
+            values_histories,  # type: Iterable[List[Number]]
+            targets_number,  # type: int
+            budget_min=1,  # type: Optional[int]
+            feasibility_histories=None,  # type: Optional[Iterable[List[bool]]]
+    ):  # type: (...) -> ndarray
         """Compute target values for a function from histories of its values.
 
         Args:
@@ -20,11 +22,28 @@ class TargetValues(object):
                 with i+1 evaluations.
             targets_number: The number of targets to compute.
             budget_min: The evaluation budget to be used to define the easiest target.
+            feasibility_histories: The histories of the solutions feasibility
+                If None then all solutions are assumed feasible.
 
         Returns:
             Target values for the function.
 
         """
+        # Check the histories lengths
+        if feasibility_histories is None:
+            feasibility_histories = [[True] * len(a_history) for a_history
+                                     in values_histories]
+        for a_val_hist, a_feas_hist in zip(values_histories, feasibility_histories):
+            if len(a_val_hist) != len(a_feas_hist):
+                raise ValueError("Histories of values and feasibility must have same "
+                                 "size")
+
+        # Take feasibility into account
+        values_histories = [a_value if a_feasibility else inf
+                            for a_value, a_feasibility in zip(values_histories,
+                                                              feasibility_histories)]
+        # TODO: use a feasibility measure / penalty
+
         # Extend the histories to a common size by repeating their last value
         maximal_size = max(len(a_history) for a_history in values_histories)
         values_histories = [a_hist + [a_hist[-1]] * (maximal_size - len(a_hist))
