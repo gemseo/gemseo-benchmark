@@ -40,9 +40,12 @@ class TargetValues(object):
                                  "size")
 
         # Take feasibility into account
-        values_histories = [a_value if a_feasibility else inf
-                            for a_value, a_feasibility in zip(values_histories,
-                                                              feasibility_histories)]
+        print(values_histories)
+        values_histories = [[a_value if a_feas else inf
+                             for a_value, a_feas in zip(a_val_hist, a_feas_hist)]
+                            for a_val_hist, a_feas_hist in zip(values_histories,
+                                                               feasibility_histories)]
+        print(values_histories)
         # TODO: use a feasibility measure / penalty
 
         # Extend the histories to a common size by repeating their last value
