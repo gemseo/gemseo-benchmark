@@ -1,6 +1,6 @@
 from itertools import chain, repeat
-
 from numbers import Number
+
 from numpy import inf, linspace, minimum, ndarray, vstack
 from typing import Iterable, List, Optional
 
