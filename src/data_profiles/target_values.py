@@ -47,9 +47,10 @@ class TargetValues(object):
 
         # Extend the histories to a common size by repeating their last value
         maximal_size = max(len(a_history) for a_history in values_histories)
-        values_histories = [chain(a_hist,
-                                  repeat(a_hist[-1], (maximal_size - len(a_hist))))
-                            for a_hist in values_histories]
+        values_histories = [
+            list(chain(a_hist, repeat(a_hist[-1], (maximal_size - len(a_hist)))))
+            for a_hist in values_histories
+        ]
 
         # Compute the history of the minimum value
         minimum_history = vstack([minimum.accumulate(a_hist) for a_hist in
