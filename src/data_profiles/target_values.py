@@ -1,8 +1,30 @@
-from itertools import chain, repeat
+# -*- coding: utf-8 -*-
+# Copyright 2021 IRT Saint Exupéry, https://www.irt-saintexupery.com
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License version 3 as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-from numbers import Number
-from numpy import inf, linspace, minimum, ndarray, vstack
-from typing import Iterable, List, Optional
+# Contributors:
+#    INITIAL AUTHORS - initial API and implementation and/or initial
+#                           documentation
+#        :author: Benoit Pauwels
+#    OTHER AUTHORS   - MACROSCOPIC CHANGES
+"""Computation of target values out of optimization histories"""
+from functools import reduce
+from itertools import chain, repeat
+from typing import Iterable, List, Optional, Tuple
+
+from numpy import array, inf, linspace, ndarray, vstack
 
 
 class TargetValues(object):
@@ -10,7 +32,7 @@ class TargetValues(object):
 
     @staticmethod
     def compute_target_values(
-            values_histories,  # type: Iterable[List[Number]]
+            values_histories,  # type: Iterable[List]
             targets_number,  # type: int
             budget_min=1,  # type: Optional[int]
             feasibility_histories=None,  # type: Optional[Iterable[List[bool]]]
@@ -27,7 +49,7 @@ class TargetValues(object):
                 If None then all solutions are assumed feasible.
 
         Returns:
-            Target values for the function.
+            The target values of the function.
 
         """
         # Check the histories lengths
@@ -75,6 +97,13 @@ class TargetValues(object):
                               budget_max,  # type: int
                               budgets_number  # type: int
                               ):  # type: (...) -> ndarray
+
+    @staticmethod
+    def _compute_budget_scale(
+            budget_min,  # type: int
+            budget_max,  # type: int
+            budgets_number  # type: int
+    ):  # type: (...) -> ndarray
         """Compute a scale of evaluation budgets, whose progression relates to
         complexity in terms of evaluation cost.
 
