@@ -72,7 +72,7 @@ class TargetValues(object):
         ]
 
         # Compute the history of the minimum value
-        minima_histories = [[reduce(TargetValues._order, a_full_hist[:i])
+        minima_histories = [[reduce(TargetValues._min, a_full_hist[:i])
                              for i in range(1, len(a_full_hist) + 1)]
                             for a_full_hist in full_histories]
         minima_histories = array(minima_histories)
@@ -125,21 +125,32 @@ class TargetValues(object):
         return values_histories, measures_histories
 
     @staticmethod
-    def _order(a_hist_item, other_hist_item):
-        # TODO: docstring
-        a_value, a_meas = a_hist_item
-        other_value, other_meas = other_hist_item
+    def _min(
+            hist_item_1,  # type: Tuple
+            hist_item_2  # type: Tuple
+    ):
+        """Return the smallest of two history items.
 
-        if a_meas > 0 and other_meas >= a_meas:
-            return a_hist_item
-        elif a_meas > 0:
-            return other_hist_item
-        elif other_meas > 0:
-            return a_hist_item
-        elif a_value <= other_value:
-            return a_hist_item
+        Args:
+            hist_item_1: A history item.
+            hist_item_2: Another history item.
+
+        Returns:
+            The smallest of the two history items.
+
+        """
+        value_1, meas_1 = hist_item_1
+        value_2, meas_2 = hist_item_2
+        if 0 < meas_1 <= meas_2:
+            return hist_item_1
+        elif meas_1 > 0:
+            return hist_item_2
+        elif meas_2 > 0:
+            return hist_item_1
+        elif value_1 <= value_2:
+            return hist_item_1
         else:
-            return other_hist_item
+            return hist_item_2
 
     @staticmethod
     def _compute_budget_scale(
