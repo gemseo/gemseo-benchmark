@@ -22,47 +22,75 @@
 """Computation of target values out of optimization histories"""
 from functools import reduce
 from itertools import chain, repeat
-from typing import Iterable, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 from numpy import array, inf, linspace, ndarray
 
 
 class TargetValues(object):
-    """Compute target values for an objective to minimize."""
+    """Compute target values for an objective to minimize.
 
-    @staticmethod
-    def compute_target_values(
-            values_histories,  # type: Iterable[List]
+    Attributes:
+        _values_histories: The histories of objective values.
+        _measures_histories: The histories of infeasibility measures.
+
+    """
+
+    def __init__(self):
+        self._values_histories = list()
+        self._measures_histories = list()
+
+    def add_history(
+            self,
+            values_history,  # type: List
+            measures_history=None,  # type: Optional[List]
+            feasibility_history=None,  # type: Optional[List[bool]]
+    ):
+        """Add a history of objective values.
+
+        Args:
+            values_history: A history of objective values.
+                N.B. the value at index i is assumed to have been obtained with i+1
+                evaluations.
+            measures_history: A history of infeasibility measures.
+                If None then measures are set to zero in case of feasibility and set
+                to infinity otherwise.
+            feasibility_history: A history of feasibilities.
+                If None then feasibility is always assumed.
+
+        """
+        self._values_histories.append(values_history)
+        if measures_history is None and feasibility_history is not None:
+            if len(feasibility_history) != len(values_history):
+                raise ValueError("Values history and feasibility history must have "
+                                 "same length.")
+            measures_history = [0.0 if a_feas else inf
+                                for a_feas in feasibility_history]
+        elif measures_history is None:
+            measures_history = [0.0] * len(values_history)
+        if len(measures_history) != len(values_history):
+            raise ValueError("Values history and measures history must have same "
+                             "length.")
+        self._measures_histories.append(measures_history)
+
+    def compute(
+            self,
             targets_number,  # type: int
             budget_min=1,  # type: Optional[int]
-            feasibility_histories=None,  # type: Optional[Iterable[List[bool]]]
-            measures_histories=None  # type: Optional[Iterable[List]]
     ):  # type: (...) -> ndarray
         """Compute target values for a function from histories of its values.
 
         Args:
-            values_histories: The histories of the function values.
-                N.B. in a history the value at index i is assumed to have been obtained
-                with i+1 evaluations.
             targets_number: The number of targets to compute.
             budget_min: The evaluation budget to be used to define the easiest target.
-            feasibility_histories: The histories of the solutions feasibility
-                If None then all solutions are assumed feasible.
-            measures_histories:  The histories of infeasibility measures.
-                If None then the behavior depends on the feasibility_histories
-                argument; otherwise the feasibility_histories argument is not
-                considered.
 
         Returns:
             The target values of the function.
 
         """
-        # Check the histories
-        values_histories, measures_histories = TargetValues._check_histories(
-            values_histories, feasibility_histories, measures_histories
-        )
+        # Build the coupled histories of objective values and infeasibility measures
         full_histories = [list(zip(a_val_hist, a_meas_hist)) for a_val_hist, a_meas_hist
-                          in zip(values_histories, measures_histories)]
+                          in zip(self._values_histories, self._measures_histories)]
 
         # Extend the histories to a common size by repeating their last value
         maximal_size = max(len(a_history) for a_history in full_histories)
@@ -89,46 +117,10 @@ class TargetValues(object):
         return target_values
 
     @staticmethod
-    def _check_histories(
-            values_histories,  # type: Iterable[List]
-            feasibility_histories=None,  # type: Optional[Iterable[List[bool]]]
-            measures_histories=None  # type: Optional[Iterable[List]]
-    ):  # type: (...) -> Tuple[Iterable[List], Iterable[List]]
-        """Set the default measures of constraints violation if they are not
-        provided, and check the length of the histories.
-
-       Args:
-            values_histories: The histories of the function values.
-                N.B. in a history the value at index i is assumed to have been obtained
-                with i+1 evaluations.
-            feasibility_histories: The histories of the solutions feasibility
-                If None then all solutions are assumed feasible.
-            measures_histories:  The histories of infeasibility measures.
-                If None then the behavior depends on the feasibility_histories
-                argument; otherwise the feasibility_histories argument is not
-                considered.
-
-        Returns:
-            (The values histories, The infeasibility measures histories)
-
-        """
-        if measures_histories is None and feasibility_histories is not None:
-            measures_histories = [[0.0 if a_feas else inf for a_feas in a_history]
-                                  for a_history in feasibility_histories]
-        elif measures_histories is None:
-            measures_histories = [[0.0] * len(a_history) for a_history in
-                                  values_histories]
-        for a_val_hist, a_viol_hist in zip(values_histories, measures_histories):
-            if len(a_val_hist) != len(a_viol_hist):
-                raise ValueError("Histories of values and feasibility must have same "
-                                 "size")
-        return values_histories, measures_histories
-
-    @staticmethod
     def _min(
             hist_item_1,  # type: Tuple
             hist_item_2  # type: Tuple
-    ):
+    ):  # type:(...)-> Tuple
         """Return the smallest of two history items.
 
         Args:
