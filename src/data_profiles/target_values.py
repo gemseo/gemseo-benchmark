@@ -24,6 +24,7 @@ from functools import reduce
 from itertools import chain, repeat
 from typing import List, Optional, Tuple
 
+from matplotlib.pyplot import (figure, semilogy, show, xlabel, xlim, xticks, ylabel)
 from numpy import array, inf, linspace, ndarray
 
 
@@ -77,12 +78,14 @@ class TargetValues(object):
             self,
             targets_number,  # type: int
             budget_min=1,  # type: Optional[int]
+            plot=False  # type: bool
     ):  # type: (...) -> ndarray
         """Compute target values for a function from histories of its values.
 
         Args:
             targets_number: The number of targets to compute.
             budget_min: The evaluation budget to be used to define the easiest target.
+            plot: Whether to plot the target values.
 
         Returns:
             The target values of the function.
@@ -114,7 +117,34 @@ class TargetValues(object):
         # Compute the target values
         target_values = minimum_history[budget_scale - 1, :]
 
+        # Plot the target values
+        if plot:
+            objective_values = [inf if a_meas > 0.0 else a_value
+                                for a_value, a_meas in target_values]
+            self._plot(objective_values)
+
         return target_values
+
+    @staticmethod
+    def _plot(
+            objective_target_values  # type: List
+    ):
+
+        """Compute and plot the target values.
+
+            Args:
+                objective_target_values: The objective target values.
+
+        """
+        targets_number = len(objective_target_values)
+        figure()
+        xlabel("Target index")
+        xlim([0, targets_number + 1])
+        xticks(linspace(1, targets_number, dtype=int))
+        ylabel("Target value")
+        semilogy(range(1, targets_number + 1), objective_target_values,
+                 marker="o", linestyle="")
+        show()
 
     @staticmethod
     def _min(
