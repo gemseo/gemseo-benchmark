@@ -1,6 +1,7 @@
+from typing import List, Optional
+
 from matplotlib.pyplot import figure, semilogy, show, xlabel, xlim, xticks, ylabel
-from numpy import inf, linspace
-from numpy.core._multiarray_umath import array
+from numpy import array, inf, linspace, ndarray
 
 from data_profiles.performance_history import PerformanceHistory
 from data_profiles.target_values import TargetValues
@@ -19,8 +20,8 @@ class TargetsGenerator(object):
 
     def add_history(
             self,
-            values_history,  # type: List
-            measures_history=None,  # type: Optional[List]
+            values_history,  # type: List[float]
+            measures_history=None,  # type: Optional[List[float]]
             feasibility_history=None,  # type: Optional[List[bool]]
     ):
         """Add a history of objective values.
@@ -84,7 +85,7 @@ class TargetsGenerator(object):
 
     @staticmethod
     def _plot(
-            objective_target_values  # type: List
+            objective_target_values  # type: List[float]
     ):
         """Compute and plot the target values.
 
