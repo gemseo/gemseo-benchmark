@@ -139,7 +139,7 @@ class DataProfile(object):
         total_hits_history = zeros(max_history_size)
         for a_pb_name, targets in self._target_values.items():
             for a_pb_history in algo_histories[a_pb_name]:
-                hits_history = array(self._compute_hits_history(a_pb_history, targets))
+                hits_history = targets.count_targets_hits(a_pb_history)
                 # If the history is shorter than the longest one, repeat its last value
                 if hits_history.size < max_history_size:
                     tail = [hits_history[-1]] * (max_history_size - hits_history.size)
@@ -172,28 +172,6 @@ class DataProfile(object):
             raise ValueError("Reference problems unequally represented for algorithm {}"
                              .format(algo_name))
         return histories_numbers.pop()
-
-    @staticmethod
-    def _compute_hits_history(values_history,  # type: Iterable
-                              target_values  # type: Iterable
-                              ):  # type: (...) -> List[int]
-        """Compute the history of the number of target hits associated with a history
-        of values.
-
-        Args:
-            values_history: The history of values.
-            target_values: The target values.
-                N.B. the target values need not be ordered.
-
-        Returns:
-            The history of the number of target hits.
-
-        """
-        minimum_history = minimum.accumulate(values_history)
-        hits_history = [[a_minimum <= a_target for a_target
-                         in target_values].count(True)
-                        for a_minimum in minimum_history]
-        return hits_history
 
     @staticmethod
     def plot_data_profile(data_profiles  # type: Dict[str, List[Number]]
