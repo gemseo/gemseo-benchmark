@@ -32,7 +32,7 @@ class PerformanceHistory(object):
             if len(infeasibility_measures) != len(objective_values):
                 raise ValueError("Objective history and infeasibility measures history "
                                  "must have same length.")
-            nonnegativity = all([a_val >= 0.0 for a_val in objective_values])
+            nonnegativity = all([a_val >= 0.0 for a_val in infeasibility_measures])
             if not nonnegativity:
                 raise ValueError("Infeasibility measures must be non-negative.")
         elif feasibility is not None:
