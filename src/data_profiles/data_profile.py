@@ -144,8 +144,8 @@ class DataProfile(object):
                 hits_history = targets.count_targets_hits(a_pb_history)
                 # If the history is shorter than the longest one, repeat its last value
                 if len(hits_history) < max_history_size:
-                    tail = [hits_history[-1]] * (max_history_size - hits_history.size)
-                    hits_history = hits_history.extend(tail)
+                    tail = [hits_history[-1]] * (max_history_size - len(hits_history))
+                    hits_history.extend(tail)
                 total_hits_history += array(hits_history)
 
         # Return the history of target hits ratios
