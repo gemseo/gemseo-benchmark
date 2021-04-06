@@ -2,12 +2,13 @@ from numbers import Number
 from typing import Dict, Iterable, List, Optional
 
 from matplotlib import rcParams
-from matplotlib.pyplot import (axhline, figure, legend, plot, show, title, xlabel,
-                               xlim, ylabel, ylim, yticks)
+from matplotlib.pyplot import (axhline, figure, legend, plot, savefig,
+                               show as pyplot_show,
+                               title, xlabel, xlim, ylabel, ylim, yticks)
 from numpy import append, array, linspace, zeros
 
-from data_profiles.target_values import TargetValues
 from data_profiles.performance_history import PerformanceHistory
+from data_profiles.target_values import TargetValues
 
 
 class DataProfile(object):
@@ -87,16 +88,21 @@ class DataProfile(object):
 
     def plot(
             self,
-            algo_names=None  # type: Optional[Iterable[str]]
+            algo_names=None,  # type: Optional[Iterable[str]]
+            show=True,  # type: Optional[bool]
+            destination_path=None  # type: Optional[str]
     ):
         """Plot the data profiles of the required algorithms.
 
         Args:
             algo_names: The names of the algorithms.
                 If None then all the algorithms are considered.
+            show: Whether to show the plot.
+            destination_path: The path where to save the plot.
+                (By default the plot is not saved.)
         """
         data_profiles = self.compute_data_profiles(algo_names)
-        DataProfile.plot_data_profile(data_profiles)
+        DataProfile._plot_data_profile(data_profiles, show, destination_path)
 
     def compute_data_profiles(
             self,
@@ -177,12 +183,18 @@ class DataProfile(object):
         return histories_numbers.pop()
 
     @staticmethod
-    def plot_data_profile(data_profiles  # type: Dict[str, List[Number]]
-                          ):
+    def _plot_data_profile(
+            data_profiles,  # type: Dict[str, List[Number]]
+            show=True,  # type: Optional[bool]
+            destination_path=None  # type: Optional[str]
+    ):
         """Plot data profiles.
 
         Args:
             data_profiles: The data profiles.
+            show: Whether to show the plot.
+            destination_path: The path where to save the plot.
+                (By default the plot is not saved.)
 
         """
         figure()
@@ -211,6 +223,10 @@ class DataProfile(object):
                 a_profile = append(a_profile, tail)
             plot(range(1, max_profile_size + 1), a_profile, color=a_color, label=a_name)
             plot(last_abscissa + 1, last_value, marker="*")
-
         legend()
-        show()
+
+        # Save and/or show the plot
+        if destination_path is not None:
+            savefig(destination_path)
+        if show:
+            pyplot_show()
