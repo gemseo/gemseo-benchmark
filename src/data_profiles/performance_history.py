@@ -1,6 +1,8 @@
 from functools import reduce
 from itertools import chain, repeat
-from typing import List, Optional, Tuple
+from math import ceil
+from operator import itemgetter
+from typing import Iterable, List, Optional, Tuple
 
 from numpy import inf
 
@@ -50,6 +52,9 @@ class PerformanceHistory(object):
 
     def __iter__(self):
         return iter(self._values)
+
+    def __getitem__(self, item):
+        return self._values[item]
 
     @staticmethod
     def _less_equal(
@@ -124,3 +129,33 @@ class PerformanceHistory(object):
 
         """
         return self._values
+
+    def sorted(self):  # type: (...) -> PerformanceHistory
+        """Return the sorted history of performance values"""
+        return sorted(self._values, key=itemgetter(1, 0), reverse=True)
+
+    def _median(self):  # type: (...) -> Tuple[float, float]
+        """Return the median of the history of performance values"""
+        return self.sorted()[ceil(len(self) // 2)]
+
+    @staticmethod
+    def median_history(
+            histories  # type: Iterable[PerformanceHistory]
+    ):  # type: (...) -> PerformanceHistory
+        """Return the history of the median of several performance histories.
+
+        Args:
+            histories: The performance histories
+
+        Returns:
+            The median history.
+
+        """
+        histories_as_list = [a_hist.to_list() for a_hist in histories]
+        median_as_list = list()
+        for snapshot in zip(*histories_as_list):
+            values_history, measures_history = zip(*snapshot)
+            median = PerformanceHistory(values_history, measures_history)._median()
+            median_as_list.append(median)
+        median_history = PerformanceHistory(*zip(*median_as_list))
+        return median_history

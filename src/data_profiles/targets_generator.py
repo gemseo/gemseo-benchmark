@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from matplotlib.pyplot import figure, semilogy, show, xlabel, xlim, xticks, ylabel
-from numpy import array, inf, linspace, ndarray
+from numpy import inf, linspace, ndarray
 
 from data_profiles.performance_history import PerformanceHistory
 from data_profiles.target_values import TargetValues
@@ -63,6 +63,7 @@ class TargetsGenerator(object):
         budget_max = max(len(a_history) for a_history in self._histories)
         minima_histories = [a_hist.cumulated_min_history(fill_up_to=budget_max)
                             for a_hist in self._histories]
+        median_history = PerformanceHistory.median_history(minima_histories)
 
         # Compute a budget scale
         budget_scale = TargetsGenerator._compute_budget_scale(
@@ -70,8 +71,8 @@ class TargetsGenerator(object):
         )
 
         # Compute the target values
-        target_values = minimum_history[budget_scale - 1, :]
-        target_values = TargetValues(*zip(*target_values.tolist()))
+        target_values = TargetValues(*zip(*[median_history[item - 1]
+                                            for item in budget_scale]))
 
         # Plot the target values
         if plot:
