@@ -4,6 +4,7 @@ from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
 from numpy import ndarray
 
+from data_profiles.data_profile import DataProfile
 from data_profiles.target_values import TargetValues
 from data_profiles.targets_generator import TargetsGenerator
 
@@ -17,6 +18,7 @@ class BenchProblem(object):
     - its target values.
 
     Attributes:
+        _name (str): The name of the benchmarking problem.
         _creator (Callable): A callable object that returns an instance of the problem.
         _start_points (Iterable[ndarray]): The starting points of the problem.
         _target_values (TargetValues): The target values of the problem.
@@ -25,10 +27,12 @@ class BenchProblem(object):
 
     def __init__(
             self,
+            name,  # type: str
             creator,  # type: Callable[[], OptimizationProblem]
             start_points,  # type: Iterable[ndarray]
             target_values=None,  # type: Optional[TargetValues]
     ):
+        self._name = name
         self._creator = creator
         self._start_points = start_points
         self._target_values = target_values
@@ -62,6 +66,34 @@ class BenchProblem(object):
         self._target_values = TargetValues
 
         return target_values
+
+    def generate_data_profile(
+            self,
+            algorithms,  # type: Dict[str, Dict]
+            show=True, # type: Optional[bool]
+            destination_path=None  # type: Optional[str]
+    ):
+        """Generate a data profile of algorithms available in Gemseo.
+
+        Args:
+            algorithms: The algorithms and their options.
+            show: Whether to show the plot.
+            destination_path: The path where to save the plot.
+                (By default the plot is not saved.)
+
+        """
+        data_profile = DataProfile({self._name: self._target_values})
+
+        # Generate the performance histories
+        for an_algo_name, an_algo_options in algorithms.items():
+            problem = self._creator()
+            OptimizersFactory().execute(problem, an_algo_name, **an_algo_options)
+            obj_values, measures, feasibility = self._extract_performance(problem)
+            data_profile.add_history(self._name, an_algo_name, obj_values, measures,
+                                     feasibility)
+
+        # Plot and/or save the data profile
+        data_profile.plot(show=show, destination_path=destination_path)
 
     @staticmethod
     def _extract_performance(
