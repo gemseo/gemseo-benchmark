@@ -63,7 +63,7 @@ class BenchProblem(object):
 
         # Compute the target values
         target_values = target_generator.run(targets_number)
-        self._target_values = TargetValues
+        self._target_values = target_values
 
         return target_values
 
