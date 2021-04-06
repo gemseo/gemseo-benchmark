@@ -51,9 +51,10 @@ def test_iter():
 def test_cumulated_min():
     """Check the cumulated minimum of a performance history"""
     history = PerformanceHistory(
-        [0.0, -3.0, -1.0, 0.0, 1.0, -1.0], [2.0, 3.0, 1.0, 0.0, 0.0, 0.0]
+        [0.0, -3.0, -1.0, 0.0, 1.0, -1.0],
+        [2.0, 3.0, 1.0, 0.0, 0.0, 0.0]
     )
-    acc_min = history.cumulated_minimum()
+    acc_min = history.cumulated_min_history()
     assert acc_min.to_list() == [
         (0.0, 2.0), (0.0, 2.0), (-1.0, 1.0), (0.0, 0.0), (0.0, 0.0), (-1.0, 0.0)
     ]

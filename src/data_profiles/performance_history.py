@@ -68,16 +68,15 @@ class PerformanceHistory(object):
         """
         a_value, a_meas = an_item
         other_value, other_meas = another_item
-        return (0 < a_meas <= other_meas or
-                (a_meas == 0 < other_meas) or
-                (a_meas == 0 == other_meas and a_value <= other_value))
+        if a_meas < 0 or other_meas < 0:
+            raise ValueError("Negative infeasibility measure")
+        return a_meas < other_meas or (a_meas == other_meas and a_value <= other_value)
 
     @staticmethod
     def _min(
-            an_item,  # type: Tuple
-            another_item  # type: Tuple
-    ):  # type: (...)-> Tuple
-        # TODO: check docstring and comments
+            an_item,  # type: Tuple[float, float]
+            another_item  # type: Tuple[float, float]
+    ):  # type: (...)-> Tuple[float, float]
         """Return the smallest of two history items.
 
         Args:
@@ -93,19 +92,21 @@ class PerformanceHistory(object):
         else:
             return another_item
 
-    def cumulated_minimum(
+    def cumulated_min_history(
             self,
             fill_up_to=None  # type: Optional[int]
     ):  # type: (...) -> PerformanceHistory
-        """Return the history of the minimum values.
+        """Return the history of the cumulated minimum.
 
         Args:
             fill_up_to: Optionally, the last value of the minima history will be append
                 as many times as necessary for the minima history to be of the required
                 length.
 
+        Returns:
+            The history of the cumulated minimum.
+
         """
-        # FIXME: name, docstring
         minima = [reduce(PerformanceHistory._min, self._values[:i + 1])
                   for i in range(len(self))]
         if fill_up_to is not None and fill_up_to < len(minima):

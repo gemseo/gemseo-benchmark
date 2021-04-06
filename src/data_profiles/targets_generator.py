@@ -61,10 +61,8 @@ class TargetsGenerator(object):
         """
         # Compute the history of the minimum value
         budget_max = max(len(a_history) for a_history in self._histories)
-        minima_histories = [a_hist.cumulated_minimum(fill_up_to=budget_max)
+        minima_histories = [a_hist.cumulated_min_history(fill_up_to=budget_max)
                             for a_hist in self._histories]
-        minima_histories = array([a_hist.to_list() for a_hist in minima_histories])
-        minimum_history = minima_histories.mean(axis=0)
 
         # Compute a budget scale
         budget_scale = TargetsGenerator._compute_budget_scale(
