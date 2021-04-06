@@ -56,6 +56,9 @@ class PerformanceHistory(object):
     def __getitem__(self, item):
         return self._values[item]
 
+    def __str__(self):
+        return str(self.to_list())
+
     @staticmethod
     def _less_equal(
             an_item,  # type:Tuple[float, float]
