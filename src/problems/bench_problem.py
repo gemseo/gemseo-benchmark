@@ -113,14 +113,16 @@ class BenchProblem(object):
 
         # Generate the performance histories
         for an_algo_name, an_algo_options in algorithms.items():
-            problem = self._creator()
-            OptimizersFactory().execute(problem, an_algo_name, **an_algo_options)
-            obj_values, measures, feasibility = self._extract_performance(problem)
-            data_profile.add_history(self._name, an_algo_name, obj_values, measures,
-                                     feasibility)
+            for start_point in self._start_points:
+                problem = self.get_instance(start_point)
+                OptimizersFactory().execute(problem, an_algo_name, **an_algo_options)
+                obj_values, measures, feasibility = self._extract_performance(problem)
+                data_profile.add_history(self._name, an_algo_name, obj_values, measures,
+                                         feasibility)
 
         # Plot and/or save the data profile
         data_profile.plot(show=show, destination_path=destination_path)
+    # TODO: remove this method (use ProblemsGroup)
 
     @staticmethod
     def _extract_performance(
