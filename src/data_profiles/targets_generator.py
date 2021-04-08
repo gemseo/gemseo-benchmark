@@ -8,12 +8,7 @@ from data_profiles.target_values import TargetValues
 
 
 class TargetsGenerator(object):
-    """Compute target values for an objective to minimize.
-
-    Attributes:
-        _histories: The reference histories of performance measures.
-
-    """
+    """Compute target values for an objective to minimize."""
 
     def __init__(self):  # type: (...) -> None
         self._histories = list()
@@ -46,23 +41,34 @@ class TargetsGenerator(object):
             self,
             targets_number,  # type: int
             budget_min=1,  # type: int
-            plot=False  # type: bool
+            plot=False,  # type: bool
+            feasible=True,  # type: bool
     ):  # type: (...) -> TargetValues
+        # TODO: document that feasible overwrite the budget_min option
         """Compute target values for a function from histories of its values.
 
         Args:
             targets_number: The number of targets to compute.
             budget_min: The evaluation budget to be used to define the easiest target.
             plot: Whether to plot the target values.
+            feasible: Whether to generate only feasible targets.
 
         Returns:
             The target values of the function.
 
         """
+        # Optionally, filter out the first infeasible items
+        if feasible:
+            histories = [
+                a_hist.remove_leading_infeasible() for a_hist in self._histories
+            ]
+        else:
+            histories = list(self._histories)
+
         # Compute the history of the minimum value
-        budget_max = max(len(a_history) for a_history in self._histories)
+        budget_max = max(len(a_history) for a_history in histories)
         minima_histories = [a_hist.cumulated_min_history(fill_up_to=budget_max)
-                            for a_hist in self._histories]
+                            for a_hist in histories]
         median_history = PerformanceHistory.median_history(minima_histories)
 
         # Compute a budget scale
@@ -85,7 +91,7 @@ class TargetsGenerator(object):
     @staticmethod
     def _plot(
             objective_target_values  # type: List[float]
-    ):   # type: (...) -> None
+    ):  # type: (...) -> None
         """Compute and plot the target values.
 
             Args:
