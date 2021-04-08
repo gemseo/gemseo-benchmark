@@ -63,6 +63,13 @@ class BenchProblem(object):
             raise ValueError("Benchmarking problem has no target")
         return self._target_values
 
+    def __iter__(self):  # type: (...) -> OptimizationProblem
+        """Iterate on the problem instances with respect to the starting points. """
+        for a_start_point in self._start_points:
+            problem = self._creator()
+            problem.design_space.set_current_x(a_start_point)
+            yield problem
+
     def get_instance(
             self,
             start_point=None  # type: Optional[ndarray]
@@ -97,10 +104,13 @@ class BenchProblem(object):
 
         # Generate reference performance histories
         for an_algo_name, an_algo_options in reference_algorithms.items():
-            for start_point in self._start_points:
-                problem = self.get_instance(start_point)
-                OptimizersFactory().execute(problem, an_algo_name, **an_algo_options)
-                obj_values, measures, feasibility = self._extract_performance(problem)
+            for an_instance in self:
+                OptimizersFactory().execute(
+                    an_instance, an_algo_name, **an_algo_options
+                )
+                obj_values, measures, feasibility = self._extract_performance(
+                    an_instance
+                )
                 targets_generator.add_history(obj_values, measures, feasibility)
 
         # Compute the target values
