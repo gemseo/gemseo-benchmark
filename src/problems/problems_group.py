@@ -19,6 +19,7 @@ class ProblemsGroup(object):
         Args:
             problems: The benchmarking problems of the group.
         """
+        # TODO: check that every problem has the same number of starting points
         self._problems = problems
 
     def generate_targets(
@@ -58,14 +59,12 @@ class ProblemsGroup(object):
         # Generate the performance histories
         for an_algo_name, an_algo_options in algorithms.items():
             for a_problem in self._problems:
-                for start_point in a_problem.start_points:
-                    pb_instance = a_problem.get_instance(start_point)
-                    OptimizersFactory().execute(pb_instance, an_algo_name,
+                for an_instance in a_problem:
+                    OptimizersFactory().execute(an_instance, an_algo_name,
                                                 **an_algo_options)
-                    obj_values, measures, feas = self._extract_performance(pb_instance)
+                    obj_values, measures, feas = self._extract_performance(an_instance)
                     data_profile.add_history(self._name, an_algo_name, obj_values,
                                              measures, feas)
-                # TODO: delegate to BenchProblem
         # TODO: use a "bench"
 
         # Plot and/or save the data profile

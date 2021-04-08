@@ -63,6 +63,13 @@ class BenchProblem(object):
             raise ValueError("Benchmarking problem has no target")
         return self._target_values
 
+    def __iter__(self):  # type: (...) -> OptimizationProblem
+        """Iterate on the problem instances with respect to the starting points. """
+        for a_start_point in self._start_points:
+            problem = self._creator()
+            problem.design_space.set_current_x(a_start_point)
+            yield problem
+
     def get_instance(
             self,
             start_point=None  # type: Optional[ndarray]
