@@ -48,6 +48,21 @@ class BenchProblem(object):
             raise ValueError("Benchmarking problem has no target")
         return self._target_values
 
+    def get_instance(
+            self,
+            start_point=None  # type: Optional[ndarray]
+    ):  # type: (...) -> OptimizationProblem
+        """Return an instance of the benchmarking problem.
+
+        Args:
+            start_point: The starting point of the instance.
+                By default it is the current design of the benchmarking problem.
+        """
+        instance = self._creator()
+        if start_point is not None and start_point in self._start_points:
+            instance.design_space.set_current_x(start_point)
+        return instance
+
     def generate_targets(
             self,
             targets_number,  # type: int
