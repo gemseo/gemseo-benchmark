@@ -1,11 +1,14 @@
 from typing import Dict, Iterable, Optional
 
+from gemseo.algos.opt.opt_factory import OptimizersFactory
+
 from data_profiles.data_profile import DataProfile
 from problems.bench_problem import BenchProblem
 
 
 class ProblemsGroup(object):
     """A group of benchmarking problems."""
+
     # TODO: explain why problems should be grouped.
 
     def __init__(
@@ -50,5 +53,20 @@ class ProblemsGroup(object):
         target_values = {
             a_problem.name: a_problem.target_values for a_problem in self._problems
         }
-        data_profile = DataProfile({self._name: self._target_values})
+        data_profile = DataProfile(target_values)
 
+        # Generate the performance histories
+        for an_algo_name, an_algo_options in algorithms.items():
+            for a_problem in self._problems:
+                for start_point in a_problem.start_points:
+                    pb_instance = a_problem.get_instance(start_point)
+                    OptimizersFactory().execute(pb_instance, an_algo_name,
+                                                **an_algo_options)
+                    obj_values, measures, feas = self._extract_performance(pb_instance)
+                    data_profile.add_history(self._name, an_algo_name, obj_values,
+                                             measures, feas)
+                # TODO: delegate to BenchProblem
+        # TODO: use a "bench"
+
+        # Plot and/or save the data profile
+        data_profile.plot(show=show, destination_path=destination_path)
