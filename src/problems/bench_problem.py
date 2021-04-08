@@ -31,6 +31,23 @@ class BenchProblem(object):
         self._start_points = start_points
         self._target_values = target_values
 
+    @property
+    def name(self):  # type: (...) -> str
+        """The name of the benchmarking problem."""
+        return self._name
+
+    @property
+    def start_points(self):  # type: (...) -> Iterable[ndarray]
+        """The starting points of the benchmarking problem."""
+        return self._start_points
+
+    @property
+    def target_values(self):  # type: (...) -> TargetValues
+        """The target values of the benchmarking problem."""
+        if self._target_values is None:
+            raise ValueError("Benchmarking problem has no target")
+        return self._target_values
+
     def generate_targets(
             self,
             targets_number,  # type: int
