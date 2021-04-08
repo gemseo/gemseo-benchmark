@@ -10,9 +10,9 @@ from data_profiles.targets_generator import TargetsGenerator
 
 
 class BenchProblem(object):
-    """A optimization benchmarking problem.
+    """An optimization benchmarking problem.
 
-    An optimization benchmarking porblem is characterized by
+    An optimization benchmarking problem is characterized by
     - its functions (objective and constraints, including bounds),
     - its starting points,
     - its target values.
@@ -31,7 +31,7 @@ class BenchProblem(object):
             creator,  # type: Callable[[], OptimizationProblem]
             start_points,  # type: Iterable[ndarray]
             target_values=None,  # type: Optional[TargetValues]
-    ):
+    ):  # type: (...) -> None
         self._name = name
         self._creator = creator
         self._start_points = start_points
@@ -70,9 +70,9 @@ class BenchProblem(object):
     def generate_data_profile(
             self,
             algorithms,  # type: Dict[str, Dict]
-            show=True, # type: Optional[bool]
+            show=True,  # type: bool
             destination_path=None  # type: Optional[str]
-    ):
+    ):  # type: (...) -> None
         """Generate a data profile of algorithms available in Gemseo.
 
         Args:
@@ -99,10 +99,10 @@ class BenchProblem(object):
     def _extract_performance(
             problem  # type: OptimizationProblem
     ):  # type: (...) -> Tuple[List[float], List[float], List[bool]]
-        """Extract the performance history from a solved Gemseo optimization problem.
+        """Extract the performance history from a solved optimization problem.
 
         Args:
-            problem: The Gemseo optimization problem.
+            problem: The optimization problem.
 
         Returns:
             (
