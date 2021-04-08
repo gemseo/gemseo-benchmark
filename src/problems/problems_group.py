@@ -62,7 +62,9 @@ class ProblemsGroup(object):
                 for an_instance in a_problem:
                     OptimizersFactory().execute(an_instance, an_algo_name,
                                                 **an_algo_options)
-                    obj_values, measures, feas = self._extract_performance(an_instance)
+                    obj_values, measures, feas = BenchProblem.extract_performance(
+                        an_instance
+                    )
                     data_profile.add_history(self._name, an_algo_name, obj_values,
                                              measures, feas)
         # TODO: use a "bench"

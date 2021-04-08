@@ -108,7 +108,7 @@ class BenchProblem(object):
                 OptimizersFactory().execute(
                     an_instance, an_algo_name, **an_algo_options
                 )
-                obj_values, measures, feasibility = self._extract_performance(
+                obj_values, measures, feasibility = self.extract_performance(
                     an_instance
                 )
                 targets_generator.add_history(obj_values, measures, feasibility)
@@ -141,7 +141,7 @@ class BenchProblem(object):
             for start_point in self._start_points:
                 problem = self.get_instance(start_point)
                 OptimizersFactory().execute(problem, an_algo_name, **an_algo_options)
-                obj_values, measures, feasibility = self._extract_performance(problem)
+                obj_values, measures, feasibility = self.extract_performance(problem)
                 data_profile.add_history(self._name, an_algo_name, obj_values, measures,
                                          feasibility)
 
@@ -151,7 +151,7 @@ class BenchProblem(object):
     # TODO: remove this method (use ProblemsGroup)
 
     @staticmethod
-    def _extract_performance(
+    def extract_performance(
             problem  # type: OptimizationProblem
     ):  # type: (...) -> Tuple[List[float], List[float], List[bool]]
         """Extract the performance history from a solved optimization problem.
