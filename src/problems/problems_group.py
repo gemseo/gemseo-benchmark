@@ -65,8 +65,9 @@ class ProblemsGroup(object):
                     obj_values, measures, feas = BenchProblem.extract_performance(
                         an_instance
                     )
-                    data_profile.add_history(self._name, an_algo_name, obj_values,
-                                             measures, feas)
+                    data_profile.add_history(
+                        a_problem.name, an_algo_name, obj_values, measures, feas
+                    )
         # TODO: use a "bench"
 
         # Plot and/or save the data profile
