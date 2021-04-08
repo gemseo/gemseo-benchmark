@@ -28,7 +28,22 @@ class BenchProblem(object):
     ):  # type: (...) -> None
         self._name = name
         self._creator = creator
+
+        # Set the dimension
+        problem = creator()
+        if not isinstance(problem, OptimizationProblem):
+            raise TypeError("Creator must return an OptimizationProblem")
+        self._dimension = problem.dimension
+
+        # Set the starting points
+        for a_point in start_points:
+            if not isinstance(a_point, ndarray):
+                raise TypeError("Starting points must be of type ndarray")
+            elif a_point.shape != (self._dimension,):
+                raise ValueError("Starting points must be 1-dimensional with size {}"
+                                 .format(self._dimension))
         self._start_points = start_points
+
         self._target_values = target_values
 
     @property
@@ -122,6 +137,7 @@ class BenchProblem(object):
 
         # Plot and/or save the data profile
         data_profile.plot(show=show, destination_path=destination_path)
+
     # TODO: remove this method (use ProblemsGroup)
 
     @staticmethod
