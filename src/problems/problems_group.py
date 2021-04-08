@@ -17,7 +17,20 @@ class ProblemsGroup(object):
             problems: The benchmarking problems of the group.
         """
         self._problems = problems
-        # TODO: check that the benchmarking problems have the same number of targets?
+
+    def generate_targets(
+            self,
+            targets_number,  # type: int
+            reference_algorithms,  # type: Dict[str, Dict]
+    ):  # type: (...) -> None
+        """Generate targets for all the problems based on given reference algorithms.
+
+        Args:
+            targets_number: The number of targets to generate.
+            reference_algorithms: The names and options of the reference algorithms.
+        """
+        for a_problem in self._problems:
+            a_problem.generate_targets(targets_number, reference_algorithms)
 
     def generate_data_profile(
             self,
