@@ -15,7 +15,7 @@ class TargetsGenerator(object):
 
     """
 
-    def __init__(self):
+    def __init__(self):  # type: (...) -> None
         self._histories = list()
 
     def add_history(
@@ -23,7 +23,7 @@ class TargetsGenerator(object):
             values_history,  # type: List[float]
             measures_history=None,  # type: Optional[List[float]]
             feasibility_history=None,  # type: Optional[List[bool]]
-    ):
+    ):  # type: (...) -> None
         """Add a history of objective values.
 
         Args:
@@ -45,7 +45,7 @@ class TargetsGenerator(object):
     def run(
             self,
             targets_number,  # type: int
-            budget_min=1,  # type: Optional[int]
+            budget_min=1,  # type: int
             plot=False  # type: bool
     ):  # type: (...) -> TargetValues
         """Compute target values for a function from histories of its values.
@@ -85,7 +85,7 @@ class TargetsGenerator(object):
     @staticmethod
     def _plot(
             objective_target_values  # type: List[float]
-    ):
+    ):   # type: (...) -> None
         """Compute and plot the target values.
 
             Args:

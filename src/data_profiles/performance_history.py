@@ -2,7 +2,7 @@ from functools import reduce
 from itertools import chain, repeat
 from math import ceil
 from operator import itemgetter
-from typing import Iterable, List, Optional, Tuple
+from typing import Iterable, Iterator, List, Optional, Tuple
 
 from numpy import inf
 
@@ -50,13 +50,13 @@ class PerformanceHistory(object):
         """Return the length of the history"""
         return len(self._values)
 
-    def __iter__(self):
+    def __iter__(self):  # type: (...) -> Iterator[Tuple[float, float]]
         return iter(self._values)
 
-    def __getitem__(self, item):
+    def __getitem__(self, item):  # type: (...) -> Tuple[float, float]
         return self._values[item]
 
-    def __str__(self):
+    def __str__(self):  # type: (...) -> str
         return str(self.to_list())
 
     @staticmethod

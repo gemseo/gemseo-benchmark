@@ -25,14 +25,18 @@ class DataProfile(object):
     def __init__(
             self,
             target_values  # type: Dict[str, TargetValues]
-    ):
+    ):  # type: (...) -> None
+        """
+        Args:
+            target_values: The target values of each of the reference problems.
+        """
         self._target_values = None
         self._targets_number = 0
         self.target_values = target_values
         self._values_histories = dict()
 
     @property
-    def target_values(self):
+    def target_values(self):  # type: (...) -> TargetValues
         """The target values of each reference problem."""
         return self._target_values
 
@@ -40,7 +44,7 @@ class DataProfile(object):
     def target_values(
             self,
             target_values  # type: Dict[str, TargetValues]
-    ):
+    ):  # type: (...) -> None
         if not isinstance(target_values, dict):
             raise TypeError("The target values be must passed as a dictionary")
         targets_numbers = set(len(pb_targets) for pb_targets in target_values.values())
@@ -57,7 +61,7 @@ class DataProfile(object):
             values_history,  # type: List[float]
             measures_history=None,  # type: Optional[List[float]]
             feasibility_history=None,  # type: Optional[List[bool]]
-    ):
+    ):  # type: (...) -> None
         """Add a history of performance values.
 
         Args:
@@ -89,9 +93,9 @@ class DataProfile(object):
     def plot(
             self,
             algo_names=None,  # type: Optional[Iterable[str]]
-            show=True,  # type: Optional[bool]
+            show=True,  # type: bool
             destination_path=None  # type: Optional[str]
-    ):
+    ):  # type: (...) -> None
         """Plot the data profiles of the required algorithms.
 
         Args:
@@ -99,7 +103,7 @@ class DataProfile(object):
                 If None then all the algorithms are considered.
             show: Whether to show the plot.
             destination_path: The path where to save the plot.
-                (By default the plot is not saved.)
+                By default the plot is not saved.
         """
         data_profiles = self.compute_data_profiles(algo_names)
         DataProfile._plot_data_profile(data_profiles, show, destination_path)
@@ -185,16 +189,16 @@ class DataProfile(object):
     @staticmethod
     def _plot_data_profile(
             data_profiles,  # type: Dict[str, List[Number]]
-            show=True,  # type: Optional[bool]
+            show=True,  # type: bool
             destination_path=None  # type: Optional[str]
-    ):
+    ):  # type: (...) -> None
         """Plot data profiles.
 
         Args:
             data_profiles: The data profiles.
             show: Whether to show the plot.
             destination_path: The path where to save the plot.
-                (By default the plot is not saved.)
+                By default the plot is not saved.
 
         """
         figure()
