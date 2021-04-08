@@ -17,12 +17,6 @@ class BenchProblem(object):
     - its starting points,
     - its target values.
 
-    Attributes:
-        _name (str): The name of the benchmarking problem.
-        _creator (Callable): A callable object that returns an instance of the problem.
-        _start_points (Iterable[ndarray]): The starting points of the problem.
-        _target_values (TargetValues): The target values of the problem.
-
     """
 
     def __init__(
