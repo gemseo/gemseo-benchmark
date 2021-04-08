@@ -78,17 +78,18 @@ class BenchProblem(object):
             The generated targets.
 
         """
-        target_generator = TargetsGenerator()
+        targets_generator = TargetsGenerator()
 
         # Generate reference performance histories
         for an_algo_name, an_algo_options in reference_algorithms.items():
-            problem = self._creator()
-            OptimizersFactory().execute(problem, an_algo_name, **an_algo_options)
-            obj_values, measures, feasibility = self._extract_performance(problem)
-            target_generator.add_history(obj_values, measures, feasibility)
+            for start_point in self._start_points:
+                problem = self.get_instance(start_point)
+                OptimizersFactory().execute(problem, an_algo_name, **an_algo_options)
+                obj_values, measures, feasibility = self._extract_performance(problem)
+                targets_generator.add_history(obj_values, measures, feasibility)
 
         # Compute the target values
-        target_values = target_generator.run(targets_number)
+        target_values = targets_generator.run(targets_number)
         self._target_values = target_values
 
         return target_values
