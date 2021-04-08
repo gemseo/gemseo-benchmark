@@ -22,19 +22,32 @@ class ProblemsGroup(object):
         # TODO: check that every problem has the same number of starting points
         self._problems = problems
 
+    def is_algorithm_suited(
+            self,
+            name,  # type: str
+    ):  # type: (...) -> bool
+        """Check whether an algorithm is suited to all the problems in the group.
+
+        Args:
+            name: The name of the algorithm.
+        """
+        return all(a_problem.is_algorithm_suited(name) for a_problem in self._problems)
+
     def generate_targets(
             self,
             targets_number,  # type: int
             reference_algorithms,  # type: Dict[str, Dict]
+            feasible=True,  # type: bool
     ):  # type: (...) -> None
         """Generate targets for all the problems based on given reference algorithms.
 
         Args:
             targets_number: The number of targets to generate.
             reference_algorithms: The names and options of the reference algorithms.
+            feasible: Whether to generate only feasible targets.
         """
         for a_problem in self._problems:
-            a_problem.generate_targets(targets_number, reference_algorithms)
+            a_problem.generate_targets(targets_number, reference_algorithms, feasible)
 
     def generate_data_profile(
             self,

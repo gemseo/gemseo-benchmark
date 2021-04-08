@@ -80,21 +80,36 @@ class BenchProblem(object):
             start_point: The starting point of the instance.
                 By default it is the current design of the benchmarking problem.
         """
+        # TODO: remove this method
         instance = self._creator()
         if start_point is not None and start_point in self._start_points:
             instance.design_space.set_current_x(start_point)
         return instance
 
+    def is_algorithm_suited(
+            self,
+            name,  # type: str
+    ):  # type: (...) -> bool
+        """Check whether an algorithm is suited to the problem.
+
+        Args:
+            name: The name of the algorithm.
+        """
+        library = OptimizersFactory().create(name)
+        return library.is_algorithm_suited(library.lib_dict[name], self._creator())
+
     def generate_targets(
             self,
             targets_number,  # type: int
             reference_algorithms,  # type: Dict[str, Dict]
+            feasible=True,  # type: bool
     ):  # type: (...) -> TargetValues
         """Generate targets based on algorithms available in Gemseo.
 
         Args:
             targets_number: The number of targets to generate.
             reference_algorithms: The names and options of the reference algorithms.
+            feasible: Whether to generate only feasible targets.
 
         Returns:
             The generated targets.
@@ -114,7 +129,7 @@ class BenchProblem(object):
                 targets_generator.add_history(obj_values, measures, feasibility)
 
         # Compute the target values
-        target_values = targets_generator.run(targets_number)
+        target_values = targets_generator.run(targets_number, feasible=feasible)
         self._target_values = target_values
 
         return target_values
