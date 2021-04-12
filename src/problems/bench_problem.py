@@ -9,19 +9,13 @@ from data_profiles.target_values import TargetValues
 from data_profiles.targets_generator import TargetsGenerator
 
 
-class BenchProblem(object):
+class BenchmarkingProblem(object):
     """An optimization benchmarking problem.
 
     An optimization benchmarking problem is characterized by
     - its functions (objective and constraints, including bounds),
     - its starting points,
     - its target values.
-
-    Attributes:
-        _name (str): The name of the benchmarking problem.
-        _creator (Callable): A callable object that returns an instance of the problem.
-        _start_points (Iterable[ndarray]): The starting points of the problem.
-        _target_values (TargetValues): The target values of the problem.
 
     """
 
@@ -42,7 +36,7 @@ class BenchProblem(object):
             targets_number,  # type: int
             reference_algorithms,  # type: Dict[str, Dict]
     ):  # type: (...) -> TargetValues
-        """Generate targets based on algorithms available in Gemseo.
+        """Generate targets based on reference algorithms.
 
         Args:
             targets_number: The number of targets to generate.

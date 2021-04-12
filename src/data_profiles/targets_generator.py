@@ -8,12 +8,7 @@ from data_profiles.target_values import TargetValues
 
 
 class TargetsGenerator(object):
-    """Compute target values for an objective to minimize.
-
-    Attributes:
-        _histories: The reference histories of performance measures.
-
-    """
+    """Compute target values for an objective to minimize."""
 
     def __init__(self):  # type: (...) -> None
         self._histories = list()
@@ -48,7 +43,7 @@ class TargetsGenerator(object):
             budget_min=1,  # type: int
             plot=False  # type: bool
     ):  # type: (...) -> TargetValues
-        """Compute target values for a function from histories of its values.
+        """Compute the target values for a function from the histories of its values.
 
         Args:
             targets_number: The number of targets to compute.
