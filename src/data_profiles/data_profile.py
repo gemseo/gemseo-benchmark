@@ -13,14 +13,10 @@ from data_profiles.target_values import TargetValues
 
 
 class DataProfile(object):
-    """Compute the data profiles of optimizers on optimization problems.
+    """Data profile that compares optimizers on reference optimization problems.
 
-    Attributes:
-        _target_values: The target values of each of the reference problems.
-        _targets_number: The number of target values.
-        _values_histories: The histories of values of the compared algorithm for each of
-            the reference problems.
-
+    A data profile is an empirical cumulative distribution function of targets
+    reached by an optimizer relative to the number of evaluations it makes.
     """
 
     def __init__(
@@ -104,7 +100,7 @@ class DataProfile(object):
                 If None then all the algorithms are considered.
             show: Whether to show the plot.
             destination_path: The path where to save the plot.
-                (By default the plot is not saved.)
+                By default the plot is not saved.
         """
         data_profiles = self.compute_data_profiles(algo_names)
         DataProfile._plot_data_profile(data_profiles, show, destination_path)
@@ -113,8 +109,10 @@ class DataProfile(object):
             self,
             algo_names=None  # type: Optional[Iterable[str]]
     ):  # type: (...) -> Dict[str, List[Number]]
-        """Compute the data profiles for the required algorithms relative to the
-        reference problems.
+        """Compute the data profiles of the required algorithms.
+
+        For each algorithm, compute the cumulative distribution function of the number
+        of evaluations required by the algorithm to reach a reference target.
 
         Args:
             algo_names: The names of the algorithms.
@@ -133,8 +131,10 @@ class DataProfile(object):
             self,
             algo_name  # type: str
     ):  # type: (...) -> List[Number]
-        """Compute the history of the target hits ratios associated with an optimizer
-        (with respect to the target values of optimization problems).
+        """Compute the data profile of the required algorithm.
+
+        Compute the cumulative distribution function of the number of evaluations
+        required by the algorithm to reach a reference target.
 
         Args:
             algo_name: The name of the algorithm.
@@ -169,9 +169,10 @@ class DataProfile(object):
             self,
             algo_name  # type: str
     ):  # type: (...) -> int
-        """Check that an algorithm has the same number of values histories for each
-        of the reference problems (so that the reference problems are equally
-        represented with respect to the algorithm performance).
+        """Check that an algorithm has the same number of histories for each problem.
+
+        Make sure that the reference problems are equally represented with respect to
+        the algorithm performance.
 
         Args:
             algo_name: The name of the algorithm.
@@ -199,7 +200,7 @@ class DataProfile(object):
             data_profiles: The data profiles.
             show: Whether to show the plot.
             destination_path: The path where to save the plot.
-                (By default the plot is not saved.)
+                By default the plot is not saved.
 
         """
         figure()

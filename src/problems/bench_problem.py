@@ -9,7 +9,7 @@ from data_profiles.target_values import TargetValues
 from data_profiles.targets_generator import TargetsGenerator
 
 
-class BenchProblem(object):
+class BenchmarkingProblem(object):
     """An optimization benchmarking problem.
 
     An optimization benchmarking problem is characterized by
@@ -104,7 +104,7 @@ class BenchProblem(object):
             reference_algorithms,  # type: Dict[str, Dict]
             feasible=True,  # type: bool
     ):  # type: (...) -> TargetValues
-        """Generate targets based on algorithms available in Gemseo.
+        """Generate targets based on reference algorithms.
 
         Args:
             targets_number: The number of targets to generate.

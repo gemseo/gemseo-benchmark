@@ -45,7 +45,7 @@ class TargetsGenerator(object):
             feasible=True,  # type: bool
     ):  # type: (...) -> TargetValues
         # TODO: document that feasible overwrite the budget_min option
-        """Compute target values for a function from histories of its values.
+        """Compute the target values for a function from the histories of its values.
 
         Args:
             targets_number: The number of targets to compute.
