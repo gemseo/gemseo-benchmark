@@ -3,7 +3,7 @@ from typing import Dict, Iterable, Optional
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 
 from data_profiles.data_profile import DataProfile
-from problems.bench_problem import BenchProblem
+from problems.problem import BenchmarkingProblem
 
 
 class ProblemsGroup(object):
@@ -13,14 +13,30 @@ class ProblemsGroup(object):
 
     def __init__(
             self,
-            problems  # type: Iterable[BenchProblem]
+            name,  # type: str
+            problems,  # type: Iterable[BenchmarkingProblem]
+            description=None,  # type: Optional[str]
     ):
         """
         Args:
+            name: The name of the group of problems.
             problems: The benchmarking problems of the group.
+            description: The description of the group of problems.
         """
         # TODO: check that every problem has the same number of starting points
+        self._name = name
         self._problems = problems
+        self._description = description
+
+    @property
+    def name(self):  # type: (...) -> str
+        """The name of the group of problems."""
+        return self._name
+
+    @property
+    def description(self):  # type: (...) -> str
+        """The description of the group of problems."""
+        return self._description
 
     def is_algorithm_suited(
             self,
@@ -75,9 +91,10 @@ class ProblemsGroup(object):
                 for an_instance in a_problem:
                     OptimizersFactory().execute(an_instance, an_algo_name,
                                                 **an_algo_options)
-                    obj_values, measures, feas = BenchProblem.extract_performance(
-                        an_instance
-                    )
+                    obj_values, measures, feas = \
+                        BenchmarkingProblem.extract_performance(
+                            an_instance
+                        )
                     data_profile.add_history(
                         a_problem.name, an_algo_name, obj_values, measures, feas
                     )
