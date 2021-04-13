@@ -19,7 +19,8 @@ class Report(object):
     MAKE_PATH = BASIC_SOURCES_DIR / "make.bat"
     MAKEFILE_PATH = BASIC_SOURCES_DIR / "Makefile"
 
-    GROUPS_DIRECTORY = "groups"
+    GROUPS_DIR = "groups"
+    IMAGES_DIR = "images"
 
     def __init__(
             self,
@@ -53,7 +54,8 @@ class Report(object):
         root_directory = self._root_directory
         root_directory.mkdir(exist_ok=True)
         (root_directory / "_static").mkdir(exist_ok=True)
-        (root_directory / Report.GROUPS_DIRECTORY).mkdir(exist_ok=True)
+        for directory in [Report.GROUPS_DIR, Report.IMAGES_DIR]:
+            (root_directory / directory).mkdir(exist_ok=True)
         for source_file in (Report.CONF_PATH, Report.MAKE_PATH, Report.MAKEFILE_PATH):
             copy(source_file, root_directory / source_file.name)
 
@@ -61,9 +63,28 @@ class Report(object):
         """Create the files corresponding to the problems groups."""
         group_template_path = Path(Report.GROUP_TEMPLATE_PATH)
         for a_group in self._problems_groups:
+
+            # Create the directory dedicated to the group
+            group_directory = (self._root_directory / Report.IMAGES_DIR /
+                               a_group.name.replace(" ", "_"))
+            group_directory.mkdir(exist_ok=True)
+
+            # Generate the data profile of the group
+            data_profile_path = group_directory / "data_profile.jpg"
+            a_group.generate_data_profile(
+                self._algorithms, show=False, destination_path=data_profile_path
+            )
+            data_profile=".. image:: /{}"\
+                .format(data_profile_path.relative_to(self._root_directory).as_posix())
+
+            # Create the file dedicated to the group
             group_template = Report._read_template(group_template_path)
-            group_contents = group_template.format(group_name=a_group.name)
-            group_path = (self._root_directory / Report.GROUPS_DIRECTORY /
+            group_contents = group_template.format(
+                name=a_group.name,
+                description=a_group.description,
+                data_profile=data_profile,
+            )
+            group_path = (self._root_directory / Report.GROUPS_DIR /
                           "{}.rst".format(a_group.name))
             Report._write_file(group_path, group_contents)
 
@@ -71,7 +92,7 @@ class Report(object):
         """Create the index file of the reST report."""
         # Create the table of contents tree
         toctree_contents = "\n".join([
-            "   {}/{}".format(Report.GROUPS_DIRECTORY, a_group.name)
+            "   {}/{}".format(Report.GROUPS_DIR, a_group.name)
             for a_group in self._problems_groups
         ])
 
