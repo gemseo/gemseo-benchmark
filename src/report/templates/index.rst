@@ -10,4 +10,5 @@ Benchmarking report
    :maxdepth: 2
    :caption: Contents:
 
-{toctree_contents}
+{% for a_doc in documents %}   {{ a_doc }}
+{% endfor %}
