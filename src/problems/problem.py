@@ -56,6 +56,13 @@ class Problem(object):
             start_points,  # type: Iterable[ndarray]
             target_values=None,  # type: Optional[TargetValues]
     ):  # type: (...) -> None
+        """
+        Args:
+            name: The name of the benchmarking problem.
+            creator: A callable object that returns an instance of the problem.
+            start_points: The starting points of the benchmarking problem.
+            target_values: The target values of the benchmarking problem.
+        """
         self._name = name
         self._creator = creator
 
