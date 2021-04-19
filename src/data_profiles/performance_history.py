@@ -139,7 +139,7 @@ class PerformanceHistory(object):
 
     def cumulated_min_history(
             self,
-            fill_up_to=None  # type: Optional[int]
+            fill_up_to=None,  # type: Optional[int]
     ):  # type: (...) -> PerformanceHistory
         """Return the history of the cumulated minimum.
 
@@ -199,3 +199,15 @@ class PerformanceHistory(object):
             median_as_list.append(median)
         median_history = PerformanceHistory(*zip(*median_as_list))
         return median_history
+
+    def remove_leading_infeasible(self):  # type: (...) -> PerformanceHistory
+        """Return the history starting from the first feasible item."""
+        first_feasible = None
+        for index, (_, measure) in enumerate(self):
+            if measure == 0.0:
+                first_feasible = index
+                break
+        if first_feasible is None:
+            return PerformanceHistory([], [])
+        else:
+            return PerformanceHistory(*zip(*self.to_list()[first_feasible:]))
