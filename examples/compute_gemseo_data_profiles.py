@@ -1,14 +1,14 @@
 from gemseo.api import get_available_opt_algorithms
 from gemseo.problems.analytical.power_2 import Power2
 
-from problems.bench_problem import BenchProblem
+from problems.problem import BenchmarkingProblem
 from problems.problems_group import ProblemsGroup
 
 # Set the benchmarking reference problems
 reference_problems = [
-    BenchProblem("Power2", Power2, [Power2().design_space.get_current_x()])
+    BenchmarkingProblem("Power2", Power2, [Power2().design_space.get_current_x()])
 ]
-problems_group = ProblemsGroup(reference_problems)
+problems_group = ProblemsGroup("Reference", reference_problems)
 
 # Generate target values for each of the reference problems
 targets_number = 20
