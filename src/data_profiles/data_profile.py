@@ -19,7 +19,20 @@
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
-"""Class to compute data profiles for algorithms comparison."""
+"""Class to compute data profiles for algorithms comparison.
+
+A data profile is a graphical tool to compare iterative algorithms,
+e.g. optimization algorithms or root-finding algorithms,
+on reference problems.
+Each of the reference problems must be assigned targets,
+i.e. values of the objective function or values of the residual norm,
+ranging from a first acceptable value to the best known value for the problem.
+The algorithms will be compared based on the number of targets they reach,
+cumulated over all the reference problems,
+relative to the number of problems functions evaluations they make.
+The data profile is the empirical cumulated distribution function of the number of
+functions evaluations made by an algorithm to reach a problem target.
+"""
 from itertools import cycle
 from numbers import Number
 from typing import Dict, Iterable, List, Optional
@@ -35,10 +48,11 @@ from data_profiles.target_values import TargetValues
 
 
 class DataProfile(object):
-    """Data profile that compares optimizers on reference optimization problems.
+    """Data profile that compares iterative algorithms on reference problems.
 
-    A data profile is an empirical cumulative distribution function of targets
-    reached by an optimizer relative to the number of evaluations it makes.
+    A data profile is an empirical cumulative distribution function of the number of
+    problems functions evaluations required by an algorithm to reach a reference problem
+    target.
     """
 
     def __init__(
