@@ -20,6 +20,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Class to compute data profiles for algorithms comparison."""
+from itertools import cycle
 from numbers import Number
 from typing import Dict, Iterable, List, Optional
 
@@ -241,14 +242,18 @@ class DataProfile(object):
 
         # Plot the data profiles
         color_cycle = rcParams["axes.prop_cycle"].by_key()["color"]
-        for a_color, (a_name, a_profile) in zip(color_cycle, data_profiles.items()):
+        marker_cycle = cycle(('o', 's', 'D', 'v', '^', '<', '>', 'X', 'H', 'p'))
+        for a_color, a_marker, (a_name, a_profile) in zip(
+                color_cycle, marker_cycle, data_profiles.items()
+        ):
             last_abscissa = len(a_profile)
             last_value = a_profile[-1]
             # Extend the profile if necessary
             if last_abscissa < max_profile_size:
                 tail = [last_value] * (max_profile_size - last_abscissa)
                 a_profile = append(a_profile, tail)
-            plot(range(1, max_profile_size + 1), a_profile, color=a_color, label=a_name)
+            plot(range(1, max_profile_size + 1), a_profile, color=a_color,
+                 label=a_name, marker=a_marker)
             plot(last_abscissa + 1, last_value, marker="*")
         legend()
 
