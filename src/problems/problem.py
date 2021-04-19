@@ -9,7 +9,7 @@ from data_profiles.target_values import TargetValues
 from data_profiles.targets_generator import TargetsGenerator
 
 
-class BenchmarkingProblem(object):
+class Problem(object):
     """An optimization benchmarking problem.
 
     An optimization benchmarking problem is characterized by
