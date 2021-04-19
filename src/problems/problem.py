@@ -1,3 +1,33 @@
+# -*- coding: utf-8 -*-
+# Copyright 2021 IRT Saint Exupéry, https://www.irt-saintexupery.com
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License version 3 as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+# Contributors:
+#    INITIAL AUTHORS - initial API and implementation and/or initial
+#                           documentation
+#        :author: Benoit Pauwels
+#    OTHER AUTHORS   - MACROSCOPIC CHANGES
+"""Reference problem for benchmarking.
+
+A benchmarking problem is a problem class to be solved by iterative algorithms for
+comparison purposes.
+A benchmarking problem is characterized by its functions
+(e.g. objective and constraints for an optimization problem),
+its starting points (each defining an instance of the problem)
+and its targets (refer to :mod:`target_values`).
+"""
 from typing import Callable, Dict, Iterable, List, Optional, Tuple
 
 from gemseo.algos.opt.opt_factory import OptimizersFactory
@@ -26,6 +56,13 @@ class Problem(object):
             start_points,  # type: Iterable[ndarray]
             target_values=None,  # type: Optional[TargetValues]
     ):  # type: (...) -> None
+        """
+        Args:
+            name: The name of the benchmarking problem.
+            creator: A callable object that returns an instance of the problem.
+            start_points: The starting points of the benchmarking problem.
+            target_values: The target values of the benchmarking problem.
+        """
         self._name = name
         self._creator = creator
 

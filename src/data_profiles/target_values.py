@@ -19,7 +19,18 @@
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
-"""Computation of target values out of optimization histories"""
+"""Computation of target values out of algorithms performance histories.
+
+Consider a problem to be solved by an iterative algorithm,
+e.g. an optimization problem or a root-finding problem.
+Targets are values,
+i.e. values of the objective function or values of the residual norm,
+ranging from a first acceptable value to the best known value for the problem.
+Targets are used to estimate the efficiency
+(relative to the number of problem functions evaluations)
+of an algorithm to solve a problem (or several)
+and computes its data profile (see :mod:`data_profile`).
+"""
 from typing import List
 
 from data_profiles.performance_history import PerformanceHistory
