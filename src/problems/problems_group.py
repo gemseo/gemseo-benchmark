@@ -3,7 +3,7 @@ from typing import Dict, Iterable, Optional
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 
 from data_profiles.data_profile import DataProfile
-from problems.problem import BenchmarkingProblem
+from problems.problem import Problem
 
 
 class ProblemsGroup(object):
@@ -92,7 +92,7 @@ class ProblemsGroup(object):
                     OptimizersFactory().execute(an_instance, an_algo_name,
                                                 **an_algo_options)
                     obj_values, measures, feas = \
-                        BenchmarkingProblem.extract_performance(
+                        Problem.extract_performance(
                             an_instance
                         )
                     data_profile.add_history(
