@@ -19,14 +19,14 @@
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
-"""Benchmarking problem.
+"""Reference problem for benchmarking.
 
 A benchmarking problem is a problem class to be solved by iterative algorithms for
 comparison purposes.
 A benchmarking problem is characterized by its functions
 (e.g. objective and constraints for an optimization problem),
 its starting points (each defining an instance of the problem)
-and its targets.
+and its targets (refer to :mod:`target_values`).
 """
 from typing import Callable, Dict, Iterable, List, Optional, Tuple
 
