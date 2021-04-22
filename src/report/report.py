@@ -31,20 +31,24 @@ class Report(object):
             root_directory,  # type: Union[str, Path]
             algorithms,  # type: Dict[str, Dict]
             problems_groups,  # type: Iterable[ProblemsGroup]
-            histories_paths,  # type: Dict[str, str]
+            histories_paths,  # type: Dict[str, Dict[str, str]]
     ):  # type: (...) -> None
         """
         Args:
             root_directory: The path to the root directory of the report.
             algorithms: The compared algorithms.
             problems_groups: The groups of reference problems.
-            histories_paths: The paths to the reference histories.
+            histories_paths: The paths to the reference histories for each algorithm.
 
         """
         self._root_directory = Path(root_directory)
         self._algorithms = algorithms
         self._problems_groups = problems_groups
         self._histories_paths = histories_paths
+        # TODO: check key / name consistency
+        if not set(algorithms) <= set(histories_paths):
+            raise ValueError("Nonexistent histories: {}"
+                             .format(", ".join(set(algorithms) - set(histories_paths))))
 
     def generate_report_sources(self):  # type: (...) -> None
         """Generate the source files of the benchmarking report."""
@@ -93,7 +97,8 @@ class Report(object):
             # Generate the data profile
             data_profile_path = group_directory / "data_profile.jpg"
             a_group.generate_data_profile(
-                self._algorithms, show=False, destination_path=data_profile_path
+                self._algorithms, self._histories_paths, show=False,
+                destination_path=data_profile_path,
             )
             data_profile = ".. image:: /{}" \
                 .format(data_profile_path.relative_to(self._root_directory).as_posix())
