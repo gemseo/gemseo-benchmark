@@ -243,7 +243,7 @@ class PerformanceHistory(object):
                      some_values))
             for some_values in self._values
         ]
-        with open(file_path, "w") as the_file:
+        with Path(file_path).open("w") as the_file:
             dump(data, the_file, indent=4)
 
     @staticmethod
@@ -255,7 +255,7 @@ class PerformanceHistory(object):
         Args:
             file_path: The path to the file.
         """
-        with open(file_path) as the_file:
+        with Path(file_path).open("r") as the_file:
             data = load(the_file)
         values = [
             [an_item[PerformanceHistory.PERFORMANCE],
