@@ -87,6 +87,18 @@ class PerformanceHistory(object):
             infeasibility_measures = [0.0] * len(objective_values)
         self._values = list(zip(objective_values, infeasibility_measures))
 
+    @property
+    def objective_values(self):  # type: (...) -> List[float]
+        """Return the objective values."""
+        objective_values, _ = zip(*self._values)
+        return objective_values
+
+    @property
+    def infeasibility_measures(self):  # type: (...) -> List[float]
+        """Return the infeasibility measures."""
+        _, infeasibility_measures = zip(*self._values)
+        return infeasibility_measures
+
     def __len__(self):  # type: (...) -> int
         """Return the length of the history"""
         return len(self._values)
