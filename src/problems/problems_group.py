@@ -14,7 +14,7 @@ class ProblemsGroup(object):
     def __init__(
             self,
             name,  # type: str
-            problems,  # type: Iterable[BenchmarkingProblem]
+            problems,  # type: Iterable[Problem]
             description=None,  # type: Optional[str]
     ):
         """
