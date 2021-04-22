@@ -36,9 +36,11 @@ or to generate the data profile of an algorithm.
 """
 from functools import reduce
 from itertools import chain, repeat
+from json import dump, load
 from math import ceil
 from operator import itemgetter
-from typing import Iterable, Iterator, List, Optional, Tuple
+from pathlib import Path
+from typing import Iterable, Iterator, List, Optional, Tuple, Union
 
 from numpy import inf
 
@@ -54,6 +56,8 @@ class PerformanceHistory(object):
     - If neither infeasibility measures nor feasibility statuses are passed then
       every infeasibility measure is set to zero.
     """
+    PERFORMANCE = "performance"
+    INFEASIBILITY = "infeasibility"
 
     def __init__(
             self,
@@ -211,3 +215,40 @@ class PerformanceHistory(object):
             return PerformanceHistory([], [])
         else:
             return PerformanceHistory(*zip(*self.to_list()[first_feasible:]))
+
+    def save_to_file(
+            self,
+            file_path,  # type: Union[str, Path]
+    ):  # type: (...) -> None
+        """Save the performance history in a file.
+
+        Args:
+            file_path: The path where to write the file.
+        """
+        data = [
+            dict(zip([PerformanceHistory.PERFORMANCE,
+                      PerformanceHistory.INFEASIBILITY],
+                     some_values))
+            for some_values in self._values
+        ]
+        with open(file_path, "w") as the_file:
+            dump(data, the_file, indent=4)
+
+    @staticmethod
+    def load_from_file(
+            file_path,  # type: Union[str, Path]
+    ):  # type: (...) -> PerformanceHistory
+        """Load a performance history from a file.
+
+        Args:
+            file_path: The path to the file.
+        """
+        with open(file_path) as the_file:
+            data = load(the_file)
+        values = [
+            [an_item[PerformanceHistory.PERFORMANCE],
+             an_item[PerformanceHistory.INFEASIBILITY]]
+            for an_item in data
+        ]
+        objective_values, infeasibility_measures = zip(*values)
+        return PerformanceHistory(objective_values, infeasibility_measures)

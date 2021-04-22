@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from numpy import inf
 from pytest import raises
 
@@ -58,3 +60,23 @@ def test_cumulated_min():
     assert acc_min.to_list() == [
         (0.0, 2.0), (0.0, 2.0), (-1.0, 1.0), (0.0, 0.0), (0.0, 0.0), (-1.0, 0.0)
     ]
+
+
+def test_save_to_file(tmp_path):
+    """Check the writing of a performance history into a file."""
+    history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
+    file_path = tmp_path / "history.json"
+    history.save_to_file(file_path)
+    with open(file_path) as the_file:
+        contents = the_file.read()
+    reference_path = Path(__file__).parent / "reference_history.json"
+    with open(reference_path) as reference_file:
+        reference = reference_file.read()
+    assert contents == reference
+
+
+def test_load_from_file():
+    """Check the initialization of a perfomance history from a file."""
+    reference_path = Path(__file__).parent / "reference_history.json"
+    history = PerformanceHistory.load_from_file(reference_path)
+    assert history.to_list() == [(-2.0, 1.0), (-3.0, 0.0)]
