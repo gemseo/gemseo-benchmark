@@ -75,8 +75,12 @@ class Report(object):
         # Get the descriptions of the algorithms
         algos_descriptions = dict()
         for a_name in self._algorithms:
-            library = OptimizersFactory().create(a_name)
-            algos_descriptions[a_name] = library.lib_dict[a_name][library.DESCRIPTION]
+            try:
+                library = OptimizersFactory().create(a_name)
+                algos_descriptions[a_name] = library.lib_dict[a_name][
+                    library.DESCRIPTION]
+            except:
+                algos_descriptions[a_name] = ""  # TODO: document Minamo
 
         # Create the file
         file_path = self._root_directory / Report.ALGOS_FILENAME
