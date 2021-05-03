@@ -51,13 +51,22 @@ class Report(object):
             raise ValueError("Nonexistent histories: {}"
                              .format(", ".join(set(algorithms) - set(histories_paths))))
 
-    def generate_report_sources(self):  # type: (...) -> None
-        """Generate the source files of the benchmarking report."""
+    def generate_report_sources(
+            self,
+            html_report=True,  # type: bool
+            pdf_report=False,  # type: bool
+    ):  # type: (...) -> None
+        """Generate the source files of the benchmarking report.
+
+        Args:
+            html_report: Whether to generate the report in HTML format.
+            pdf_report: Whether to generate the report in PDF format.
+        """
         self._create_root_directory()
         self._create_algos_file()
         self._create_groups_files()
         self._create_index()
-        self._build_report()
+        self._build_report(html_report, pdf_report)
 
     def _create_root_directory(self):  # type: (...) -> None
         """Create the source directory and basic files."""
