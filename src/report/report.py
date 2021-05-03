@@ -115,7 +115,7 @@ class Report(object):
             # Create the file
             a_group_path = (self._root_directory / Report.GROUPS_DIR /
                             "{}.rst".format(a_group.name))
-            groups_paths.append(a_group_path)
+            groups_paths.append(a_group_path.relative_to(self._root_directory))
             Report._fill_template(
                 a_group_path,
                 Report.GROUP_FILENAME,
