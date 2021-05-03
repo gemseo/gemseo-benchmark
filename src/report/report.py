@@ -127,7 +127,8 @@ class Report(object):
         # Create the file listing the problems groups
         groups_list_path = self._root_directory / Report.GROUPS_LIST_FILENAME
         Report._fill_template(
-            groups_list_path, Report.INDEX_FILENAME, documents=groups_paths
+            groups_list_path, Report.GROUPS_LIST_FILENAME,
+            documents=groups_paths
         )
 
     def _create_index(self):  # type: (...) -> None

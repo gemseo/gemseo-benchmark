@@ -3,7 +3,7 @@ Groups of problems
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: The groups of reference problems:
 
 {% for a_doc in documents %}   {{ a_doc }}
 {% endfor %}
