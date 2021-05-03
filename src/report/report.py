@@ -3,7 +3,7 @@ from os import chdir
 from pathlib import Path
 from shutil import copy
 from subprocess import call
-from typing import Dict, Iterable, Union
+from typing import Dict, Iterable, Optional, Union
 
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from jinja2 import Environment, FileSystemLoader
@@ -33,6 +33,7 @@ class Report(object):
             algorithms,  # type: Dict[str, Dict]
             problems_groups,  # type: Iterable[ProblemsGroup]
             histories_paths,  # type: Dict[str, Dict[str, str]]
+            minamo_algos_descriptions=None,  # type: Optional[Dict[str, str]]
     ):  # type: (...) -> None
         """
         Args:
@@ -40,12 +41,14 @@ class Report(object):
             algorithms: The compared algorithms.
             problems_groups: The groups of reference problems.
             histories_paths: The paths to the reference histories for each algorithm.
+            minamo_algos_descriptions: The descriptions of the MINAMO algorithms.
 
         """
         self._root_directory = Path(root_directory)
         self._algorithms = algorithms
         self._problems_groups = problems_groups
         self._histories_paths = histories_paths
+        self._minamo_algos_descriptions = minamo_algos_descriptions
         # TODO: check key / name consistency
         if not set(algorithms) <= set(histories_paths):
             raise ValueError("Nonexistent histories: {}"
@@ -92,7 +95,10 @@ class Report(object):
                 algos_descriptions[a_name] = library.lib_dict[a_name][
                     library.DESCRIPTION]
             except:
-                algos_descriptions[a_name] = ""  # TODO: document Minamo
+                if a_name in self._minamo_algos_descriptions:
+                    algos_descriptions[a_name] = self._minamo_algos_descriptions[a_name]
+                else:
+                    algos_descriptions[a_name] = ""
 
         # Create the file
         file_path = self._root_directory / Report.ALGOS_FILENAME
@@ -144,10 +150,10 @@ class Report(object):
         """Create the index file of the reST report."""
         # Create the table of contents tree
         toctree_contents = [Report.ALGOS_FILENAME, Report.GROUPS_LIST_FILENAME]
-#        toctree_contents.extend([
-#            "{}/{}".format(Report.GROUPS_DIR, a_group.name)
-#            for a_group in self._problems_groups
-#        ])
+        #        toctree_contents.extend([
+        #            "{}/{}".format(Report.GROUPS_DIR, a_group.name)
+        #            for a_group in self._problems_groups
+        #        ])
 
         # Create the file
         index_path = self._root_directory / Report.INDEX_FILENAME
