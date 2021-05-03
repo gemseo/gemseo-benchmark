@@ -16,6 +16,7 @@ class Report(object):
     TEMPLATES_DIR = Path(__file__).parent / "templates"
     INDEX_FILENAME = "index.rst"
     ALGOS_FILENAME = "algorithms.rst"
+    GROUPS_LIST_FILENAME = "problems_groups.rst"
     GROUP_FILENAME = "group.rst"
 
     BASIC_SOURCES_DIR = Path(__file__).parent / "basic_sources"
@@ -67,7 +68,9 @@ class Report(object):
         for directory in [Report.GROUPS_DIR, Report.IMAGES_DIR]:
             (root_directory / directory).mkdir(exist_ok=True)
         # Create the basic source files
-        for source_file in (Report.CONF_PATH, Report.MAKE_PATH, Report.MAKEFILE_PATH):
+        for source_file in (
+                Report.CONF_PATH, Report.MAKE_PATH, Report.MAKEFILE_PATH
+        ):
             copy(source_file, root_directory / source_file.name)
 
     def _create_algos_file(self):  # type: (...)-> None
@@ -92,6 +95,7 @@ class Report(object):
 
     def _create_groups_files(self):  # type: (...) -> None
         """Create the files corresponding to the problems groups."""
+        groups_paths = list()
         for a_group in self._problems_groups:
             # Create the directory dedicated to the group
             group_directory = (self._root_directory / Report.IMAGES_DIR /
@@ -104,28 +108,36 @@ class Report(object):
                 self._algorithms, self._histories_paths, show=False,
                 destination_path=data_profile_path,
             )
-            data_profile = ".. image:: /{}" \
-                .format(data_profile_path.relative_to(self._root_directory).as_posix())
+            data_profile = ".. image:: /{}".format(
+                data_profile_path.relative_to(self._root_directory).as_posix()
+            )
 
             # Create the file
-            group_path = (self._root_directory / Report.GROUPS_DIR /
-                          "{}.rst".format(a_group.name))
+            a_group_path = (self._root_directory / Report.GROUPS_DIR /
+                            "{}.rst".format(a_group.name))
+            groups_paths.append(a_group_path)
             Report._fill_template(
-                group_path,
+                a_group_path,
                 Report.GROUP_FILENAME,
                 name=a_group.name,
                 description=a_group.description,
                 data_profile=data_profile,
             )
 
+        # Create the file listing the problems groups
+        groups_list_path = self._root_directory / Report.GROUPS_LIST_FILENAME
+        Report._fill_template(
+            groups_list_path, Report.INDEX_FILENAME, documents=groups_paths
+        )
+
     def _create_index(self):  # type: (...) -> None
         """Create the index file of the reST report."""
         # Create the table of contents tree
-        toctree_contents = [Report.ALGOS_FILENAME]
-        toctree_contents.extend([
-            "{}/{}".format(Report.GROUPS_DIR, a_group.name)
-            for a_group in self._problems_groups
-        ])
+        toctree_contents = [Report.ALGOS_FILENAME, Report.GROUPS_LIST_FILENAME]
+#        toctree_contents.extend([
+#            "{}/{}".format(Report.GROUPS_DIR, a_group.name)
+#            for a_group in self._problems_groups
+#        ])
 
         # Create the file
         index_path = self._root_directory / Report.INDEX_FILENAME
@@ -156,9 +168,20 @@ class Report(object):
         with file_path.open("w") as file:
             file.write(file_contents)
 
-    def _build_report(self):  # type: (...) -> None
-        """Build the benchmarking report."""
+    def _build_report(
+            self,
+            html_report=True,  # type: bool
+            pdf_report=False,  # type: bool
+    ):  # type: (...) -> None
+        """Build the benchmarking report.
+
+        Args:
+            html_report: Whether to generate the report in HTML format.
+            pdf_report: Whether to generate the report in PDF format.
+        """
         root_directory = self._root_directory
         chdir(root_directory)
-        call("make html", shell=True)
-        call("make latexpdf", shell=True)
+        if html_report:
+            call("make html", shell=True)
+        if pdf_report:
+            call("make latexpdf", shell=True)
