@@ -71,10 +71,19 @@ class Report(object):
         self._problems_groups = problems_groups
         self._histories_paths = histories_paths
         self._minamo_algos_descriptions = minamo_algos_descriptions
-        # TODO: check key / name consistency
-        if not set(algorithms) <= set(histories_paths):
-            raise ValueError("Nonexistent histories: {}"
-                             .format(", ".join(set(algorithms) - set(histories_paths))))
+        for an_algo in algorithms:
+            if an_algo not in histories_paths:
+                raise ValueError(
+                    "Missing histories for algorithm '{}'".format(an_algo)
+                )
+            some_histories = histories_paths[an_algo]
+            for a_group in problems_groups:
+                for a_problem in a_group:
+                    if a_problem.name not in some_histories:
+                        raise ValueError(
+                            "Missing histories for algorithm '{}' on problem '{}'"
+                                .format(an_algo, a_problem.name)
+                        )
 
     def generate_report_sources(
             self,
