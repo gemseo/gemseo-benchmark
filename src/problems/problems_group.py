@@ -72,7 +72,7 @@ class ProblemsGroup(object):
     def generate_data_profile(
             self,
             algorithms,  # type: Dict[str, Dict]
-            histories_path,  # type: Dict[str, Dict[str, List[Path]]]
+            histories_paths,  # type: Dict[str, Dict[str, List[Path]]]
             show=True,  # type: bool
             destination_path=None  # type: Optional[str]
     ):  # type: (...) -> None
@@ -94,7 +94,7 @@ class ProblemsGroup(object):
         # Generate the performance histories
         for an_algo_name, an_algo_options in algorithms.items():
             for a_problem in self._problems:
-                for a_history_path in histories_path[an_algo_name][a_problem.name]:
+                for a_history_path in histories_paths[an_algo_name][a_problem.name]:
                     history = PerformanceHistory.load_from_file(a_history_path)
                     obj_values = history.objective_values
                     measures = history.infeasibility_measures
