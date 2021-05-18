@@ -25,7 +25,7 @@ from os import chdir
 from pathlib import Path
 from shutil import copy
 from subprocess import call
-from typing import Dict, Iterable, Optional, Union
+from typing import Dict, Iterable, List, Optional, Union
 
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from jinja2 import Environment, FileSystemLoader
@@ -54,16 +54,21 @@ class Report(object):
             root_directory,  # type: Union[str, Path]
             algorithms,  # type: Dict[str, Dict]
             problems_groups,  # type: Iterable[ProblemsGroup]
-            histories_paths,  # type: Dict[str, Dict[str, str]]
+            histories_paths,  # type: Dict[str, Dict[str, List[Union[str, Path]]]]
             minamo_algos_descriptions=None,  # type: Optional[Dict[str, str]]
     ):  # type: (...) -> None
         """
         Args:
             root_directory: The path to the root directory of the report.
-            algorithms: The compared algorithms.
+            algorithms: The compared algorithms and their options.
             problems_groups: The groups of reference problems.
-            histories_paths: The paths to the reference histories for each algorithm.
+            histories_paths: The paths to the reference histories for each algorithm
+                and reference problem.
             minamo_algos_descriptions: The descriptions of the MINAMO algorithms.
+
+        Raises:
+            ValueError: If an algorithm has no associated histories,
+                or has a missing history for a given reference problem.
 
         """
         self._root_directory = Path(root_directory)
@@ -117,7 +122,7 @@ class Report(object):
             copy(source_file, root_directory / source_file.name)
 
     def _create_algos_file(self):  # type: (...)-> None
-        """Create the file describing the algorithms"""
+        """Create the file describing the algorithms."""
         # Get the descriptions of the algorithms
         algos_descriptions = dict()
         for a_name in self._algorithms:
@@ -186,10 +191,6 @@ class Report(object):
         """Create the index file of the reST report."""
         # Create the table of contents tree
         toctree_contents = [Report.ALGOS_FILENAME, Report.GROUPS_LIST_FILENAME]
-        #        toctree_contents.extend([
-        #            "{}/{}".format(Report.GROUPS_DIR, a_group.name)
-        #            for a_group in self._problems_groups
-        #        ])
 
         # Create the file
         index_path = self._root_directory / Report.INDEX_FILENAME
