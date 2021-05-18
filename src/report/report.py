@@ -115,12 +115,15 @@ class Report(object):
             try:
                 library = OptimizersFactory().create(a_name)
                 algos_descriptions[a_name] = library.lib_dict[a_name][
-                    library.DESCRIPTION]
-            except:
-                if a_name in self._minamo_algos_descriptions:
+                    library.DESCRIPTION
+                ]
+            except ImportError:
+                # The algorithm is unavailable
+                if self._minamo_algos_descriptions is not None \
+                        and a_name in self._minamo_algos_descriptions:
                     algos_descriptions[a_name] = self._minamo_algos_descriptions[a_name]
                 else:
-                    algos_descriptions[a_name] = ""
+                    algos_descriptions[a_name] = "<No description available.>"
 
         # Create the file
         file_path = self._root_directory / Report.ALGOS_FILENAME
