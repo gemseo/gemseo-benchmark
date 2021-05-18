@@ -136,7 +136,7 @@ class Report(object):
         for a_group in self._problems_groups:
             # Create the directory dedicated to the group
             group_directory = (self._root_directory / Report.IMAGES_DIR /
-                               a_group.name.replace(" ", "_"))
+                               Report._format_group_name(a_group.name))
             group_directory.mkdir(exist_ok=True)
 
             # Generate the data profile
@@ -151,8 +151,10 @@ class Report(object):
 
             # Create the file
             a_group_path = (self._root_directory / Report.GROUPS_DIR /
-                            "{}.rst".format(a_group.name))
-            groups_paths.append(a_group_path.relative_to(self._root_directory))
+                            "{}.rst".format(Report._format_group_name(a_group.name)))
+            groups_paths.append(
+                a_group_path.relative_to(self._root_directory).as_posix()
+            )
             Report._fill_template(
                 a_group_path,
                 Report.GROUP_FILENAME,
@@ -223,3 +225,17 @@ class Report(object):
             call("make html", shell=True)
         if pdf_report:
             call("make latexpdf", shell=True)
+
+    @staticmethod
+    def _format_group_name(
+            name,  # type: str
+    ):  # type: (...) -> str
+        """Format a group name for the report source paths.
+
+        Args:
+            name: The group name.
+
+        Returns:
+            The formatted the group name.
+        """
+        return name.replace(" ", "_")
