@@ -148,17 +148,6 @@ class PerformanceHistory(object):
         minimum_history.history_items = minima
         return minimum_history
 
-    def to_list(self):  # type: (...) -> List[Tuple[float, float]]
-        """Return the performance history as a list of 2-tuples.
-
-        Returns:
-            The performance history as a list.
-        """
-        return [
-            (an_item.objective_value, an_item.infeasibility_measure)
-            for an_item in self._items
-        ]
-
     def _compute_median(self):  # type: (...) -> HistoryItem
         """Return the median of the history of performance values.
 

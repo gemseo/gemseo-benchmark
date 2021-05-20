@@ -31,16 +31,6 @@ def test_length():
     assert len(history_3) == 2
 
 
-def test_to_list():
-    """Check the conversion of a performance history to a list"""
-    history_1 = PerformanceHistory([3.0, 2.0])
-    assert history_1.to_list() == [(3.0, 0.0), (2.0, 0.0)]
-    history_2 = PerformanceHistory([3.0, 2.0], [1.0, 0.0])
-    assert history_2.to_list() == [(3.0, 1.0), (2.0, 0.0)]
-    history_3 = PerformanceHistory([3.0, 2.0], feasibility=[False, True])
-    assert history_3.to_list() == [(3.0, inf), (2.0, 0.0)]
-
-
 def test_iter():
     """Check the iteration over a performance history"""
     history = PerformanceHistory([3.0, 2.0], [1.0, 0.0])
