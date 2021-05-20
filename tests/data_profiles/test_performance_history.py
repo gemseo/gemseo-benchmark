@@ -60,6 +60,22 @@ def test_cumulated_min():
     assert acc_min.to_list() == [
         (0.0, 2.0), (0.0, 2.0), (-1.0, 1.0), (0.0, 0.0), (0.0, 0.0), (-1.0, 0.0)
     ]
+def test_compute_median_history():
+    """Check the computation of the median history."""
+    hist_1 = PerformanceHistory([1.0, -1.0, 0.0], [2.0, 0.0, 3.0])
+    hist_2 = PerformanceHistory([-2.0, -2.0, 2.0], [0.0, 3.0, 0.0])
+    hist_3 = PerformanceHistory([3.0, -3.0, 3.0], [0.0, 0.0, 0.0])
+    reference = PerformanceHistory([3.0, -1.0, 3.0], [0.0, 0.0, 0.0])
+    median = PerformanceHistory.compute_median_history([hist_1, hist_2, hist_3])
+    assert median.history_items == reference.history_items
+
+
+def test_remove_leading_infeasible():
+    """Check the removal of the leading infeasible items in a performance history."""
+    history = PerformanceHistory([2.0, 1.0, 0.0, 1.0, -1.0], [2.0, 1.0, 0.0, 3.0, 0.0])
+    reference = PerformanceHistory([0.0, 1.0, -1.0], [0.0, 3.0, 0.0])
+    truncation = history.remove_leading_infeasible()
+    assert truncation.history_items == reference.history_items
 
 
 def test_save_to_file(tmp_path):
