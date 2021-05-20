@@ -67,6 +67,9 @@ class HistoryItem(object):
             raise ValueError("The infeasibility measure must be non-negative.")
         self._infeas_measure = infeasibility_measure
 
+    def __repr__(self):  # type: (...) -> str
+        return str(tuple([self.objective_value, self.infeasibility_measure]))
+
     def __eq__(
             self,
             other,  # type: HistoryItem

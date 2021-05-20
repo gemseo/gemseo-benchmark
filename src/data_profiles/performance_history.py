@@ -134,9 +134,8 @@ class PerformanceHistory(object):
         """Return the required history item."""
         return self._items[item]
 
-    def __str__(self):  # type: (...) -> str
-        # FIXME: repr ?
-        return str(self.to_list())
+    def __repr__(self):  # type: (...) -> str
+        return str([an_item for an_item in self])
 
     def compute_cumulated_minimum(self):  # type: (...) -> PerformanceHistory
         """Return the history of the cumulated minimum.
