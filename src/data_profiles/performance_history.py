@@ -35,7 +35,6 @@ Performance histories can be used to generate target values for a problem,
 or to generate the data profile of an algorithm.
 """
 from functools import reduce
-from itertools import chain, repeat
 from json import dump, load
 from math import ceil
 from pathlib import Path
@@ -139,26 +138,13 @@ class PerformanceHistory(object):
         # FIXME: repr ?
         return str(self.to_list())
 
-    def compute_cumulated_minimum(
-            self,
-            fill_up_to=None,  # type: Optional[int]
-    ):  # type: (...) -> PerformanceHistory
+    def compute_cumulated_minimum(self):  # type: (...) -> PerformanceHistory
         """Return the history of the cumulated minimum.
-
-        Args:
-            fill_up_to: Optionally, the last value of the minima history will be
-                appended as many times as necessary for the minima history to be of
-                the required length.
 
         Returns:
             The history of the cumulated minimum.
         """
         minima = [reduce(min, self._items[:i + 1]) for i in range(len(self))]
-        if fill_up_to is not None and fill_up_to < len(minima):
-            raise ValueError("Cannot fill up to length {} lower than total length {}"
-                             .format(fill_up_to, len(minima)))
-        elif fill_up_to is not None:
-            minima = list(chain(minima, repeat(minima[-1], (fill_up_to - len(minima)))))
         minimum_history = PerformanceHistory()
         minimum_history.history_items = minima
         return minimum_history

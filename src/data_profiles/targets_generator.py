@@ -26,6 +26,7 @@ the median of the reference histories is computed
 and a uniformly distributed subset (of the required size) of this median history is
 extracted.
 """
+from itertools import chain, repeat
 from typing import List, Optional
 
 from matplotlib.pyplot import figure, semilogy, show, xlabel, xlim, xticks, ylabel
@@ -94,11 +95,16 @@ class TargetsGenerator(object):
 
         # Compute the history of the minimum value
         budget_max = max(len(a_history) for a_history in histories)
-        minima_histories = [
-            a_hist.compute_cumulated_minimum(fill_up_to=budget_max)
-            for a_hist in histories
-        ]
-        median_history = PerformanceHistory.compute_median_history(minima_histories)
+        minimum_histories = list()
+        for a_history in histories:
+            a_min_hist = a_history.compute_cumulated_minimum()
+            # If necessary, extend the history by repeating its last value
+            if len(a_min_hist) < budget_max:
+                a_min_hist.history_items = list(chain(
+                    a_min_hist, repeat(a_min_hist[-1], (budget_max - len(a_min_hist)))
+                ))
+            minimum_histories.append(a_min_hist)
+        median_history = PerformanceHistory.compute_median_history(minimum_histories)
 
         # Compute a budget scale
         budget_scale = TargetsGenerator._compute_budget_scale(
