@@ -70,6 +70,9 @@ class PerformanceHistory(object):
             objective_values: The history of the quantity to be minimized.
             infeasibility_measures: The history of infeasibility measures.
             feasibility: The history of (boolean) feasibility.
+
+        Raises:
+            ValueError: If the lengths of the histories do not match.
         """
         if objective_values is None:
             objective_values = []
@@ -219,7 +222,11 @@ class PerformanceHistory(object):
         return median_history
 
     def remove_leading_infeasible(self):  # type: (...) -> PerformanceHistory
-        """Return the history starting from the first feasible item."""
+        """Return the history starting from the first feasible item.
+
+        Returns:
+            The truncated performance history.
+        """
         first_feasible = None
         for index, (_, measure) in enumerate(self):
             if measure == 0.0:
@@ -256,6 +263,9 @@ class PerformanceHistory(object):
 
         Args:
             file_path: The path to the file.
+
+        Returns:
+            The performance history.
         """
         with Path(file_path).open("r") as the_file:
             data = load(the_file)
