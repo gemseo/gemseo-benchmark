@@ -38,11 +38,12 @@ from functools import reduce
 from itertools import chain, repeat
 from json import dump, load
 from math import ceil
-from operator import itemgetter
 from pathlib import Path
 from typing import Iterable, Iterator, List, Optional, Tuple, Union
 
 from numpy import inf
+
+from data_profiles.history_item import HistoryItem
 
 
 class PerformanceHistory(object):
@@ -87,117 +88,101 @@ class PerformanceHistory(object):
             infeasibility_measures = [0.0 if a_feas else inf for a_feas in feasibility]
         else:
             infeasibility_measures = [0.0] * len(objective_values)
-        self._values = list(zip(objective_values, infeasibility_measures))
+        self.history_items = [
+            HistoryItem(a_value, a_measure) for a_value, a_measure
+            in zip(objective_values, infeasibility_measures)
+        ]
 
     @property
     def objective_values(self):  # type: (...) -> List[float]
         """Return the objective values."""
-        objective_values, _ = zip(*self._values)
-        return objective_values
+        return [an_item.objective_value for an_item in self.history_items]
 
     @property
     def infeasibility_measures(self):  # type: (...) -> List[float]
         """Return the infeasibility measures."""
-        _, infeasibility_measures = zip(*self._values)
-        return infeasibility_measures
+        return [an_item.infeasibility_measure for an_item in self.history_items]
+
+    @property
+    def history_items(self):  # type: (...) -> List[HistoryItem]
+        """Return the history items."""
+        return self._items
+
+    @history_items.setter
+    def history_items(
+            self,
+            history_items,  # type: Iterable[HistoryItem]
+    ):  # type: (...) -> None
+        """
+        Raises:
+            TypeError: If an item is not of type HistoryItem.
+        """
+        for an_item in history_items:
+            if not isinstance(an_item, HistoryItem):
+                raise TypeError("History items must be of type HistoryItem")
+        self._items = list(history_items)
 
     def __len__(self):  # type: (...) -> int
-        """Return the length of the history"""
-        return len(self._values)
+        """Return the length of the history."""
+        return len(self._items)
 
-    def __iter__(self):  # type: (...) -> Iterator[Tuple[float, float]]
-        return iter(self._values)
+    def __iter__(self):  # type: (...) -> Iterator[HistoryItem]
+        """Return the history items as an iterator."""
+        return iter(self._items)
 
-    def __getitem__(self, item):  # type: (...) -> Tuple[float, float]
-        return self._values[item]
+    def __getitem__(self, item):  # type: (...) -> HistoryItem
+        """Return the required history item."""
+        return self._items[item]
 
     def __str__(self):  # type: (...) -> str
+        # FIXME: repr ?
         return str(self.to_list())
 
-    @staticmethod
-    def _less_equal(
-            an_item,  # type:Tuple[float, float]
-            another_item  # type:Tuple[float,float]
-    ):  # type: (...) -> bool
-        """Return whether a history item is lower or equal to another history item.
-
-        Args:
-            an_item: a history item
-            another_item: another history item
-
-        Returns:
-            Whether the first history item is lower or equal to the second one.
-
-        """
-        a_value, a_meas = an_item
-        other_value, other_meas = another_item
-        if a_meas < 0 or other_meas < 0:
-            raise ValueError("Negative infeasibility measure")
-        return a_meas < other_meas or (a_meas == other_meas and a_value <= other_value)
-
-    @staticmethod
-    def _min(
-            an_item,  # type: Tuple[float, float]
-            another_item  # type: Tuple[float, float]
-    ):  # type: (...)-> Tuple[float, float]
-        """Return the smallest of two history items.
-
-        Args:
-            an_item: A history item.
-            another_item: Another history item.
-
-        Returns:
-            The smallest of the two history items.
-
-        """
-        if PerformanceHistory._less_equal(an_item, another_item):
-            return an_item
-        else:
-            return another_item
-
-    def cumulated_min_history(
+    def compute_cumulated_minimum(
             self,
             fill_up_to=None,  # type: Optional[int]
     ):  # type: (...) -> PerformanceHistory
         """Return the history of the cumulated minimum.
 
         Args:
-            fill_up_to: Optionally, the last value of the minima history will be append
-                as many times as necessary for the minima history to be of the required
-                length.
+            fill_up_to: Optionally, the last value of the minima history will be
+                appended as many times as necessary for the minima history to be of
+                the required length.
 
         Returns:
             The history of the cumulated minimum.
-
         """
-        minima = [reduce(PerformanceHistory._min, self._values[:i + 1])
-                  for i in range(len(self))]
+        minima = [reduce(min, self._items[:i + 1]) for i in range(len(self))]
         if fill_up_to is not None and fill_up_to < len(minima):
             raise ValueError("Cannot fill up to length {} lower than total length {}"
                              .format(fill_up_to, len(minima)))
         elif fill_up_to is not None:
             minima = list(chain(minima, repeat(minima[-1], (fill_up_to - len(minima)))))
-        return PerformanceHistory(*zip(*minima))
+        minimum_history = PerformanceHistory()
+        minimum_history.history_items = minima
+        return minimum_history
 
     def to_list(self):  # type: (...) -> List[Tuple[float, float]]
         """Return the performance history as a list of 2-tuples.
 
         Returns:
             The performance history as a list.
-
         """
-        return self._values
+        return [
+            (an_item.objective_value, an_item.infeasibility_measure)
+            for an_item in self._items
+        ]
 
-    def sorted(self):  # type: (...) -> PerformanceHistory
-        """Return the sorted history of performance values"""
-        return sorted(self._values, key=itemgetter(1, 0), reverse=True)
+    def _compute_median(self):  # type: (...) -> HistoryItem
+        """Return the median of the history of performance values.
 
-    def _median(self):  # type: (...) -> Tuple[float, float]
-        """Return the median of the history of performance values"""
-        return self.sorted()[ceil(len(self) // 2)]
+        Returns:
+            The median of the history of performance values.
+        """
+        return sorted(self._items)[ceil(len(self) // 2)]
 
     @staticmethod
-    def median_history(
+    def compute_median_history(
             histories  # type: Iterable[PerformanceHistory]
     ):  # type: (...) -> PerformanceHistory
         """Return the history of the median of several performance histories.
@@ -207,15 +192,15 @@ class PerformanceHistory(object):
 
         Returns:
             The median history.
-
         """
-        histories_as_list = [a_hist.to_list() for a_hist in histories]
-        median_as_list = list()
-        for snapshot in zip(*histories_as_list):
-            values_history, measures_history = zip(*snapshot)
-            median = PerformanceHistory(values_history, measures_history)._median()
-            median_as_list.append(median)
-        median_history = PerformanceHistory(*zip(*median_as_list))
+        medians_list = list()
+        for snapshot in zip(*[a_hist.history_items for a_hist in histories]):
+            snapshot_as_hist = PerformanceHistory()
+            snapshot_as_hist.history_items = snapshot
+            median = snapshot_as_hist._compute_median()
+            medians_list.append(median)
+        median_history = PerformanceHistory()
+        median_history.history_items = medians_list
         return median_history
 
     def remove_leading_infeasible(self):  # type: (...) -> PerformanceHistory
@@ -225,14 +210,16 @@ class PerformanceHistory(object):
             The truncated performance history.
         """
         first_feasible = None
-        for index, (_, measure) in enumerate(self):
-            if measure == 0.0:
-                first_feasible = index
+        for an_index, an_item in enumerate(self):
+            if an_item.infeasibility_measure == 0.0:
+                first_feasible = an_index
                 break
         if first_feasible is None:
-            return PerformanceHistory([], [])
+            truncated_history = PerformanceHistory()
         else:
-            return PerformanceHistory(*zip(*self.to_list()[first_feasible:]))
+            truncated_history = PerformanceHistory()
+            truncated_history.history_items = self.history_items[first_feasible:]
+        return truncated_history
 
     def save_to_file(
             self,
@@ -244,10 +231,11 @@ class PerformanceHistory(object):
             file_path: The path where to write the file.
         """
         data = [
-            dict(zip([PerformanceHistory.PERFORMANCE,
-                      PerformanceHistory.INFEASIBILITY],
-                     some_values))
-            for some_values in self._values
+            dict([
+                (PerformanceHistory.PERFORMANCE, an_item.objective_value),
+                (PerformanceHistory.INFEASIBILITY, an_item.infeasibility_measure)
+            ])
+            for an_item in self.history_items
         ]
         with Path(file_path).open("w") as the_file:
             dump(data, the_file, indent=4)
@@ -267,8 +255,10 @@ class PerformanceHistory(object):
         with Path(file_path).open("r") as the_file:
             data = load(the_file)
         values = [
-            [an_item[PerformanceHistory.PERFORMANCE],
-             an_item[PerformanceHistory.INFEASIBILITY]]
+            [
+                an_item[PerformanceHistory.PERFORMANCE],
+                an_item[PerformanceHistory.INFEASIBILITY]
+            ]
             for an_item in data
         ]
         objective_values, infeasibility_measures = zip(*values)
