@@ -94,9 +94,11 @@ class TargetsGenerator(object):
 
         # Compute the history of the minimum value
         budget_max = max(len(a_history) for a_history in histories)
-        minima_histories = [a_hist.cumulated_min_history(fill_up_to=budget_max)
-                            for a_hist in histories]
-        median_history = PerformanceHistory.median_history(minima_histories)
+        minima_histories = [
+            a_hist.compute_cumulated_minimum(fill_up_to=budget_max)
+            for a_hist in histories
+        ]
+        median_history = PerformanceHistory.compute_median_history(minima_histories)
 
         # Compute a budget scale
         budget_scale = TargetsGenerator._compute_budget_scale(
@@ -104,13 +106,17 @@ class TargetsGenerator(object):
         )
 
         # Compute the target values
-        target_values = TargetValues(*zip(*[median_history[item - 1]
-                                            for item in budget_scale]))
+        target_values = TargetValues()
+        target_values.history_items = [
+            median_history[item - 1] for item in budget_scale
+        ]
 
         # Plot the target values
         if plot:
-            objective_values = [inf if a_meas > 0.0 else a_value
-                                for a_value, a_meas in target_values]
+            objective_values = [
+                inf if an_item.infeasibility_measure > 0.0 else an_item.objective_value
+                for an_item in target_values
+            ]
             self._plot(objective_values)
 
         return target_values
