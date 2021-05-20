@@ -61,7 +61,7 @@ class PerformanceHistory(object):
 
     def __init__(
             self,
-            objective_values,  # type: List[float]
+            objective_values=None,  # type: Optional[List[float]]
             infeasibility_measures=None,  # type: Optional[List[float]]
             feasibility=None  # type: Optional[List[bool]]
     ):  # type: (...) -> None
@@ -71,6 +71,8 @@ class PerformanceHistory(object):
             infeasibility_measures: The history of infeasibility measures.
             feasibility: The history of (boolean) feasibility.
         """
+        if objective_values is None:
+            objective_values = []
         if infeasibility_measures is not None:
             if len(infeasibility_measures) != len(objective_values):
                 raise ValueError("Objective history and infeasibility measures history "
