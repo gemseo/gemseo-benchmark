@@ -71,7 +71,6 @@ class TargetsGenerator(object):
             self,
             targets_number,  # type: int
             budget_min=1,  # type: int
-            plot=False,  # type: bool
             feasible=True,  # type: bool
             show=True,  # type: bool
             destination_path=None,  # type: Optional[str]
