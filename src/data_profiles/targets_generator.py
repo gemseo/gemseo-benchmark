@@ -29,7 +29,8 @@ extracted.
 from itertools import chain, repeat
 from typing import List, Optional
 
-from matplotlib.pyplot import figure, semilogy, show, xlabel, xlim, xticks, ylabel
+from matplotlib.pyplot import (figure, savefig, semilogy, show as pyplot_show, xlabel,
+                               xlim, xticks, ylabel)
 from numpy import inf, linspace, ndarray
 
 from data_profiles.performance_history import PerformanceHistory
@@ -72,6 +73,8 @@ class TargetsGenerator(object):
             budget_min=1,  # type: int
             plot=False,  # type: bool
             feasible=True,  # type: bool
+            show=True,  # type: bool
+            destination_path=None,  # type: Optional[str]
     ):  # type: (...) -> TargetValues
         """Compute the target values for a function from the histories of its values.
 
@@ -80,6 +83,9 @@ class TargetsGenerator(object):
             budget_min: The evaluation budget to be used to define the easiest target.
             plot: Whether to plot the target values.
             feasible: Whether to generate only feasible targets.
+            show: Whether to show the plot.
+            destination_path: The path where to save the plot.
+                By default the plot is not saved.
 
         Returns:
             The target values of the function.
@@ -118,24 +124,28 @@ class TargetsGenerator(object):
         ]
 
         # Plot the target values
-        if plot:
+        if show or destination_path is not None:
             objective_values = [
                 inf if an_item.infeasibility_measure > 0.0 else an_item.objective_value
                 for an_item in target_values
             ]
-            self._plot(objective_values)
+            self._plot(objective_values, show, destination_path)
 
         return target_values
 
     @staticmethod
     def _plot(
-            objective_target_values  # type: List[float]
+            objective_target_values,  # type: List[float]
+            show=True,  # type: bool
+            destination_path=None,  # type: Optional[str]
     ):  # type: (...) -> None
         """Compute and plot the target values.
 
             Args:
                 objective_target_values: The objective target values.
-
+                show: Whether to show the plot.
+                destination_path: The path where to save the plot.
+                    By default the plot is not saved.
         """
         targets_number = len(objective_target_values)
         figure()
@@ -145,7 +155,12 @@ class TargetsGenerator(object):
         ylabel("Target value")
         semilogy(range(1, targets_number + 1), objective_target_values,
                  marker="o", linestyle="")
-        show()
+
+        # Save and/or show the plot
+        if destination_path is not None:
+            savefig(destination_path)
+        if show:
+            pyplot_show()
 
     @staticmethod
     def _compute_budget_scale(

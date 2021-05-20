@@ -63,13 +63,14 @@ for a_ref_algo, a_start_point in product(reference_algos, start_points):
 
 # Compute the scale of target values
 targets_number = 20
-targets_values = {"Rosenbrock": targets_generator.run(targets_number, plot=True)}
+targets_values = {"Rosenbrock": targets_generator.run(targets_number, show=True)}
 print("Target values\n", targets_values["Rosenbrock"])
 
 # Set the algorithms to be compared
-methods = ['nelder-mead', 'powell', 'cg', 'bfgs', 'newton-cg',
-           'l-bfgs-b', 'tnc', 'cobyla', 'slsqp', 'trust-constr',
-           'dogleg', 'trust-ncg', 'trust-exact', 'trust-krylov']
+methods = [
+    'nelder-mead', 'powell', 'cg', 'bfgs', 'newton-cg', 'l-bfgs-b', 'tnc', 'cobyla',
+    'slsqp', 'trust-constr', 'dogleg', 'trust-ncg', 'trust-exact', 'trust-krylov'
+]
 methods.remove("newton-cg")
 methods.remove("dogleg")
 methods.remove("trust-ncg")

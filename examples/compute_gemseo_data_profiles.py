@@ -46,7 +46,7 @@ for a_pb_name, a_pb_class in ref_problems.items():
         OptimizersFactory().execute(pb_instance, an_algo_name, **an_algo_options)
         obj_hist, feas_hist, meas_hist = extract_histories(pb_instance)
         target_generator.add_history(obj_hist, meas_hist, feas_hist)
-    targets_values[a_pb_name] = target_generator.run(targets_number, plot=True)
+    targets_values[a_pb_name] = target_generator.run(targets_number, show=True)
 # TODO: target values generator based on Gemseo
 
 # Generate data profiles
