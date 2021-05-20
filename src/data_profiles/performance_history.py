@@ -38,7 +38,7 @@ from functools import reduce
 from json import dump, load
 from math import ceil
 from pathlib import Path
-from typing import Iterable, Iterator, List, Optional, Tuple, Union
+from typing import Iterable, Iterator, List, Optional, Union
 
 from numpy import inf
 
@@ -168,14 +168,14 @@ class PerformanceHistory(object):
         Returns:
             The median history.
         """
-        medians_list = list()
-        for snapshot in zip(*[a_hist.history_items for a_hist in histories]):
+        medians = list()
+        for a_snapshot in zip(*[a_hist.history_items for a_hist in histories]):
             snapshot_as_hist = PerformanceHistory()
-            snapshot_as_hist.history_items = snapshot
-            median = snapshot_as_hist._compute_median()
-            medians_list.append(median)
+            snapshot_as_hist.history_items = a_snapshot
+            a_median = snapshot_as_hist._compute_median()
+            medians.append(a_median)
         median_history = PerformanceHistory()
-        median_history.history_items = medians_list
+        median_history.history_items = medians
         return median_history
 
     def remove_leading_infeasible(self):  # type: (...) -> PerformanceHistory
