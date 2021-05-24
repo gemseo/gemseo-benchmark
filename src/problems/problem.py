@@ -62,6 +62,11 @@ class Problem(object):
             creator: A callable object that returns an instance of the problem.
             start_points: The starting points of the benchmarking problem.
             target_values: The target values of the benchmarking problem.
+
+        Raises:
+            TypeError: If the return type of the creator is not OptimizationProblem,
+                or if a starting point is not of type ndarray.
+            ValueError: If a starting point is of inappropriate shape.
         """
         self._name = name
         self._creator = creator

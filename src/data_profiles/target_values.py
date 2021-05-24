@@ -53,8 +53,9 @@ class TargetValues(PerformanceHistory):
             The history of the number of target hits.
 
         """
-        minimum_history = values_history.cumulated_min_history()
-        hits_history = [[self._less_equal(a_minimum, a_target)
-                         for a_target in self].count(True)
-                        for a_minimum in minimum_history]
+        minimum_history = values_history.compute_cumulated_minimum()
+        hits_history = [
+            [a_minimum <= a_target for a_target in self].count(True)
+            for a_minimum in minimum_history
+        ]
         return hits_history
