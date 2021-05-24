@@ -177,6 +177,7 @@ class Report(object):
                 Report.GROUP_FILENAME,
                 name=a_group.name,
                 description=a_group.description,
+                problems={a_problem.name: a_problem.__doc__ for a_problem in a_group},
                 data_profile=data_profile,
             )
 

@@ -1,10 +1,20 @@
 {{ name }}
 {{ "=" * name|length }}
 
+
 -----------
 Description
 -----------
 {{ description }}
+{% for a_problem_name, a_problem_description in problems.items() %}
+
+^^^^^^^^
+Problems
+^^^^^^^^
+{{ a_problem_name }}
+   {{ a_problem_description }}
+{% endfor %}
+
 
 ------------
 Data profile
