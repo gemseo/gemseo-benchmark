@@ -120,11 +120,9 @@ class Problem(object):
         Returns:
             The starting points of the benchmarking problem.
         """
-        problem = self._creator()
-        design_space = problem.design_space
-        dimension = design_space.dimension
+        design_space = self._creator().design_space
         doe_library = DOEFactory().create(doe_algo_name)
-        doe = doe_library(doe_size, dimension, **doe_options)
+        doe = doe_library(doe_size, design_space.dimension, **doe_options)
         doe = [design_space.unnormalize_vect(array(row)) for row in doe]
         return doe
 
