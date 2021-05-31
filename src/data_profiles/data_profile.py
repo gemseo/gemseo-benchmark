@@ -139,7 +139,7 @@ class DataProfile(object):
                 If None then all the algorithms are considered.
             show: Whether to show the plot.
             destination_path: The path where to save the plot.
-                By default the plot is not saved.
+                If None, the plot is not saved.
         """
         data_profiles = self.compute_data_profiles(algo_names)
         DataProfile._plot_data_profile(data_profiles, show, destination_path)
