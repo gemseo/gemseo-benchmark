@@ -23,7 +23,11 @@
 
 
 class HistoryItem(object):
-    """A performance history item."""
+    """A performance history item.
+
+    Attributes:
+        objective_value: The objective function value of the item.
+    """
 
     def __init__(
             self,
@@ -34,24 +38,9 @@ class HistoryItem(object):
         Args:
             objective_value: The objective function value of the item.
             infeasibility_measure: The infeasibility measure of the item.
-
-        Raises:
-            ValueError: If the infeasibility measure is negative.
         """
         self.objective_value = objective_value
         self.infeasibility_measure = infeasibility_measure
-
-    @property
-    def objective_value(self):  # type: (...) -> float
-        """Return the objective value of the history item."""
-        return self._obj_value
-
-    @objective_value.setter
-    def objective_value(
-            self,
-            objective_value,  # type: float
-    ):  # type: (...) -> None
-        self._obj_value = objective_value
 
     @property
     def infeasibility_measure(self):  # type: (...) -> float
@@ -63,6 +52,10 @@ class HistoryItem(object):
             self,
             infeasibility_measure,  # type: float
     ):  # type: (...) -> None
+        """
+        Raises:
+             ValueError: If the infeasibility measure is negative.
+        """
         if infeasibility_measure < 0.0:
             raise ValueError("The infeasibility measure must be non-negative.")
         self._infeas_measure = infeasibility_measure
@@ -83,7 +76,7 @@ class HistoryItem(object):
             Whether the history item is equal to the other one.
         """
         return (self._infeas_measure == other._infeas_measure
-                and self._obj_value == other._obj_value)
+                and self.objective_value == other.objective_value)
 
     def __lt__(
             self,
@@ -99,7 +92,7 @@ class HistoryItem(object):
         """
         return self._infeas_measure < other._infeas_measure or (
                 self._infeas_measure == other._infeas_measure
-                and self._obj_value < other._obj_value
+                and self.objective_value < other.objective_value
         )
 
     def __le__(
