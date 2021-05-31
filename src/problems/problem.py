@@ -123,8 +123,7 @@ class Problem(object):
         design_space = self._creator().design_space
         doe_library = DOEFactory().create(doe_algo_name)
         doe = doe_library(doe_size, design_space.dimension, **doe_options)
-        doe = [design_space.unnormalize_vect(array(row)) for row in doe]
-        return doe
+        return [design_space.unnormalize_vect(array(row)) for row in doe]
 
     @property
     def name(self):  # type: (...) -> str
