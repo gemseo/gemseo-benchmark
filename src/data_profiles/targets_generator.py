@@ -60,7 +60,6 @@ class TargetsGenerator(object):
                 to infinity otherwise.
             feasibility_history: A history of feasibilities.
                 If None then feasibility is always assumed.
-
         """
         history = PerformanceHistory(
             values_history, measures_history, feasibility_history
@@ -88,7 +87,6 @@ class TargetsGenerator(object):
 
         Returns:
             The target values of the function.
-
         """
         # Optionally, filter out the first infeasible items
         if feasible:
