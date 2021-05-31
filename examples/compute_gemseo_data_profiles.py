@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 from itertools import product
-from pathlib import Path
 from typing import Any, Callable, List
 
 from numpy import array
@@ -78,5 +77,4 @@ data_profiles = DataProfile(targets_values)
 for method_name, start_point in product(methods, STARTING_POINTS):
     history = generate_values_history(objective, method_name, start_point)
     data_profiles.add_history("Rosenbrock", method_name, history)
-plot_path = Path(__file__).parent / "data_profile.jpg"
-data_profiles.plot(destination_path=plot_path)
+data_profiles.plot()
