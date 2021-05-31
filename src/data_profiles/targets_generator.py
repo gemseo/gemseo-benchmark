@@ -45,25 +45,24 @@ class TargetsGenerator(object):
 
     def add_history(
             self,
-            values_history,  # type: List[float]
-            measures_history=None,  # type: Optional[List[float]]
-            feasibility_history=None,  # type: Optional[List[bool]]
+            objective_values,  # type: List[float]
+            infeasibility_measures=None,  # type: Optional[List[float]]
+            feasibility_statuses=None,  # type: Optional[List[bool]]
     ):  # type: (...) -> None
         """Add a history of objective values.
 
         Args:
-            values_history: A history of objective values.
+            objective_values: A history of objective values.
                 N.B. the value at index i is assumed to have been obtained with i+1
                 evaluations.
-            measures_history: A history of infeasibility measures.
+            infeasibility_measures: A history of infeasibility measures.
                 If None then measures are set to zero in case of feasibility and set
                 to infinity otherwise.
-            feasibility_history: A history of feasibilities.
+            feasibility_statuses: A history of (boolean) feasibility statuses.
                 If None then feasibility is always assumed.
-
         """
         history = PerformanceHistory(
-            values_history, measures_history, feasibility_history
+            objective_values, infeasibility_measures, feasibility_statuses
         )
         self._histories.append(history)
 
@@ -83,33 +82,32 @@ class TargetsGenerator(object):
             budget_min: The evaluation budget to be used to define the easiest target.
             plot: Whether to plot the target values.
             feasible: Whether to generate only feasible targets.
-            show: Whether to show the plot.
+            show: If True, show the plot.
             destination_path: The path where to save the plot.
-                By default the plot is not saved.
+                If None, the plot is not saved.
 
         Returns:
             The target values of the function.
-
         """
         # Optionally, filter out the first infeasible items
         if feasible:
             histories = [
-                a_hist.remove_leading_infeasible() for a_hist in self._histories
+                hist.remove_leading_infeasible() for hist in self._histories
             ]
         else:
             histories = list(self._histories)
 
         # Compute the history of the minimum value
-        budget_max = max(len(a_history) for a_history in histories)
+        budget_max = max(len(history) for history in histories)
         minimum_histories = list()
-        for a_history in histories:
-            a_min_hist = a_history.compute_cumulated_minimum()
+        for history in histories:
+            min_hist = history.compute_cumulated_minimum()
             # If necessary, extend the history by repeating its last value
-            if len(a_min_hist) < budget_max:
-                a_min_hist.history_items = list(chain(
-                    a_min_hist, repeat(a_min_hist[-1], (budget_max - len(a_min_hist)))
+            if len(min_hist) < budget_max:
+                min_hist.history_items = list(chain(
+                    min_hist, repeat(min_hist[-1], (budget_max - len(min_hist)))
                 ))
-            minimum_histories.append(a_min_hist)
+            minimum_histories.append(min_hist)
         median_history = PerformanceHistory.compute_median_history(minimum_histories)
 
         # Compute a budget scale
@@ -126,8 +124,8 @@ class TargetsGenerator(object):
         # Plot the target values
         if show or destination_path is not None:
             objective_values = [
-                inf if an_item.infeasibility_measure > 0.0 else an_item.objective_value
-                for an_item in target_values
+                inf if item.infeasibility_measure > 0.0 else item.objective_value
+                for item in target_values
             ]
             self._plot(objective_values, show, destination_path)
 
@@ -141,11 +139,11 @@ class TargetsGenerator(object):
     ):  # type: (...) -> None
         """Compute and plot the target values.
 
-            Args:
-                objective_target_values: The objective target values.
-                show: Whether to show the plot.
-                destination_path: The path where to save the plot.
-                    By default the plot is not saved.
+        Args:
+            objective_target_values: The objective target values.
+            show: If True, show the plot.
+            destination_path: The path where to save the plot.
+                If None, the plot is not saved.
         """
         targets_number = len(objective_target_values)
         figure()
@@ -168,20 +166,20 @@ class TargetsGenerator(object):
             budget_max,  # type: int
             budgets_number  # type: int
     ):  # type: (...) -> ndarray
-        """Compute a scale of evaluation budgets, whose progression relates to
-        complexity in terms of evaluation cost.
+        """Compute a scale of evaluation budgets.
+
+         The progression of the scale relates to complexity in terms of evaluation cost.
 
         N.B. here the evaluation cost is assumed linear with respect to the number of
         evaluations.
 
         Args:
-            budget_min: The minimum number of evaluations
-            budget_max: The maximum number of evaluations
-            budgets_number: the number of budgets
+            budget_min: The minimum number of evaluations.
+            budget_max: The maximum number of evaluations.
+            budgets_number: The number of budgets.
 
         Returns:
-            distribution of evaluation budgets
-
+            The distribution of evaluation budgets.
         """
         budget_scale = linspace(budget_min, budget_max, budgets_number, dtype=int)
         return budget_scale

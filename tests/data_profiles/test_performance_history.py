@@ -12,7 +12,7 @@ def test_invalid_init_lengths():
     with raises(ValueError):
         PerformanceHistory([3.0, 2.0], [1.0])
     with raises(ValueError):
-        PerformanceHistory([3.0, 2.0], feasibility=[False])
+        PerformanceHistory([3.0, 2.0], feasibility_statuses=[False])
 
 
 def test_negative_infeasibility_measures():
@@ -27,7 +27,7 @@ def test_length():
     assert len(history_1) == 2
     history_2 = PerformanceHistory([3.0, 2.0], [1.0, 0.0])
     assert len(history_2) == 2
-    history_3 = PerformanceHistory([3.0, 2.0], feasibility=[False, True])
+    history_3 = PerformanceHistory([3.0, 2.0], feasibility_statuses=[False, True])
     assert len(history_3) == 2
 
 
@@ -35,7 +35,7 @@ def test_iter():
     """Check the iteration over a performance history"""
     history = PerformanceHistory([3.0, 2.0], [1.0, 0.0])
     assert list(iter(history)) == [HistoryItem(3.0, 1.0), HistoryItem(2.0, 0.0)]
-    history = PerformanceHistory([3.0, 2.0], feasibility=[False, True])
+    history = PerformanceHistory([3.0, 2.0], feasibility_statuses=[False, True])
     assert list(iter(history)) == [HistoryItem(3.0, inf), HistoryItem(2.0, 0.0)]
 
 

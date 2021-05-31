@@ -66,7 +66,6 @@ class DataProfile(object):
         Args:
             target_values: The target values of each of the reference problems.
         """
-        self._target_values = None
         self._targets_number = 0
         self.target_values = target_values
         self._values_histories = dict()
@@ -81,6 +80,12 @@ class DataProfile(object):
             self,
             target_values  # type: Dict[str, TargetValues]
     ):  # type: (...) -> None
+        """
+        Raises:
+            TypeError: if the target values are not passed as a dictionary.
+            ValueError: If the reference problems have different numbers of target
+                values.
+        """
         if not isinstance(target_values, dict):
             raise TypeError("The target values be must passed as a dictionary")
         targets_numbers = set(len(pb_targets) for pb_targets in target_values.values())
@@ -94,24 +99,26 @@ class DataProfile(object):
             self,
             problem_name,  # type: str
             algo_name,  # type: str
-            values_history,  # type: List[float]
-            measures_history=None,  # type: Optional[List[float]]
-            feasibility_history=None,  # type: Optional[List[bool]]
+            objective_values,  # type: List[float]
+            infeasibility_measures=None,  # type: Optional[List[float]]
+            feasibility_statuses=None,  # type: Optional[List[bool]]
     ):  # type: (...) -> None
         """Add a history of performance values.
 
         Args:
             problem_name: The name of the problem.
             algo_name: The name of the algorithm.
-            values_history: A history of objective values.
-                N.B. the value at index i is assumed to have been obtained with i+1
-                evaluations.
-            measures_history: A history of infeasibility measures.
+            objective_values: A history of objective values.
+                N.B. the value at index ``i`` is assumed to have been obtained with
+                ``i+1`` evaluations.
+            infeasibility_measures: A history of infeasibility measures.
                 If None then measures are set to zero in case of feasibility and set
                 to infinity otherwise.
-            feasibility_history: A history of feasibilities.
+            feasibility_statuses: A history of (boolean) feasibility statuses.
                 If None then feasibility is always assumed.
 
+        Raises:
+            ValueError: If the problem name is not the name of a reference problem.
         """
         if problem_name not in self._target_values:
             raise ValueError(
@@ -119,10 +126,10 @@ class DataProfile(object):
             )
         if algo_name not in self._values_histories:
             self._values_histories[algo_name] = {
-                a_pb_name: list() for a_pb_name in self._target_values.keys()
+                pb_name: list() for pb_name in self._target_values.keys()
             }
         history = PerformanceHistory(
-            values_history, measures_history, feasibility_history
+            objective_values, infeasibility_measures, feasibility_statuses
         )
         self._values_histories[algo_name][problem_name].append(history)
 
@@ -137,9 +144,9 @@ class DataProfile(object):
         Args:
             algo_names: The names of the algorithms.
                 If None then all the algorithms are considered.
-            show: Whether to show the plot.
+            show: If True, show the plot.
             destination_path: The path where to save the plot.
-                By default the plot is not saved.
+                If None, the plot is not saved.
         """
         data_profiles = self.compute_data_profiles(algo_names)
         DataProfile._plot_data_profile(data_profiles, show, destination_path)
@@ -159,12 +166,9 @@ class DataProfile(object):
 
         Returns:
             The data profiles.
-
         """
         algo_names = self._values_histories.keys() if algo_names is None else algo_names
-        data_profiles = {a_name: self.compute_a_data_profile(a_name)
-                         for a_name in algo_names}
-        return data_profiles
+        return {name: self.compute_a_data_profile(name) for name in algo_names}
 
     def compute_a_data_profile(
             self,
@@ -180,18 +184,19 @@ class DataProfile(object):
 
         Returns:
             The history of the success ratios.
-
         """
-        repeat_number = self._check_repeat_number(algo_name)
+        repeat_number = self._get_repeat_number(algo_name)
         algo_histories = self._values_histories[algo_name]
 
         # Compute the history of total target hits
-        max_history_size = max([max([len(a_pb_hist) for a_pb_hist in a_pb_histories])
-                                for a_pb_histories in algo_histories.values()])
+        max_history_size = max([
+            max([len(pb_hist) for pb_hist in pb_histories])
+            for pb_histories in algo_histories.values()
+        ])
         total_hits_history = zeros(max_history_size)
-        for a_pb_name, targets in self._target_values.items():
-            for a_pb_history in algo_histories[a_pb_name]:
-                hits_history = targets.count_targets_hits(a_pb_history)
+        for pb_name, targets in self._target_values.items():
+            for pb_history in algo_histories[pb_name]:
+                hits_history = targets.count_targets_hits(pb_history)
                 # If the history is shorter than the longest one, repeat its last value
                 if len(hits_history) < max_history_size:
                     tail = [hits_history[-1]] * (max_history_size - len(hits_history))
@@ -204,7 +209,7 @@ class DataProfile(object):
         ratios = total_hits_history / targets_total
         return ratios.tolist()
 
-    def _check_repeat_number(
+    def _get_repeat_number(
             self,
             algo_name  # type: str
     ):  # type: (...) -> int
@@ -219,9 +224,13 @@ class DataProfile(object):
         Returns:
             The common number of values histories per problem.
 
+        Raises:
+            ValueError: If the algorithm does not have the same number of histories
+                for each problem.
         """
-        histories_numbers = set(len(histories) for histories
-                                in self._values_histories[algo_name].values())
+        histories_numbers = set(
+            len(histories) for histories in self._values_histories[algo_name].values()
+        )
         if len(histories_numbers) != 1:
             raise ValueError("Reference problems unequally represented for algorithm {}"
                              .format(algo_name))
@@ -233,20 +242,19 @@ class DataProfile(object):
             show=True,  # type: bool
             destination_path=None  # type: Optional[str]
     ):  # type: (...) -> None
-        """Plot data profiles.
+        """Plot the data profiles.
 
         Args:
             data_profiles: The data profiles.
-            show: Whether to show the plot.
+            show: If True, show the plot.
             destination_path: The path where to save the plot.
-                By default the plot is not saved.
-
+                If None, the plot is not saved.
         """
         figure()
 
         # Set the title and axes
         title("Data profile{}".format("s" if len(data_profiles) > 1 else ""))
-        max_profile_size = max([len(a_profile) for a_profile in data_profiles.values()])
+        max_profile_size = max([len(profile) for profile in data_profiles.values()])
         xlabel("Number of functions evaluations")
         xlim([1, max_profile_size])
         y_ticks = linspace(0.0, 1.0, 11)
@@ -260,17 +268,17 @@ class DataProfile(object):
         # Plot the data profiles
         color_cycle = rcParams["axes.prop_cycle"].by_key()["color"]
         marker_cycle = cycle(('o', 's', 'D', 'v', '^', '<', '>', 'X', 'H', 'p'))
-        for a_color, a_marker, (a_name, a_profile) in zip(
+        for color, marker, (name, profile) in zip(
                 color_cycle, marker_cycle, data_profiles.items()
         ):
-            last_abscissa = len(a_profile)
-            last_value = a_profile[-1]
+            last_abscissa = len(profile)
+            last_value = profile[-1]
             # Extend the profile if necessary
             if last_abscissa < max_profile_size:
                 tail = [last_value] * (max_profile_size - last_abscissa)
-                a_profile = append(a_profile, tail)
-            plot(range(1, max_profile_size + 1), a_profile, color=a_color,
-                 label=a_name, marker=a_marker)
+                profile = append(profile, tail)
+            plot(range(1, max_profile_size + 1), profile, color=color,
+                 label=name, marker=marker)
             plot(last_abscissa + 1, last_value, marker="*")
         legend()
 
