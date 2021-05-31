@@ -34,8 +34,8 @@ boolean feasibility statuses.
 Performance histories can be used to generate target values for a problem,
 or to generate the data profile of an algorithm.
 """
+import json
 from functools import reduce
-from json import dump, load
 from math import ceil
 from pathlib import Path
 from typing import Iterable, Iterator, List, Optional, Union
@@ -211,15 +211,16 @@ class PerformanceHistory(object):
         Args:
             file_path: The path where to write the file.
         """
-        data = [
-            dict([
-                (PerformanceHistory.PERFORMANCE, item.objective_value),
-                (PerformanceHistory.INFEASIBILITY, item.infeasibility_measure)
-            ])
-            for item in self.history_items
-        ]
+        data = list()
+        # Add each history item in dictionary format
+        for item in self.history_items:
+            data_item = {
+                PerformanceHistory.PERFORMANCE: item.objective_value,
+                PerformanceHistory.INFEASIBILITY: item.infeasibility_measure
+            }
+            data.append(data_item)
         with Path(file_path).open("w") as file:
-            dump(data, file, indent=4)
+            json.dump(data, file, indent=4)
 
     @staticmethod
     def load_from_file(
@@ -234,13 +235,10 @@ class PerformanceHistory(object):
             The performance history.
         """
         with Path(file_path).open("r") as file:
-            data = load(file)
-        values = [
-            [
-                item[PerformanceHistory.PERFORMANCE],
-                item[PerformanceHistory.INFEASIBILITY]
-            ]
-            for item in data
-        ]
-        objective_values, infeasibility_measures = zip(*values)
+            data = json.load(file)
+        objective_values = list()
+        infeasibility_measures = list()
+        for item in data:
+            objective_values.append(item[PerformanceHistory.PERFORMANCE])
+            infeasibility_measures.append(item[PerformanceHistory.INFEASIBILITY])
         return PerformanceHistory(objective_values, infeasibility_measures)
