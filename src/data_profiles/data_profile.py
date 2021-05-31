@@ -188,7 +188,7 @@ class DataProfile(object):
             The history of the success ratios.
 
         """
-        repeat_number = self._check_repeat_number(algo_name)
+        repeat_number = self._get_repeat_number(algo_name)
         algo_histories = self._values_histories[algo_name]
 
         # Compute the history of total target hits
@@ -212,7 +212,7 @@ class DataProfile(object):
         ratios = total_hits_history / targets_total
         return ratios.tolist()
 
-    def _check_repeat_number(
+    def _get_repeat_number(
             self,
             algo_name  # type: str
     ):  # type: (...) -> int
