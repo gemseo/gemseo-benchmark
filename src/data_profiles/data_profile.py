@@ -66,7 +66,6 @@ class DataProfile(object):
         Args:
             target_values: The target values of each of the reference problems.
         """
-        self._target_values = None
         self._targets_number = 0
         self.target_values = target_values
         self._values_histories = dict()
