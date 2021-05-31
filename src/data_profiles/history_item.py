@@ -23,7 +23,11 @@
 
 
 class HistoryItem(object):
-    """A performance history item."""
+    """A performance history item.
+
+    Attributes:
+        objective_value: The objective function value of the item.
+    """
 
     def __init__(
             self,
@@ -34,9 +38,6 @@ class HistoryItem(object):
         Args:
             objective_value: The objective function value of the item.
             infeasibility_measure: The infeasibility measure of the item.
-
-        Raises:
-            ValueError: If the infeasibility measure is negative.
         """
         self.objective_value = objective_value
         self.infeasibility_measure = infeasibility_measure
@@ -63,6 +64,10 @@ class HistoryItem(object):
             self,
             infeasibility_measure,  # type: float
     ):  # type: (...) -> None
+        """
+        Raises:
+             ValueError: If the infeasibility measure is negative.
+        """
         if infeasibility_measure < 0.0:
             raise ValueError("The infeasibility measure must be non-negative.")
         self._infeas_measure = infeasibility_measure

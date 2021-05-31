@@ -140,11 +140,11 @@ class TargetsGenerator(object):
     ):  # type: (...) -> None
         """Compute and plot the target values.
 
-            Args:
-                objective_target_values: The objective target values.
-                show: Whether to show the plot.
-                destination_path: The path where to save the plot.
-                    By default the plot is not saved.
+        Args:
+            objective_target_values: The objective target values.
+            show: If True, show the plot.
+            destination_path: The path where to save the plot.
+                If None, the plot is not saved.
         """
         targets_number = len(objective_target_values)
         figure()
@@ -167,20 +167,20 @@ class TargetsGenerator(object):
             budget_max,  # type: int
             budgets_number  # type: int
     ):  # type: (...) -> ndarray
-        """Compute a scale of evaluation budgets, whose progression relates to
-        complexity in terms of evaluation cost.
+        """Compute a scale of evaluation budgets.
+
+         The progression of the scale relates to complexity in terms of evaluation cost.
 
         N.B. here the evaluation cost is assumed linear with respect to the number of
         evaluations.
 
         Args:
-            budget_min: The minimum number of evaluations
-            budget_max: The maximum number of evaluations
-            budgets_number: the number of budgets
+            budget_min: The minimum number of evaluations.
+            budget_max: The maximum number of evaluations.
+            budgets_number: The number of budgets.
 
         Returns:
-            distribution of evaluation budgets
-
+            The distribution of evaluation budgets.
         """
         budget_scale = linspace(budget_min, budget_max, budgets_number, dtype=int)
         return budget_scale

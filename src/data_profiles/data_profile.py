@@ -81,6 +81,12 @@ class DataProfile(object):
             self,
             target_values  # type: Dict[str, TargetValues]
     ):  # type: (...) -> None
+        """
+        Raises:
+            TypeError: if the target values are not passed as a dictionary.
+            ValueError: If the reference problems have different numbers of target
+                values.
+        """
         if not isinstance(target_values, dict):
             raise TypeError("The target values be must passed as a dictionary")
         targets_numbers = set(len(pb_targets) for pb_targets in target_values.values())
@@ -104,14 +110,16 @@ class DataProfile(object):
             problem_name: The name of the problem.
             algo_name: The name of the algorithm.
             values_history: A history of objective values.
-                N.B. the value at index i is assumed to have been obtained with i+1
-                evaluations.
+                N.B. the value at index ``i`` is assumed to have been obtained with
+                ``i+1`` evaluations.
             measures_history: A history of infeasibility measures.
                 If None then measures are set to zero in case of feasibility and set
                 to infinity otherwise.
             feasibility_history: A history of feasibilities.
                 If None then feasibility is always assumed.
 
+        Raises:
+            ValueError: If the problem name is not the name of a reference problem.
         """
         if problem_name not in self._target_values:
             raise ValueError(
@@ -220,6 +228,9 @@ class DataProfile(object):
         Returns:
             The common number of values histories per problem.
 
+        Raises:
+            ValueError: If the algorithm does not have the same number of histories
+                for each problem.
         """
         histories_numbers = set(
             len(histories) for histories in self._values_histories[algo_name].values()

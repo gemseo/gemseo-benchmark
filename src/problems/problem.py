@@ -28,7 +28,7 @@ A benchmarking problem is characterized by its functions
 its starting points (each defining an instance of the problem)
 and its targets (refer to :mod:`target_values`).
 """
-from typing import Callable, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 
 from gemseo.algos.doe.doe_factory import DOEFactory
 from gemseo.algos.opt.opt_factory import OptimizersFactory
@@ -58,7 +58,7 @@ class Problem(object):
             target_values=None,  # type: Optional[TargetValues]
             doe_algo_name=None,  # type: Optional[str]
             doe_size=None,  # type: Optional[int]
-            doe_options=None,  # type: Optional[Dict]
+            doe_options=None,  # type: Optional[Dict[str, Any]]
     ):  # type: (...) -> None
         """
         Args:
@@ -66,6 +66,8 @@ class Problem(object):
             creator: A callable object that returns an instance of the problem.
             start_points: The starting points of the benchmarking problem.
             target_values: The target values of the benchmarking problem.
+                If None, the target values will have to be generated later with the
+                `generate_targets` method.
             doe_algo_name: The name of the DOE algorithm.
             doe_size: The number of starting points.
             doe_options: The options of the DOE algorithm.
@@ -73,7 +75,8 @@ class Problem(object):
         Raises:
             TypeError: If the return type of the creator is not OptimizationProblem,
                 or if a starting point is not of type ndarray.
-            ValueError: If a starting point is of inappropriate shape.
+            ValueError: If neither starting points nor DOE parameters are passed,
+               or if a starting point is of inappropriate shape.
         """
         self._name = name
         self._creator = creator
@@ -108,7 +111,7 @@ class Problem(object):
             self,
             doe_algo_name,  # type: str
             doe_size,  # type: int
-            doe_options=None,  # type: Optional[Dict]
+            doe_options=None,  # type: Optional[Dict[str, Any]]
     ):  # type: (...) -> Iterable[ndarray]
         """Generate the starting points of the benchmarking problem.
 
@@ -158,6 +161,9 @@ class Problem(object):
         Args:
             start_point: The starting point of the instance.
                 By default it is the current design of the benchmarking problem.
+
+        Returns:
+            The instance of the benchmarking problem.
         """
         # TODO: remove this method
         instance = self._creator()
@@ -173,6 +179,9 @@ class Problem(object):
 
         Args:
             name: The name of the algorithm.
+
+        Returns:
+            True if the algorithm is suited to the problem, False otherwise.
         """
         library = OptimizersFactory().create(name)
         return library.is_algorithm_suited(library.lib_dict[name], self._creator())
@@ -180,7 +189,7 @@ class Problem(object):
     def generate_targets(
             self,
             targets_number,  # type: int
-            reference_algorithms,  # type: Dict[str, Dict]
+            reference_algorithms,  # type: Dict[str, Dict[str, Any]]
             feasible=True,  # type: bool
     ):  # type: (...) -> TargetValues
         """Generate targets based on reference algorithms.
