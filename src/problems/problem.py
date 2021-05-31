@@ -30,9 +30,10 @@ and its targets (refer to :mod:`target_values`).
 """
 from typing import Callable, Dict, Iterable, List, Optional, Tuple
 
+from gemseo.algos.doe.doe_factory import DOEFactory
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
-from numpy import ndarray
+from numpy import array, ndarray
 
 from data_profiles.data_profile import DataProfile
 from data_profiles.target_values import TargetValues
@@ -53,8 +54,11 @@ class Problem(object):
             self,
             name,  # type: str
             creator,  # type: Callable[[], OptimizationProblem]
-            start_points,  # type: Iterable[ndarray]
+            start_points=None,  # type: Optional[Iterable[ndarray]]
             target_values=None,  # type: Optional[TargetValues]
+            doe_algo_name=None,  # type: Optional[str]
+            doe_size=None,  # type: Optional[int]
+            doe_options=None,  # type: Optional[Dict]
     ):  # type: (...) -> None
         """
         Args:
@@ -62,6 +66,9 @@ class Problem(object):
             creator: A callable object that returns an instance of the problem.
             start_points: The starting points of the benchmarking problem.
             target_values: The target values of the benchmarking problem.
+            doe_algo_name: The name of the DOE algorithm.
+            doe_size: The number of starting points.
+            doe_options: The options of the DOE algorithm.
 
         Raises:
             TypeError: If the return type of the creator is not OptimizationProblem,
@@ -78,6 +85,15 @@ class Problem(object):
         self._dimension = problem.dimension
 
         # Set the starting points
+        if start_points is None and (doe_size is None or doe_algo_name is None):
+            raise ValueError("The starting points, "
+                             "or their number and the name of the algorithm to "
+                             "generate them, "
+                             "must be passed")
+        elif start_points is None:
+            start_points = self._generate_start_points(
+                doe_size, doe_algo_name, doe_options
+            )
         for a_point in start_points:
             if not isinstance(a_point, ndarray):
                 raise TypeError("Starting points must be of type ndarray")
@@ -87,6 +103,30 @@ class Problem(object):
         self._start_points = start_points
 
         self._target_values = target_values
+
+    def _generate_start_points(
+            self,
+            doe_algo_name,  # type: str
+            doe_size,  # type: int
+            doe_options=None,  # type: Optional[Dict]
+    ):  # type: (...) -> Iterable[ndarray]
+        """Generate the starting points of the benchmarking problem.
+
+        Args:
+            doe_algo_name: The name of the DOE algorithm.
+            doe_size: The number of starting points.
+            doe_options: The options of the DOE algorithm.
+
+        Returns:
+            The starting points of the benchmarking problem.
+        """
+        problem = self._creator()
+        design_space = problem.design_space
+        dimension = design_space.dimension
+        doe_library = DOEFactory().create(doe_algo_name)
+        doe = doe_library(doe_size, dimension, **doe_options)
+        doe = [design_space.unnormalize_vect(array(row)) for row in doe]
+        return doe
 
     @property
     def name(self):  # type: (...) -> str
