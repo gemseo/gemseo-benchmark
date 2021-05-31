@@ -219,7 +219,6 @@ class DataProfile(object):
 
         Returns:
             The common number of values histories per problem.
-
         """
         histories_numbers = set(
             len(histories) for histories in self._values_histories[algo_name].values()
@@ -235,13 +234,13 @@ class DataProfile(object):
             show=True,  # type: bool
             destination_path=None  # type: Optional[str]
     ):  # type: (...) -> None
-        """Plot data profiles.
+        """Plot the data profiles.
 
         Args:
             data_profiles: The data profiles.
             show: Whether to show the plot.
             destination_path: The path where to save the plot.
-                By default the plot is not saved.
+                If None, the plot is not saved.
 
         """
         figure()

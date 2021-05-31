@@ -189,10 +189,8 @@ class PerformanceHistory(object):
             if item.infeasibility_measure == 0.0:
                 first_feasible = index
                 break
-        if first_feasible is None:
-            truncated_history = PerformanceHistory()
-        else:
-            truncated_history = PerformanceHistory()
+        truncated_history = PerformanceHistory()
+        if first_feasible is not None:
             truncated_history.history_items = self.history_items[first_feasible:]
         return truncated_history
 

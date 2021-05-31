@@ -47,7 +47,6 @@ class Problem(object):
     - its functions (objective and constraints, including bounds),
     - its starting points,
     - its target values.
-
     """
 
     def __init__(
@@ -157,7 +156,7 @@ class Problem(object):
 
         Args:
             start_point: The starting point of the instance.
-                By default it is the current design of the benchmarking problem.
+                If None, it is the current design of the benchmarking problem.
         """
         # TODO: remove this method
         instance = self._creator()
@@ -192,7 +191,6 @@ class Problem(object):
 
         Returns:
             The generated targets.
-
         """
         targets_generator = TargetsGenerator()
 
@@ -221,7 +219,7 @@ class Problem(object):
             algorithms: The algorithms and their options.
             show: Whether to show the plot.
             destination_path: The path where to save the plot.
-                (By default the plot is not saved.)
+                If None, the plot is not saved.
 
         """
         data_profile = DataProfile({self._name: self._target_values})
@@ -261,5 +259,4 @@ class Problem(object):
         obj_name = problem.objective.name
         history = [(values[obj_name],) + problem.get_violation_criteria(key)
                    for key, values in problem.database.items()]
-        objective_values, feasibility, infeasibility_measures = zip(*history)
-        return objective_values, infeasibility_measures, feasibility
+        return zip(*history)
