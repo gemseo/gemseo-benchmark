@@ -146,7 +146,7 @@ class DataProfile(object):
                 If None then all the algorithms are considered.
             show: Whether to show the plot.
             destination_path: The path where to save the plot.
-                By default the plot is not saved.
+                If None, the plot is not saved.
         """
         data_profiles = self.compute_data_profiles(algo_names)
         DataProfile._plot_data_profile(data_profiles, show, destination_path)
@@ -166,7 +166,6 @@ class DataProfile(object):
 
         Returns:
             The data profiles.
-
         """
         algo_names = self._values_histories.keys() if algo_names is None else algo_names
         return {name: self.compute_a_data_profile(name) for name in algo_names}
@@ -185,7 +184,6 @@ class DataProfile(object):
 
         Returns:
             The history of the success ratios.
-
         """
         repeat_number = self._get_repeat_number(algo_name)
         algo_histories = self._values_histories[algo_name]
@@ -244,14 +242,13 @@ class DataProfile(object):
             show=True,  # type: bool
             destination_path=None  # type: Optional[str]
     ):  # type: (...) -> None
-        """Plot data profiles.
+        """Plot the data profiles.
 
         Args:
             data_profiles: The data profiles.
             show: Whether to show the plot.
             destination_path: The path where to save the plot.
-                By default the plot is not saved.
-
+                If None, the plot is not saved.
         """
         figure()
 
