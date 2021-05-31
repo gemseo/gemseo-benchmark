@@ -74,7 +74,7 @@ class Problem(object):
         Raises:
             TypeError: If the return type of the creator is not OptimizationProblem,
                 or if a starting point is not of type ndarray.
-            ValueError: If neither starting points nor DOE parameters are passed,
+            ValueError: If neither starting points nor DOE specifications are passed,
                or if a starting point is of inappropriate shape.
         """
         self._name = name
@@ -188,14 +188,14 @@ class Problem(object):
     def generate_targets(
             self,
             targets_number,  # type: int
-            reference_algorithms,  # type: Dict[str, Dict[str, Any]]
+            ref_algo_specs,  # type: Dict[str, Dict[str, Any]]
             feasible=True,  # type: bool
     ):  # type: (...) -> TargetValues
         """Generate targets based on reference algorithms.
 
         Args:
             targets_number: The number of targets to generate.
-            reference_algorithms: The names and options of the reference algorithms.
+            ref_algo_specs: The names and options of the reference algorithms.
             feasible: Whether to generate only feasible targets.
 
         Returns:
@@ -204,7 +204,7 @@ class Problem(object):
         targets_generator = TargetsGenerator()
 
         # Generate reference performance histories
-        for algo_name, algo_options in reference_algorithms.items():
+        for algo_name, algo_options in ref_algo_specs.items():
             for instance in self:
                 OptimizersFactory().execute(instance, algo_name, **algo_options)
                 obj_values, measures, feas_statuses = self.extract_performance(instance)

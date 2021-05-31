@@ -81,9 +81,9 @@ class TargetsGenerator(object):
             budget_min: The evaluation budget to be used to define the easiest target.
             plot: Whether to plot the target values.
             feasible: Whether to generate only feasible targets.
-            show: Whether to show the plot.
+            show: If True, show the plot.
             destination_path: The path where to save the plot.
-                By default the plot is not saved.
+                If None, the plot is not saved.
 
         Returns:
             The target values of the function.

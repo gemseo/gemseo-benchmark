@@ -144,7 +144,7 @@ class DataProfile(object):
         Args:
             algo_names: The names of the algorithms.
                 If None then all the algorithms are considered.
-            show: Whether to show the plot.
+            show: If True, show the plot.
             destination_path: The path where to save the plot.
                 If None, the plot is not saved.
         """
@@ -246,7 +246,7 @@ class DataProfile(object):
 
         Args:
             data_profiles: The data profiles.
-            show: Whether to show the plot.
+            show: If True, show the plot.
             destination_path: The path where to save the plot.
                 If None, the plot is not saved.
         """
