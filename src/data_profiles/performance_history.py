@@ -85,23 +85,23 @@ class PerformanceHistory(object):
             if len(feasibility) != len(objective_values):
                 raise ValueError("The objective history and the feasibility history "
                                  "must have same length.")
-            infeasibility_measures = [0.0 if a_feas else inf for a_feas in feasibility]
+            infeasibility_measures = [0.0 if feas else inf for feas in feasibility]
         else:
             infeasibility_measures = [0.0] * len(objective_values)
         self.history_items = [
-            HistoryItem(a_value, a_measure) for a_value, a_measure
+            HistoryItem(value, measure) for value, measure
             in zip(objective_values, infeasibility_measures)
         ]
 
     @property
     def objective_values(self):  # type: (...) -> List[float]
         """Return the objective values."""
-        return [an_item.objective_value for an_item in self.history_items]
+        return [item.objective_value for item in self.history_items]
 
     @property
     def infeasibility_measures(self):  # type: (...) -> List[float]
         """Return the infeasibility measures."""
-        return [an_item.infeasibility_measure for an_item in self.history_items]
+        return [item.infeasibility_measure for item in self.history_items]
 
     @property
     def history_items(self):  # type: (...) -> List[HistoryItem]
@@ -117,8 +117,8 @@ class PerformanceHistory(object):
         Raises:
             TypeError: If an item is not of type HistoryItem.
         """
-        for an_item in history_items:
-            if not isinstance(an_item, HistoryItem):
+        for item in history_items:
+            if not isinstance(item, HistoryItem):
                 raise TypeError("History items must be of type HistoryItem")
         self._items = list(history_items)
 
@@ -135,7 +135,7 @@ class PerformanceHistory(object):
         return self._items[item]
 
     def __repr__(self):  # type: (...) -> str
-        return str([an_item for an_item in self])
+        return str([item for item in self])
 
     def compute_cumulated_minimum(self):  # type: (...) -> PerformanceHistory
         """Return the history of the cumulated minimum.
@@ -169,11 +169,11 @@ class PerformanceHistory(object):
             The median history.
         """
         medians = list()
-        for a_snapshot in zip(*[a_hist.history_items for a_hist in histories]):
+        for snapshot in zip(*[hist.history_items for hist in histories]):
             snapshot_as_hist = PerformanceHistory()
-            snapshot_as_hist.history_items = a_snapshot
-            a_median = snapshot_as_hist._compute_median()
-            medians.append(a_median)
+            snapshot_as_hist.history_items = snapshot
+            median = snapshot_as_hist._compute_median()
+            medians.append(median)
         median_history = PerformanceHistory()
         median_history.history_items = medians
         return median_history
@@ -185,9 +185,9 @@ class PerformanceHistory(object):
             The truncated performance history.
         """
         first_feasible = None
-        for an_index, an_item in enumerate(self):
-            if an_item.infeasibility_measure == 0.0:
-                first_feasible = an_index
+        for index, item in enumerate(self):
+            if item.infeasibility_measure == 0.0:
+                first_feasible = index
                 break
         if first_feasible is None:
             truncated_history = PerformanceHistory()
@@ -207,13 +207,13 @@ class PerformanceHistory(object):
         """
         data = [
             dict([
-                (PerformanceHistory.PERFORMANCE, an_item.objective_value),
-                (PerformanceHistory.INFEASIBILITY, an_item.infeasibility_measure)
+                (PerformanceHistory.PERFORMANCE, item.objective_value),
+                (PerformanceHistory.INFEASIBILITY, item.infeasibility_measure)
             ])
-            for an_item in self.history_items
+            for item in self.history_items
         ]
-        with Path(file_path).open("w") as the_file:
-            dump(data, the_file, indent=4)
+        with Path(file_path).open("w") as file:
+            dump(data, file, indent=4)
 
     @staticmethod
     def load_from_file(
@@ -227,14 +227,14 @@ class PerformanceHistory(object):
         Returns:
             The performance history.
         """
-        with Path(file_path).open("r") as the_file:
-            data = load(the_file)
+        with Path(file_path).open("r") as file:
+            data = load(file)
         values = [
             [
-                an_item[PerformanceHistory.PERFORMANCE],
-                an_item[PerformanceHistory.INFEASIBILITY]
+                item[PerformanceHistory.PERFORMANCE],
+                item[PerformanceHistory.INFEASIBILITY]
             ]
-            for an_item in data
+            for item in data
         ]
         objective_values, infeasibility_measures = zip(*values)
         return PerformanceHistory(objective_values, infeasibility_measures)

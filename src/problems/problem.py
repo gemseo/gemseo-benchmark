@@ -94,10 +94,10 @@ class Problem(object):
             start_points = self._generate_start_points(
                 doe_size, doe_algo_name, doe_options
             )
-        for a_point in start_points:
-            if not isinstance(a_point, ndarray):
+        for point in start_points:
+            if not isinstance(point, ndarray):
                 raise TypeError("Starting points must be of type ndarray")
-            elif a_point.shape != (self._dimension,):
+            elif point.shape != (self._dimension,):
                 raise ValueError("Starting points must be 1-dimensional with size {}"
                                  .format(self._dimension))
         self._start_points = start_points
@@ -147,9 +147,9 @@ class Problem(object):
 
     def __iter__(self):  # type: (...) -> OptimizationProblem
         """Iterate on the problem instances with respect to the starting points. """
-        for a_start_point in self._start_points:
+        for start_point in self._start_points:
             problem = self._creator()
-            problem.design_space.set_current_x(a_start_point)
+            problem.design_space.set_current_x(start_point)
             yield problem
 
     def get_instance(
@@ -200,14 +200,10 @@ class Problem(object):
         targets_generator = TargetsGenerator()
 
         # Generate reference performance histories
-        for an_algo_name, an_algo_options in reference_algorithms.items():
-            for an_instance in self:
-                OptimizersFactory().execute(
-                    an_instance, an_algo_name, **an_algo_options
-                )
-                obj_values, measures, feasibility = self.extract_performance(
-                    an_instance
-                )
+        for algo_name, algo_options in reference_algorithms.items():
+            for instance in self:
+                OptimizersFactory().execute(instance, algo_name, **algo_options)
+                obj_values, measures, feasibility = self.extract_performance(instance)
                 targets_generator.add_history(obj_values, measures, feasibility)
 
         # Compute the target values
@@ -234,13 +230,14 @@ class Problem(object):
         data_profile = DataProfile({self._name: self._target_values})
 
         # Generate the performance histories
-        for an_algo_name, an_algo_options in algorithms.items():
+        for algo_name, algo_options in algorithms.items():
             for start_point in self._start_points:
                 problem = self.get_instance(start_point)
-                OptimizersFactory().execute(problem, an_algo_name, **an_algo_options)
+                OptimizersFactory().execute(problem, algo_name, **algo_options)
                 obj_values, measures, feasibility = self.extract_performance(problem)
-                data_profile.add_history(self._name, an_algo_name, obj_values, measures,
-                                         feasibility)
+                data_profile.add_history(
+                    self._name, algo_name, obj_values, measures, feasibility
+                )
 
         # Plot and/or save the data profile
         data_profile.plot(show=show, destination_path=destination_path)
@@ -265,7 +262,7 @@ class Problem(object):
 
         """
         obj_name = problem.objective.name
-        history = [(the_values[obj_name],) + problem.get_violation_criteria(an_x)
-                   for an_x, the_values in problem.database.items()]
+        history = [(values[obj_name],) + problem.get_violation_criteria(key)
+                   for key, values in problem.database.items()]
         objective_values, feasibility, infeasibility_measures = zip(*history)
         return objective_values, infeasibility_measures, feasibility

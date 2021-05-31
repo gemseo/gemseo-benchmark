@@ -93,22 +93,22 @@ class TargetsGenerator(object):
         # Optionally, filter out the first infeasible items
         if feasible:
             histories = [
-                a_hist.remove_leading_infeasible() for a_hist in self._histories
+                hist.remove_leading_infeasible() for hist in self._histories
             ]
         else:
             histories = list(self._histories)
 
         # Compute the history of the minimum value
-        budget_max = max(len(a_history) for a_history in histories)
+        budget_max = max(len(history) for history in histories)
         minimum_histories = list()
-        for a_history in histories:
-            a_min_hist = a_history.compute_cumulated_minimum()
+        for history in histories:
+            min_hist = history.compute_cumulated_minimum()
             # If necessary, extend the history by repeating its last value
-            if len(a_min_hist) < budget_max:
-                a_min_hist.history_items = list(chain(
-                    a_min_hist, repeat(a_min_hist[-1], (budget_max - len(a_min_hist)))
+            if len(min_hist) < budget_max:
+                min_hist.history_items = list(chain(
+                    min_hist, repeat(min_hist[-1], (budget_max - len(min_hist)))
                 ))
-            minimum_histories.append(a_min_hist)
+            minimum_histories.append(min_hist)
         median_history = PerformanceHistory.compute_median_history(minimum_histories)
 
         # Compute a budget scale
@@ -125,8 +125,8 @@ class TargetsGenerator(object):
         # Plot the target values
         if show or destination_path is not None:
             objective_values = [
-                inf if an_item.infeasibility_measure > 0.0 else an_item.objective_value
-                for an_item in target_values
+                inf if item.infeasibility_measure > 0.0 else item.objective_value
+                for item in target_values
             ]
             self._plot(objective_values, show, destination_path)
 

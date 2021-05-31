@@ -55,7 +55,7 @@ class TargetValues(PerformanceHistory):
         """
         minimum_history = values_history.compute_cumulated_minimum()
         hits_history = [
-            [a_minimum <= a_target for a_target in self].count(True)
-            for a_minimum in minimum_history
+            [minimum <= target for target in self].count(True)
+            for minimum in minimum_history
         ]
         return hits_history
