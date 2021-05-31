@@ -45,24 +45,24 @@ class TargetsGenerator(object):
 
     def add_history(
             self,
-            values_history,  # type: List[float]
-            measures_history=None,  # type: Optional[List[float]]
-            feasibility_history=None,  # type: Optional[List[bool]]
+            objective_values,  # type: List[float]
+            infeasibility_measures=None,  # type: Optional[List[float]]
+            feasibility_statuses=None,  # type: Optional[List[bool]]
     ):  # type: (...) -> None
         """Add a history of objective values.
 
         Args:
-            values_history: A history of objective values.
+            objective_values: A history of objective values.
                 N.B. the value at index i is assumed to have been obtained with i+1
                 evaluations.
-            measures_history: A history of infeasibility measures.
+            infeasibility_measures: A history of infeasibility measures.
                 If None then measures are set to zero in case of feasibility and set
                 to infinity otherwise.
-            feasibility_history: A history of feasibilities.
+            feasibility_statuses: A history of (boolean) feasibility statuses.
                 If None then feasibility is always assumed.
         """
         history = PerformanceHistory(
-            values_history, measures_history, feasibility_history
+            objective_values, infeasibility_measures, feasibility_statuses
         )
         self._histories.append(history)
 

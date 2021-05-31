@@ -99,22 +99,22 @@ class DataProfile(object):
             self,
             problem_name,  # type: str
             algo_name,  # type: str
-            values_history,  # type: List[float]
-            measures_history=None,  # type: Optional[List[float]]
-            feasibility_history=None,  # type: Optional[List[bool]]
+            objective_values,  # type: List[float]
+            infeasibility_measures=None,  # type: Optional[List[float]]
+            feasibility_statuses=None,  # type: Optional[List[bool]]
     ):  # type: (...) -> None
         """Add a history of performance values.
 
         Args:
             problem_name: The name of the problem.
             algo_name: The name of the algorithm.
-            values_history: A history of objective values.
+            objective_values: A history of objective values.
                 N.B. the value at index ``i`` is assumed to have been obtained with
                 ``i+1`` evaluations.
-            measures_history: A history of infeasibility measures.
+            infeasibility_measures: A history of infeasibility measures.
                 If None then measures are set to zero in case of feasibility and set
                 to infinity otherwise.
-            feasibility_history: A history of feasibilities.
+            feasibility_statuses: A history of (boolean) feasibility statuses.
                 If None then feasibility is always assumed.
 
         Raises:
@@ -129,7 +129,7 @@ class DataProfile(object):
                 pb_name: list() for pb_name in self._target_values.keys()
             }
         history = PerformanceHistory(
-            values_history, measures_history, feasibility_history
+            objective_values, infeasibility_measures, feasibility_statuses
         )
         self._values_histories[algo_name][problem_name].append(history)
 
@@ -195,8 +195,8 @@ class DataProfile(object):
         ])
         total_hits_history = zeros(max_history_size)
         for pb_name, targets in self._target_values.items():
-            for a_pb_history in algo_histories[pb_name]:
-                hits_history = targets.count_targets_hits(a_pb_history)
+            for pb_history in algo_histories[pb_name]:
+                hits_history = targets.count_targets_hits(pb_history)
                 # If the history is shorter than the longest one, repeat its last value
                 if len(hits_history) < max_history_size:
                     tail = [hits_history[-1]] * (max_history_size - len(hits_history))

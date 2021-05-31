@@ -58,7 +58,7 @@ class PerformanceHistory(object):
             self,
             objective_values=None,  # type: Optional[List[float]]
             infeasibility_measures=None,  # type: Optional[List[float]]
-            feasibility=None  # type: Optional[List[bool]]
+            feasibility_statuses=None  # type: Optional[List[bool]]
     ):  # type: (...) -> None
         """
         Args:
@@ -67,14 +67,14 @@ class PerformanceHistory(object):
                 An infeasibility measure is a non-negative real number representing
                 the gap between the design and the feasible space,
                 a zero value meaning feasibility.
-                If None and `feasibility` is not None
+                If None and `feasibility_history` is not None
                 then the infeasibility measures are set to zero in case of feasibility,
                 and set to infinity otherwise.
-                If neither infeasibility measures nor feasibility statuses are passed
+                If None and `feasibility_history` is None
                 then every infeasibility measure is set to zero.
-            feasibility: The history of (boolean) feasibility.
-                If infeasibility measures are passed then the boolean feasibility
-                statuses are disregarded.
+            feasibility_statuses: The history of the (boolean) feasibility statuses.
+                If `infeasibility_measures` is not None then `feasibility_statuses` is
+                disregarded.
 
         Raises:
             ValueError: If the lengths of the histories do not match.
@@ -83,13 +83,15 @@ class PerformanceHistory(object):
             objective_values = []
         if infeasibility_measures is not None:
             if len(infeasibility_measures) != len(objective_values):
-                raise ValueError("The objective history and the infeasibility measures "
-                                 "history must have same length.")
-        elif feasibility is not None:
-            if len(feasibility) != len(objective_values):
+                raise ValueError("The objective history and the infeasibility history "
+                                 "must have same length.")
+        elif feasibility_statuses is not None:
+            if len(feasibility_statuses) != len(objective_values):
                 raise ValueError("The objective history and the feasibility history "
                                  "must have same length.")
-            infeasibility_measures = [0.0 if feas else inf for feas in feasibility]
+            infeasibility_measures = [
+                0.0 if is_feas else inf for is_feas in feasibility_statuses
+            ]
         else:
             infeasibility_measures = [0.0] * len(objective_values)
         self.history_items = [

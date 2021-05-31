@@ -207,8 +207,8 @@ class Problem(object):
         for algo_name, algo_options in reference_algorithms.items():
             for instance in self:
                 OptimizersFactory().execute(instance, algo_name, **algo_options)
-                obj_values, measures, feasibility = self.extract_performance(instance)
-                targets_generator.add_history(obj_values, measures, feasibility)
+                obj_values, measures, feas_statuses = self.extract_performance(instance)
+                targets_generator.add_history(obj_values, measures, feas_statuses)
 
         # Compute the target values
         target_values = targets_generator.run(targets_number, feasible=feasible)
@@ -237,9 +237,9 @@ class Problem(object):
             for start_point in self._start_points:
                 problem = self.get_instance(start_point)
                 OptimizersFactory().execute(problem, algo_name, **algo_options)
-                obj_values, measures, feasibility = self.extract_performance(problem)
+                obj_values, measures, feas_statuses = self.extract_performance(problem)
                 data_profile.add_history(
-                    self._name, algo_name, obj_values, measures, feasibility
+                    self._name, algo_name, obj_values, measures, feas_statuses
                 )
 
         # Plot and/or save the data profile

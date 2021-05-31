@@ -10,7 +10,7 @@ def test_add_inconsistent_histories():
     with raises(ValueError):
         generator.add_history([3.0, 2.0], [1.0])
     with raises(ValueError):
-        generator.add_history([3.0, 2.0], feasibility_history=[False])
+        generator.add_history([3.0, 2.0], feasibility_statuses=[False])
 
 
 def test_negative_infeasibility_measures():
