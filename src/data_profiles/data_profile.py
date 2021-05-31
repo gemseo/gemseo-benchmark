@@ -170,8 +170,7 @@ class DataProfile(object):
 
         """
         algo_names = self._values_histories.keys() if algo_names is None else algo_names
-        data_profiles = {name: self.compute_a_data_profile(name) for name in algo_names}
-        return data_profiles
+        return {name: self.compute_a_data_profile(name) for name in algo_names}
 
     def compute_a_data_profile(
             self,
