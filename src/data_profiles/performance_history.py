@@ -38,7 +38,7 @@ import json
 from functools import reduce
 from math import ceil
 from pathlib import Path
-from typing import Iterable, Iterator, List, Optional, Sequence, Sized, Union
+from typing import Iterable, Iterator, List, Optional, Sequence, Union
 
 from numpy import inf
 
