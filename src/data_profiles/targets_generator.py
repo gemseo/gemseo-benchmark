@@ -29,8 +29,6 @@ extracted.
 from itertools import chain, repeat
 from typing import Optional, Sequence
 
-from matplotlib.pyplot import (figure, savefig, semilogy, show as pyplot_show, xlabel,
-                               xlim, xticks, ylabel)
 from numpy import inf, linspace, ndarray
 
 from data_profiles.performance_history import PerformanceHistory
@@ -122,42 +120,9 @@ class TargetsGenerator(object):
 
         # Plot the target values
         if show or destination_path is not None:
-            objective_values = [
-                inf if item.infeasibility_measure > 0.0 else item.objective_value
-                for item in target_values
-            ]
-            self._plot(objective_values, show, destination_path)
+            target_values.plot(show, destination_path)
 
         return target_values
-
-    @staticmethod
-    def _plot(
-            objective_target_values,  # type: Sequence[float]
-            show=True,  # type: bool
-            destination_path=None,  # type: Optional[str]
-    ):  # type: (...) -> None
-        """Compute and plot the target values.
-
-        Args:
-            objective_target_values: The objective target values.
-            show: If True, show the plot.
-            destination_path: The path where to save the plot.
-                If None, the plot is not saved.
-        """
-        targets_number = len(objective_target_values)
-        figure()
-        xlabel("Target index")
-        xlim([0, targets_number + 1])
-        xticks(linspace(1, targets_number, dtype=int))
-        ylabel("Target value")
-        semilogy(range(1, targets_number + 1), objective_target_values,
-                 marker="o", linestyle="")
-
-        # Save and/or show the plot
-        if destination_path is not None:
-            savefig(destination_path)
-        if show:
-            pyplot_show()
 
     @staticmethod
     def _compute_budget_scale(
