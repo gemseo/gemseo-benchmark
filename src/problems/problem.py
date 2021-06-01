@@ -47,6 +47,10 @@ class Problem(object):
     - its functions (objective and constraints, including bounds),
     - its starting points,
     - its target values.
+
+    Attributes:
+        name: The name of the benchmarking problem.
+        start_points: The starting points of the benchmarking problem.
     """
 
     def __init__(
@@ -77,7 +81,7 @@ class Problem(object):
             ValueError: If neither starting points nor DOE specifications are passed,
                or if a starting point is of inappropriate shape.
         """
-        self._name = name
+        self.name = name
         self._creator = creator
 
         # Set the dimension
@@ -102,7 +106,7 @@ class Problem(object):
             elif point.shape != (self._dimension,):
                 raise ValueError("Starting points must be 1-dimensional with size {}"
                                  .format(self._dimension))
-        self._start_points = start_points
+        self.start_points = start_points
 
         self._target_values = target_values
 
@@ -128,16 +132,6 @@ class Problem(object):
         return [design_space.unnormalize_vect(array(row)) for row in doe]
 
     @property
-    def name(self):  # type: (...) -> str
-        """The name of the benchmarking problem."""
-        return self._name
-
-    @property
-    def start_points(self):  # type: (...) -> Iterable[ndarray]
-        """The starting points of the benchmarking problem."""
-        return self._start_points
-
-    @property
     def target_values(self):  # type: (...) -> TargetValues
         """The target values of the benchmarking problem."""
         if self._target_values is None:
@@ -146,7 +140,7 @@ class Problem(object):
 
     def __iter__(self):  # type: (...) -> OptimizationProblem
         """Iterate on the problem instances with respect to the starting points. """
-        for start_point in self._start_points:
+        for start_point in self.start_points:
             problem = self._creator()
             problem.design_space.set_current_x(start_point)
             yield problem
@@ -166,7 +160,7 @@ class Problem(object):
         """
         # TODO: remove this method
         instance = self._creator()
-        if start_point is not None and start_point in self._start_points:
+        if start_point is not None and start_point in self.start_points:
             instance.design_space.set_current_x(start_point)
         return instance
 
@@ -230,16 +224,16 @@ class Problem(object):
             destination_path: The path where to save the plot.
                 If None, the plot is not saved.
         """
-        data_profile = DataProfile({self._name: self._target_values})
+        data_profile = DataProfile({self.name: self._target_values})
 
         # Generate the performance histories
         for algo_name, algo_options in algorithms.items():
-            for start_point in self._start_points:
+            for start_point in self.start_points:
                 problem = self.get_instance(start_point)
                 OptimizersFactory().execute(problem, algo_name, **algo_options)
                 obj_values, measures, feas_statuses = self.extract_performance(problem)
                 data_profile.add_history(
-                    self._name, algo_name, obj_values, measures, feas_statuses
+                    self.name, algo_name, obj_values, measures, feas_statuses
                 )
 
         # Plot and/or save the data profile
