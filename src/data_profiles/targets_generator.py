@@ -29,7 +29,7 @@ extracted.
 from itertools import chain, repeat
 from typing import Optional, Sequence
 
-from numpy import inf, linspace, ndarray
+from numpy import linspace, ndarray
 
 from data_profiles.performance_history import PerformanceHistory
 from data_profiles.target_values import TargetValues
@@ -77,7 +77,6 @@ class TargetsGenerator(object):
         Args:
             targets_number: The number of targets to compute.
             budget_min: The evaluation budget to be used to define the easiest target.
-            plot: Whether to plot the target values.
             feasible: Whether to generate only feasible targets.
             show: If True, show the plot.
             destination_path: The path where to save the plot.
@@ -85,6 +84,10 @@ class TargetsGenerator(object):
 
         Returns:
             The target values of the function.
+
+        Raises:
+            ValueError: If the number of targets required is larger than the size of
+                the longest history.
         """
         # Optionally, filter out the first infeasible items
         if feasible:
@@ -108,6 +111,10 @@ class TargetsGenerator(object):
         median_history = PerformanceHistory.compute_median_history(minimum_histories)
 
         # Compute a budget scale
+        if targets_number > budget_max - budget_min + 1:
+            raise ValueError("The number of budgets required cannot be larger than "
+                             "the number of budgets available: {} > {}"
+                             .format(targets_number, budget_max - budget_min + 1))
         budget_scale = TargetsGenerator._compute_budget_scale(
             budget_min, budget_max, targets_number
         )
