@@ -103,7 +103,7 @@ class Problem(object):
         for point in start_points:
             if not isinstance(point, ndarray):
                 raise TypeError("Starting points must be of type ndarray")
-            elif point.shape != (self._dimension,):
+            if point.shape != (self._dimension,):
                 raise ValueError("Starting points must be 1-dimensional with size {}"
                                  .format(self._dimension))
         self.start_points = start_points

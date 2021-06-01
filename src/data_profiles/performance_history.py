@@ -226,7 +226,7 @@ class PerformanceHistory(object):
     def load_from_file(
             file_path,  # type: Union[str, Path]
     ):  # type: (...) -> PerformanceHistory
-        """Load a performance history from a file.
+        """Create a new performance history from a file.
 
         Args:
             file_path: The path to the file.
