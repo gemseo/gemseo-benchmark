@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
@@ -41,7 +40,7 @@ from numbers import Number
 from typing import Dict, Iterable, List, Mapping, Optional, Sequence
 
 from matplotlib import rcParams
-from matplotlib.pyplot import (axhline, figure, legend, plot, savefig,
+from matplotlib.pyplot import (axhline, close, figure, legend, plot, savefig,
                                show as pyplot_show,
                                title, xlabel, xlim, ylabel, ylim, yticks)
 from numpy import append, array, linspace, zeros
@@ -255,7 +254,7 @@ class DataProfile(object):
             destination_path: The path where to save the plot.
                 If None, the plot is not saved.
         """
-        figure()
+        fig = figure()
 
         # Set the title and axes
         title("Data profile{}".format("s" if len(data_profiles) > 1 else ""))
@@ -292,3 +291,5 @@ class DataProfile(object):
             savefig(destination_path)
         if show:
             pyplot_show()
+        else:
+            close(fig)
