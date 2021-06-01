@@ -116,7 +116,7 @@ class PerformanceHistory(object):
         Raises:
             TypeError: If an item is set with a type different from HistoryItem.
         """
-        return self._items
+        return self.__items
 
     @history_items.setter
     def history_items(
@@ -126,19 +126,19 @@ class PerformanceHistory(object):
         for item in history_items:
             if not isinstance(item, HistoryItem):
                 raise TypeError("History items must be of type HistoryItem")
-        self._items = list(history_items)
+        self.__items = list(history_items)
 
     def __len__(self):  # type: (...) -> int
         """Return the length of the history."""
-        return len(self._items)
+        return len(self.__items)
 
     def __iter__(self):  # type: (...) -> Iterator[HistoryItem]
         """Return the history items as an iterator."""
-        return iter(self._items)
+        return iter(self.__items)
 
     def __getitem__(self, item):  # type: (...) -> HistoryItem
         """Return the required history item."""
-        return self._items[item]
+        return self.__items[item]
 
     def __repr__(self):  # type: (...) -> str
         return str([item for item in self])
@@ -149,18 +149,18 @@ class PerformanceHistory(object):
         Returns:
             The history of the cumulated minimum.
         """
-        minima = [reduce(min, self._items[:i + 1]) for i in range(len(self))]
+        minima = [reduce(min, self.__items[:i + 1]) for i in range(len(self))]
         minimum_history = PerformanceHistory()
         minimum_history.history_items = minima
         return minimum_history
 
-    def _compute_median(self):  # type: (...) -> HistoryItem
+    def __compute_median(self):  # type: (...) -> HistoryItem
         """Return the median of the history of performance values.
 
         Returns:
             The median of the history of performance values.
         """
-        return sorted(self._items)[ceil(len(self) // 2)]
+        return sorted(self.__items)[ceil(len(self) // 2)]
 
     @staticmethod
     def compute_median_history(
@@ -180,7 +180,7 @@ class PerformanceHistory(object):
         for snapshot in zip(*[hist.history_items for hist in histories]):
             snapshot_as_hist = PerformanceHistory()
             snapshot_as_hist.history_items = snapshot
-            median = snapshot_as_hist._compute_median()
+            median = snapshot_as_hist.__compute_median()
             medians.append(median)
         median_history = PerformanceHistory()
         median_history.history_items = medians

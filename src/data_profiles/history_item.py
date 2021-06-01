@@ -49,7 +49,7 @@ class HistoryItem(object):
         Raises:
              ValueError: If the infeasibility measure is negative.
         """
-        return self._infeas_measure
+        return self.__infeas_measure
 
     @infeasibility_measure.setter
     def infeasibility_measure(
@@ -58,7 +58,7 @@ class HistoryItem(object):
     ):  # type: (...) -> None
         if infeasibility_measure < 0.0:
             raise ValueError("The infeasibility measure must be non-negative.")
-        self._infeas_measure = infeasibility_measure
+        self.__infeas_measure = infeasibility_measure
 
     def __repr__(self):  # type: (...) -> str
         return str((self.objective_value, self.infeasibility_measure))
@@ -75,7 +75,7 @@ class HistoryItem(object):
         Returns:
             Whether the history item is equal to the other one.
         """
-        return (self._infeas_measure == other._infeas_measure
+        return (self.__infeas_measure == other.__infeas_measure
                 and self.objective_value == other.objective_value)
 
     def __lt__(
@@ -90,8 +90,8 @@ class HistoryItem(object):
         Returns:
             Whether the history item is lower than the other one.
         """
-        return self._infeas_measure < other._infeas_measure or (
-                self._infeas_measure == other._infeas_measure
+        return self.__infeas_measure < other.__infeas_measure or (
+                self.__infeas_measure == other.__infeas_measure
                 and self.objective_value < other.objective_value
         )
 

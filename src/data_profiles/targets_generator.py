@@ -39,7 +39,7 @@ class TargetsGenerator(object):
     """Compute target values for an objective to minimize."""
 
     def __init__(self):  # type: (...) -> None
-        self._histories = list()
+        self.__histories = list()
 
     def add_history(
             self,
@@ -62,7 +62,7 @@ class TargetsGenerator(object):
         history = PerformanceHistory(
             objective_values, infeasibility_measures, feasibility_statuses
         )
-        self._histories.append(history)
+        self.__histories.append(history)
 
     def run(
             self,
@@ -92,10 +92,10 @@ class TargetsGenerator(object):
         # Optionally, filter out the first infeasible items
         if feasible:
             histories = [
-                hist.remove_leading_infeasible() for hist in self._histories
+                hist.remove_leading_infeasible() for hist in self.__histories
             ]
         else:
-            histories = list(self._histories)
+            histories = list(self.__histories)
 
         # Compute the history of the minimum value
         budget_max = max(len(history) for history in histories)
@@ -115,7 +115,7 @@ class TargetsGenerator(object):
             raise ValueError("The number of budgets required cannot be larger than "
                              "the number of budgets available: {} > {}"
                              .format(targets_number, budget_max - budget_min + 1))
-        budget_scale = TargetsGenerator._compute_budget_scale(
+        budget_scale = TargetsGenerator.__compute_budget_scale(
             budget_min, budget_max, targets_number
         )
 
@@ -132,7 +132,7 @@ class TargetsGenerator(object):
         return target_values
 
     @staticmethod
-    def _compute_budget_scale(
+    def __compute_budget_scale(
             budget_min,  # type: int
             budget_max,  # type: int
             budgets_number  # type: int
