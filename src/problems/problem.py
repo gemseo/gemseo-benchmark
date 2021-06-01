@@ -28,7 +28,7 @@ A benchmarking problem is characterized by its functions
 its starting points (each defining an instance of the problem)
 and its targets (refer to :mod:`target_values`).
 """
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
 
 from gemseo.algos.doe.doe_factory import DOEFactory
 from gemseo.algos.opt.opt_factory import OptimizersFactory
@@ -47,6 +47,10 @@ class Problem(object):
     - its functions (objective and constraints, including bounds),
     - its starting points,
     - its target values.
+
+    Attributes:
+        name: The name of the benchmarking problem.
+        start_points: The starting points of the benchmarking problem.
     """
 
     def __init__(
@@ -77,7 +81,7 @@ class Problem(object):
             ValueError: If neither starting points nor DOE specifications are passed,
                or if a starting point is of inappropriate shape.
         """
-        self._name = name
+        self.name = name
         self._creator = creator
 
         # Set the dimension
@@ -94,7 +98,7 @@ class Problem(object):
                              "must be passed")
         elif start_points is None:
             start_points = self._generate_start_points(
-                doe_size, doe_algo_name, doe_options
+                doe_algo_name, doe_size, doe_options
             )
         for point in start_points:
             if not isinstance(point, ndarray):
@@ -102,7 +106,7 @@ class Problem(object):
             elif point.shape != (self._dimension,):
                 raise ValueError("Starting points must be 1-dimensional with size {}"
                                  .format(self._dimension))
-        self._start_points = start_points
+        self.start_points = start_points
 
         self._target_values = target_values
 
@@ -110,7 +114,7 @@ class Problem(object):
             self,
             doe_algo_name,  # type: str
             doe_size,  # type: int
-            doe_options=None,  # type: Optional[Dict[str, Any]]
+            doe_options=None,  # type: Optional[Mapping[str, Any]]
     ):  # type: (...) -> Iterable[ndarray]
         """Generate the starting points of the benchmarking problem.
 
@@ -124,18 +128,10 @@ class Problem(object):
         """
         design_space = self._creator().design_space
         doe_library = DOEFactory().create(doe_algo_name)
+        if doe_options is None:
+            doe_options = dict()
         doe = doe_library(doe_size, design_space.dimension, **doe_options)
         return [design_space.unnormalize_vect(array(row)) for row in doe]
-
-    @property
-    def name(self):  # type: (...) -> str
-        """The name of the benchmarking problem."""
-        return self._name
-
-    @property
-    def start_points(self):  # type: (...) -> Iterable[ndarray]
-        """The starting points of the benchmarking problem."""
-        return self._start_points
 
     @property
     def target_values(self):  # type: (...) -> TargetValues
@@ -146,7 +142,7 @@ class Problem(object):
 
     def __iter__(self):  # type: (...) -> OptimizationProblem
         """Iterate on the problem instances with respect to the starting points. """
-        for start_point in self._start_points:
+        for start_point in self.start_points:
             problem = self._creator()
             problem.design_space.set_current_x(start_point)
             yield problem
@@ -166,7 +162,7 @@ class Problem(object):
         """
         # TODO: remove this method
         instance = self._creator()
-        if start_point is not None and start_point in self._start_points:
+        if start_point is not None:
             instance.design_space.set_current_x(start_point)
         return instance
 
@@ -188,8 +184,11 @@ class Problem(object):
     def generate_targets(
             self,
             targets_number,  # type: int
-            ref_algo_specs,  # type: Dict[str, Dict[str, Any]]
+            ref_algo_specs,  # type: Mapping[str, Mapping[str, Any]]
             feasible=True,  # type: bool
+            budget_min=1,  # type: int
+            show=False,  # type: bool
+            destination_path=None,  # type: Optional[str]
     ):  # type: (...) -> TargetValues
         """Generate targets based on reference algorithms.
 
@@ -197,6 +196,10 @@ class Problem(object):
             targets_number: The number of targets to generate.
             ref_algo_specs: The names and options of the reference algorithms.
             feasible: Whether to generate only feasible targets.
+            budget_min: The evaluation budget to be used to define the easiest target.
+            show: If True, show the plot.
+            destination_path: The path where to save the plot.
+                If None, the plot is not saved.
 
         Returns:
             The generated targets.
@@ -211,14 +214,16 @@ class Problem(object):
                 targets_generator.add_history(obj_values, measures, feas_statuses)
 
         # Compute the target values
-        target_values = targets_generator.run(targets_number, feasible=feasible)
+        target_values = targets_generator.run(
+            targets_number, budget_min, feasible, show, destination_path
+        )
         self._target_values = target_values
 
         return target_values
 
     def generate_data_profile(
             self,
-            algorithms,  # type: Dict[str, Dict]
+            algorithms,  # type: Mapping[str, Mapping[str, Any]]
             show=True,  # type: bool
             destination_path=None  # type: Optional[str]
     ):  # type: (...) -> None
@@ -230,16 +235,16 @@ class Problem(object):
             destination_path: The path where to save the plot.
                 If None, the plot is not saved.
         """
-        data_profile = DataProfile({self._name: self._target_values})
+        data_profile = DataProfile({self.name: self._target_values})
 
         # Generate the performance histories
         for algo_name, algo_options in algorithms.items():
-            for start_point in self._start_points:
+            for start_point in self.start_points:
                 problem = self.get_instance(start_point)
                 OptimizersFactory().execute(problem, algo_name, **algo_options)
                 obj_values, measures, feas_statuses = self.extract_performance(problem)
                 data_profile.add_history(
-                    self._name, algo_name, obj_values, measures, feas_statuses
+                    self.name, algo_name, obj_values, measures, feas_statuses
                 )
 
         # Plot and/or save the data profile
@@ -267,7 +272,7 @@ class Problem(object):
         feas_statuses = list()
         for key, values in problem.database.items():
             obj_values.append(values[obj_name])
-            measure, feasibility = problem.get_violation_criteria(key)
+            feasibility, measure = problem.get_violation_criteria(key)
             infeas_measures.append(measure)
             feas_statuses.append(feasibility)
         return obj_values, infeas_measures, feas_statuses

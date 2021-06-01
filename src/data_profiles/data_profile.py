@@ -38,10 +38,10 @@ functions evaluations made by an algorithm to reach a problem target.
 """
 from itertools import cycle
 from numbers import Number
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, Iterable, List, Mapping, Optional, Sequence
 
 from matplotlib import rcParams
-from matplotlib.pyplot import (axhline, figure, legend, plot, savefig,
+from matplotlib.pyplot import (axhline, close, figure, legend, plot, savefig,
                                show as pyplot_show,
                                title, xlabel, xlim, ylabel, ylim, yticks)
 from numpy import append, array, linspace, zeros
@@ -60,7 +60,7 @@ class DataProfile(object):
 
     def __init__(
             self,
-            target_values  # type: Dict[str, TargetValues]
+            target_values  # type: Mapping[str, TargetValues]
     ):  # type: (...) -> None
         """
         Args:
@@ -71,37 +71,42 @@ class DataProfile(object):
         self._values_histories = dict()
 
     @property
-    def target_values(self):  # type: (...) -> TargetValues
-        """The target values of each reference problem."""
-        return self._target_values
+    def target_values(self):  # type: (...) -> Dict[str, TargetValues]
+        """The target values of each reference problem.
 
-    @target_values.setter
-    def target_values(
-            self,
-            target_values  # type: Dict[str, TargetValues]
-    ):  # type: (...) -> None
-        """
+        Target values are a scale of objective function values,
+        ranging from an easily achievable one to the best known value.
+        A data profile is computed by counting the number of targets reached by an
+        algorithm at each iteration.
+
         Raises:
             TypeError: if the target values are not passed as a dictionary.
             ValueError: If the reference problems have different numbers of target
                 values.
         """
-        if not isinstance(target_values, dict):
+        return self._target_values
+
+    @target_values.setter
+    def target_values(
+            self,
+            target_values  # type: Mapping[str, TargetValues]
+    ):  # type: (...) -> None
+        if not isinstance(target_values, Mapping):
             raise TypeError("The target values be must passed as a dictionary")
         targets_numbers = set(len(pb_targets) for pb_targets in target_values.values())
         if len(targets_numbers) != 1:
             raise ValueError("The reference problems must have the same number of "
                              "target values")
-        self._target_values = target_values
+        self._target_values = dict(target_values)
         self._targets_number = targets_numbers.pop()
 
     def add_history(
             self,
             problem_name,  # type: str
             algo_name,  # type: str
-            objective_values,  # type: List[float]
-            infeasibility_measures=None,  # type: Optional[List[float]]
-            feasibility_statuses=None,  # type: Optional[List[bool]]
+            objective_values,  # type: Sequence[float]
+            infeasibility_measures=None,  # type: Optional[Sequence[float]]
+            feasibility_statuses=None,  # type: Optional[Sequence[bool]]
     ):  # type: (...) -> None
         """Add a history of performance values.
 
@@ -238,7 +243,7 @@ class DataProfile(object):
 
     @staticmethod
     def _plot_data_profile(
-            data_profiles,  # type: Dict[str, List[Number]]
+            data_profiles,  # type: Mapping[str, Sequence[Number]]
             show=True,  # type: bool
             destination_path=None  # type: Optional[str]
     ):  # type: (...) -> None
@@ -250,7 +255,7 @@ class DataProfile(object):
             destination_path: The path where to save the plot.
                 If None, the plot is not saved.
         """
-        figure()
+        fig = figure()
 
         # Set the title and axes
         title("Data profile{}".format("s" if len(data_profiles) > 1 else ""))
@@ -287,3 +292,5 @@ class DataProfile(object):
             savefig(destination_path)
         if show:
             pyplot_show()
+        else:
+            close(fig)

@@ -1,24 +1,18 @@
-from gemseo.api import get_available_opt_algorithms
 from gemseo.problems.analytical.power_2 import Power2
 
 from problems.problem import Problem
-from problems.problems_group import ProblemsGroup
 
-# Set the benchmarking reference problems
-reference_problems = [
-    Problem("Power2", Power2, [Power2().design_space.get_current_x()])
-]
-problems_group = ProblemsGroup("Reference", reference_problems)
+# Set the benchmarking reference problem
+problem = Problem("Power2", Power2, doe_algo_name="lhs", doe_size=10)
 
-# Generate target values for each of the reference problems
-targets_number = 20
-reference_algorithms = {"SLSQP": dict()}
-problems_group.generate_targets(targets_number, reference_algorithms, feasible=True)
+# Generate target values
+ref_algos_specs = {"NLOPT_COBYLA": dict()}
+problem.generate_targets(3, ref_algos_specs, show=True)
 
 # Generate data profiles
-algo_names = get_available_opt_algorithms()
-algorithms = dict.fromkeys(algo_names, dict())
-for an_algo in algo_names:
-    if not problems_group.is_algorithm_suited(an_algo):
-        algorithms.pop(an_algo)
-problems_group.generate_data_profile(algorithms)
+comparison_algos_specs = {
+    "SLSQP": dict(),
+    "NLOPT_SLSQP": dict(),
+    "NLOPT_COBYLA": dict()
+}
+problem.generate_data_profile(comparison_algos_specs, show=True)

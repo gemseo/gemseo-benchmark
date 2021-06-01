@@ -38,7 +38,7 @@ import json
 from functools import reduce
 from math import ceil
 from pathlib import Path
-from typing import Iterable, Iterator, List, Optional, Union
+from typing import Iterable, Iterator, List, Optional, Sequence, Union
 
 from numpy import inf
 
@@ -56,9 +56,9 @@ class PerformanceHistory(object):
 
     def __init__(
             self,
-            objective_values=None,  # type: Optional[List[float]]
-            infeasibility_measures=None,  # type: Optional[List[float]]
-            feasibility_statuses=None  # type: Optional[List[bool]]
+            objective_values=None,  # type: Optional[Sequence[float]]
+            infeasibility_measures=None,  # type: Optional[Sequence[float]]
+            feasibility_statuses=None  # type: Optional[Sequence[bool]]
     ):  # type: (...) -> None
         """
         Args:
@@ -111,7 +111,11 @@ class PerformanceHistory(object):
 
     @property
     def history_items(self):  # type: (...) -> List[HistoryItem]
-        """The history items."""
+        """The history items.
+
+        Raises:
+            TypeError: If an item is set with a type different from HistoryItem.
+        """
         return self._items
 
     @history_items.setter
@@ -119,10 +123,6 @@ class PerformanceHistory(object):
             self,
             history_items,  # type: Iterable[HistoryItem]
     ):  # type: (...) -> None
-        """
-        Raises:
-            TypeError: If an item is set with a type different from HistoryItem.
-        """
         for item in history_items:
             if not isinstance(item, HistoryItem):
                 raise TypeError("History items must be of type HistoryItem")

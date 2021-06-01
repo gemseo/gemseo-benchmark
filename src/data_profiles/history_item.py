@@ -44,7 +44,11 @@ class HistoryItem(object):
 
     @property
     def infeasibility_measure(self):  # type: (...) -> float
-        """Return the infeasibility measure of the history item."""
+        """The infeasibility measure of the history item.
+
+        Raises:
+             ValueError: If the infeasibility measure is negative.
+        """
         return self._infeas_measure
 
     @infeasibility_measure.setter
@@ -52,10 +56,6 @@ class HistoryItem(object):
             self,
             infeasibility_measure,  # type: float
     ):  # type: (...) -> None
-        """
-        Raises:
-             ValueError: If the infeasibility measure is negative.
-        """
         if infeasibility_measure < 0.0:
             raise ValueError("The infeasibility measure must be non-negative.")
         self._infeas_measure = infeasibility_measure
