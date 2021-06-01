@@ -27,7 +27,7 @@ and a uniformly distributed subset (of the required size) of this median history
 extracted.
 """
 from itertools import chain, repeat
-from typing import List, Optional
+from typing import Optional, Sequence
 
 from matplotlib.pyplot import (figure, savefig, semilogy, show as pyplot_show, xlabel,
                                xlim, xticks, ylabel)
@@ -45,9 +45,9 @@ class TargetsGenerator(object):
 
     def add_history(
             self,
-            objective_values,  # type: List[float]
-            infeasibility_measures=None,  # type: Optional[List[float]]
-            feasibility_statuses=None,  # type: Optional[List[bool]]
+            objective_values,  # type: Sequence[float]
+            infeasibility_measures=None,  # type: Optional[Sequence[float]]
+            feasibility_statuses=None,  # type: Optional[Sequence[bool]]
     ):  # type: (...) -> None
         """Add a history of objective values.
 
@@ -132,7 +132,7 @@ class TargetsGenerator(object):
 
     @staticmethod
     def _plot(
-            objective_target_values,  # type: List[float]
+            objective_target_values,  # type: Sequence[float]
             show=True,  # type: bool
             destination_path=None,  # type: Optional[str]
     ):  # type: (...) -> None

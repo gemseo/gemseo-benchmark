@@ -38,7 +38,7 @@ import json
 from functools import reduce
 from math import ceil
 from pathlib import Path
-from typing import Iterable, Iterator, List, Optional, Union
+from typing import Iterable, Iterator, List, Optional, Sequence, Sized, Union
 
 from numpy import inf
 
@@ -56,9 +56,9 @@ class PerformanceHistory(object):
 
     def __init__(
             self,
-            objective_values=None,  # type: Optional[List[float]]
-            infeasibility_measures=None,  # type: Optional[List[float]]
-            feasibility_statuses=None  # type: Optional[List[bool]]
+            objective_values=None,  # type: Optional[Sequence[float]]
+            infeasibility_measures=None,  # type: Optional[Sequence[float]]
+            feasibility_statuses=None  # type: Optional[Sequence[bool]]
     ):  # type: (...) -> None
         """
         Args:
