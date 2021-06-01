@@ -223,7 +223,7 @@ class PerformanceHistory(object):
             json.dump(data, file, indent=4)
 
     @staticmethod
-    def load_from_file(
+    def from_file(
             file_path,  # type: Union[str, Path]
     ):  # type: (...) -> PerformanceHistory
         """Load a performance history from a file.
