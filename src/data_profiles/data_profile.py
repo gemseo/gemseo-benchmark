@@ -72,7 +72,13 @@ class DataProfile(object):
 
     @property
     def target_values(self):  # type: (...) -> TargetValues
-        """The target values of each reference problem."""
+        """The target values of each reference problem.
+
+        Raises:
+            TypeError: if the target values are not passed as a dictionary.
+            ValueError: If the reference problems have different numbers of target
+                values.
+        """
         return self._target_values
 
     @target_values.setter
@@ -80,12 +86,6 @@ class DataProfile(object):
             self,
             target_values  # type: Dict[str, TargetValues]
     ):  # type: (...) -> None
-        """
-        Raises:
-            TypeError: if the target values are not passed as a dictionary.
-            ValueError: If the reference problems have different numbers of target
-                values.
-        """
         if not isinstance(target_values, dict):
             raise TypeError("The target values be must passed as a dictionary")
         targets_numbers = set(len(pb_targets) for pb_targets in target_values.values())
