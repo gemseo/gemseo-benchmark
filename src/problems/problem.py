@@ -82,35 +82,35 @@ class Problem(object):
                or if a starting point is of inappropriate shape.
         """
         self.name = name
-        self._creator = creator
+        self.__creator = creator
 
         # Set the dimension
         problem = creator()
         if not isinstance(problem, OptimizationProblem):
             raise TypeError("Creator must return an OptimizationProblem")
-        self._dimension = problem.dimension
+        self.__dimension = problem.dimension
 
         # Set the starting points
-        if start_points is None and (doe_size is None or doe_algo_name is None):
-            raise ValueError("The starting points, "
-                             "or their number and the name of the algorithm to "
-                             "generate them, "
-                             "must be passed")
-        elif start_points is None:
-            start_points = self._generate_start_points(
+        if start_points is None:
+            if doe_size is None or doe_algo_name is None:
+                raise ValueError("The starting points, "
+                                 "or their number and the name of the algorithm to "
+                                 "generate them, "
+                                 "must be passed")
+            start_points = self.__generate_start_points(
                 doe_algo_name, doe_size, doe_options
             )
         for point in start_points:
             if not isinstance(point, ndarray):
                 raise TypeError("Starting points must be of type ndarray")
-            elif point.shape != (self._dimension,):
+            if point.shape != (self.__dimension,):
                 raise ValueError("Starting points must be 1-dimensional with size {}"
-                                 .format(self._dimension))
+                                 .format(self.__dimension))
         self.start_points = start_points
 
-        self._target_values = target_values
+        self.__target_values = target_values
 
-    def _generate_start_points(
+    def __generate_start_points(
             self,
             doe_algo_name,  # type: str
             doe_size,  # type: int
@@ -126,7 +126,7 @@ class Problem(object):
         Returns:
             The starting points of the benchmarking problem.
         """
-        design_space = self._creator().design_space
+        design_space = self.__creator().design_space
         doe_library = DOEFactory().create(doe_algo_name)
         if doe_options is None:
             doe_options = dict()
@@ -136,14 +136,14 @@ class Problem(object):
     @property
     def target_values(self):  # type: (...) -> TargetValues
         """The target values of the benchmarking problem."""
-        if self._target_values is None:
+        if self.__target_values is None:
             raise ValueError("Benchmarking problem has no target")
-        return self._target_values
+        return self.__target_values
 
     def __iter__(self):  # type: (...) -> OptimizationProblem
         """Iterate on the problem instances with respect to the starting points. """
         for start_point in self.start_points:
-            problem = self._creator()
+            problem = self.__creator()
             problem.design_space.set_current_x(start_point)
             yield problem
 
@@ -161,7 +161,7 @@ class Problem(object):
             The instance of the benchmarking problem.
         """
         # TODO: remove this method
-        instance = self._creator()
+        instance = self.__creator()
         if start_point is not None:
             instance.design_space.set_current_x(start_point)
         return instance
@@ -179,7 +179,7 @@ class Problem(object):
             True if the algorithm is suited to the problem, False otherwise.
         """
         library = OptimizersFactory().create(name)
-        return library.is_algorithm_suited(library.lib_dict[name], self._creator())
+        return library.is_algorithm_suited(library.lib_dict[name], self.__creator())
 
     def generate_targets(
             self,
@@ -217,7 +217,7 @@ class Problem(object):
         target_values = targets_generator.run(
             targets_number, budget_min, feasible, show, destination_path
         )
-        self._target_values = target_values
+        self.__target_values = target_values
 
         return target_values
 
@@ -235,7 +235,7 @@ class Problem(object):
             destination_path: The path where to save the plot.
                 If None, the plot is not saved.
         """
-        data_profile = DataProfile({self.name: self._target_values})
+        data_profile = DataProfile({self.name: self.__target_values})
 
         # Generate the performance histories
         for algo_name, algo_options in algorithms.items():

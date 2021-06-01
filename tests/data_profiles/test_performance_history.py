@@ -105,9 +105,9 @@ def test_save_to_file(tmp_path):
     assert contents == reference
 
 
-def test_load_from_file():
+def test_from_file():
     """Check the initialization of a perfomance history from a file."""
     reference_path = Path(__file__).parent / "reference_history.json"
-    history = PerformanceHistory.load_from_file(reference_path)
+    history = PerformanceHistory.from_file(reference_path)
     reference = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
     assert history.history_items == reference.history_items

@@ -44,7 +44,7 @@ from matplotlib import rcParams
 from matplotlib.pyplot import (axhline, close, figure, legend, plot, savefig,
                                show as pyplot_show,
                                title, xlabel, xlim, ylabel, ylim, yticks)
-from numpy import append, array, linspace, zeros
+from numpy import append, array, linspace, ndarray, zeros
 
 from data_profiles.performance_history import PerformanceHistory
 from data_profiles.target_values import TargetValues
@@ -66,9 +66,9 @@ class DataProfile(object):
         Args:
             target_values: The target values of each of the reference problems.
         """
-        self._targets_number = 0
+        self.__targets_number = 0
         self.target_values = target_values
-        self._values_histories = dict()
+        self.__values_histories = dict()
 
     @property
     def target_values(self):  # type: (...) -> Dict[str, TargetValues]
@@ -84,7 +84,7 @@ class DataProfile(object):
             ValueError: If the reference problems have different numbers of target
                 values.
         """
-        return self._target_values
+        return self.__target_values
 
     @target_values.setter
     def target_values(
@@ -97,8 +97,8 @@ class DataProfile(object):
         if len(targets_numbers) != 1:
             raise ValueError("The reference problems must have the same number of "
                              "target values")
-        self._target_values = dict(target_values)
-        self._targets_number = targets_numbers.pop()
+        self.__target_values = dict(target_values)
+        self.__targets_number = targets_numbers.pop()
 
     def add_history(
             self,
@@ -125,18 +125,18 @@ class DataProfile(object):
         Raises:
             ValueError: If the problem name is not the name of a reference problem.
         """
-        if problem_name not in self._target_values:
+        if problem_name not in self.__target_values:
             raise ValueError(
                 "{} is not the name of a reference problem".format(problem_name)
             )
-        if algo_name not in self._values_histories:
-            self._values_histories[algo_name] = {
-                pb_name: list() for pb_name in self._target_values.keys()
+        if algo_name not in self.__values_histories:
+            self.__values_histories[algo_name] = {
+                pb_name: list() for pb_name in self.__target_values.keys()
             }
         history = PerformanceHistory(
             objective_values, infeasibility_measures, feasibility_statuses
         )
-        self._values_histories[algo_name][problem_name].append(history)
+        self.__values_histories[algo_name][problem_name].append(history)
 
     def plot(
             self,
@@ -154,11 +154,11 @@ class DataProfile(object):
                 If None, the plot is not saved.
         """
         data_profiles = self.compute_data_profiles(algo_names)
-        DataProfile._plot_data_profile(data_profiles, show, destination_path)
+        DataProfile.__plot_data_profile(data_profiles, show, destination_path)
 
     def compute_data_profiles(
             self,
-            algo_names=None  # type: Optional[Iterable[str]]
+            *algo_names  # type: Iterable[str]
     ):  # type: (...) -> Dict[str, List[Number]]
         """Compute the data profiles of the required algorithms.
 
@@ -172,34 +172,41 @@ class DataProfile(object):
         Returns:
             The data profiles.
         """
-        algo_names = self._values_histories.keys() if algo_names is None else algo_names
-        return {name: self.compute_a_data_profile(name) for name in algo_names}
+        data_profiles = dict()
+        if not algo_names:
+            algo_names = self.__values_histories.keys()
+        for name in algo_names:
+            total_hits_history = self.__compute_hits_history(name)
+            problems_number = len(self.__target_values)
+            repeat_number = self._get_repeat_number(name)
+            targets_total = self.__targets_number * problems_number * repeat_number
+            ratios = total_hits_history / targets_total
+            data_profiles[name] = ratios.tolist()
+        return data_profiles
 
-    def compute_a_data_profile(
+    def __compute_hits_history(
             self,
-            algo_name  # type: str
-    ):  # type: (...) -> List[Number]
-        """Compute the data profile of the required algorithm.
-
-        Compute the cumulative distribution function of the number of evaluations
-        required by the algorithm to reach a reference target.
+            algo_name,  # type: str
+    ):  # type: (...) -> ndarray
+        """Compute the history of the number of target hits of an algorithm.
 
         Args:
             algo_name: The name of the algorithm.
 
         Returns:
-            The history of the success ratios.
+            The history of the number of target hits.
         """
-        repeat_number = self._get_repeat_number(algo_name)
-        algo_histories = self._values_histories[algo_name]
+        algo_histories = self.__values_histories[algo_name]
 
-        # Compute the history of total target hits
+        # Compute the maximal size of an optimization history
         max_history_size = max([
             max([len(pb_hist) for pb_hist in pb_histories])
             for pb_histories in algo_histories.values()
         ])
+
+        # Compute the history of the number of target hits across all optimizations
         total_hits_history = zeros(max_history_size)
-        for pb_name, targets in self._target_values.items():
+        for pb_name, targets in self.__target_values.items():
             for pb_history in algo_histories[pb_name]:
                 hits_history = targets.count_targets_hits(pb_history)
                 # If the history is shorter than the longest one, repeat its last value
@@ -208,13 +215,9 @@ class DataProfile(object):
                     hits_history.extend(tail)
                 total_hits_history += array(hits_history)
 
-        # Return the history of target hits ratios
-        problems_number = len(self._target_values)
-        targets_total = self._targets_number * problems_number * repeat_number
-        ratios = total_hits_history / targets_total
-        return ratios.tolist()
+        return total_hits_history
 
-    def _get_repeat_number(
+    def __get_repeat_number(
             self,
             algo_name  # type: str
     ):  # type: (...) -> int
@@ -234,7 +237,7 @@ class DataProfile(object):
                 for each problem.
         """
         histories_numbers = set(
-            len(histories) for histories in self._values_histories[algo_name].values()
+            len(histories) for histories in self.__values_histories[algo_name].values()
         )
         if len(histories_numbers) != 1:
             raise ValueError("Reference problems unequally represented for algorithm {}"
@@ -242,7 +245,7 @@ class DataProfile(object):
         return histories_numbers.pop()
 
     @staticmethod
-    def _plot_data_profile(
+    def __plot_data_profile(
             data_profiles,  # type: Mapping[str, Sequence[Number]]
             show=True,  # type: bool
             destination_path=None  # type: Optional[str]
