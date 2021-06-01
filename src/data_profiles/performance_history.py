@@ -222,8 +222,9 @@ class PerformanceHistory(object):
         with Path(file_path).open("w") as file:
             json.dump(data, file, indent=4)
 
-    @staticmethod
+    @classmethod
     def from_file(
+            cls,
             file_path,  # type: Union[str, Path]
     ):  # type: (...) -> PerformanceHistory
         """Create a new performance history from a file.
@@ -241,4 +242,4 @@ class PerformanceHistory(object):
         for item in data:
             objective_values.append(item[PerformanceHistory.PERFORMANCE])
             infeasibility_measures.append(item[PerformanceHistory.INFEASIBILITY])
-        return PerformanceHistory(objective_values, infeasibility_measures)
+        return cls(objective_values, infeasibility_measures)
