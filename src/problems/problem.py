@@ -91,12 +91,12 @@ class Problem(object):
         self._dimension = problem.dimension
 
         # Set the starting points
-        if start_points is None and (doe_size is None or doe_algo_name is None):
-            raise ValueError("The starting points, "
-                             "or their number and the name of the algorithm to "
-                             "generate them, "
-                             "must be passed")
-        elif start_points is None:
+        if start_points is None:
+            if doe_size is None or doe_algo_name is None:
+                raise ValueError("The starting points, "
+                                 "or their number and the name of the algorithm to "
+                                 "generate them, "
+                                 "must be passed")
             start_points = self._generate_start_points(
                 doe_algo_name, doe_size, doe_options
             )
