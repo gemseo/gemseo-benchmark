@@ -152,5 +152,4 @@ class TargetsGenerator(object):
         Returns:
             The distribution of evaluation budgets.
         """
-        budget_scale = linspace(budget_min, budget_max, budgets_number, dtype=int)
-        return budget_scale
+        return linspace(budget_min, budget_max, budgets_number, dtype=int)
