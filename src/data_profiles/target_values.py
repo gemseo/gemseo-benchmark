@@ -78,7 +78,7 @@ class TargetValues(PerformanceHistory):
         ]
         targets_number = len(self)
         fig = plt.figure()
-        axes = fig.add_subplot()
+        axes = fig.add_subplot(1, 1, 1)
         axes.set_title("Target values")
         plt.xlabel("Target index")
         plt.xlim([0, targets_number + 1])

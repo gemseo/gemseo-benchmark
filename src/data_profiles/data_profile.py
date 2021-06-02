@@ -259,7 +259,7 @@ class DataProfile(object):
                 If None, the plot is not saved.
         """
         fig = plt.figure()
-        axes = fig.add_subplot()
+        axes = fig.add_subplot(1, 1, 1)
 
         # Set the title and axes
         axes.set_title("Data profile{}".format("s" if len(data_profiles) > 1 else ""))

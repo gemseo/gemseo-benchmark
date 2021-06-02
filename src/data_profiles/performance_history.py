@@ -34,12 +34,13 @@ boolean feasibility statuses.
 Performance histories can be used to generate target values for a problem,
 or to generate the data profile of an algorithm.
 """
+
 import json
 from functools import reduce
-from pathlib import Path
-from typing import Iterable, List, Optional, Sequence, Union
 
 from numpy import inf
+from pathlib import Path
+from typing import Iterable, List, Optional, Sequence, Union
 
 from data_profiles.history_item import HistoryItem
 
@@ -222,8 +223,8 @@ class PerformanceHistory(Sequence[HistoryItem]):
                 PerformanceHistory.INFEASIBILITY: item.infeasibility_measure
             }
             data.append(data_item)
-        with Path(file_path).open("w") as file:
-            json.dump(data, file, indent=4)
+        with open(file_path, "w") as file:
+            json.dump(data, file, indent=4, separators=(',', ': '))
 
     @classmethod
     def from_file(
