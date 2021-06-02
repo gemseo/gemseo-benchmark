@@ -28,12 +28,11 @@ A benchmarking problem is characterized by its functions
 its starting points (each defining an instance of the problem)
 and its targets (refer to :mod:`target_values`).
 """
-from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
-
 from gemseo.algos.doe.doe_factory import DOEFactory
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
 from numpy import array, ndarray
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
 
 from data_profiles.data_profile import DataProfile
 from data_profiles.target_values import TargetValues
