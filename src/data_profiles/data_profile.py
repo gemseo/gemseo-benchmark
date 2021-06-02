@@ -178,7 +178,7 @@ class DataProfile(object):
         for name in algo_names:
             total_hits_history = self.__compute_hits_history(name)
             problems_number = len(self.__target_values)
-            repeat_number = self._get_repeat_number(name)
+            repeat_number = self.__get_repeat_number(name)
             targets_total = self.__targets_number * problems_number * repeat_number
             ratios = total_hits_history / targets_total
             data_profiles[name] = ratios.tolist()
