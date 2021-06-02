@@ -94,4 +94,4 @@ class TargetValues(PerformanceHistory):
         if show:
             plt.show()
         else:
-            plt.close(fig)
+            plt.close()

@@ -297,4 +297,4 @@ class DataProfile(object):
         if show:
             plt.show()
         else:
-            plt.close(fig)
+            plt.close()
