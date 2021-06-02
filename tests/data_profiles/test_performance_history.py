@@ -92,7 +92,7 @@ def test_remove_leading_infeasible():
     assert truncation.history_items == reference.history_items
 
 
-def test_save_to_file(tmpdir):
+def test_to_file(tmpdir):
     """Check the writing of a performance history into a file."""
     history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
     file_path = tmpdir / "history.json"
