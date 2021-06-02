@@ -181,7 +181,7 @@ class Problem(object):
         library = OptimizersFactory().create(name)
         return library.is_algorithm_suited(library.lib_dict[name], self.__creator())
 
-    def generate_targets(
+    def compute_targets(
             self,
             targets_number,  # type: int
             ref_algo_specs,  # type: Mapping[str, Mapping[str, Any]]
@@ -210,7 +210,7 @@ class Problem(object):
         for algo_name, algo_options in ref_algo_specs.items():
             for instance in self:
                 OptimizersFactory().execute(instance, algo_name, **algo_options)
-                obj_values, measures, feas_statuses = self.extract_performance(instance)
+                obj_values, measures, feas_statuses = self.compute_performance(instance)
                 targets_generator.add_history(obj_values, measures, feas_statuses)
 
         # Compute the target values
@@ -221,18 +221,19 @@ class Problem(object):
 
         return target_values
 
-    def generate_data_profile(
+    def compute_data_profile(
             self,
             algorithms,  # type: Mapping[str, Mapping[str, Any]]
             show=True,  # type: bool
-            destination_path=None  # type: Optional[str]
+            path=None  # type: Optional[str]
     ):  # type: (...) -> None
+        # TODO: remove this method (use ProblemsGroup)
         """Generate a data profile of algorithms available in Gemseo.
 
         Args:
             algorithms: The algorithms and their options.
             show: Whether to show the plot.
-            destination_path: The path where to save the plot.
+            path: The path where to save the plot.
                 If None, the plot is not saved.
         """
         data_profile = DataProfile({self.name: self.__target_values})
@@ -242,18 +243,16 @@ class Problem(object):
             for start_point in self.start_points:
                 problem = self.get_instance(start_point)
                 OptimizersFactory().execute(problem, algo_name, **algo_options)
-                obj_values, measures, feas_statuses = self.extract_performance(problem)
+                obj_values, measures, feas_statuses = self.compute_performance(problem)
                 data_profile.add_history(
                     self.name, algo_name, obj_values, measures, feas_statuses
                 )
 
         # Plot and/or save the data profile
-        data_profile.plot(show=show, destination_path=destination_path)
-
-    # TODO: remove this method (use ProblemsGroup)
+        data_profile.plot(show=show, path=path)
 
     @staticmethod
-    def extract_performance(
+    def compute_performance(
             problem  # type: OptimizationProblem
     ):  # type: (...) -> Tuple[List[float], List[float], List[bool]]
         """Extract the performance history from a solved optimization problem.

@@ -96,7 +96,7 @@ def test_save_to_file(tmpdir):
     """Check the writing of a performance history into a file."""
     history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
     file_path = tmpdir / "history.json"
-    history.save_to_file(str(file_path))
+    history.to_file(str(file_path))
     with file_path.open("r") as file:
         contents = file.read()
     reference_path = Path(__file__).parent / "reference_history.json"

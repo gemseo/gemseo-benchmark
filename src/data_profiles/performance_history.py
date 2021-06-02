@@ -206,14 +206,14 @@ class PerformanceHistory(Sequence[HistoryItem]):
             truncated_history.history_items = self.history_items[first_feasible:]
         return truncated_history
 
-    def save_to_file(
+    def to_file(
             self,
-            file_path,  # type: Union[str, Path]
+            path,  # type: Union[str, Path]
     ):  # type: (...) -> None
         """Save the performance history in a file.
 
         Args:
-            file_path: The path where to write the file.
+            path: The path where to write the file.
         """
         data = list()
         # Add each history item in dictionary format
@@ -223,23 +223,23 @@ class PerformanceHistory(Sequence[HistoryItem]):
                 PerformanceHistory.INFEASIBILITY: item.infeasibility_measure
             }
             data.append(data_item)
-        with open(file_path, "w") as file:
+        with open(path, "w") as file:
             json.dump(data, file, indent=4, separators=(',', ': '))
 
     @classmethod
     def from_file(
             cls,
-            file_path,  # type: Union[str, Path]
+            path,  # type: Union[str, Path]
     ):  # type: (...) -> PerformanceHistory
         """Create a new performance history from a file.
 
         Args:
-            file_path: The path to the file.
+            path: The path to the file.
 
         Returns:
             The performance history.
         """
-        with Path(file_path).open("r") as file:
+        with Path(path).open("r") as file:
             data = json.load(file)
         objective_values = list()
         infeasibility_measures = list()

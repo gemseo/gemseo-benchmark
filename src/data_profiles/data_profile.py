@@ -140,7 +140,7 @@ class DataProfile(object):
             self,
             algo_names=None,  # type: Optional[Iterable[str]]
             show=True,  # type: bool
-            destination_path=None  # type: Optional[str]
+            path=None  # type: Optional[str]
     ):  # type: (...) -> None
         """Plot the data profiles of the required algorithms.
 
@@ -148,13 +148,13 @@ class DataProfile(object):
             algo_names: The names of the algorithms.
                 If None then all the algorithms are considered.
             show: If True, show the plot.
-            destination_path: The path where to save the plot.
+            path: The path where to save the plot.
                 If None, the plot is not saved.
         """
         if algo_names is None:
             algo_names = tuple()
         data_profiles = self.compute_data_profiles(*algo_names)
-        DataProfile.__plot_data_profile(data_profiles, show, destination_path)
+        DataProfile.__plot_data_profile(data_profiles, show, path)
 
     def compute_data_profiles(
             self,
@@ -248,14 +248,14 @@ class DataProfile(object):
     def __plot_data_profile(
             data_profiles,  # type: Mapping[str, Sequence[Number]]
             show=True,  # type: bool
-            destination_path=None  # type: Optional[str]
+            path=None  # type: Optional[str]
     ):  # type: (...) -> None
         """Plot the data profiles.
 
         Args:
             data_profiles: The data profiles.
             show: If True, show the plot.
-            destination_path: The path where to save the plot.
+            path: The path where to save the plot.
                 If None, the plot is not saved.
         """
         fig = plt.figure()
@@ -292,8 +292,8 @@ class DataProfile(object):
         plt.legend()
 
         # Save and/or show the plot
-        if destination_path is not None:
-            plt.savefig(destination_path)
+        if path is not None:
+            plt.savefig(path)
         if show:
             plt.show()
         else:

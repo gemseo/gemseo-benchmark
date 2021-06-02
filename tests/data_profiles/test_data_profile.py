@@ -62,6 +62,6 @@ def test_plot_save(tmpdir):
     """Check the save of the data profiles plot."""
     data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
     data_profile.add_history("problem", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
-    plot_path = tmpdir / "data_profile.png"
-    data_profile.plot(show=False, destination_path=str(plot_path))
-    assert plot_path.isfile()
+    path = tmpdir / "data_profile.png"
+    data_profile.plot(show=False, path=str(path))
+    assert path.isfile()

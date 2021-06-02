@@ -63,13 +63,13 @@ class TargetValues(PerformanceHistory):
     def plot(
             self,
             show=True,  # type: bool
-            destination_path=None,  # type: Optional[str]
+            path=None,  # type: Optional[str]
     ):  # type: (...) -> None
         """Compute and plot the target values.
 
         Args:
             show: If True, show the plot.
-            destination_path: The path where to save the plot.
+            path: The path where to save the plot.
                 If None, the plot is not saved.
         """
         objective_values = [
@@ -89,8 +89,8 @@ class TargetValues(PerformanceHistory):
         )
 
         # Save and/or show the plot
-        if destination_path is not None:
-            plt.savefig(destination_path)
+        if path is not None:
+            plt.savefig(path)
         if show:
             plt.show()
         else:
