@@ -36,7 +36,6 @@ or to generate the data profile of an algorithm.
 """
 import json
 from functools import reduce
-from math import ceil
 from pathlib import Path
 from typing import Iterable, List, Optional, Sequence, Union
 
@@ -159,7 +158,12 @@ class PerformanceHistory(Sequence[HistoryItem]):
         Returns:
             The median of the history of performance values.
         """
-        return sorted(self.__items)[ceil(len(self) // 2)]
+        # Compute the middle index of the items (N.B. zero-based index)
+        if len(self) % 2 == 0:
+            middle_index = len(self) // 2 - 1
+        else:
+            middle_index = len(self) // 2
+        return sorted(self.__items)[middle_index]
 
     @staticmethod
     def compute_median_history(
