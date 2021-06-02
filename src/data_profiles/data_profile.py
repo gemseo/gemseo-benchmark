@@ -92,7 +92,7 @@ class DataProfile(object):
             target_values  # type: Mapping[str, TargetValues]
     ):  # type: (...) -> None
         if not isinstance(target_values, Mapping):
-            raise TypeError("The target values be must passed as a dictionary")
+            raise TypeError("The target values be must passed as a mapping")
         targets_numbers = set(len(pb_targets) for pb_targets in target_values.values())
         if len(targets_numbers) != 1:
             raise ValueError("The reference problems must have the same number of "
