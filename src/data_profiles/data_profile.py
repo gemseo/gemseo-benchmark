@@ -41,9 +41,9 @@ from numbers import Number
 from typing import Dict, Iterable, List, Mapping, Optional, Sequence
 
 from matplotlib import rcParams
-from matplotlib.pyplot import (axhline, close, figure, legend, plot, savefig,
+from matplotlib.pyplot import (close, figure, legend, savefig,
                                show as pyplot_show,
-                               title, xlabel, xlim, ylabel, ylim, yticks)
+                               xlabel, xlim, ylabel, ylim, yticks)
 from numpy import append, array, linspace, ndarray, zeros
 
 from data_profiles.performance_history import PerformanceHistory
@@ -259,9 +259,10 @@ class DataProfile(object):
                 If None, the plot is not saved.
         """
         fig = figure()
+        axes = fig.add_subplot()
 
         # Set the title and axes
-        title("Data profile{}".format("s" if len(data_profiles) > 1 else ""))
+        axes.set_title("Data profile{}".format("s" if len(data_profiles) > 1 else ""))
         max_profile_size = max([len(profile) for profile in data_profiles.values()])
         xlabel("Number of functions evaluations")
         xlim([1, max_profile_size])
@@ -271,7 +272,7 @@ class DataProfile(object):
         ylim([0.0, 1.05])
 
         # Plot the 100% line
-        axhline(1.0, linestyle=":", color="black")
+        axes.axhline(1.0, linestyle=":", color="black")
 
         # Plot the data profiles
         color_cycle = rcParams["axes.prop_cycle"].by_key()["color"]
@@ -285,9 +286,9 @@ class DataProfile(object):
             if last_abscissa < max_profile_size:
                 tail = [last_value] * (max_profile_size - last_abscissa)
                 profile = append(profile, tail)
-            plot(range(1, max_profile_size + 1), profile, color=color,
-                 label=name, marker=marker)
-            plot(last_abscissa + 1, last_value, marker="*")
+            axes.plot(range(1, max_profile_size + 1), profile, color=color,
+                        label=name, marker=marker)
+            axes.plot(last_abscissa + 1, last_value, marker="*")
         legend()
 
         # Save and/or show the plot

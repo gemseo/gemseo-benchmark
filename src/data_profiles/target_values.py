@@ -81,11 +81,13 @@ class TargetValues(PerformanceHistory):
         ]
         targets_number = len(self)
         fig = figure()
+        axes = fig.add_subplot()
+        axes.set_title("Target values")
         xlabel("Target index")
         xlim([0, targets_number + 1])
         xticks(linspace(1, targets_number, dtype=int))
         ylabel("Target value")
-        semilogy(
+        axes.semilogy(
             range(1, targets_number + 1), objective_values, marker="o", linestyle=""
         )
 
