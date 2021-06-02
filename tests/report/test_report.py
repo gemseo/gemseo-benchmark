@@ -45,8 +45,8 @@ def get_report_args(histories_dir):
     targets = TargetValues(list(range(1000, 0, -100)))
     a_problem = Problem("A problem", Rosenbrock, [zeros(2)], targets)
     problems_groups = [ProblemsGroup("A group", [a_problem], "A description")]
-    targets.save_to_file(histories_dir / "history.json")
-    histories_path = {"An algo": {"A problem": [histories_dir / "history.json"]}}
+    targets.to_file(str(histories_dir / "history.json"))
+    histories_path = {"An algo": {"A problem": [str(histories_dir / "history.json")]}}
     return algorithms, problems_groups, histories_path
 
 

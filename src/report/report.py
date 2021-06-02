@@ -22,13 +22,13 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Generation of a benchmarking report"""
 from os import chdir
-from pathlib import Path
-from shutil import copy
 from subprocess import call
-from typing import Dict, Iterable, List, Optional, Union
 
 from gemseo.algos.opt.opt_factory import OptimizersFactory
+from gemseo.utils.py23_compat import Path
 from jinja2 import Environment, FileSystemLoader
+from shutil import copy
+from typing import Dict, Iterable, List, Optional, Union
 
 from problems.problems_group import ProblemsGroup
 
@@ -119,7 +119,7 @@ class Report(object):
         for source_file in (
                 Report.CONF_PATH, Report.MAKE_PATH, Report.MAKEFILE_PATH
         ):
-            copy(source_file, root_directory / source_file.name)
+            copy(str(source_file), str(root_directory / source_file.name))
 
     def _create_algos_file(self):  # type: (...)-> None
         """Create the file describing the algorithms."""
@@ -157,10 +157,10 @@ class Report(object):
             group_directory.mkdir(exist_ok=True)
 
             # Generate the data profile
-            data_profile_path = group_directory / "data_profile.jpg"
-            a_group.generate_data_profile(
+            data_profile_path = group_directory / "data_profile.png"
+            a_group.compute_data_profile(
                 self._algorithms, self._histories_paths, show=False,
-                destination_path=data_profile_path,
+                plot_path=str(data_profile_path),
             )
             data_profile = ".. image:: /{}".format(
                 data_profile_path.relative_to(self._root_directory).as_posix()
@@ -234,7 +234,7 @@ class Report(object):
             pdf_report: Whether to generate the report in PDF format.
         """
         root_directory = self._root_directory
-        chdir(root_directory)
+        chdir(str(root_directory))
         if html_report:
             call("make html", shell=True)
         if pdf_report:
