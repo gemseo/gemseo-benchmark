@@ -210,7 +210,7 @@ class DataProfile(object):
         total_hits_history = zeros(max_history_size)
         for pb_name, targets in self.__target_values.items():
             for pb_history in algo_histories[pb_name]:
-                hits_history = targets.count_targets_hits(pb_history)
+                hits_history = targets.compute_target_hits_history(pb_history)
                 # If the history is shorter than the longest one, repeat its last value
                 if len(hits_history) < max_history_size:
                     tail = [hits_history[-1]] * (max_history_size - len(hits_history))

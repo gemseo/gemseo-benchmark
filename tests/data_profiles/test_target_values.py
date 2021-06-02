@@ -30,4 +30,4 @@ def test_count_targets_hist():
     history = PerformanceHistory(
         [0.0, -3.0, -1.0, 0.0, 1.0, -1.0], [2.0, 3.0, 1.0, 0.0, 0.0, 0.0]
     )
-    assert targets.count_targets_hits(history) == [0, 0, 0, 2, 2, 3]
+    assert targets.compute_target_hits_history(history) == [0, 0, 0, 2, 2, 3]

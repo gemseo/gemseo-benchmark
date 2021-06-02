@@ -33,8 +33,7 @@ and computes its data profile (see :mod:`data_profile`).
 """
 from typing import List, Optional
 
-from matplotlib.pyplot import (close, figure, savefig, semilogy, show as pyplot_show,
-                               xlabel,
+from matplotlib.pyplot import (close, figure, savefig, show as pyplot_show, xlabel,
                                xlim, xticks, ylabel)
 from numpy import inf, linspace
 
@@ -44,12 +43,11 @@ from data_profiles.performance_history import PerformanceHistory
 class TargetValues(PerformanceHistory):
     """Target values of a problem"""
 
-    def count_targets_hits(
+    def compute_target_hits_history(
             self,
             values_history  # type: PerformanceHistory
     ):  # type: (...) -> List[int]
-        """Compute the history of the number of target hits associated with a history
-        of values.
+        """Compute the history of the number of target hits for a performance history.
 
         Args:
             values_history: The history of values.
