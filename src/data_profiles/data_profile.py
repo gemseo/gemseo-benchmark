@@ -158,7 +158,7 @@ class DataProfile(object):
 
     def compute_data_profiles(
             self,
-            *algo_names  # type: Iterable[str]
+            *algo_names  # type: str
     ):  # type: (...) -> Dict[str, List[Number]]
         """Compute the data profiles of the required algorithms.
 
