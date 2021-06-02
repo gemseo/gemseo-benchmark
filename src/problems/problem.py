@@ -198,7 +198,7 @@ class Problem(object):
             feasible: Whether to generate only feasible targets.
             budget_min: The evaluation budget to be used to define the easiest target.
             show: If True, show the plot.
-            destination_path: The path where to save the plot.
+            path: The path where to save the plot.
                 If None, the plot is not saved.
 
         Returns:
@@ -215,7 +215,7 @@ class Problem(object):
 
         # Compute the target values
         target_values = targets_generator.run(
-            targets_number, budget_min, feasible, show, destination_path
+            targets_number, budget_min, feasible, show, path
         )
         self.__target_values = target_values
 
