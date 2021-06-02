@@ -70,7 +70,7 @@ class TargetsGenerator(object):
             budget_min=1,  # type: int
             feasible=True,  # type: bool
             show=True,  # type: bool
-            destination_path=None,  # type: Optional[str]
+            path=None,  # type: Optional[str]
     ):  # type: (...) -> TargetValues
         # TODO: document that feasible overwrite the budget_min option
         """Compute the target values for a function from the histories of its values.
@@ -80,7 +80,7 @@ class TargetsGenerator(object):
             budget_min: The evaluation budget to be used to define the easiest target.
             feasible: Whether to generate only feasible targets.
             show: If True, show the plot.
-            destination_path: The path where to save the plot.
+            path: The path where to save the plot.
                 If None, the plot is not saved.
 
         Returns:
@@ -127,8 +127,8 @@ class TargetsGenerator(object):
         ]
 
         # Plot the target values
-        if show or destination_path is not None:
-            target_values.plot(show, destination_path)
+        if show or path is not None:
+            target_values.plot(show, path)
 
         return target_values
 

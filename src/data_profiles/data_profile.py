@@ -40,10 +40,8 @@ from itertools import cycle
 from numbers import Number
 from typing import Dict, Iterable, List, Mapping, Optional, Sequence
 
+import matplotlib.pyplot as plt
 from matplotlib import rcParams
-from matplotlib.pyplot import (axhline, close, figure, legend, plot, savefig,
-                               show as pyplot_show,
-                               title, xlabel, xlim, ylabel, ylim, yticks)
 from numpy import append, array, linspace, ndarray, zeros
 
 from data_profiles.performance_history import PerformanceHistory
@@ -92,7 +90,7 @@ class DataProfile(object):
             target_values  # type: Mapping[str, TargetValues]
     ):  # type: (...) -> None
         if not isinstance(target_values, Mapping):
-            raise TypeError("The target values be must passed as a dictionary")
+            raise TypeError("The target values be must passed as a mapping")
         targets_numbers = set(len(pb_targets) for pb_targets in target_values.values())
         if len(targets_numbers) != 1:
             raise ValueError("The reference problems must have the same number of "
@@ -142,7 +140,7 @@ class DataProfile(object):
             self,
             algo_names=None,  # type: Optional[Iterable[str]]
             show=True,  # type: bool
-            destination_path=None  # type: Optional[str]
+            path=None  # type: Optional[str]
     ):  # type: (...) -> None
         """Plot the data profiles of the required algorithms.
 
@@ -150,15 +148,17 @@ class DataProfile(object):
             algo_names: The names of the algorithms.
                 If None then all the algorithms are considered.
             show: If True, show the plot.
-            destination_path: The path where to save the plot.
+            path: The path where to save the plot.
                 If None, the plot is not saved.
         """
-        data_profiles = self.compute_data_profiles(algo_names)
-        DataProfile.__plot_data_profile(data_profiles, show, destination_path)
+        if algo_names is None:
+            algo_names = tuple()
+        data_profiles = self.compute_data_profiles(*algo_names)
+        DataProfile.__plot_data_profile(data_profiles, show, path)
 
     def compute_data_profiles(
             self,
-            *algo_names  # type: Iterable[str]
+            *algo_names  # type: str
     ):  # type: (...) -> Dict[str, List[Number]]
         """Compute the data profiles of the required algorithms.
 
@@ -178,7 +178,7 @@ class DataProfile(object):
         for name in algo_names:
             total_hits_history = self.__compute_hits_history(name)
             problems_number = len(self.__target_values)
-            repeat_number = self._get_repeat_number(name)
+            repeat_number = self.__get_repeat_number(name)
             targets_total = self.__targets_number * problems_number * repeat_number
             ratios = total_hits_history / targets_total
             data_profiles[name] = ratios.tolist()
@@ -208,7 +208,7 @@ class DataProfile(object):
         total_hits_history = zeros(max_history_size)
         for pb_name, targets in self.__target_values.items():
             for pb_history in algo_histories[pb_name]:
-                hits_history = targets.count_targets_hits(pb_history)
+                hits_history = targets.compute_target_hits_history(pb_history)
                 # If the history is shorter than the longest one, repeat its last value
                 if len(hits_history) < max_history_size:
                     tail = [hits_history[-1]] * (max_history_size - len(hits_history))
@@ -248,30 +248,31 @@ class DataProfile(object):
     def __plot_data_profile(
             data_profiles,  # type: Mapping[str, Sequence[Number]]
             show=True,  # type: bool
-            destination_path=None  # type: Optional[str]
+            path=None  # type: Optional[str]
     ):  # type: (...) -> None
         """Plot the data profiles.
 
         Args:
             data_profiles: The data profiles.
             show: If True, show the plot.
-            destination_path: The path where to save the plot.
+            path: The path where to save the plot.
                 If None, the plot is not saved.
         """
-        fig = figure()
+        fig = plt.figure()
+        axes = fig.add_subplot(1, 1, 1)
 
         # Set the title and axes
-        title("Data profile{}".format("s" if len(data_profiles) > 1 else ""))
+        axes.set_title("Data profile{}".format("s" if len(data_profiles) > 1 else ""))
         max_profile_size = max([len(profile) for profile in data_profiles.values()])
-        xlabel("Number of functions evaluations")
-        xlim([1, max_profile_size])
+        plt.xlabel("Number of functions evaluations")
+        plt.xlim([1, max_profile_size])
         y_ticks = linspace(0.0, 1.0, 11)
-        yticks(y_ticks, ("{:02.0f}%".format(ratio * 100.0) for ratio in y_ticks))
-        ylabel("Ratios of targets reached")
-        ylim([0.0, 1.05])
+        plt.yticks(y_ticks, ("{:02.0f}%".format(ratio * 100.0) for ratio in y_ticks))
+        plt.ylabel("Ratios of targets reached")
+        plt.ylim([0.0, 1.05])
 
         # Plot the 100% line
-        axhline(1.0, linestyle=":", color="black")
+        axes.axhline(1.0, linestyle=":", color="black")
 
         # Plot the data profiles
         color_cycle = rcParams["axes.prop_cycle"].by_key()["color"]
@@ -285,15 +286,14 @@ class DataProfile(object):
             if last_abscissa < max_profile_size:
                 tail = [last_value] * (max_profile_size - last_abscissa)
                 profile = append(profile, tail)
-            plot(range(1, max_profile_size + 1), profile, color=color,
-                 label=name, marker=marker)
-            plot(last_abscissa + 1, last_value, marker="*")
-        legend()
+            axes.plot(range(1, max_profile_size + 1), profile, color=color,
+                      label=name, marker=marker)
+            axes.plot(last_abscissa + 1, last_value, marker="*")
+        plt.legend()
 
         # Save and/or show the plot
-        if destination_path is not None:
-            savefig(destination_path)
+        if path is not None:
+            plt.savefig(path)
         if show:
-            pyplot_show()
-        else:
-            close(fig)
+            plt.show()
+        plt.close()

@@ -33,9 +33,7 @@ and computes its data profile (see :mod:`data_profile`).
 """
 from typing import List, Optional
 
-from matplotlib.pyplot import (close, figure, savefig, semilogy, show as pyplot_show,
-                               xlabel,
-                               xlim, xticks, ylabel)
+import matplotlib.pyplot as plt
 from numpy import inf, linspace
 
 from data_profiles.performance_history import PerformanceHistory
@@ -44,12 +42,11 @@ from data_profiles.performance_history import PerformanceHistory
 class TargetValues(PerformanceHistory):
     """Target values of a problem"""
 
-    def count_targets_hits(
+    def compute_target_hits_history(
             self,
             values_history  # type: PerformanceHistory
     ):  # type: (...) -> List[int]
-        """Compute the history of the number of target hits associated with a history
-        of values.
+        """Compute the history of the number of target hits for a performance history.
 
         Args:
             values_history: The history of values.
@@ -66,13 +63,13 @@ class TargetValues(PerformanceHistory):
     def plot(
             self,
             show=True,  # type: bool
-            destination_path=None,  # type: Optional[str]
+            path=None,  # type: Optional[str]
     ):  # type: (...) -> None
         """Compute and plot the target values.
 
         Args:
             show: If True, show the plot.
-            destination_path: The path where to save the plot.
+            path: The path where to save the plot.
                 If None, the plot is not saved.
         """
         objective_values = [
@@ -80,19 +77,20 @@ class TargetValues(PerformanceHistory):
             for item in self
         ]
         targets_number = len(self)
-        fig = figure()
-        xlabel("Target index")
-        xlim([0, targets_number + 1])
-        xticks(linspace(1, targets_number, dtype=int))
-        ylabel("Target value")
-        semilogy(
+        fig = plt.figure()
+        axes = fig.add_subplot(1, 1, 1)
+        axes.set_title("Target values")
+        plt.xlabel("Target index")
+        plt.xlim([0, targets_number + 1])
+        plt.xticks(linspace(1, targets_number, dtype=int))
+        plt.ylabel("Target value")
+        axes.semilogy(
             range(1, targets_number + 1), objective_values, marker="o", linestyle=""
         )
 
         # Save and/or show the plot
-        if destination_path is not None:
-            savefig(destination_path)
+        if path is not None:
+            plt.savefig(path)
         if show:
-            pyplot_show()
-        else:
-            close(fig)
+            plt.show()
+        plt.close()
