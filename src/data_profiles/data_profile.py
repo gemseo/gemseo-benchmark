@@ -153,7 +153,9 @@ class DataProfile(object):
             destination_path: The path where to save the plot.
                 If None, the plot is not saved.
         """
-        data_profiles = self.compute_data_profiles(algo_names)
+        if algo_names is None:
+            algo_names = tuple()
+        data_profiles = self.compute_data_profiles(*algo_names)
         DataProfile.__plot_data_profile(data_profiles, show, destination_path)
 
     def compute_data_profiles(
