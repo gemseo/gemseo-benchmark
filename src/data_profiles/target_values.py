@@ -33,8 +33,7 @@ and computes its data profile (see :mod:`data_profile`).
 """
 from typing import List, Optional
 
-from matplotlib.pyplot import (close, figure, savefig, show as pyplot_show, xlabel,
-                               xlim, xticks, ylabel)
+import matplotlib.pyplot as plt
 from numpy import inf, linspace
 
 from data_profiles.performance_history import PerformanceHistory
@@ -78,21 +77,21 @@ class TargetValues(PerformanceHistory):
             for item in self
         ]
         targets_number = len(self)
-        fig = figure()
+        fig = plt.figure()
         axes = fig.add_subplot()
         axes.set_title("Target values")
-        xlabel("Target index")
-        xlim([0, targets_number + 1])
-        xticks(linspace(1, targets_number, dtype=int))
-        ylabel("Target value")
+        plt.xlabel("Target index")
+        plt.xlim([0, targets_number + 1])
+        plt.xticks(linspace(1, targets_number, dtype=int))
+        plt.ylabel("Target value")
         axes.semilogy(
             range(1, targets_number + 1), objective_values, marker="o", linestyle=""
         )
 
         # Save and/or show the plot
         if destination_path is not None:
-            savefig(destination_path)
+            plt.savefig(destination_path)
         if show:
-            pyplot_show()
+            plt.show()
         else:
-            close(fig)
+            plt.close(fig)
