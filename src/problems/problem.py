@@ -188,7 +188,7 @@ class Problem(object):
             feasible=True,  # type: bool
             budget_min=1,  # type: int
             show=False,  # type: bool
-            destination_path=None,  # type: Optional[str]
+            path=None,  # type: Optional[str]
     ):  # type: (...) -> TargetValues
         """Generate targets based on reference algorithms.
 
