@@ -93,5 +93,4 @@ class TargetValues(PerformanceHistory):
             plt.savefig(path)
         if show:
             plt.show()
-        else:
-            plt.close()
+        plt.close()
