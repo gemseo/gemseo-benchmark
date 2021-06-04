@@ -70,10 +70,18 @@ def test_plot_data_profiles():
     data_profile._plot_data_profiles(data_profiles)
 
 
-def test_plot_save(tmpdir):
-    """Check the save of the data profiles plot."""
+def test_plot_save_pathlib(tmpdir):
+    """Check the save of the data profiles plot to a pathlib path."""
     data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
     data_profile.add_history("problem", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
     path = tmpdir / "data_profile.png"
     data_profile.plot(show=False, path=path)
+    assert path.isfile()
+
+def test_plot_save(tmpdir):
+    """Check the save of the data profiles plot to a string path."""
+    data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
+    data_profile.add_history("problem", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
+    path = tmpdir / "data_profile.png"
+    data_profile.plot(show=False, path=str(path))
     assert path.isfile()
