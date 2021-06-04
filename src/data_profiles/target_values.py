@@ -34,7 +34,6 @@ and computes its data profile (see :mod:`data_profile`).
 from typing import List, Optional
 
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
 from numpy import inf, linspace
 
 from data_profiles.performance_history import PerformanceHistory
@@ -82,12 +81,8 @@ class TargetValues(PerformanceHistory):
             plt.show()
         plt.close()
 
-    def _plot_targets(self):  # type: (...) -> Figure
-        """Compute and plot the target values.
-
-        Returns:
-            The target values figure.
-        """
+    def _plot_targets(self):  # type: (...) -> None
+        """Compute and plot the target values."""
         objective_values = [
             inf if item.infeasibility_measure > 0.0 else item.objective_value
             for item in self
@@ -103,4 +98,3 @@ class TargetValues(PerformanceHistory):
         axes.semilogy(
             range(1, targets_number + 1), objective_values, marker="o", linestyle=""
         )
-        return fig

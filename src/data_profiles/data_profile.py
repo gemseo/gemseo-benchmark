@@ -42,7 +42,6 @@ from typing import Dict, Iterable, List, Mapping, Optional, Sequence
 
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
-from matplotlib.figure import Figure
 from numpy import append, array, linspace, ndarray, zeros
 
 from data_profiles.performance_history import PerformanceHistory
@@ -255,14 +254,11 @@ class DataProfile(object):
     @staticmethod
     def _plot_data_profiles(
             data_profiles,  # type: Mapping[str, Sequence[Number]]
-    ):  # type: (...) -> Figure
+    ):  # type: (...) -> None
         """Plot the data profiles.
 
         Args:
             data_profiles: The data profiles.
-
-        Returns:
-            The data profiles figure.
         """
         fig = plt.figure()
         axes = fig.add_subplot(1, 1, 1)
@@ -296,5 +292,3 @@ class DataProfile(object):
                       label=name, marker=marker)
             axes.plot(last_abscissa + 1, last_value, marker="*")
         plt.legend()
-
-        return fig
