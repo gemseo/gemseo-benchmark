@@ -20,6 +20,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the target values."""
+import pytest
 from matplotlib.testing.decorators import image_comparison
 
 from data_profiles.performance_history import PerformanceHistory
@@ -44,17 +45,14 @@ def test_plot_targets():
     targets._plot_targets()
 
 
-def test_plot_save_pathlib(tmpdir):
-    """Check the saving of the target values plot to a pathlib path."""
+@pytest.mark.parametrize("converter", [lambda _: _, str])
+def test_plot_save(tmpdir, converter):
+    """Check the saving of the target values plot.
+
+    Args:
+        converter: The Path converter.
+    """
     targets = TargetValues([-2.0, 1.0, -1.0], [1.0, 0.0, 0.0])
     path = tmpdir / "targets.png"
-    targets.plot(show=False, path=path)
-    assert path.isfile()
-
-
-def test_plot_save_str(tmpdir):
-    """Check the saving of the target values plot to a string path."""
-    targets = TargetValues([-2.0, 1.0, -1.0], [1.0, 0.0, 0.0])
-    path = tmpdir / "targets.png"
-    targets.plot(show=False, path=str(path))
+    targets.plot(show=False, path=converter(path))
     assert path.isfile()
