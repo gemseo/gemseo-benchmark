@@ -48,5 +48,5 @@ def test_plot_save(tmpdir):
     """Check the saving of the target values plot."""
     targets = TargetValues([-2.0, 1.0, -1.0], [1.0, 0.0, 0.0])
     path = tmpdir / "targets.png"
-    targets.plot(show=False, path=str(path))
+    targets.plot(show=False, path=path)
     assert path.isfile()

@@ -31,9 +31,10 @@ Targets are used to estimate the efficiency
 of an algorithm to solve a problem (or several)
 and computes its data profile (see :mod:`data_profile`).
 """
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import matplotlib.pyplot as plt
+from gemseo.utils.py23_compat import Path
 from numpy import inf, linspace
 
 from data_profiles.performance_history import PerformanceHistory
@@ -64,7 +65,7 @@ class TargetValues(PerformanceHistory):
     def plot(
             self,
             show=True,  # type: bool
-            path=None,  # type: Optional[str]
+            path=None,  # type: Optional[Union[str, Path]]
     ):  # type: (...) -> None
         """Compute and plot the target values.
 

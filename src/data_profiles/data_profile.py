@@ -38,9 +38,10 @@ functions evaluations made by an algorithm to reach a problem target.
 """
 from itertools import cycle
 from numbers import Number
-from typing import Dict, Iterable, List, Mapping, Optional, Sequence
+from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Union
 
 import matplotlib.pyplot as plt
+from gemseo.utils.py23_compat import Path
 from matplotlib import rcParams
 from numpy import append, array, linspace, ndarray, zeros
 
@@ -141,7 +142,7 @@ class DataProfile(object):
             self,
             algo_names=None,  # type: Optional[Iterable[str]]
             show=True,  # type: bool
-            path=None  # type: Optional[str]
+            path=None  # type: Optional[Union[str, Path]]
     ):  # type: (...) -> None
         """Plot the data profiles of the required algorithms.
 
