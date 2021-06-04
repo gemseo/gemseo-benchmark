@@ -42,6 +42,7 @@ from typing import Dict, Iterable, List, Mapping, Optional, Sequence
 
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
+from matplotlib.figure import Figure
 from numpy import append, array, linspace, ndarray, zeros
 
 from data_profiles.performance_history import PerformanceHistory
@@ -154,7 +155,14 @@ class DataProfile(object):
         if algo_names is None:
             algo_names = tuple()
         data_profiles = self.compute_data_profiles(*algo_names)
-        DataProfile.__plot_data_profile(data_profiles, show, path)
+        DataProfile._plot_data_profiles(data_profiles)
+
+        # Save and/or show the plot
+        if path is not None:
+            plt.savefig(path)
+        if show:
+            plt.show()
+        plt.close()
 
     def compute_data_profiles(
             self,
@@ -245,18 +253,16 @@ class DataProfile(object):
         return histories_numbers.pop()
 
     @staticmethod
-    def __plot_data_profile(
+    def _plot_data_profiles(
             data_profiles,  # type: Mapping[str, Sequence[Number]]
-            show=True,  # type: bool
-            path=None  # type: Optional[str]
-    ):  # type: (...) -> None
+    ):  # type: (...) -> Figure
         """Plot the data profiles.
 
         Args:
             data_profiles: The data profiles.
-            show: If True, show the plot.
-            path: The path where to save the plot.
-                If None, the plot is not saved.
+
+        Returns:
+            The data profiles figure.
         """
         fig = plt.figure()
         axes = fig.add_subplot(1, 1, 1)
@@ -291,9 +297,4 @@ class DataProfile(object):
             axes.plot(last_abscissa + 1, last_value, marker="*")
         plt.legend()
 
-        # Save and/or show the plot
-        if path is not None:
-            plt.savefig(path)
-        if show:
-            plt.show()
-        plt.close()
+        return fig

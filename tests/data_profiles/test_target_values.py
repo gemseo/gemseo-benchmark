@@ -20,6 +20,8 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the target values."""
+from matplotlib.testing.decorators import image_comparison
+
 from data_profiles.performance_history import PerformanceHistory
 from data_profiles.target_values import TargetValues
 
@@ -33,9 +35,18 @@ def test_count_targets_hist():
     assert targets.compute_target_hits_history(history) == [0, 0, 0, 2, 2, 3]
 
 
+@image_comparison(
+    baseline_images=["targets"], remove_text=True, extensions=['png']
+)
+def test_plot_targets():
+    """Check the target values figure."""
+    targets = TargetValues([2.0, 1.0, 0.0])
+    targets._plot_targets()
+
+
 def test_plot_save(tmpdir):
     """Check the saving of the target values plot."""
     targets = TargetValues([-2.0, 1.0, -1.0], [1.0, 0.0, 0.0])
     path = tmpdir / "targets.png"
-    targets.to_file(str(path))
+    targets.plot(show=False, path=str(path))
     assert path.isfile()
