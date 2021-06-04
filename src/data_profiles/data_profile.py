@@ -45,6 +45,7 @@ from matplotlib import rcParams
 from numpy import append, array, linspace, ndarray, zeros
 
 from data_profiles.performance_history import PerformanceHistory
+from data_profiles.plot_tools import save_show_close
 from data_profiles.target_values import TargetValues
 
 
@@ -155,13 +156,7 @@ class DataProfile(object):
             algo_names = tuple()
         data_profiles = self.compute_data_profiles(*algo_names)
         DataProfile._plot_data_profiles(data_profiles)
-
-        # Save and/or show the plot
-        if path is not None:
-            plt.savefig(path)
-        if show:
-            plt.show()
-        plt.close()
+        save_show_close(show, path)
 
     def compute_data_profiles(
             self,

@@ -37,6 +37,7 @@ import matplotlib.pyplot as plt
 from numpy import inf, linspace
 
 from data_profiles.performance_history import PerformanceHistory
+from data_profiles.plot_tools import save_show_close
 
 
 class TargetValues(PerformanceHistory):
@@ -73,13 +74,7 @@ class TargetValues(PerformanceHistory):
                 If None, the plot is not saved.
         """
         self._plot_targets()
-
-        # Save and/or show the plot
-        if path is not None:
-            plt.savefig(path)
-        if show:
-            plt.show()
-        plt.close()
+        save_show_close(show, path)
 
     def _plot_targets(self):  # type: (...) -> None
         """Compute and plot the target values."""
