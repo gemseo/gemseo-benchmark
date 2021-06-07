@@ -81,10 +81,10 @@ class Report(object):
                 raise ValueError(
                     "Missing histories for algorithm '{}'".format(algo_name)
                 )
-            some_histories = histories_paths[an_algo]
-            for a_group in problems_groups:
-                for problem in problems_group:
-                    if problem.name not in some_histories:
+            histories = histories_paths[algo_name]
+            for group in problems_groups:
+                for problem in group:
+                    if problem.name not in histories:
                         raise ValueError(
                             "Missing histories for algorithm {!r} on problem {!r}"
                             .format(algo_name, problem.name)
@@ -109,17 +109,16 @@ class Report(object):
 
     def __create_root_directory(self):  # type: (...) -> None
         """Create the source directory and basic files."""
-        root_directory = self.__root_directory
-        root_directory.mkdir(exist_ok=True)
+        self.__root_directory.mkdir(exist_ok=True)
         # Create the subdirectories
-        (root_directory / "_static").mkdir(exist_ok=True)
+        (self.__root_directory / "_static").mkdir(exist_ok=True)
         for directory in [Report.GROUPS_DIR, Report.IMAGES_DIR]:
-            (root_directory / directory).mkdir(exist_ok=True)
+            (self.__root_directory / directory).mkdir(exist_ok=True)
         # Create the basic source files
         for source_file in (
                 Report.CONF_PATH, Report.MAKE_PATH, Report.MAKEFILE_PATH
         ):
-            copy(str(source_file), str(root_directory / source_file.name))
+            copy(str(source_file), str(self.__root_directory / source_file.name))
 
     def __create_algos_file(self):  # type: (...)-> None
         """Create the file describing the algorithms."""
@@ -168,8 +167,8 @@ class Report(object):
             )
 
             # Create the file
-            group_path = (self.__root_directory / Report.GROUPS_DIR /
-                            "{}.rst".format(Report.__format_group_name(problems_group.name)))
+            group_path = (self.__root_directory / Report.GROUPS_DIR / "{}.rst"
+                          .format(Report.__format_group_name(problems_group.name)))
             groups_paths.append(
                 group_path.relative_to(self.__root_directory).as_posix()
             )
@@ -177,8 +176,8 @@ class Report(object):
                 group_path,
                 Report.GROUP_FILENAME,
                 name=problems_group.name,
-                description=a_group.description,
-                problems={problem.name: problem.__doc__ for a_problem in problems_group},
+                description=problems_group.description,
+                problems={problem.name: problem.__doc__ for problem in problems_group},
                 data_profile=data_profile,
             )
 
@@ -233,8 +232,7 @@ class Report(object):
             html_report: Whether to generate the report in HTML format.
             pdf_report: Whether to generate the report in PDF format.
         """
-        root_directory = self.__root_directory
-        chdir(str(root_directory))
+        chdir(str(self.__root_directory))
         if html_report:
             call("make html", shell=True)
         if pdf_report:
