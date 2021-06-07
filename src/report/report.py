@@ -90,7 +90,7 @@ class Report(object):
                             .format(algo_name, problem.name)
                         )
 
-    def generate_report_sources(
+    def generate_report(
             self,
             html_report=True,  # type: bool
             pdf_report=False,  # type: bool
