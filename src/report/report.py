@@ -82,7 +82,7 @@ class Report(object):
                     "Missing histories for algorithm '{}'".format(algo_name)
                 )
             some_histories = histories_paths[an_algo]
-            for a_group in problems_groups:
+            for problems_group in problems_groups:
                 for problem in problems_group:
                     if problem.name not in some_histories:
                         raise ValueError(
