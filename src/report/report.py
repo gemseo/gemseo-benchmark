@@ -52,7 +52,7 @@ class Report(object):
     def __init__(
             self,
             root_directory,  # type: Union[str, Path]
-            algos_specs,  # type: Mapping[str, Mapping[str, Any]]
+            algos_specifications,  # type: Mapping[str, Mapping[str, Any]]
             problems_groups,  # type: Iterable[ProblemsGroup]
             histories_paths,  # type: Mapping[str, Mapping[str, List[Union[str, Path]]]]
             minamo_algos_descriptions=None,  # type: Optional[Mapping[str, str]]
@@ -60,7 +60,7 @@ class Report(object):
         """
         Args:
             root_directory: The path to the root directory of the report.
-            algos_specs: The compared algorithms and their options.
+            algos_specifications: The compared algorithms and their options.
             problems_groups: The groups of reference problems.
             histories_paths: The paths to the reference histories for each algorithm
                 and reference problem.
@@ -72,11 +72,11 @@ class Report(object):
 
         """
         self.__root_directory = Path(root_directory)
-        self.__algos_specs = algos_specs
+        self.__algos_specs = algos_specifications
         self.__problems_groups = problems_groups
         self.__histories_paths = histories_paths
         self.__minamo_algos_descriptions = minamo_algos_descriptions
-        for algo_name in algos_specs:
+        for algo_name in algos_specifications:
             if algo_name not in histories_paths:
                 raise ValueError(
                     "Missing histories for algorithm '{}'".format(algo_name)

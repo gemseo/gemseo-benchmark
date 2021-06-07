@@ -77,30 +77,30 @@ class ProblemsGroup(object):
     def compute_targets(
             self,
             targets_number,  # type: int
-            ref_algos_specs,  # type: Mapping[str, Mapping[str, Any]]
+            ref_algos_specifications,  # type: Mapping[str, Mapping[str, Any]]
             feasible=True,  # type: bool
     ):  # type: (...) -> None
         """Generate targets for all the problems based on given reference algorithms.
 
         Args:
             targets_number: The number of targets to generate.
-            ref_algos_specs: The names and options of the reference algorithms.
+            ref_algos_specifications: The names and options of the reference algorithms.
             feasible: Whether to generate only feasible targets.
         """
         for problem in self.__problems:
-            problem.compute_targets(targets_number, ref_algos_specs, feasible)
+            problem.compute_targets(targets_number, ref_algos_specifications, feasible)
 
     def compute_data_profile(
             self,
-            algos_specs,  # type: Mapping[str, Mapping[str, Any]]
-            histories_paths,  # type: Mapping[str, Mapping[str, List[Path]]]
+            algos_specifications,  # type: Mapping[str, Mapping[str, Any]]
+            histories_paths,  # type: Mapping[str, Mapping[str, Iterable[Path]]]
             show=True,  # type: bool
             plot_path=None  # type: Optional[str]
     ):  # type: (...) -> None
         """Generate the data profiles of given algorithms relative to the problems.
 
         Args:
-            algos_specs: The algorithms and their options.
+            algos_specifications: The algorithms and their options.
             histories_paths: The paths to the reference histories for each algorithm.
             show: If True, show the plot.
             plot_path: The path where to save the plot.
@@ -113,14 +113,13 @@ class ProblemsGroup(object):
         data_profile = DataProfile(target_values)
 
         # Generate the performance histories
-        for algo_name, algo_options in algos_specs.items():
+        for algo_name, algo_options in algos_specifications.items():
             for problem in self.__problems:
                 for history_path in histories_paths[algo_name][problem.name]:
                     history = PerformanceHistory.from_file(history_path)
-                    obj_values = history.objective_values
-                    measures = history.infeasibility_measures
                     data_profile.add_history(
-                        problem.name, algo_name, obj_values, measures
+                        problem.name, algo_name, history.objective_values,
+                        history.infeasibility_measures
                     )
 
         # Plot and/or save the data profile

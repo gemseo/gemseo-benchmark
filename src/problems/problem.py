@@ -183,7 +183,7 @@ class Problem(object):
     def compute_targets(
             self,
             targets_number,  # type: int
-            ref_algo_specs,  # type: Mapping[str, Mapping[str, Any]]
+            ref_algo_specifications,  # type: Mapping[str, Mapping[str, Any]]
             feasible=True,  # type: bool
             budget_min=1,  # type: int
             show=False,  # type: bool
@@ -193,7 +193,7 @@ class Problem(object):
 
         Args:
             targets_number: The number of targets to generate.
-            ref_algo_specs: The names and options of the reference algorithms.
+            ref_algo_specifications: The names and options of the reference algorithms.
             feasible: Whether to generate only feasible targets.
             budget_min: The evaluation budget to be used to define the easiest target.
             show: If True, show the plot.
@@ -206,7 +206,7 @@ class Problem(object):
         targets_generator = TargetsGenerator()
 
         # Generate reference performance histories
-        for algo_name, algo_options in ref_algo_specs.items():
+        for algo_name, algo_options in ref_algo_specifications.items():
             for instance in self:
                 OptimizersFactory().execute(instance, algo_name, **algo_options)
                 obj_values, measures, feas_statuses = self.compute_performance(instance)
