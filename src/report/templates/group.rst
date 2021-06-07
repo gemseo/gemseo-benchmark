@@ -6,13 +6,13 @@
 Description
 -----------
 {{ description }}
-{% for a_problem_name, a_problem_description in problems.items() %}
+{% for problem_name, problem_description in problems.items() %}
 
 ^^^^^^^^
 Problems
 ^^^^^^^^
-{{ a_problem_name }}
-   {{ a_problem_description }}
+{{ problem_name }}
+   {{ problem_description }}
 {% endfor %}
 
 

@@ -3,7 +3,7 @@ Algorithms
 
 The following algorithms are considered in this benchmarking report.
 
-{% for an_algo_name, an_algo_description in algorithms.items() %}
-{{ an_algo_name }}
-   {{ an_algo_description }}
+{% for algo_name, algo_description in algorithms.items() %}
+{{ algo_name }}
+   {{ algo_description }}
 {% endfor %}

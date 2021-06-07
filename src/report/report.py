@@ -76,18 +76,18 @@ class Report(object):
         self.__problems_groups = problems_groups
         self.__histories_paths = histories_paths
         self.__minamo_algos_descriptions = minamo_algos_descriptions
-        for an_algo in algos_specs:
-            if an_algo not in histories_paths:
+        for algo_name in algos_specs:
+            if algo_name not in histories_paths:
                 raise ValueError(
-                    "Missing histories for algorithm '{}'".format(an_algo)
+                    "Missing histories for algorithm '{}'".format(algo_name)
                 )
             some_histories = histories_paths[an_algo]
             for a_group in problems_groups:
-                for a_problem in a_group:
-                    if a_problem.name not in some_histories:
+                for problem in problems_group:
+                    if problem.name not in some_histories:
                         raise ValueError(
                             "Missing histories for algorithm '{}' on problem '{}'"
-                            .format(an_algo, a_problem.name)
+                            .format(algo_name, problem.name)
                         )
 
     def generate_report_sources(
@@ -125,20 +125,20 @@ class Report(object):
         """Create the file describing the algorithms."""
         # Get the descriptions of the algorithms
         algos_descriptions = dict()
-        for a_name in self.__algos_specs:
+        for algo_name in self.__algos_specs:
             try:
-                library = OptimizersFactory().create(a_name)
-                algos_descriptions[a_name] = library.lib_dict[a_name][
+                library = OptimizersFactory().create(algo_name)
+                algos_descriptions[algo_name] = library.lib_dict[algo_name][
                     library.DESCRIPTION
                 ]
             except ImportError:
                 # The algorithm is unavailable
                 if self.__minamo_algos_descriptions is not None \
-                        and a_name in self.__minamo_algos_descriptions:
-                    algos_descriptions[a_name] = self.__minamo_algos_descriptions[
-                        a_name]
+                        and algo_name in self.__minamo_algos_descriptions:
+                    algos_descriptions[algo_name] = self.__minamo_algos_descriptions[
+                        algo_name]
                 else:
-                    algos_descriptions[a_name] = "<No description available.>"
+                    algos_descriptions[algo_name] = "<No description available.>"
 
         # Create the file
         file_path = self.__root_directory / Report.ALGOS_FILENAME
@@ -151,15 +151,15 @@ class Report(object):
     def __create_groups_files(self):  # type: (...) -> None
         """Create the files corresponding to the problems groups."""
         groups_paths = list()
-        for a_group in self.__problems_groups:
+        for problems_group in self.__problems_groups:
             # Create the directory dedicated to the group
             group_directory = (self.__root_directory / Report.IMAGES_DIR /
-                               Report.__format_group_name(a_group.name))
+                               Report.__format_group_name(problems_group.name))
             group_directory.mkdir(exist_ok=True)
 
             # Generate the data profile
             data_profile_path = group_directory / "data_profile.png"
-            a_group.compute_data_profile(
+            problems_group.compute_data_profile(
                 self.__algos_specs, self.__histories_paths, show=False,
                 plot_path=str(data_profile_path),
             )
@@ -168,17 +168,17 @@ class Report(object):
             )
 
             # Create the file
-            a_group_path = (self.__root_directory / Report.GROUPS_DIR /
-                            "{}.rst".format(Report.__format_group_name(a_group.name)))
+            group_path = (self.__root_directory / Report.GROUPS_DIR /
+                            "{}.rst".format(Report.__format_group_name(problems_group.name)))
             groups_paths.append(
-                a_group_path.relative_to(self.__root_directory).as_posix()
+                group_path.relative_to(self.__root_directory).as_posix()
             )
             Report.__fill_template(
-                a_group_path,
+                group_path,
                 Report.GROUP_FILENAME,
-                name=a_group.name,
+                name=problems_group.name,
                 description=a_group.description,
-                problems={a_problem.name: a_problem.__doc__ for a_problem in a_group},
+                problems={problem.name: problem.__doc__ for a_problem in problems_group},
                 data_profile=data_profile,
             )
 
@@ -250,6 +250,6 @@ class Report(object):
             name: The group name.
 
         Returns:
-            The formatted the group name.
+            The formatted group name.
         """
         return name.replace(" ", "_")

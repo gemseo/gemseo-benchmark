@@ -36,7 +36,7 @@ class ProblemsGroup(object):
     functions smoothness and constraint set geometry.
 
     Attributes:
-        name: The name of the group of problems.
+        name (str): The name of the group of problems.
         description: The description of the group of problems.
     """
 
@@ -70,7 +70,7 @@ class ProblemsGroup(object):
             name: The name of the algorithm.
 
         Returns:
-            True if the algorithm is suited, False otherwise.
+            True if the algorithm is suited.
         """
         return all(problem.is_algorithm_suited(name) for problem in self.__problems)
 
@@ -102,7 +102,7 @@ class ProblemsGroup(object):
         Args:
             algos_specs: The algorithms and their options.
             histories_paths: The paths to the reference histories for each algorithm.
-            show: if True, show the plot.
+            show: If True, show the plot.
             plot_path: The path where to save the plot.
                 By default the plot is not saved.
         """
