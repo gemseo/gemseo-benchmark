@@ -55,7 +55,7 @@ class Report(object):
             algos_specs,  # type: Mapping[str, Mapping[str, Any]]
             problems_groups,  # type: Iterable[ProblemsGroup]
             histories_paths,  # type: Mapping[str, Mapping[str, List[Union[str, Path]]]]
-            minamo_algos_descriptions=None,  # type: Optional[Mapping[str, str]]
+            custom_algos_descriptions=None,  # type: Optional[Mapping[str, str]]
     ):  # type: (...) -> None
         """
         Args:
