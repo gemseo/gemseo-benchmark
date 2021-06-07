@@ -10,5 +10,5 @@ Benchmarking report
    :maxdepth: 2
    :caption: Contents:
 
-{% for a_doc in documents %}   {{ a_doc }}
+{% for document in documents %}   {{document}}
 {% endfor %}

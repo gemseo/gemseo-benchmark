@@ -55,7 +55,7 @@ class Report(object):
             algos_specifications,  # type: Mapping[str, Mapping[str, Any]]
             problems_groups,  # type: Iterable[ProblemsGroup]
             histories_paths,  # type: Mapping[str, Mapping[str, List[Union[str, Path]]]]
-            minamo_algos_descriptions=None,  # type: Optional[Mapping[str, str]]
+            custom_algos_descriptions=None,  # type: Optional[Mapping[str, str]]
     ):  # type: (...) -> None
         """
         Args:
@@ -75,7 +75,7 @@ class Report(object):
         self.__algos_specs = algos_specifications
         self.__problems_groups = problems_groups
         self.__histories_paths = histories_paths
-        self.__minamo_algos_descriptions = minamo_algos_descriptions
+        self.__custom_algos_descriptions = custom_algos_descriptions
         for algo_name in algos_specifications:
             if algo_name not in histories_paths:
                 raise ValueError(
@@ -123,20 +123,16 @@ class Report(object):
     def __create_algos_file(self):  # type: (...)-> None
         """Create the file describing the algorithms."""
         # Get the descriptions of the algorithms
-        algos_descriptions = dict()
+        algos_descriptions = dict(self.__custom_algos_descriptions)
         for algo_name in self.__algos_specs:
-            try:
-                library = OptimizersFactory().create(algo_name)
-                algos_descriptions[algo_name] = library.lib_dict[algo_name][
-                    library.DESCRIPTION
-                ]
-            except ImportError:
-                # The algorithm is unavailable
-                if self.__minamo_algos_descriptions is not None \
-                        and algo_name in self.__minamo_algos_descriptions:
-                    algos_descriptions[algo_name] = self.__minamo_algos_descriptions[
-                        algo_name]
-                else:
+            if algo_name not in algos_descriptions:
+                try:
+                    library = OptimizersFactory().create(algo_name)
+                    algos_descriptions[algo_name] = library.lib_dict[algo_name][
+                        library.DESCRIPTION
+                    ]
+                except ImportError:
+                    # The algorithm is unavailable
                     algos_descriptions[algo_name] = "N/A"
 
         # Create the file
