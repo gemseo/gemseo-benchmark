@@ -95,7 +95,7 @@ class Report(object):
             html_report=True,  # type: bool
             pdf_report=False,  # type: bool
     ):  # type: (...) -> None
-        """Generate the source files of the benchmarking report.
+        """Generate the benchmarking report.
 
         Args:
             html_report: Whether to generate the report in HTML format.

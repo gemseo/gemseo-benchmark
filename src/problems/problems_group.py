@@ -32,8 +32,10 @@ from problems.problem import Problem
 class ProblemsGroup(object):
     """A group of reference problems for benchmarking.
 
-    N.B. reference problems should be grouped based on common characteristics such as
-    functions smoothness and constraint set geometry.
+    .. note::
+
+       Reference problems should be grouped based on common characteristics such as
+       functions smoothness and constraint set geometry.
 
     Attributes:
         name (str): The name of the group of problems.
@@ -57,7 +59,6 @@ class ProblemsGroup(object):
         self.description = description
 
     def __iter__(self):  # type: (...) -> Iterator[Problem]
-        """Iterate on the problems of the group."""
         return iter(problem for problem in self.__problems)
 
     def is_algorithm_suited(
