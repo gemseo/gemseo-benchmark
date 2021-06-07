@@ -21,7 +21,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Grouping of reference problems for benchmarking."""
-from pathlib import Path
+from gemseo.utils.py23_compat import Path
 from typing import Any, Iterable, Iterator, List, Mapping, Optional
 
 from data_profiles.data_profile import DataProfile
