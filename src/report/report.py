@@ -86,7 +86,7 @@ class Report(object):
                 for problem in problems_group:
                     if problem.name not in some_histories:
                         raise ValueError(
-                            "Missing histories for algorithm '{}' on problem '{}'"
+                            "Missing histories for algorithm {!r} on problem {!r}"
                             .format(algo_name, problem.name)
                         )
 

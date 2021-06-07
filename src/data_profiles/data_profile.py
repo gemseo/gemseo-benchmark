@@ -127,7 +127,7 @@ class DataProfile(object):
         """
         if problem_name not in self.__target_values:
             raise ValueError(
-                "{} is not the name of a reference problem".format(problem_name)
+                "{!r} is not the name of a reference problem".format(problem_name)
             )
         if algo_name not in self.__values_histories:
             self.__values_histories[algo_name] = {
@@ -243,7 +243,7 @@ class DataProfile(object):
             len(histories) for histories in self.__values_histories[algo_name].values()
         )
         if len(histories_numbers) != 1:
-            raise ValueError("Reference problems unequally represented for algorithm {}"
+            raise ValueError("Reference problems unequally represented for algorithm {!r}"
                              .format(algo_name))
         return histories_numbers.pop()
 
