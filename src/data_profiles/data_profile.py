@@ -38,13 +38,15 @@ functions evaluations made by an algorithm to reach a problem target.
 """
 from itertools import cycle
 from numbers import Number
-from typing import Dict, Iterable, List, Mapping, Optional, Sequence
+from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Union
 
 import matplotlib.pyplot as plt
+from gemseo.utils.py23_compat import Path
 from matplotlib import rcParams
 from numpy import append, array, linspace, ndarray, zeros
 
 from data_profiles.performance_history import PerformanceHistory
+from data_profiles.plot_tools import save_show_close
 from data_profiles.target_values import TargetValues
 
 
@@ -140,7 +142,7 @@ class DataProfile(object):
             self,
             algo_names=None,  # type: Optional[Iterable[str]]
             show=True,  # type: bool
-            path=None  # type: Optional[str]
+            path=None  # type: Optional[Union[str, Path]]
     ):  # type: (...) -> None
         """Plot the data profiles of the required algorithms.
 
@@ -154,7 +156,8 @@ class DataProfile(object):
         if algo_names is None:
             algo_names = tuple()
         data_profiles = self.compute_data_profiles(*algo_names)
-        DataProfile.__plot_data_profile(data_profiles, show, path)
+        DataProfile._plot_data_profiles(data_profiles)
+        save_show_close(show, path)
 
     def compute_data_profiles(
             self,
@@ -245,18 +248,13 @@ class DataProfile(object):
         return histories_numbers.pop()
 
     @staticmethod
-    def __plot_data_profile(
+    def _plot_data_profiles(
             data_profiles,  # type: Mapping[str, Sequence[Number]]
-            show=True,  # type: bool
-            path=None  # type: Optional[str]
     ):  # type: (...) -> None
         """Plot the data profiles.
 
         Args:
             data_profiles: The data profiles.
-            show: If True, show the plot.
-            path: The path where to save the plot.
-                If None, the plot is not saved.
         """
         fig = plt.figure()
         axes = fig.add_subplot(1, 1, 1)
@@ -290,10 +288,3 @@ class DataProfile(object):
                       label=name, marker=marker)
             axes.plot(last_abscissa + 1, last_value, marker="*")
         plt.legend()
-
-        # Save and/or show the plot
-        if path is not None:
-            plt.savefig(path)
-        if show:
-            plt.show()
-        plt.close()

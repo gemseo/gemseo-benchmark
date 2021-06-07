@@ -37,10 +37,10 @@ or to generate the data profile of an algorithm.
 
 import json
 from functools import reduce
-
-from numpy import inf
 from pathlib import Path
 from typing import Iterable, List, Optional, Sequence, Union
+
+from numpy import inf
 
 from data_profiles.history_item import HistoryItem
 

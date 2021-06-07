@@ -31,12 +31,14 @@ Targets are used to estimate the efficiency
 of an algorithm to solve a problem (or several)
 and computes its data profile (see :mod:`data_profile`).
 """
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import matplotlib.pyplot as plt
+from gemseo.utils.py23_compat import Path
 from numpy import inf, linspace
 
 from data_profiles.performance_history import PerformanceHistory
+from data_profiles.plot_tools import save_show_close
 
 
 class TargetValues(PerformanceHistory):
@@ -63,7 +65,7 @@ class TargetValues(PerformanceHistory):
     def plot(
             self,
             show=True,  # type: bool
-            path=None,  # type: Optional[str]
+            path=None,  # type: Optional[Union[str, Path]]
     ):  # type: (...) -> None
         """Compute and plot the target values.
 
@@ -72,6 +74,11 @@ class TargetValues(PerformanceHistory):
             path: The path where to save the plot.
                 If None, the plot is not saved.
         """
+        self._plot_targets()
+        save_show_close(show, path)
+
+    def _plot_targets(self):  # type: (...) -> None
+        """Compute and plot the target values."""
         objective_values = [
             inf if item.infeasibility_measure > 0.0 else item.objective_value
             for item in self
@@ -87,10 +94,3 @@ class TargetValues(PerformanceHistory):
         axes.semilogy(
             range(1, targets_number + 1), objective_values, marker="o", linestyle=""
         )
-
-        # Save and/or show the plot
-        if path is not None:
-            plt.savefig(path)
-        if show:
-            plt.show()
-        plt.close()
