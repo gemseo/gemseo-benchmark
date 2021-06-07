@@ -79,7 +79,7 @@ class Report(object):
         for algo_name in algos_specifications:
             if algo_name not in histories_paths:
                 raise ValueError(
-                    "Missing histories for algorithm '{}'".format(algo_name)
+                    "Missing histories for algorithm {!r}".format(algo_name)
                 )
             histories = histories_paths[algo_name]
             for group in problems_groups:
@@ -137,7 +137,7 @@ class Report(object):
                     algos_descriptions[algo_name] = self.__minamo_algos_descriptions[
                         algo_name]
                 else:
-                    algos_descriptions[algo_name] = "<No description available.>"
+                    algos_descriptions[algo_name] = "N/A"
 
         # Create the file
         file_path = self.__root_directory / Report.ALGOS_FILENAME
