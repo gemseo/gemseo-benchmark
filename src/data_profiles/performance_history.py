@@ -37,7 +37,7 @@ or to generate the data profile of an algorithm.
 
 import json
 from functools import reduce
-from pathlib import Path
+from gemseo.utils.py23_compat import Path
 from typing import Iterable, List, Optional, Sequence, Union
 
 from numpy import inf
