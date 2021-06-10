@@ -20,7 +20,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the performance history."""
-from pathlib import Path
+from gemseo.utils.py23_compat import Path
 
 from numpy import inf
 from pytest import raises
