@@ -41,13 +41,11 @@ class Report(object):
     GROUPS_LIST_FILENAME = "problems_groups.rst"
     GROUP_FILENAME = "group.rst"
 
-    BASIC_SOURCES_DIR_PATH = Path(__file__).parent / "basic_sources"
-    CONF_PATH = BASIC_SOURCES_DIR_PATH / "conf.py"
-    MAKE_PATH = BASIC_SOURCES_DIR_PATH / "make.bat"
-    MAKEFILE_PATH = BASIC_SOURCES_DIR_PATH / "Makefile"
+    CONF_PATH = Path(__file__).parent / "conf.py"
 
     GROUPS_DIR_NAME = "groups"
     IMAGES_DIR_NAME = "images"
+    BUILD_DIR_NAME = "_build"
 
     def __init__(
             self,
@@ -122,11 +120,8 @@ class Report(object):
         (self.__root_directory / "_static").mkdir(exist_ok=True)
         for directory in [Report.GROUPS_DIR_NAME, Report.IMAGES_DIR_NAME]:
             (self.__root_directory / directory).mkdir(exist_ok=True)
-        # Create the basic source files
-        for source_file in (
-                Report.CONF_PATH, Report.MAKE_PATH, Report.MAKEFILE_PATH
-        ):
-            copy(str(source_file), str(self.__root_directory / source_file.name))
+        # Create the configuration file
+        copy(str(Report.CONF_PATH), str(self.__root_directory / Report.CONF_PATH.name))
 
     def __create_algos_file(self):  # type: (...)-> None
         """Create the file describing the algorithms."""
@@ -227,22 +222,27 @@ class Report(object):
 
     def __build_report(
             self,
-            html_report=True,  # type: bool
-            pdf_report=False,  # type: bool
+            to_html=True,  # type: bool
+            to_pdf=False,  # type: bool
     ):  # type: (...) -> None
         """Build the benchmarking report.
 
         Args:
-            html_report: Whether to generate the report in HTML format.
-            pdf_report: Whether to generate the report in PDF format.
+            to_html: Whether to generate the report in HTML format.
+            to_pdf: Whether to generate the report in PDF format.
         """
         initial_dir = os.getcwd()
         os.chdir(str(self.__root_directory))
+        builders = list()
+        if to_html:
+            builders.append("html")
+        if to_pdf:
+            builders.append("latexpdf")
         try:
-            if html_report:
-                call("make html", shell=True)
-            if pdf_report:
-                call("make latexpdf", shell=True)
+            for builder in builders:
+                call("sphinx-build -M {} {} {}".format(
+                    builder, self.__root_directory, Report.BUILD_DIR_NAME
+                ), shell=True)
         finally:
             os.chdir(initial_dir)
 
