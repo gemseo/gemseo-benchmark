@@ -76,19 +76,25 @@ class Report(object):
         self.__problems_groups = problems_groups
         self.__histories_paths = histories_paths
         self.__custom_algos_descriptions = custom_algos_descriptions
-        for algo_name in algos_specifications:
-            if algo_name not in histories_paths:
-                raise ValueError(
-                    "Missing histories for algorithm {!r}".format(algo_name)
+        algos_diff = set(algos_specifications) - set(histories_paths)
+        if algos_diff:
+            raise ValueError(
+                "Missing histories for algorithm{} {}".format(
+                    "s" if len(algos_diff) > 1 else "",
+                    ", ".join(["{!r}".format(name) for name in algos_diff])
                 )
-            histories = histories_paths[algo_name]
-            for group in problems_groups:
-                for problem in group:
-                    if problem.name not in histories:
-                        raise ValueError(
-                            "Missing histories for algorithm {!r} on problem {!r}"
-                            .format(algo_name, problem.name)
-                        )
+            )
+        for algo_name in algos_specifications:
+            problems_diff = set(
+                problem.name for group in problems_groups for problem in group
+            ) - set(histories_paths[algo_name])
+            if problems_diff:
+                raise ValueError(
+                    "Missing histories for algorithm {!r} on problem{} {!r}".format(
+                        algo_name, "s" if len(problems_diff) > 1 else "",
+                        ", ".join(["{!r}".format(name) for name in problems_diff])
+                    )
+                )
 
     def generate_report(
             self,
