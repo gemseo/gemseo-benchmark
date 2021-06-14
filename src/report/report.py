@@ -21,7 +21,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Generation of a benchmarking report"""
-from os import chdir
+import os
 from shutil import copy
 from subprocess import call
 from typing import Any, Iterable, List, Mapping, Optional, Union
@@ -35,23 +35,23 @@ from problems.problems_group import ProblemsGroup
 
 class Report(object):
     """A benchmarking report."""
-    TEMPLATES_DIR = Path(__file__).parent / "templates"
+    TEMPLATES_DIR_PATH = Path(__file__).parent / "templates"
     INDEX_FILENAME = "index.rst"
     ALGOS_FILENAME = "algorithms.rst"
     GROUPS_LIST_FILENAME = "problems_groups.rst"
     GROUP_FILENAME = "group.rst"
 
-    BASIC_SOURCES_DIR = Path(__file__).parent / "basic_sources"
-    CONF_PATH = BASIC_SOURCES_DIR / "conf.py"
-    MAKE_PATH = BASIC_SOURCES_DIR / "make.bat"
-    MAKEFILE_PATH = BASIC_SOURCES_DIR / "Makefile"
+    BASIC_SOURCES_DIR_PATH = Path(__file__).parent / "basic_sources"
+    CONF_PATH = BASIC_SOURCES_DIR_PATH / "conf.py"
+    MAKE_PATH = BASIC_SOURCES_DIR_PATH / "make.bat"
+    MAKEFILE_PATH = BASIC_SOURCES_DIR_PATH / "Makefile"
 
-    GROUPS_DIR = "groups"
-    IMAGES_DIR = "images"
+    GROUPS_DIR_NAME = "groups"
+    IMAGES_DIR_NAME = "images"
 
     def __init__(
             self,
-            root_directory,  # type: Union[str, Path]
+            root_directory_path,  # type: Union[str, Path]
             algos_specifications,  # type: Mapping[str, Mapping[str, Any]]
             problems_groups,  # type: Iterable[ProblemsGroup]
             histories_paths,  # type: Mapping[str, Mapping[str, List[Union[str, Path]]]]
@@ -59,60 +59,66 @@ class Report(object):
     ):  # type: (...) -> None
         """
         Args:
-            root_directory: The path to the root directory of the report.
+            root_directory_path: The path to the root directory of the report.
             algos_specifications: The compared algorithms and their options.
             problems_groups: The groups of reference problems.
             histories_paths: The paths to the reference histories for each algorithm
                 and reference problem.
-            minamo_algos_descriptions: The descriptions of the MINAMO algorithms.
+            custom_algos_descriptions: The descriptions of the MINAMO algorithms.
 
         Raises:
             ValueError: If an algorithm has no associated histories,
                 or has a missing history for a given reference problem.
 
         """
-        self.__root_directory = Path(root_directory)
+        self.__root_directory = Path(root_directory_path)
         self.__algos_specs = algos_specifications
         self.__problems_groups = problems_groups
         self.__histories_paths = histories_paths
         self.__custom_algos_descriptions = custom_algos_descriptions
-        for algo_name in algos_specifications:
-            if algo_name not in histories_paths:
-                raise ValueError(
-                    "Missing histories for algorithm {!r}".format(algo_name)
+        algos_diff = set(algos_specifications) - set(histories_paths)
+        if algos_diff:
+            raise ValueError(
+                "Missing histories for algorithm{} {}".format(
+                    "s" if len(algos_diff) > 1 else "",
+                    ", ".join(["{!r}".format(name) for name in algos_diff])
                 )
-            histories = histories_paths[algo_name]
-            for group in problems_groups:
-                for problem in group:
-                    if problem.name not in histories:
-                        raise ValueError(
-                            "Missing histories for algorithm {!r} on problem {!r}"
-                            .format(algo_name, problem.name)
-                        )
+            )
+        for algo_name in algos_specifications:
+            problems_diff = set(
+                problem.name for group in problems_groups for problem in group
+            ) - set(histories_paths[algo_name])
+            if problems_diff:
+                raise ValueError(
+                    "Missing histories for algorithm {!r} on problem{} {}".format(
+                        algo_name, "s" if len(problems_diff) > 1 else "",
+                        ", ".join(["{!r}".format(name) for name in problems_diff])
+                    )
+                )
 
     def generate_report(
             self,
-            html_report=True,  # type: bool
-            pdf_report=False,  # type: bool
+            to_html=True,  # type: bool
+            to_pdf=False,  # type: bool
     ):  # type: (...) -> None
         """Generate the benchmarking report.
 
         Args:
-            html_report: Whether to generate the report in HTML format.
-            pdf_report: Whether to generate the report in PDF format.
+            to_html: Whether to generate the report in HTML format.
+            to_pdf: Whether to generate the report in PDF format.
         """
         self.__create_root_directory()
         self.__create_algos_file()
         self.__create_groups_files()
         self.__create_index()
-        self.__build_report(html_report, pdf_report)
+        self.__build_report(to_html, to_pdf)
 
     def __create_root_directory(self):  # type: (...) -> None
         """Create the source directory and basic files."""
         self.__root_directory.mkdir(exist_ok=True)
         # Create the subdirectories
         (self.__root_directory / "_static").mkdir(exist_ok=True)
-        for directory in [Report.GROUPS_DIR, Report.IMAGES_DIR]:
+        for directory in [Report.GROUPS_DIR_NAME, Report.IMAGES_DIR_NAME]:
             (self.__root_directory / directory).mkdir(exist_ok=True)
         # Create the basic source files
         for source_file in (
@@ -148,7 +154,7 @@ class Report(object):
         groups_paths = list()
         for problems_group in self.__problems_groups:
             # Create the directory dedicated to the group
-            group_directory = (self.__root_directory / Report.IMAGES_DIR /
+            group_directory = (self.__root_directory / Report.IMAGES_DIR_NAME /
                                Report.__format_group_name(problems_group.name))
             group_directory.mkdir(exist_ok=True)
 
@@ -163,7 +169,7 @@ class Report(object):
             )
 
             # Create the file
-            group_path = (self.__root_directory / Report.GROUPS_DIR / "{}.rst"
+            group_path = (self.__root_directory / Report.GROUPS_DIR_NAME / "{}.rst"
                           .format(Report.__format_group_name(problems_group.name)))
             groups_paths.append(
                 group_path.relative_to(self.__root_directory).as_posix()
@@ -199,7 +205,7 @@ class Report(object):
     def __fill_template(
             file_path,  # type: Path
             template_name,  # type: str
-            **kwargs
+            **kwargs,  # type: Any
     ):  # type: (...) -> None
         """Fill a file template.
 
@@ -210,7 +216,7 @@ class Report(object):
         Returns:
             The filled file template.
         """
-        file_loader = FileSystemLoader(Report.TEMPLATES_DIR)
+        file_loader = FileSystemLoader(Report.TEMPLATES_DIR_PATH)
         environment = Environment(loader=file_loader)
         template = environment.get_template(template_name)
         file_contents = template.render(**kwargs)
@@ -228,11 +234,15 @@ class Report(object):
             html_report: Whether to generate the report in HTML format.
             pdf_report: Whether to generate the report in PDF format.
         """
-        chdir(str(self.__root_directory))
-        if html_report:
-            call("make html", shell=True)
-        if pdf_report:
-            call("make latexpdf", shell=True)
+        initial_dir = os.getcwd()
+        os.chdir(str(self.__root_directory))
+        try:
+            if html_report:
+                call("make html", shell=True)
+            if pdf_report:
+                call("make latexpdf", shell=True)
+        finally:
+            os.chdir(initial_dir)
 
     @staticmethod
     def __format_group_name(
