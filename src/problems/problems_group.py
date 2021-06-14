@@ -21,8 +21,9 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Grouping of reference problems for benchmarking."""
+from typing import Any, Iterable, Iterator, Mapping, Optional
+
 from gemseo.utils.py23_compat import Path
-from typing import Any, Iterable, Iterator, List, Mapping, Optional
 
 from data_profiles.data_profile import DataProfile
 from data_profiles.performance_history import PerformanceHistory
@@ -46,7 +47,7 @@ class ProblemsGroup(object):
             name,  # type: str
             problems,  # type: Iterable[Problem]
             description=None,  # type: Optional[str]
-    ):
+    ):  # type: (...) -> None
         """
         Args:
             name: The name of the group of problems.
