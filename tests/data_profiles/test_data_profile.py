@@ -47,7 +47,7 @@ def test_consistent_target_values():
 def test_add_history_unknown_problem():
     """Check the addition of a history for an unknown problem."""
     data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
-    with raises(ValueError, match="toto is not the name of a reference problem"):
+    with raises(ValueError, match="'toto' is not the name of a reference problem"):
         data_profile.add_history("toto", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
 
 
