@@ -41,22 +41,30 @@ def get_report_args(histories_dir):
     Returns:
         The algorithms and their options, the groups of problems, the histories paths.
     """
-    algorithms = {"An algo": dict()}
+    algos_specifications = {"An algo": dict()}
     targets = TargetValues(list(range(1000, 0, -100)))
     a_problem = Problem("A problem", Rosenbrock, [zeros(2)], targets)
     problems_groups = [ProblemsGroup("A group", [a_problem], "A description")]
     targets.to_file(str(histories_dir / "history.json"))
     histories_path = {"An algo": {"A problem": [str(histories_dir / "history.json")]}}
-    return algorithms, problems_groups, histories_path
+    return algos_specifications, problems_groups, histories_path
 
 
 def test_init(tmpdir):
     """Check the initialization of the report."""
-    algorithms, problems_groups, histories_path = get_report_args(tmpdir)
-    with raises(ValueError):
-        Report(tmpdir, {"tata": dict()}, problems_groups, histories_path)
-    with raises(ValueError):
-        Report(tmpdir, algorithms, problems_groups, {"tata": histories_path["An algo"]})
+    algos_specs, problems_groups, histories_path = get_report_args(tmpdir)
+    with raises(ValueError, match="Missing histories for algorithm 'An algo'"):
+        Report(
+            tmpdir, algos_specs, problems_groups,
+            {"Another algo": histories_path["An algo"]}
+        )
+    with raises(
+            ValueError,
+            match="Missing histories for algorithm 'An algo' on problem 'A problem'"
+    ):
+        Report(tmpdir, algos_specs, problems_groups,
+               {"An algo": {"Another problem": histories_path["An algo"]["A problem"]}}
+               )
 
 
 def test_generate_report_sources(tmpdir):
