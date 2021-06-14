@@ -73,7 +73,7 @@ class ProblemsGroup(object):
         """
         if self.__description is None:
             raise AttributeError("The description of the problem is not set.")
-        return self.description
+        return self.__description
 
     def is_algorithm_suited(
             self,
