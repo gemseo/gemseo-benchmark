@@ -75,6 +75,8 @@ class Report(object):
         self.__algos_specs = algos_specifications
         self.__problems_groups = problems_groups
         self.__histories_paths = histories_paths
+        if custom_algos_descriptions is None:
+            custom_algos_descriptions = dict()
         self.__custom_algos_descriptions = custom_algos_descriptions
         algos_diff = set(algos_specifications) - set(histories_paths)
         if algos_diff:
