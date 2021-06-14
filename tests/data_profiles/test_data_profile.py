@@ -21,6 +21,7 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the data profile."""
 import pytest
+from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
 from pytest import raises
 
@@ -68,6 +69,7 @@ def test_plot_data_profiles():
     data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
     data_profile.add_history("problem", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
     data_profiles = data_profile.compute_data_profiles("algo")
+    pyplot.close("all")
     data_profile._plot_data_profiles(data_profiles)
 
 
