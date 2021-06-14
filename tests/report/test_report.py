@@ -71,9 +71,10 @@ def test_generate_report_sources(tmpdir):
     """Check the generation of the report sources."""
     algorithms, problems_groups, histories_path = get_report_args(tmpdir)
     report = Report(tmpdir, algorithms, problems_groups, histories_path)
-    report.generate_report()
+    report.generate_report(to_pdf=True)
     assert (tmpdir / "index.rst").isfile()
     assert (tmpdir / "algorithms.rst").isfile()
     assert (tmpdir / "problems_groups.rst").isfile()
     assert (tmpdir / "groups" / "A_group.rst").isfile()
     assert (tmpdir / "_build" / "html" / "index.html").isfile()
+    assert (tmpdir / "_build" / "latex" / "benchmarkingreport.pdf").isfile()
