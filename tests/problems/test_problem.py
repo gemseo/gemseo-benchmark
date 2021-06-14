@@ -50,9 +50,9 @@ def test_wrong_start_points_type():
 
 
 def test_inconsistent_start_points():
-    """Check initialization with starting points of inconsistent sizes."""
-    with raises(ValueError):
-        Problem("Rosenbrock2D", Rosenbrock, [zeros(2), zeros(3)])
+    """Check initialization with starting points of inadequate size."""
+    with raises(ValueError, match="Starting points must be 1-dimensional with size 2"):
+        Problem("Rosenbrock2D", Rosenbrock, [zeros(3)])
 
 
 def test_start_points_iteration():
