@@ -59,7 +59,7 @@ class ProblemsGroup(object):
         self.__description = description
 
     def __iter__(self):  # type: (...) -> Iterator[Problem]
-        return iter(problem for problem in self.__problems)
+        return iter(self.__problems)
 
     @property
     def description(self):  # type: (...) -> str
