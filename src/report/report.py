@@ -21,7 +21,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Generation of a benchmarking report"""
-from os import chdir
+import os
 from shutil import copy
 from subprocess import call
 from typing import Any, Iterable, List, Mapping, Optional, Union
@@ -228,11 +228,15 @@ class Report(object):
             html_report: Whether to generate the report in HTML format.
             pdf_report: Whether to generate the report in PDF format.
         """
-        chdir(str(self.__root_directory))
-        if html_report:
-            call("make html", shell=True)
-        if pdf_report:
-            call("make latexpdf", shell=True)
+        initial_dir = os.getcwd()
+        os.chdir(str(self.__root_directory))
+        try:
+            if html_report:
+                call("make html", shell=True)
+            if pdf_report:
+                call("make latexpdf", shell=True)
+        finally:
+            os.chdir(initial_dir)
 
     @staticmethod
     def __format_group_name(
