@@ -28,11 +28,12 @@ A benchmarking problem is characterized by its functions
 its starting points (each defining an instance of the problem)
 and its targets (refer to :mod:`target_values`).
 """
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
+
 from gemseo.algos.doe.doe_factory import DOEFactory
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
 from numpy import array, ndarray
-from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
 
 from data_profiles.data_profile import DataProfile
 from data_profiles.target_values import TargetValues
@@ -146,25 +147,6 @@ class Problem(object):
             problem.design_space.set_current_x(start_point)
             yield problem
 
-    def get_instance(
-            self,
-            start_point=None  # type: Optional[ndarray]
-    ):  # type: (...) -> OptimizationProblem
-        """Return an instance of the benchmarking problem.
-
-        Args:
-            start_point: The starting point of the instance.
-                If None, it is the current design of the benchmarking problem.
-
-        Returns:
-            The instance of the benchmarking problem.
-        """
-        # TODO: remove this method
-        instance = self.__creator()
-        if start_point is not None:
-            instance.design_space.set_current_x(start_point)
-        return instance
-
     def is_algorithm_suited(
             self,
             name,  # type: str
@@ -239,8 +221,7 @@ class Problem(object):
 
         # Generate the performance histories
         for algo_name, algo_options in algorithms.items():
-            for start_point in self.start_points:
-                problem = self.get_instance(start_point)
+            for problem in self:
                 OptimizersFactory().execute(problem, algo_name, **algo_options)
                 obj_values, measures, feas_statuses = self.compute_performance(problem)
                 data_profile.add_history(
