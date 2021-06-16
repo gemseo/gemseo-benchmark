@@ -93,17 +93,19 @@ class ProblemsGroup(object):
             self,
             targets_number,  # type: int
             ref_algos_specifications,  # type: Mapping[str, Mapping[str, Any]]
-            feasible=True,  # type: bool
+            only_feasible=True,  # type: bool
     ):  # type: (...) -> None
         """Generate targets for all the problems based on given reference algorithms.
 
         Args:
             targets_number: The number of targets to generate.
             ref_algos_specifications: The names and options of the reference algorithms.
-            feasible: Whether to generate only feasible targets.
+            only_feasible: Whether to generate only feasible targets.
         """
         for problem in self.__problems:
-            problem.compute_targets(targets_number, ref_algos_specifications, feasible)
+            problem.compute_targets(
+                targets_number, ref_algos_specifications, only_feasible
+            )
 
     def compute_data_profile(
             self,

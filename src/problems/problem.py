@@ -166,7 +166,7 @@ class Problem(object):
             self,
             targets_number,  # type: int
             ref_algo_specifications,  # type: Mapping[str, Mapping[str, Any]]
-            feasible=True,  # type: bool
+            only_feasible=True,  # type: bool
             budget_min=1,  # type: int
             show=False,  # type: bool
             path=None,  # type: Optional[str]
@@ -176,7 +176,7 @@ class Problem(object):
         Args:
             targets_number: The number of targets to generate.
             ref_algo_specifications: The names and options of the reference algorithms.
-            feasible: Whether to generate only feasible targets.
+            only_feasible: Whether to generate only feasible targets.
             budget_min: The evaluation budget to be used to define the easiest target.
             show: If True, show the plot.
             path: The path where to save the plot.
@@ -196,7 +196,7 @@ class Problem(object):
 
         # Compute the target values
         target_values = targets_generator.run(
-            targets_number, budget_min, feasible, show, path
+            targets_number, budget_min, only_feasible, show, path
         )
         self.__target_values = target_values
 
