@@ -77,4 +77,4 @@ def test_generate_report_sources(tmpdir):
     assert (tmpdir / "problems_groups.rst").isfile()
     assert (tmpdir / "groups" / "A_group.rst").isfile()
     assert (tmpdir / "_build" / "html" / "index.html").isfile()
-    assert (tmpdir / "_build" / "latex" / "benchmarkingreport.pdf").isfile()
+    assert (tmpdir / "_build" / "latex" / "benchmarking_report.pdf").isfile()
