@@ -53,27 +53,14 @@ class ProblemsGroup(object):
             name: The name of the group of problems.
             problems: The benchmarking problems of the group.
             description: The description of the group of problems.
+                If None, the description is set to None.
         """
         self.name = name
         self.__problems = problems
-        self.__description = description
+        self.description = description
 
     def __iter__(self):  # type: (...) -> Iterator[Problem]
         return iter(self.__problems)
-
-    @property
-    def description(self):  # type: (...) -> str
-        """The description of the group of problems.
-
-        Raises:
-            AttributeError: If the description of the problem is not set.
-
-        Returns:
-            The description of the group of problems.
-        """
-        if self.__description is None:
-            raise AttributeError("The description of the problem is not set.")
-        return self.__description
 
     def is_algorithm_suited(
             self,
