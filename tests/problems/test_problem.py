@@ -59,7 +59,7 @@ def test_start_points_iteration():
     """Check the iteration on start points."""
     start_points = [zeros(2), ones(2)]
     problem = Problem("Rosenbrock2D", Rosenbrock, start_points)
-    problem_instances = list(iter(problem))
+    problem_instances = list(problem)
     assert len(problem_instances) == 2
     assert_allclose(problem_instances[0].design_space.get_current_x(), start_points[0])
     assert_allclose(problem_instances[1].design_space.get_current_x(), start_points[1])
