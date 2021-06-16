@@ -202,7 +202,7 @@ class Report(object):
     def __fill_template(
             file_path,  # type: Path
             template_name,  # type: str
-            **kwargs,  # type: Any
+            **kwargs  # type: Any
     ):  # type: (...) -> None
         """Fill a file template.
 
