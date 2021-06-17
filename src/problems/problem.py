@@ -35,7 +35,6 @@ from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
 from numpy import array, ndarray
 
-from data_profiles.data_profile import DataProfile
 from data_profiles.target_values import TargetValues
 from data_profiles.targets_generator import TargetsGenerator
 
@@ -201,35 +200,6 @@ class Problem(object):
         self.__target_values = target_values
 
         return target_values
-
-    def compute_data_profile(
-            self,
-            algorithms,  # type: Mapping[str, Mapping[str, Any]]
-            show=True,  # type: bool
-            path=None  # type: Optional[str]
-    ):  # type: (...) -> None
-        # TODO: remove this method (use ProblemsGroup)
-        """Generate a data profile of algorithms available in Gemseo.
-
-        Args:
-            algorithms: The algorithms and their options.
-            show: Whether to show the plot.
-            path: The path where to save the plot.
-                If None, the plot is not saved.
-        """
-        data_profile = DataProfile({self.name: self.__target_values})
-
-        # Generate the performance histories
-        for algo_name, algo_options in algorithms.items():
-            for problem in self:
-                OptimizersFactory().execute(problem, algo_name, **algo_options)
-                obj_values, measures, feas_statuses = self.compute_performance(problem)
-                data_profile.add_history(
-                    self.name, algo_name, obj_values, measures, feas_statuses
-                )
-
-        # Plot and/or save the data profile
-        data_profile.plot(show=show, path=path)
 
     @staticmethod
     def compute_performance(
