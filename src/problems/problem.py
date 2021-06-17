@@ -48,8 +48,9 @@ class Problem(object):
     - its target values.
 
     Attributes:
-        name: The name of the benchmarking problem.
-        start_points: The starting points of the benchmarking problem.
+        name (str): The name of the benchmarking problem.
+        start_points (Iterable[ndarray]): The starting points of the benchmarking
+            problem.
     """
 
     def __init__(
