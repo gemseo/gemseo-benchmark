@@ -70,3 +70,9 @@ def test_undefined_targets():
     problem = Problem("Rosenbrock2D", Rosenbrock, [zeros(2)])
     with raises(ValueError, match="Benchmarking problem has no target"):
         problem.target_values
+
+
+def test_generate_start_points():
+    """Check the generation of starting points."""
+    problem = Problem("Rosenbrock2D", Rosenbrock, doe_algo_name="lhs", doe_size=5)
+    assert len(list(problem.start_points)) == 5
