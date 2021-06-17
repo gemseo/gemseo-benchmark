@@ -33,7 +33,7 @@ from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
 from gemseo.algos.doe.doe_factory import DOEFactory
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
-from numpy import array, ndarray
+from numpy import ndarray
 
 from data_profiles.target_values import TargetValues
 from data_profiles.targets_generator import TargetsGenerator
@@ -126,12 +126,12 @@ class Problem(object):
         Returns:
             The starting points of the benchmarking problem.
         """
-        design_space = self.__creator().design_space
         doe_library = DOEFactory().create(doe_algo_name)
         if doe_options is None:
             doe_options = dict()
-        doe = doe_library(doe_size, design_space.dimension, **doe_options)
-        return [design_space.unnormalize_vect(array(row)) for row in doe]
+        doe_options["n_samples"] = doe_size
+        doe_library.execute(self.__creator(), **doe_options)
+        return doe_library.samples
 
     @property
     def target_values(self):  # type: (...) -> TargetValues
