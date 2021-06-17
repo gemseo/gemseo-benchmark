@@ -26,6 +26,7 @@ from matplotlib.testing.decorators import image_comparison
 from pytest import raises
 
 from data_profiles.data_profile import DataProfile
+from data_profiles.history_item import HistoryItem
 from data_profiles.target_values import TargetValues
 
 
@@ -85,3 +86,50 @@ def test_plot_save(tmpdir, converter):
     path = tmpdir / "data_profile.png"
     data_profile.plot(show=False, path=converter(path))
     assert path.isfile()
+
+
+def test_target_values_getter():
+    """Check the getting of target values."""
+    targets = DataProfile({"problem": TargetValues([1.0, 0.0])}).target_values
+    assert len(targets) == 1
+    assert len(targets["problem"]) == 2
+    assert targets["problem"][0] == HistoryItem(1.0, 0.0)
+    assert targets["problem"][1] == HistoryItem(0.0, 0.0)
+
+
+def test_different_sizes_histories():
+    """Check the computation of a data profile based on histories of different sizes."""
+    data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
+    data_profile.add_history("problem", "algo", [2.0, 2.0])
+    data_profile.add_history("problem", "algo", [2.0, 1.0, 0.0])
+    profile = data_profile.compute_data_profiles()
+    assert profile["algo"] == [0.0, 0.25, 0.5]
+
+
+def test_unevenly_represented_problems():
+    """Check the handling of unevenly represented reference problems."""
+    data_profile = DataProfile({
+        "problem1": TargetValues([1.0, 0.0]),
+        "problem2": TargetValues([1.0, 0.0]),
+    })
+    data_profile.add_history("problem1", "algo", [2.0, 2.0])
+    data_profile.add_history("problem1", "algo", [2.0, 2.0])
+    data_profile.add_history("problem2", "algo", [2.0, 2.0])
+    with raises(
+            ValueError,
+            match="Reference problems unequally represented for algorithm 'algo'"
+    ):
+        data_profile.compute_data_profiles()
+
+
+@image_comparison(
+    baseline_images=["two_data_profiles"], remove_text=True, extensions=['png']
+)
+def test_different_sizes_data_profiles():
+    """Check the plotting of data profiles of different sizes."""
+    data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
+    data_profile.add_history("problem", "algo1", [1.0, 1.0])
+    data_profile.add_history("problem", "algo2", [2.0, 1.0, 0.0])
+    profiles = data_profile.compute_data_profiles()
+    pyplot.close("all")
+    data_profile._plot_data_profiles(profiles)
