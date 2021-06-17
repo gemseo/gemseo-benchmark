@@ -23,6 +23,7 @@
 """Tests for the generation of a benchmarking report"""
 
 from gemseo.problems.analytical.rosenbrock import Rosenbrock
+from gemseo.utils.py23_compat import Path
 from numpy import zeros
 from pytest import raises
 
@@ -32,21 +33,26 @@ from problems.problems_group import ProblemsGroup
 from report.report import Report
 
 
-def get_report_args(histories_dir):
+def get_report_args(
+        histories_dir,  # type: Path
+        algo_name="An algo",  # type: str
+):
     """Return the arguments for the report initialization.
 
     Args:
         histories_dir: Path to the histories directory.
+        algo_name: The name of the algorithm.
+            If None, defaults to "An algo".
 
     Returns:
         The algorithms and their options, the groups of problems, the histories paths.
     """
-    algos_specifications = {"An algo": dict()}
+    algos_specifications = {algo_name: dict()}
     targets = TargetValues(list(range(1000, 0, -100)))
     a_problem = Problem("A problem", Rosenbrock, [zeros(2)], targets)
     problems_groups = [ProblemsGroup("A group", [a_problem], "A description")]
     targets.to_file(str(histories_dir / "history.json"))
-    histories_path = {"An algo": {"A problem": [str(histories_dir / "history.json")]}}
+    histories_path = {algo_name: {"A problem": [str(histories_dir / "history.json")]}}
     return algos_specifications, problems_groups, histories_path
 
 
@@ -78,3 +84,23 @@ def test_generate_report_sources(tmpdir):
     assert (tmpdir / "groups" / "A_group.rst").isfile()
     assert (tmpdir / "_build" / "html" / "index.html").isfile()
     assert (tmpdir / "_build" / "latex" / "benchmarking_report.pdf").isfile()
+
+
+def test_retrieve_description(tmpdir):
+    """Check the retrieval of a Gemseo algorithm description."""
+    algorithms, problems_groups, histories_path = get_report_args(tmpdir, "SLSQP")
+    report = Report(tmpdir, algorithms, problems_groups, histories_path)
+    ref_contents = [
+        "Algorithms\n",
+        "==========\n",
+        "\n",
+        "The following algorithms are considered in this benchmarking report.\n",
+        "\n",
+        "SLSQP\n",
+        "   Sequential Least-Squares Quadratic Programming (SLSQP) implemented in the "
+        "SciPy library\n"
+        ]
+    report.generate_report()
+    with open(tmpdir / "algorithms.rst") as file:
+        contents = file.readlines()
+    assert contents == ref_contents

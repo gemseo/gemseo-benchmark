@@ -131,12 +131,13 @@ class Report(object):
             if algo_name not in algos_descriptions:
                 try:
                     library = OptimizersFactory().create(algo_name)
-                    algos_descriptions[algo_name] = library.lib_dict[algo_name][
-                        library.DESCRIPTION
-                    ]
                 except ImportError:
                     # The algorithm is unavailable
                     algos_descriptions[algo_name] = "N/A"
+                else:
+                    algos_descriptions[algo_name] = library.lib_dict[algo_name][
+                        library.DESCRIPTION
+                    ]
 
         # Create the file
         file_path = self.__root_directory / Report.ALGOS_FILENAME
