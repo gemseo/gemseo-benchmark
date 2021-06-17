@@ -50,3 +50,8 @@ def test_le():
     assert HistoryItem(0.0, 2.0) <= HistoryItem(1.0, 2.0)
     assert HistoryItem(0.0, 1.0) <= HistoryItem(0.0, 2.0)
     assert not HistoryItem(0.0, 2.0) <= HistoryItem(1.0, 1.0)
+
+
+def test_repr():
+    """Check the representation of a history item."""
+    assert repr(HistoryItem(1.0, 2.0)) == "(1.0, 2.0)"
