@@ -72,6 +72,7 @@ class TargetsGenerator(object):
             show=True,  # type: bool
             path=None,  # type: Optional[str]
     ):  # type: (...) -> TargetValues
+        # TODO: document that feasible overwrite the budget_min option
         """Compute the target values for a function from the histories of its values.
 
         Args:

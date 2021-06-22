@@ -20,8 +20,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the performance history."""
-from pathlib import Path
-
+from gemseo.utils.py23_compat import Path
 from numpy import inf
 from pytest import raises
 
@@ -111,3 +110,16 @@ def test_from_file():
     history = PerformanceHistory.from_file(reference_path)
     reference = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
     assert history.history_items == reference.history_items
+
+
+def test_history_items_setter():
+    """Check the setting of history items."""
+    history = PerformanceHistory()
+    with raises(TypeError, match="History items must be of type HistoryItem"):
+        history.history_items = [1.0, 2.0]
+
+
+def test_repr():
+    """Check the representation of a performance history."""
+    history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
+    assert repr(history) == "[(-2.0, 1.0), (-3.0, 0.0)]"

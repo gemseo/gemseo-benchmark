@@ -22,6 +22,7 @@
 """Tests for the targets generator."""
 from pytest import raises
 
+from data_profiles.history_item import HistoryItem
 from data_profiles.targets_generator import TargetsGenerator
 
 
@@ -39,3 +40,45 @@ def test_negative_infeasibility_measures():
     generator = TargetsGenerator()
     with raises(ValueError):
         generator.add_history([3.0, 2.0], [1.0, -1.0])
+
+
+def test_too_many_targets():
+    """Check that requiring more targets than are iterations raises an exception."""
+    generator = TargetsGenerator()
+    generator.add_history([3.0, 2.0])
+    with raises(
+            ValueError,
+            match="The number of budgets required cannot be larger than "
+                  "the number of budgets available: 3 > 2"
+    ):
+        generator.run(3)
+
+
+def test_infeasible_targets():
+    """Check the computation of infeasible targets."""
+    generator = TargetsGenerator()
+    generator.add_history([3.0, 2.0], [0.0, 1.0])
+    generator.add_history([2.0, 1.0], [1.0, 1.0])
+    targets = generator.run(2, feasible=False, show=False)
+    assert targets.history_items == [HistoryItem(3.0, 0.0), HistoryItem(3.0, 0.0)]
+
+
+def test_various_lengths_histories():
+    """Check the computation of targets out of histories of various sizes."""
+    generator = TargetsGenerator()
+    generator.add_history([3.0, 2.0])
+    generator.add_history([2.0])
+    targets = generator.run(2, show=False)
+    assert targets.history_items == [HistoryItem(2.0, 0.0), HistoryItem(2.0, 0.0)]
+
+
+def test_run(tmpdir):
+    """Check the computation of target values."""
+    generator = TargetsGenerator()
+    generator.add_history([3.0, 2.0])
+    generator.add_history([2.0, 3.0])
+    generator.add_history([1.0, 0.0])
+    path = tmpdir / "targets.png"
+    targets = generator.run(2, show=False, path=path)
+    assert targets.history_items == [HistoryItem(2.0, 0.0), HistoryItem(2.0, 0.0)]
+    assert path.isfile()

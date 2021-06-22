@@ -21,6 +21,7 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the target values."""
 import pytest
+from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
 
 from data_profiles.performance_history import PerformanceHistory
@@ -42,6 +43,7 @@ def test_count_targets_hist():
 def test_plot_targets():
     """Check the target values figure."""
     targets = TargetValues([2.0, 1.0, 0.0])
+    pyplot.close("all")
     targets._plot_targets()
 
 

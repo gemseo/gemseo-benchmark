@@ -33,9 +33,8 @@ from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
 from gemseo.algos.doe.doe_factory import DOEFactory
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
-from numpy import array, ndarray
+from numpy import ndarray
 
-from data_profiles.data_profile import DataProfile
 from data_profiles.target_values import TargetValues
 from data_profiles.targets_generator import TargetsGenerator
 
@@ -49,8 +48,9 @@ class Problem(object):
     - its target values.
 
     Attributes:
-        name: The name of the benchmarking problem.
-        start_points: The starting points of the benchmarking problem.
+        name (str): The name of the benchmarking problem.
+        start_points (Iterable[ndarray]): The starting points of the benchmarking
+            problem.
     """
 
     def __init__(
@@ -126,12 +126,12 @@ class Problem(object):
         Returns:
             The starting points of the benchmarking problem.
         """
-        design_space = self.__creator().design_space
         doe_library = DOEFactory().create(doe_algo_name)
         if doe_options is None:
             doe_options = dict()
-        doe = doe_library(doe_size, design_space.dimension, **doe_options)
-        return [design_space.unnormalize_vect(array(row)) for row in doe]
+        doe_options["n_samples"] = doe_size
+        doe_library.execute(self.__creator(), **doe_options)
+        return doe_library.samples
 
     @property
     def target_values(self):  # type: (...) -> TargetValues
@@ -146,25 +146,6 @@ class Problem(object):
             problem = self.__creator()
             problem.design_space.set_current_x(start_point)
             yield problem
-
-    def get_instance(
-            self,
-            start_point=None  # type: Optional[ndarray]
-    ):  # type: (...) -> OptimizationProblem
-        """Return an instance of the benchmarking problem.
-
-        Args:
-            start_point: The starting point of the instance.
-                If None, it is the current design of the benchmarking problem.
-
-        Returns:
-            The instance of the benchmarking problem.
-        """
-        # TODO: remove this method
-        instance = self.__creator()
-        if start_point is not None:
-            instance.design_space.set_current_x(start_point)
-        return instance
 
     def is_algorithm_suited(
             self,
@@ -184,8 +165,8 @@ class Problem(object):
     def compute_targets(
             self,
             targets_number,  # type: int
-            ref_algo_specs,  # type: Mapping[str, Mapping[str, Any]]
-            feasible=True,  # type: bool
+            ref_algo_specifications,  # type: Mapping[str, Mapping[str, Any]]
+            only_feasible=True,  # type: bool
             budget_min=1,  # type: int
             show=False,  # type: bool
             path=None,  # type: Optional[str]
@@ -194,8 +175,8 @@ class Problem(object):
 
         Args:
             targets_number: The number of targets to generate.
-            ref_algo_specs: The names and options of the reference algorithms.
-            feasible: Whether to generate only feasible targets.
+            ref_algo_specifications: The names and options of the reference algorithms.
+            only_feasible: Whether to generate only feasible targets.
             budget_min: The evaluation budget to be used to define the easiest target.
             show: If True, show the plot.
             path: The path where to save the plot.
@@ -207,7 +188,7 @@ class Problem(object):
         targets_generator = TargetsGenerator()
 
         # Generate reference performance histories
-        for algo_name, algo_options in ref_algo_specs.items():
+        for algo_name, algo_options in ref_algo_specifications.items():
             for instance in self:
                 OptimizersFactory().execute(instance, algo_name, **algo_options)
                 obj_values, measures, feas_statuses = self.compute_performance(instance)
@@ -215,41 +196,11 @@ class Problem(object):
 
         # Compute the target values
         target_values = targets_generator.run(
-            targets_number, budget_min, feasible, show, path
+            targets_number, budget_min, only_feasible, show, path
         )
         self.__target_values = target_values
 
         return target_values
-
-    def compute_data_profile(
-            self,
-            algorithms,  # type: Mapping[str, Mapping[str, Any]]
-            show=True,  # type: bool
-            path=None  # type: Optional[str]
-    ):  # type: (...) -> None
-        # TODO: remove this method (use ProblemsGroup)
-        """Generate a data profile of algorithms available in Gemseo.
-
-        Args:
-            algorithms: The algorithms and their options.
-            show: Whether to show the plot.
-            path: The path where to save the plot.
-                If None, the plot is not saved.
-        """
-        data_profile = DataProfile({self.name: self.__target_values})
-
-        # Generate the performance histories
-        for algo_name, algo_options in algorithms.items():
-            for start_point in self.start_points:
-                problem = self.get_instance(start_point)
-                OptimizersFactory().execute(problem, algo_name, **algo_options)
-                obj_values, measures, feas_statuses = self.compute_performance(problem)
-                data_profile.add_history(
-                    self.name, algo_name, obj_values, measures, feas_statuses
-                )
-
-        # Plot and/or save the data profile
-        data_profile.plot(show=show, path=path)
 
     @staticmethod
     def compute_performance(
