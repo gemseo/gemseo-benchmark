@@ -67,8 +67,7 @@ class Results(object):
             self.__dict[algo_name] = dict()
         if problem_name not in self.__dict[algo_name]:
             self.__dict[algo_name][problem_name] = list()
-        self.__dict[algo_name][problem_name].append(str(absolute_path))
-        # The paths are converted to strings to be JSON serializable.
+        self.__dict[algo_name][problem_name].append(absolute_path)
 
     def to_file(
             self,
@@ -81,8 +80,14 @@ class Results(object):
             path: The path where to save the JSON file.
             indent: The indent level of the JSON serialization.
         """
+        # Convert the paths to strings to be JSON serializable
+        serializable = dict()
+        for algo_name, problems in self.__dict.items():
+            serializable[algo_name] = dict()
+            for problem_name, paths in problems.items():
+                serializable[algo_name][problem_name] = [str(path) for path in paths]
         with Path(path).open("w") as file:
-            json.dump(self.__dict, file, indent=indent)
+            json.dump(serializable, file, indent=indent)
 
     def from_file(
             self,
