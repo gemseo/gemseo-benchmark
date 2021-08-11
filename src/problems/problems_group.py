@@ -23,11 +23,10 @@
 """Grouping of reference problems for benchmarking."""
 from typing import Any, Iterable, Iterator, Mapping, Optional
 
-from gemseo.utils.py23_compat import Path
-
 from data_profiles.data_profile import DataProfile
 from data_profiles.performance_history import PerformanceHistory
 from problems.problem import Problem
+from results.results import Results
 
 
 class ProblemsGroup(object):
@@ -97,7 +96,7 @@ class ProblemsGroup(object):
     def compute_data_profile(
             self,
             algos_specifications,  # type: Mapping[str, Mapping[str, Any]]
-            histories_paths,  # type: Mapping[str, Mapping[str, Iterable[Path]]]
+            histories_paths,  # type: Results
             show=True,  # type: bool
             plot_path=None  # type: Optional[str]
     ):  # type: (...) -> None
@@ -119,7 +118,7 @@ class ProblemsGroup(object):
         # Generate the performance histories
         for algo_name, algo_options in algos_specifications.items():
             for problem in self.__problems:
-                for history_path in histories_paths[algo_name][problem.name]:
+                for history_path in histories_paths.get_paths(algo_name, problem.name):
                     history = PerformanceHistory.from_file(history_path)
                     data_profile.add_history(
                         problem.name, algo_name, history.objective_values,
