@@ -21,7 +21,7 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """A class to collect the paths to performance histories."""
 import json
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 from gemseo.utils.py23_compat import Path
 
@@ -105,3 +105,31 @@ class Results(object):
             for problem_name, paths in problems.items():
                 for path in paths:
                     self.add_path(algo_name, problem_name, path)
+
+    @property
+    def algorithms(self):  # type: (...) -> List[str]
+        """Return the names of the algorithms.
+
+        Returns:
+            The names of the algorithms.
+        """
+        return list(self.__dict)
+
+    def get_problems(
+            self,
+            algo_name,  # type: str
+    ):  # type: (...) -> List[str]
+        """Return the names of the problems for a given algorithm.
+
+        Args:
+            algo_name: The name of the algorithm.
+
+        Returns:
+            The names of the problems.
+
+        Raises:
+            ValueError: If the algorithm name is unknown.
+        """
+        if algo_name not in self.__dict:
+            raise ValueError("Unknown algorithm name: {}.".format(algo_name))
+        return list(self.__dict[algo_name])
