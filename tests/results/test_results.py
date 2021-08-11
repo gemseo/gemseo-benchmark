@@ -30,9 +30,11 @@ from results.results import Results
 def test_add_invalid_path():
     """Check the addition of a nonexistent path to a collection."""
     results = Results()
-    path = Path(__file__).parent / "not_a_file.json"
-    with pytest.raises(FileNotFoundError):
-        results.add_path("algo", "problem", path)
+    with pytest.raises(
+            FileNotFoundError,
+            match="The path to the history does not exist: not_a_file.json."
+    ):
+        results.add_path("algo", "problem", "not_a_file.json")
 
 
 def test_to_file(tmpdir):
@@ -63,8 +65,11 @@ def test_from_file(tmpdir):
 def test_from_invalid_file():
     """Check the loading of a collection to an invalid path."""
     results = Results()
-    with pytest.raises(FileNotFoundError):
-        results.from_file(Path("not_a_path.json"))
+    with pytest.raises(
+            FileNotFoundError,
+            match="The path to the JSON file does not exist: not_a_path.json."
+    ):
+        results.from_file("not_a_path.json")
 
 
 def test_algorithms():
