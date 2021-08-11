@@ -137,3 +137,23 @@ class Results(object):
         if algo_name not in self.__dict:
             raise ValueError("Unknown algorithm name: {}.".format(algo_name))
         return list(self.__dict[algo_name])
+
+    def get_paths(
+            self,
+            algo_name,  # type: str
+            problem_name,  # type: str
+    ):  # type: (...) -> List[Path]
+        """Return the paths associated with an algorithm and a problem.
+
+        Args:
+            algo_name: The name of the algorithm.
+            problem_name: The name of the problem.
+
+        Returns:
+            The paths to the performance histories.
+        """
+        if algo_name not in self.__dict:
+            raise ValueError("Unknown algorithm name: {}.".format(algo_name))
+        if problem_name not in self.__dict[algo_name]:
+            raise ValueError("Unknown problem name: {}.".format(problem_name))
+        return self.__dict[algo_name][problem_name]
