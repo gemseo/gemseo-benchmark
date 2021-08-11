@@ -86,3 +86,11 @@ def test_get_problems():
     history_path = Path(__file__).parent / "history.json"
     results.add_path("algo", "problem", history_path)
     assert results.get_problems("algo") == ["problem"]
+
+
+def test_test_paths():
+    """Check the accessor to the performance histories paths."""
+    results = Results()
+    history_path = Path(__file__).parent / "history.json"
+    results.add_path("algo", "problem", history_path)
+    assert results.get_paths("algo", "problem") == [history_path.resolve()]
