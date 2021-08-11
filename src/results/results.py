@@ -99,6 +99,10 @@ class Results(object):
         Args:
             path: The path to the JSON file.
         """
+        if not Path(path).is_file():
+            raise FileNotFoundError(
+                "The path to the JSON file does not exist: {}.".format(path)
+            )
         with Path(path).open("r") as file:
             histories = json.load(file)
         for algo_name, problems in histories.items():
