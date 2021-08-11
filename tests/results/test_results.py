@@ -59,9 +59,25 @@ def test_from_file(tmpdir):
     history_path = Path(__file__).parent / "history.json"
     assert contents == {"algo": {"problem": [str(history_path.resolve())]}}
 
+
 def test_from_invalid_file():
     """Check the loading of a collection to an invalid path."""
     results = Results()
     with pytest.raises(FileNotFoundError):
         results.from_file(Path("not_a_path.json"))
 
+
+def test_algorithms():
+    """Check the accessor to the algorithms names."""
+    results = Results()
+    history_path = Path(__file__).parent / "history.json"
+    results.add_path("algo", "problem", history_path)
+    assert results.algorithms == ["algo"]
+
+
+def test_get_problems():
+    """Check the accessor to the problems names."""
+    results = Results()
+    history_path = Path(__file__).parent / "history.json"
+    results.add_path("algo", "problem", history_path)
+    assert results.get_problems("algo") == ["problem"]
