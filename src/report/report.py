@@ -67,7 +67,6 @@ class Report(object):
         Raises:
             ValueError: If an algorithm has no associated histories,
                 or has a missing history for a given reference problem.
-
         """
         self.__root_directory = Path(root_directory_path)
         self.__algos_specs = algos_specifications
