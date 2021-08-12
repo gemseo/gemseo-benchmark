@@ -21,9 +21,8 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the generation of a benchmarking report"""
-from unittest.mock import Mock
-
 import pytest
+from gemseo.utils.py23_compat import mock
 from report.report import Report
 
 
@@ -44,17 +43,17 @@ def problem_name():
 
 @pytest.fixture
 def problem(problem_name):
-    mock = Mock()
-    mock.name = problem_name
-    return mock
+    problem = mock.Mock()
+    problem.name = problem_name
+    return problem
 
 
 @pytest.fixture
 def group(problem):
-    mock = Mock()
-    mock.name = "A group"
-    mock.__iter__ = Mock(return_value=iter([problem]))
-    return mock
+    group = mock.Mock()
+    group.name = "A group"
+    group.__iter__ = mock.Mock(return_value=iter([problem]))
+    return group
 
 
 @pytest.fixture
@@ -64,10 +63,10 @@ def problems_groups(group):
 
 @pytest.fixture
 def results(algo_name, problem_name, tmpdir):
-    mock = Mock()
-    mock.algorithms = [algo_name]
-    mock.get_problems = Mock(return_value=[problem_name])
-    return mock
+    results = mock.Mock()
+    results.algorithms = [algo_name]
+    results.get_problems = mock.Mock(return_value=[problem_name])
+    return results
 
 
 def test_init_missing_algorithms(
@@ -85,7 +84,7 @@ def test_init_missing_problems(
         tmpdir, algo_name, algos_specifications, problems_groups, results
 ):
     """Check the initialization of the report with missing problems histories."""
-    results.get_problems = Mock(return_value=["Another problem"])
+    results.get_problems = mock.Mock(return_value=["Another problem"])
     with pytest.raises(
             ValueError,
             match="Missing histories for algorithm '{}' on problem 'A problem'.".format(
