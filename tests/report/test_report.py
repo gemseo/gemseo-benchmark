@@ -21,13 +21,13 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the generation of a benchmarking report"""
+from unittest.mock import Mock
 
+import pytest
+from data_profiles.target_values import TargetValues
 from gemseo.problems.analytical.rosenbrock import Rosenbrock
 from gemseo.utils.py23_compat import Path
 from numpy import zeros
-from pytest import raises
-
-from data_profiles.target_values import TargetValues
 from problems.problem import Problem
 from problems.problems_group import ProblemsGroup
 from report.report import Report
@@ -53,24 +53,30 @@ def get_report_args(
     problems_groups = [ProblemsGroup("A group", [a_problem], "A description")]
     targets.to_file(str(histories_dir / "history.json"))
     histories_path = {algo_name: {"A problem": [str(histories_dir / "history.json")]}}
+    # FIXME: replace with a Results mock
     return algos_specifications, problems_groups, histories_path
 
 
-def test_init(tmpdir):
-    """Check the initialization of the report."""
-    algos_specs, problems_groups, histories_path = get_report_args(tmpdir)
-    with raises(ValueError, match="Missing histories for algorithm 'An algo'"):
-        Report(
-            tmpdir, algos_specs, problems_groups,
-            {"Another algo": histories_path["An algo"]}
-        )
-    with raises(
+def test_init_missing_algorithms(tmpdir):
+    """Check the initialization of the report with missing algorithms histories."""
+    algos_specs, problems_groups, _ = get_report_args(tmpdir)
+    results = Mock()
+    results.algorithms = ["Another algo"]
+    with pytest.raises(ValueError, match="Missing histories for algorithm 'An algo'"):
+        Report(tmpdir, algos_specs, problems_groups, results)
+
+
+def test_init_missing_problems(tmpdir):
+    """Check the initialization of the report with missing problems histories."""
+    algos_specs, problems_groups, _ = get_report_args(tmpdir)
+    results = Mock()
+    results.algorithms = ["An algo"]
+    results.get_problems = Mock(return_value=["Another problem"])
+    with pytest.raises(
             ValueError,
             match="Missing histories for algorithm 'An algo' on problem 'A problem'"
     ):
-        Report(tmpdir, algos_specs, problems_groups,
-               {"An algo": {"Another problem": histories_path["An algo"]["A problem"]}}
-               )
+        Report(tmpdir, algos_specs, problems_groups, results)
 
 
 def test_generate_report_sources(tmpdir):
@@ -99,7 +105,7 @@ def test_retrieve_description(tmpdir):
         "SLSQP\n",
         "   Sequential Least-Squares Quadratic Programming (SLSQP) implemented in the "
         "SciPy library\n"
-        ]
+    ]
     report.generate_report()
     with open(tmpdir / "algorithms.rst") as file:
         contents = file.readlines()
