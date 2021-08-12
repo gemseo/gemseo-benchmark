@@ -21,35 +21,42 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the generation of a benchmarking report"""
+from typing import Dict, List
+
 import pytest
 from gemseo.utils.py23_compat import mock
 from report.report import Report
 
 
 @pytest.fixture
-def algo_name():
+def algo_name():  # type: (...) -> str
+    """The name of the algorithm."""
     return "SLSQP"
 
 
 @pytest.fixture
-def algos_specifications(algo_name):
+def algos_specifications(algo_name):  # type: (...) -> Dict[str, Dict]
+    """The specifications of the algorithms."""
     return {algo_name: dict()}
 
 
 @pytest.fixture
-def problem_name():
+def problem_name():  # type:(...) -> str
+    """The name of the problem."""
     return "A problem"
 
 
 @pytest.fixture
-def problem(problem_name):
+def problem(problem_name):  # type: (...) -> mock.Mock
+    """The problem."""
     problem = mock.Mock()
     problem.name = problem_name
     return problem
 
 
 @pytest.fixture
-def group(problem):
+def group(problem):  # type: (...) -> mock.Mock
+    """The group of problems."""
     group = mock.Mock()
     group.name = "A group"
     group.__iter__ = mock.Mock(return_value=iter([problem]))
@@ -57,12 +64,14 @@ def group(problem):
 
 
 @pytest.fixture
-def problems_groups(group):
+def problems_groups(group):  # type: (...) -> List[mock.Mock]
+    """The groups of problems."""
     return [group]
 
 
 @pytest.fixture
-def results(algo_name, problem_name, tmpdir):
+def results(algo_name, problem_name, tmpdir):  # type: (...) -> mock.Mock
+    """The results of the benchmarking."""
     results = mock.Mock()
     results.algorithms = [algo_name]
     results.get_problems = mock.Mock(return_value=[problem_name])
