@@ -79,7 +79,7 @@ class Report(object):
         algos_diff = set(algos_specifications) - set(histories_paths.algorithms)
         if algos_diff:
             raise ValueError(
-                "Missing histories for algorithm{} {}".format(
+                "Missing histories for algorithm{} {}.".format(
                     "s" if len(algos_diff) > 1 else "",
                     ", ".join(["{!r}".format(name) for name in algos_diff])
                 )
@@ -90,7 +90,7 @@ class Report(object):
             ) - set(histories_paths.get_problems(algo_name))
             if problems_diff:
                 raise ValueError(
-                    "Missing histories for algorithm {!r} on problem{} {}".format(
+                    "Missing histories for algorithm {!r} on problem{} {}.".format(
                         algo_name, "s" if len(problems_diff) > 1 else "",
                         ", ".join(["{!r}".format(name) for name in problems_diff])
                     )

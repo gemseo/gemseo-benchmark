@@ -62,7 +62,7 @@ def test_init_missing_algorithms(tmpdir):
     algos_specs, problems_groups, _ = get_report_args(tmpdir)
     results = Mock()
     results.algorithms = ["Another algo"]
-    with pytest.raises(ValueError, match="Missing histories for algorithm 'An algo'"):
+    with pytest.raises(ValueError, match="Missing histories for algorithm 'An algo'."):
         Report(tmpdir, algos_specs, problems_groups, results)
 
 
@@ -74,7 +74,7 @@ def test_init_missing_problems(tmpdir):
     results.get_problems = Mock(return_value=["Another problem"])
     with pytest.raises(
             ValueError,
-            match="Missing histories for algorithm 'An algo' on problem 'A problem'"
+            match="Missing histories for algorithm 'An algo' on problem 'A problem'."
     ):
         Report(tmpdir, algos_specs, problems_groups, results)
 
