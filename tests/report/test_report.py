@@ -24,65 +24,82 @@
 from unittest.mock import Mock
 
 import pytest
-from data_profiles.target_values import TargetValues
-from gemseo.problems.analytical.rosenbrock import Rosenbrock
-from gemseo.utils.py23_compat import Path
-from numpy import zeros
-from problems.problem import Problem
-from problems.problems_group import ProblemsGroup
 from report.report import Report
 
 
-def get_report_args(
-        histories_dir,  # type: Path
-        algo_name="An algo",  # type: str
+@pytest.fixture
+def algo_name():
+    return "SLSQP"
+
+
+@pytest.fixture
+def algos_specifications(algo_name):
+    return {algo_name: dict()}
+
+
+@pytest.fixture
+def problem_name():
+    return "A problem"
+
+
+@pytest.fixture
+def problem(problem_name):
+    mock = Mock()
+    mock.name = problem_name
+    return mock
+
+
+@pytest.fixture
+def group(problem):
+    mock = Mock()
+    mock.name = "A group"
+    mock.__iter__ = Mock(return_value=iter([problem]))
+    return mock
+
+
+@pytest.fixture
+def problems_groups(group):
+    return [group]
+
+
+@pytest.fixture
+def results(algo_name, problem_name, tmpdir):
+    mock = Mock()
+    mock.algorithms = [algo_name]
+    mock.get_problems = Mock(return_value=[problem_name])
+    return mock
+
+
+def test_init_missing_algorithms(
+        tmpdir, algo_name, algos_specifications, problems_groups, results
 ):
-    """Return the arguments for the report initialization.
-
-    Args:
-        histories_dir: Path to the histories directory.
-        algo_name: The name of the algorithm.
-            If None, defaults to "An algo".
-
-    Returns:
-        The algorithms and their options, the groups of problems, the histories paths.
-    """
-    algos_specifications = {algo_name: dict()}
-    targets = TargetValues(list(range(1000, 0, -100)))
-    a_problem = Problem("A problem", Rosenbrock, [zeros(2)], targets)
-    problems_groups = [ProblemsGroup("A group", [a_problem], "A description")]
-    targets.to_file(str(histories_dir / "history.json"))
-    histories_path = {algo_name: {"A problem": [str(histories_dir / "history.json")]}}
-    # FIXME: replace with a Results mock
-    return algos_specifications, problems_groups, histories_path
-
-
-def test_init_missing_algorithms(tmpdir):
     """Check the initialization of the report with missing algorithms histories."""
-    algos_specs, problems_groups, _ = get_report_args(tmpdir)
-    results = Mock()
     results.algorithms = ["Another algo"]
-    with pytest.raises(ValueError, match="Missing histories for algorithm 'An algo'."):
-        Report(tmpdir, algos_specs, problems_groups, results)
+    with pytest.raises(
+            ValueError, match="Missing histories for algorithm '{}'.".format(algo_name)
+    ):
+        Report(tmpdir, algos_specifications, problems_groups, results)
 
 
-def test_init_missing_problems(tmpdir):
+def test_init_missing_problems(
+        tmpdir, algo_name, algos_specifications, problems_groups, results
+):
     """Check the initialization of the report with missing problems histories."""
-    algos_specs, problems_groups, _ = get_report_args(tmpdir)
-    results = Mock()
-    results.algorithms = ["An algo"]
     results.get_problems = Mock(return_value=["Another problem"])
     with pytest.raises(
             ValueError,
-            match="Missing histories for algorithm 'An algo' on problem 'A problem'."
+            match="Missing histories for algorithm '{}' on problem 'A problem'.".format(
+                algo_name
+            )
     ):
-        Report(tmpdir, algos_specs, problems_groups, results)
+        Report(tmpdir, algos_specifications, problems_groups, results)
 
 
-def test_generate_report_sources(tmpdir):
+def test_generate_report_sources(
+        tmpdir, algos_specifications, problems_groups, results
+):
     """Check the generation of the report sources."""
-    algorithms, problems_groups, histories_path = get_report_args(tmpdir)
-    report = Report(tmpdir, algorithms, problems_groups, histories_path)
+    report = Report(tmpdir, algos_specifications, problems_groups, results)
     report.generate_report(to_pdf=True)
     assert (tmpdir / "index.rst").isfile()
     assert (tmpdir / "algorithms.rst").isfile()
@@ -92,10 +109,9 @@ def test_generate_report_sources(tmpdir):
     assert (tmpdir / "_build" / "latex" / "benchmarking_report.pdf").isfile()
 
 
-def test_retrieve_description(tmpdir):
-    """Check the retrieval of a Gemseo algorithm description."""
-    algorithms, problems_groups, histories_path = get_report_args(tmpdir, "SLSQP")
-    report = Report(tmpdir, algorithms, problems_groups, histories_path)
+def test_retrieve_description(tmpdir, algos_specifications, problems_groups, results):
+    """Check the retrieval of a GEMSEO algorithm description."""
+    report = Report(tmpdir, algos_specifications, problems_groups, results)
     ref_contents = [
         "Algorithms\n",
         "==========\n",
