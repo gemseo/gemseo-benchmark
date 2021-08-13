@@ -25,7 +25,7 @@ from typing import Dict, List
 
 import pytest
 from gemseo.utils.py23_compat import mock
-from report.report import Report
+from gemseo_benchmark.report.report import Report
 
 
 @pytest.fixture

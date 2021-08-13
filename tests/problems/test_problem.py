@@ -21,11 +21,10 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for benchmarking reference problems."""
 from gemseo.problems.analytical.rosenbrock import Rosenbrock
+from gemseo_benchmark.problems.problem import Problem
 from numpy import ones, zeros
 from numpy.testing import assert_allclose
 from pytest import raises
-
-from problems.problem import Problem
 
 
 def test_invalid_creator():

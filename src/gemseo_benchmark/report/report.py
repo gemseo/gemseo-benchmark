@@ -28,9 +28,9 @@ from typing import Any, Iterable, Mapping, Optional, Union
 
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.utils.py23_compat import Path
+from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from jinja2 import Environment, FileSystemLoader
-from problems.problems_group import ProblemsGroup
-from results.results import Results
+from gemseo_benchmark.results.results import Results
 
 
 class Report(object):

@@ -21,11 +21,10 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the performance history."""
 from gemseo.utils.py23_compat import Path
+from gemseo_benchmark.data_profiles.history_item import HistoryItem
+from gemseo_benchmark.data_profiles.performance_history import PerformanceHistory
 from numpy import inf
 from pytest import raises
-
-from data_profiles.history_item import HistoryItem
-from data_profiles.performance_history import PerformanceHistory
 
 
 def test_invalid_init_lengths():

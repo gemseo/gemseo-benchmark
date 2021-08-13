@@ -20,9 +20,8 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the performance history item."""
+from gemseo_benchmark.data_profiles.history_item import HistoryItem
 from pytest import raises
-
-from data_profiles.history_item import HistoryItem
 
 
 def test_nonnegative_infeasibility_measure():

@@ -42,12 +42,11 @@ from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Union
 
 import matplotlib.pyplot as plt
 from gemseo.utils.py23_compat import Path
+from gemseo_benchmark.data_profiles.performance_history import PerformanceHistory
+from gemseo_benchmark.data_profiles.plot_tools import save_show_close
+from gemseo_benchmark.data_profiles.target_values import TargetValues
 from matplotlib import rcParams
 from numpy import append, array, linspace, ndarray, zeros
-
-from data_profiles.performance_history import PerformanceHistory
-from data_profiles.plot_tools import save_show_close
-from data_profiles.target_values import TargetValues
 
 
 class DataProfile(object):
@@ -243,8 +242,9 @@ class DataProfile(object):
             len(histories) for histories in self.__values_histories[algo_name].values()
         )
         if len(histories_numbers) != 1:
-            raise ValueError("Reference problems unequally represented for algorithm {!r}"
-                             .format(algo_name))
+            raise ValueError(
+                "Reference problems unequally represented for algorithm {!r}"
+                .format(algo_name))
         return histories_numbers.pop()
 
     @staticmethod

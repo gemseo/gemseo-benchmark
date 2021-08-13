@@ -22,12 +22,11 @@
 """Tests for the problems group."""
 from gemseo.problems.analytical.power_2 import Power2
 from gemseo.problems.analytical.rosenbrock import Rosenbrock
+from gemseo_benchmark.data_profiles.target_values import TargetValues
+from gemseo_benchmark.problems.problem import Problem
+from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from numpy import zeros
 from pytest import raises
-
-from data_profiles.target_values import TargetValues
-from problems.problem import Problem
-from problems.problems_group import ProblemsGroup
 
 
 def test_is_algorithm_suited():

@@ -21,13 +21,12 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the data profile."""
 import pytest
+from gemseo_benchmark.data_profiles.data_profile import DataProfile
+from gemseo_benchmark.data_profiles.history_item import HistoryItem
+from gemseo_benchmark.data_profiles.target_values import TargetValues
 from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
 from pytest import raises
-
-from data_profiles.data_profile import DataProfile
-from data_profiles.history_item import HistoryItem
-from data_profiles.target_values import TargetValues
 
 
 def test_target_values_as_mapping():

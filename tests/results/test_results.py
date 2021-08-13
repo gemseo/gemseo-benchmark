@@ -25,7 +25,7 @@ from typing import Dict
 
 import pytest
 from gemseo.utils.py23_compat import Path
-from results.results import Results
+from gemseo_benchmark.results.results import Results
 
 
 @pytest.fixture

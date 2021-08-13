@@ -23,10 +23,10 @@
 """Grouping of reference problems for benchmarking."""
 from typing import Any, Iterable, Iterator, Mapping, Optional
 
-from data_profiles.data_profile import DataProfile
-from data_profiles.performance_history import PerformanceHistory
-from problems.problem import Problem
-from results.results import Results
+from gemseo_benchmark.data_profiles.data_profile import DataProfile
+from gemseo_benchmark.data_profiles.performance_history import PerformanceHistory
+from gemseo_benchmark.problems.problem import Problem
+from gemseo_benchmark.results.results import Results
 
 
 class ProblemsGroup(object):
