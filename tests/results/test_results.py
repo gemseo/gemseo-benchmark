@@ -21,6 +21,7 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the collection of paths to performance histories."""
 import json
+from typing import Dict, List
 
 import pytest
 from gemseo.utils.py23_compat import Path
@@ -49,17 +50,31 @@ def test_to_file(tmpdir):
     assert contents == {"algo": {"problem": [str(history_path.resolve())]}}
 
 
-def test_from_file(tmpdir):
+@pytest.fixture
+def results_contents():  # type: (...) -> Dict[str, Dict[str, List[str]]]
+    """The paths for the performance histories."""
+    return {"algo": {"problem": [str(Path(__file__).parent / "history.json")]}}
+
+
+@pytest.fixture
+def results_file(tmpdir, results_contents):  # type: (...) -> Path
+    """The path to the results file."""
+    results_path = tmpdir / "results_reference.json"
+    with results_path.open("w") as file:
+        json.dump(results_contents, file)
+    return results_path
+
+
+def test_from_file(tmpdir, results_contents, results_file):
     """Check the loading of a collection of paths to performance histories."""
     results = Results()
-    results.from_file(Path(__file__).parent / "results.json")
+    results.from_file(results_file)
     # Save the results to check their contents as a file
     results_path = tmpdir / "results.json"
     results.to_file(results_path)
     with results_path.open("r") as file:
         contents = json.load(file)
-    history_path = Path(__file__).parent / "history.json"
-    assert contents == {"algo": {"problem": [str(history_path.resolve())]}}
+    assert contents == results_contents
 
 
 def test_from_invalid_file():
@@ -88,7 +103,7 @@ def test_get_problems():
     assert results.get_problems("algo") == ["problem"]
 
 
-def test_test_paths():
+def test_get_paths():
     """Check the accessor to the performance histories paths."""
     results = Results()
     history_path = Path(__file__).parent / "history.json"
