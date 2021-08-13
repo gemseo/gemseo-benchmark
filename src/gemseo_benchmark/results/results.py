@@ -62,8 +62,7 @@ class Results(object):
             absolute_path = Path(path).resolve(strict=True)
         except FileNotFoundError:
             raise FileNotFoundError(
-                "The path to the history does not exist: {} {}.".format(path, Path(
-                    ".").resolve())
+                "The path to the history does not exist: {}.".format(path)
             )
         if algo_name not in self.__dict:
             self.__dict[algo_name] = dict()
