@@ -71,13 +71,13 @@ def test_various_lengths_histories():
     assert targets.history_items == [HistoryItem(2.0, 0.0), HistoryItem(2.0, 0.0)]
 
 
-def test_run(tmpdir):
+def test_run(tmp_path):
     """Check the computation of target values."""
     generator = TargetsGenerator()
     generator.add_history([3.0, 2.0])
     generator.add_history([2.0, 3.0])
     generator.add_history([1.0, 0.0])
-    path = tmpdir / "targets.png"
+    path = tmp_path / "targets.png"
     targets = generator.run(2, show=False, path=path)
     assert targets.history_items == [HistoryItem(2.0, 0.0), HistoryItem(2.0, 0.0)]
-    assert path.isfile()
+    assert path.is_file()

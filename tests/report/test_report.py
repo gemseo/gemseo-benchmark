@@ -61,7 +61,7 @@ def problems_groups(group):  # type: (...) -> List[mock.Mock]
 
 
 @pytest.fixture
-def results(tmpdir):  # type: (...) -> mock.Mock
+def results():  # type: (...) -> mock.Mock
     """The results of the benchmarking."""
     results = mock.Mock()
     results.algorithms = [ALGO_NAME]
@@ -70,17 +70,19 @@ def results(tmpdir):  # type: (...) -> mock.Mock
 
 
 def test_init_missing_algorithms(
-        tmpdir, algos_specifications, problems_groups, results
+        tmp_path, algos_specifications, problems_groups, results
 ):
     """Check the initialization of the report with missing algorithms histories."""
     results.algorithms = ["Another algo"]
     with pytest.raises(
             ValueError, match="Missing histories for algorithm '{}'.".format(ALGO_NAME)
     ):
-        Report(tmpdir, algos_specifications, problems_groups, results)
+        Report(tmp_path, algos_specifications, problems_groups, results)
 
 
-def test_init_missing_problems(tmpdir, algos_specifications, problems_groups, results):
+def test_init_missing_problems(
+        tmp_path, algos_specifications, problems_groups, results
+):
     """Check the initialization of the report with missing problems histories."""
     results.get_problems = mock.Mock(return_value=["Another problem"])
     with pytest.raises(
@@ -89,26 +91,26 @@ def test_init_missing_problems(tmpdir, algos_specifications, problems_groups, re
                 ALGO_NAME
             )
     ):
-        Report(tmpdir, algos_specifications, problems_groups, results)
+        Report(tmp_path, algos_specifications, problems_groups, results)
 
 
 def test_generate_report_sources(
-        tmpdir, algos_specifications, problems_groups, results
+        tmp_path, algos_specifications, problems_groups, results
 ):
     """Check the generation of the report sources."""
-    report = Report(tmpdir, algos_specifications, problems_groups, results)
+    report = Report(tmp_path, algos_specifications, problems_groups, results)
     report.generate_report(to_pdf=True)
-    assert (tmpdir / "index.rst").isfile()
-    assert (tmpdir / "algorithms.rst").isfile()
-    assert (tmpdir / "problems_groups.rst").isfile()
-    assert (tmpdir / "groups" / "A_group.rst").isfile()
-    assert (tmpdir / "_build" / "html" / "index.html").isfile()
-    assert (tmpdir / "_build" / "latex" / "benchmarking_report.pdf").isfile()
+    assert (tmp_path / "index.rst").is_file()
+    assert (tmp_path / "algorithms.rst").is_file()
+    assert (tmp_path / "problems_groups.rst").is_file()
+    assert (tmp_path / "groups" / "A_group.rst").is_file()
+    assert (tmp_path / "_build" / "html" / "index.html").is_file()
+    assert (tmp_path / "_build" / "latex" / "benchmarking_report.pdf").is_file()
 
 
-def test_retrieve_description(tmpdir, algos_specifications, problems_groups, results):
+def test_retrieve_description(tmp_path, algos_specifications, problems_groups, results):
     """Check the retrieval of a GEMSEO algorithm description."""
-    report = Report(tmpdir, algos_specifications, problems_groups, results)
+    report = Report(tmp_path, algos_specifications, problems_groups, results)
     ref_contents = [
         "Algorithms\n",
         "==========\n",
@@ -120,6 +122,6 @@ def test_retrieve_description(tmpdir, algos_specifications, problems_groups, res
         "SciPy library\n"
     ]
     report.generate_report()
-    with open(tmpdir / "algorithms.rst") as file:
+    with open(tmp_path / "algorithms.rst") as file:
         contents = file.readlines()
     assert contents == ref_contents

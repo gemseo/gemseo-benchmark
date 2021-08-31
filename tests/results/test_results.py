@@ -38,12 +38,12 @@ def test_add_invalid_path():
         results.add_path("algo", "problem", "not_a_file.json")
 
 
-def test_to_file(tmpdir):
+def test_to_file(tmp_path):
     """Check the saving of a collection of paths to performance histories."""
     results = Results()
     history_path = Path(__file__).parent / "history.json"
     results.add_path("algo", "problem", history_path)
-    results_path = tmpdir / "results.json"
+    results_path = tmp_path / "results.json"
     results.to_file(results_path)
     with results_path.open("r") as file:
         contents = json.load(file)
@@ -57,20 +57,20 @@ def results_contents():  # type: (...) -> Dict[str, Dict[str, List[str]]]
 
 
 @pytest.fixture
-def results_file(tmpdir, results_contents):  # type: (...) -> Path
+def results_file(tmp_path, results_contents):  # type: (...) -> Path
     """The path to the results file."""
-    results_path = tmpdir / "results_reference.json"
+    results_path = tmp_path / "results_reference.json"
     with results_path.open("w") as file:
         json.dump(results_contents, file)
     return results_path
 
 
-def test_from_file(tmpdir, results_contents, results_file):
+def test_from_file(tmp_path, results_contents, results_file):
     """Check the loading of a collection of paths to performance histories."""
     results = Results()
     results.from_file(results_file)
     # Save the results to check their contents as a file
-    results_path = tmpdir / "results.json"
+    results_path = tmp_path / "results.json"
     results.to_file(results_path)
     with results_path.open("r") as file:
         contents = json.load(file)

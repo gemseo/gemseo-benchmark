@@ -74,7 +74,7 @@ def test_plot_data_profiles():
 
 
 @pytest.mark.parametrize("converter", [lambda _: _, str])
-def test_plot_save(tmpdir, converter):
+def test_plot_save(tmp_path, converter):
     """Check the save of the data profiles plot.
 
     Args:
@@ -82,9 +82,9 @@ def test_plot_save(tmpdir, converter):
     """
     data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
     data_profile.add_history("problem", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
-    path = tmpdir / "data_profile.png"
+    path = tmp_path / "data_profile.png"
     data_profile.plot(show=False, path=converter(path))
-    assert path.isfile()
+    assert path.is_file()
 
 
 def test_target_values_getter():

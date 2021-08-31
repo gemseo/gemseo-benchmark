@@ -47,13 +47,13 @@ def test_plot_targets():
 
 
 @pytest.mark.parametrize("converter", [lambda _: _, str])
-def test_plot_save(tmpdir, converter):
+def test_plot_save(tmp_path, converter):
     """Check the saving of the target values plot.
 
     Args:
         converter: The Path converter.
     """
     targets = TargetValues([-2.0, 1.0, -1.0], [1.0, 0.0, 0.0])
-    path = tmpdir / "targets.png"
+    path = tmp_path / "targets.png"
     targets.plot(show=False, path=converter(path))
-    assert path.isfile()
+    assert path.is_file()
