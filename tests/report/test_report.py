@@ -27,30 +27,21 @@ import pytest
 from gemseo.utils.py23_compat import mock
 from gemseo_benchmark.report.report import Report
 
-
-@pytest.fixture
-def algo_name():  # type: (...) -> str
-    """The name of the algorithm."""
-    return "SLSQP"
+ALGO_NAME = "SLSQP"
+PROBLEM_NAME = "A problem"
 
 
 @pytest.fixture
-def algos_specifications(algo_name):  # type: (...) -> Dict[str, Dict]
+def algos_specifications():  # type: (...) -> Dict[str, Dict]
     """The specifications of the algorithms."""
-    return {algo_name: dict()}
+    return {ALGO_NAME: dict()}
 
 
 @pytest.fixture
-def problem_name():  # type:(...) -> str
-    """The name of the problem."""
-    return "A problem"
-
-
-@pytest.fixture
-def problem(problem_name):  # type: (...) -> mock.Mock
+def problem():  # type: (...) -> mock.Mock
     """The problem."""
     problem = mock.Mock()
-    problem.name = problem_name
+    problem.name = PROBLEM_NAME
     return problem
 
 
@@ -70,34 +61,32 @@ def problems_groups(group):  # type: (...) -> List[mock.Mock]
 
 
 @pytest.fixture
-def results(algo_name, problem_name, tmpdir):  # type: (...) -> mock.Mock
+def results(tmpdir):  # type: (...) -> mock.Mock
     """The results of the benchmarking."""
     results = mock.Mock()
-    results.algorithms = [algo_name]
-    results.get_problems = mock.Mock(return_value=[problem_name])
+    results.algorithms = [ALGO_NAME]
+    results.get_problems = mock.Mock(return_value=[PROBLEM_NAME])
     return results
 
 
 def test_init_missing_algorithms(
-        tmpdir, algo_name, algos_specifications, problems_groups, results
+        tmpdir, algos_specifications, problems_groups, results
 ):
     """Check the initialization of the report with missing algorithms histories."""
     results.algorithms = ["Another algo"]
     with pytest.raises(
-            ValueError, match="Missing histories for algorithm '{}'.".format(algo_name)
+            ValueError, match="Missing histories for algorithm '{}'.".format(ALGO_NAME)
     ):
         Report(tmpdir, algos_specifications, problems_groups, results)
 
 
-def test_init_missing_problems(
-        tmpdir, algo_name, algos_specifications, problems_groups, results
-):
+def test_init_missing_problems(tmpdir, algos_specifications, problems_groups, results):
     """Check the initialization of the report with missing problems histories."""
     results.get_problems = mock.Mock(return_value=["Another problem"])
     with pytest.raises(
             ValueError,
             match="Missing histories for algorithm '{}' on problem 'A problem'.".format(
-                algo_name
+                ALGO_NAME
             )
     ):
         Report(tmpdir, algos_specifications, problems_groups, results)
