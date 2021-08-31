@@ -31,13 +31,13 @@ ALGO_NAME = "SLSQP"
 PROBLEM_NAME = "A problem"
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def algos_specifications():  # type: (...) -> Dict[str, Dict]
     """The specifications of the algorithms."""
     return {ALGO_NAME: dict()}
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def problem():  # type: (...) -> mock.Mock
     """The problem."""
     problem = mock.Mock()
@@ -45,7 +45,7 @@ def problem():  # type: (...) -> mock.Mock
     return problem
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def group(problem):  # type: (...) -> mock.Mock
     """The group of problems."""
     group = mock.Mock()
@@ -54,7 +54,7 @@ def group(problem):  # type: (...) -> mock.Mock
     return group
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def problems_groups(group):  # type: (...) -> List[mock.Mock]
     """The groups of problems."""
     return [group]

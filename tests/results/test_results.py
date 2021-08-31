@@ -50,7 +50,7 @@ def test_to_file(tmp_path):
     assert contents == {"algo": {"problem": [str(history_path.resolve())]}}
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def results_contents():  # type: (...) -> Dict[str, Dict[str, List[str]]]
     """The paths for the performance histories."""
     return {"algo": {"problem": [str(Path(__file__).parent / "history.json")]}}
