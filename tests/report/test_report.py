@@ -21,10 +21,11 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the generation of a benchmarking report"""
+import shutil
 from typing import Dict, List
 
 import pytest
-from gemseo.utils.py23_compat import mock
+from gemseo.utils.py23_compat import mock, Path
 from gemseo_benchmark.report.report import Report
 
 ALGO_NAME = "SLSQP"
@@ -51,6 +52,11 @@ def group(problem):  # type: (...) -> mock.Mock
     group = mock.Mock()
     group.name = "A group"
     group.__iter__ = mock.Mock(return_value=iter([problem]))
+
+    def side_effect(algos_specifications, histories_paths, show, plot_path):
+        shutil.copyfile(Path(__file__).parent / "data_profile.png", plot_path)
+
+    group.compute_data_profile = mock.Mock(side_effect=side_effect)
     return group
 
 
