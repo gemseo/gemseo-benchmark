@@ -36,11 +36,11 @@ or to generate the data profile of an algorithm.
 """
 import json
 from functools import reduce
-from typing import Iterable, List, Optional, Sequence, Union
 
 from gemseo.utils.py23_compat import Path
 from gemseo_benchmark.results.history_item import HistoryItem
 from numpy import inf
+from typing import Iterable, List, Optional, Sequence, Union
 
 
 class PerformanceHistory(Sequence[HistoryItem]):
@@ -58,8 +58,16 @@ class PerformanceHistory(Sequence[HistoryItem]):
             self,
             objective_values=None,  # type: Optional[Sequence[float]]
             infeasibility_measures=None,  # type: Optional[Sequence[float]]
-            feasibility_statuses=None  # type: Optional[Sequence[bool]]
+            feasibility_statuses=None,  # type: Optional[Sequence[bool]]
+            problem_name=None,  # type: Optional[str]
+            objective_name=None,  # type: Optional[str]
+            constraints_names=None,  # type: Optional[List[str]]
+            doe_size=None,  # type: Optional[int]
+            nbr_eval_iter=None,  # type: Optional[int]
+            population_size=None,  # type: Optional[int]
+            total_time=None,  # type: Optional[int]
     ):  # type: (...) -> None
+        # TODO: document last arguments
         """
         Args:
             objective_values: The history of the quantity to be minimized.
@@ -98,6 +106,13 @@ class PerformanceHistory(Sequence[HistoryItem]):
             HistoryItem(value, measure) for value, measure
             in zip(objective_values, infeasibility_measures)
         ]
+        self.__problem_name = problem_name
+        self.__objective_name = objective_name
+        self.__constraints_names = constraints_names
+        self.__doe_size = doe_size
+        self.__nbr_eval_iter = nbr_eval_iter
+        self.__population_size = population_size
+        self.__total_time = total_time
 
     @property
     def objective_values(self):  # type: (...) -> List[float]
@@ -222,6 +237,34 @@ class PerformanceHistory(Sequence[HistoryItem]):
             }
             data.append(data_item)
         with open(path, "w") as file:
+            json.dump(data, file, indent=4, separators=(',', ': '))
+
+    def to_json(
+            self,
+            path,  # type: Union[str, Path]
+
+    ):  # type: (...) -> None
+        """Save the performance history to a post-processing file.
+
+        Args:
+            path: The path where to write the file.
+        """
+        data = dict()
+        objectives_names = list()  # TODO: grab
+        constraints_names = list()  # TODO: grab
+        data = {
+            "responses": objectives_names + constraints_names,
+            "objective": self.objective_values(),
+            "doe_size": None,  # TODO: grab
+            "nbr_eval_iter": None,  # TODO: grab
+            "sum_const": [],  # TODO: grab
+            "num_const": [],  # TODO: grab
+            "population": None,  # TODO: grab
+            "name": None,  # TODO: grab
+            "total_time": None,  # TODO: grab
+            "total_memory": None,  # TODO: grab
+        }
+        with Path(path).open("w") as file:
             json.dump(data, file, indent=4, separators=(',', ': '))
 
     @classmethod
