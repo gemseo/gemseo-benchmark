@@ -54,7 +54,7 @@ def group(problem):  # type: (...) -> mock.Mock
     group.__iter__ = mock.Mock(return_value=iter([problem]))
 
     def side_effect(algos_specifications, histories_paths, show, plot_path):
-        shutil.copyfile(Path(__file__).parent / "data_profile.png", plot_path)
+        shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(plot_path))
 
     group.compute_data_profile = mock.Mock(side_effect=side_effect)
     return group
