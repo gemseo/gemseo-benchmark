@@ -21,8 +21,8 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the performance history."""
 from gemseo.utils.py23_compat import Path
-from gemseo_benchmark.data_profiles.history_item import HistoryItem
-from gemseo_benchmark.data_profiles.performance_history import PerformanceHistory
+from gemseo_benchmark.results.history_item import HistoryItem
+from gemseo_benchmark.results.performance_history import PerformanceHistory
 from numpy import inf
 from pytest import raises
 

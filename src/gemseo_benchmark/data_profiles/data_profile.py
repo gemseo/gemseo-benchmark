@@ -42,7 +42,7 @@ from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Union
 
 import matplotlib.pyplot as plt
 from gemseo.utils.py23_compat import Path
-from gemseo_benchmark.data_profiles.performance_history import PerformanceHistory
+from gemseo_benchmark.results.performance_history import PerformanceHistory
 from gemseo_benchmark.data_profiles.plot_tools import save_show_close
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from matplotlib import rcParams

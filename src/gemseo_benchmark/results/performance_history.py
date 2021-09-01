@@ -39,7 +39,7 @@ from functools import reduce
 from typing import Iterable, List, Optional, Sequence, Union
 
 from gemseo.utils.py23_compat import Path
-from gemseo_benchmark.data_profiles.history_item import HistoryItem
+from gemseo_benchmark.results.history_item import HistoryItem
 from numpy import inf
 
 

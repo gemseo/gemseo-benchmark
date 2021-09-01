@@ -20,7 +20,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the targets generator."""
-from gemseo_benchmark.data_profiles.history_item import HistoryItem
+from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
 from pytest import raises
 

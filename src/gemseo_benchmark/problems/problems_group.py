@@ -24,7 +24,7 @@
 from typing import Any, Iterable, Iterator, Mapping, Optional
 
 from gemseo_benchmark.data_profiles.data_profile import DataProfile
-from gemseo_benchmark.data_profiles.performance_history import PerformanceHistory
+from gemseo_benchmark.results.performance_history import PerformanceHistory
 from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.results.results import Results
 

@@ -21,7 +21,7 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the target values."""
 import pytest
-from gemseo_benchmark.data_profiles.performance_history import PerformanceHistory
+from gemseo_benchmark.results.performance_history import PerformanceHistory
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
