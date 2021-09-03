@@ -249,19 +249,16 @@ class PerformanceHistory(Sequence[HistoryItem]):
         Args:
             path: The path where to write the file.
         """
-        data = dict()
-        objectives_names = list()  # TODO: grab
-        constraints_names = list()  # TODO: grab
+        num_const = []  # TODO: compute
         data = {
-            "responses": objectives_names + constraints_names,
-            "objective": self.objective_values(),
-            "doe_size": None,  # TODO: grab
-            "nbr_eval_iter": None,  # TODO: grab
-            "sum_const": [],  # TODO: grab
-            "num_const": [],  # TODO: grab
-            "population": None,  # TODO: grab
-            "name": None,  # TODO: grab
-            "total_time": None,  # TODO: grab
+            "responses": [self.__objective_name] + self.__constraints_names,
+            "objective": self.objective_values,
+            "doe_size": self.__doe_size,
+            "nbr_eval_iter": self.__nbr_eval_iter,
+            "num_const": num_const,
+            "population": self.__population_size,
+            "name": self.__problem_name,
+            "total_time": self.__total_time,
             "total_memory": None,  # TODO: grab
         }
         with Path(path).open("w") as file:
