@@ -24,13 +24,13 @@
 import os
 from shutil import copy
 from subprocess import call
-from typing import Any, Iterable, List, Mapping, Optional, Union
+from typing import Any, Iterable, Mapping, Optional, Union
 
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.utils.py23_compat import Path
+from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from jinja2 import Environment, FileSystemLoader
-
-from problems.problems_group import ProblemsGroup
+from gemseo_benchmark.results.results import Results
 
 
 class Report(object):
@@ -52,7 +52,7 @@ class Report(object):
             root_directory_path,  # type: Union[str, Path]
             algos_specifications,  # type: Mapping[str, Mapping[str, Any]]
             problems_groups,  # type: Iterable[ProblemsGroup]
-            histories_paths,  # type: Mapping[str, Mapping[str, List[Union[str, Path]]]]
+            histories_paths,  # type: Results
             custom_algos_descriptions=None,  # type: Optional[Mapping[str, str]]
     ):  # type: (...) -> None
         """
@@ -67,7 +67,6 @@ class Report(object):
         Raises:
             ValueError: If an algorithm has no associated histories,
                 or has a missing history for a given reference problem.
-
         """
         self.__root_directory = Path(root_directory_path)
         self.__algos_specs = algos_specifications
@@ -76,10 +75,10 @@ class Report(object):
         if custom_algos_descriptions is None:
             custom_algos_descriptions = dict()
         self.__custom_algos_descriptions = custom_algos_descriptions
-        algos_diff = set(algos_specifications) - set(histories_paths)
+        algos_diff = set(algos_specifications) - set(histories_paths.algorithms)
         if algos_diff:
             raise ValueError(
-                "Missing histories for algorithm{} {}".format(
+                "Missing histories for algorithm{} {}.".format(
                     "s" if len(algos_diff) > 1 else "",
                     ", ".join(["{!r}".format(name) for name in algos_diff])
                 )
@@ -87,10 +86,10 @@ class Report(object):
         for algo_name in algos_specifications:
             problems_diff = set(
                 problem.name for group in problems_groups for problem in group
-            ) - set(histories_paths[algo_name])
+            ) - set(histories_paths.get_problems(algo_name))
             if problems_diff:
                 raise ValueError(
-                    "Missing histories for algorithm {!r} on problem{} {}".format(
+                    "Missing histories for algorithm {!r} on problem{} {}.".format(
                         algo_name, "s" if len(problems_diff) > 1 else "",
                         ", ".join(["{!r}".format(name) for name in problems_diff])
                     )

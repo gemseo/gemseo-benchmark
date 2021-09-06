@@ -35,10 +35,9 @@ from typing import List, Optional, Union
 
 import matplotlib.pyplot as plt
 from gemseo.utils.py23_compat import Path
+from gemseo_benchmark.results.performance_history import PerformanceHistory
+from gemseo_benchmark.data_profiles.plot_tools import save_show_close
 from numpy import inf, linspace
-
-from data_profiles.performance_history import PerformanceHistory
-from data_profiles.plot_tools import save_show_close
 
 
 class TargetValues(PerformanceHistory):

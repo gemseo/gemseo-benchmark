@@ -7,8 +7,8 @@ from numpy import array
 from numpy.core.multiarray import ndarray
 from scipy.optimize import minimize, rosen
 
-from data_profiles.data_profile import DataProfile
-from data_profiles.targets_generator import TargetsGenerator
+from gemseo_benchmark.data_profiles import DataProfile
+from gemseo_benchmark.data_profiles import TargetsGenerator
 
 
 def generate_values_history(

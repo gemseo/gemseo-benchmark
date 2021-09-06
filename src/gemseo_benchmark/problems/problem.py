@@ -33,10 +33,9 @@ from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
 from gemseo.algos.doe.doe_factory import DOEFactory
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
+from gemseo_benchmark.data_profiles.target_values import TargetValues
+from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
 from numpy import ndarray
-
-from data_profiles.target_values import TargetValues
-from data_profiles.targets_generator import TargetsGenerator
 
 
 class Problem(object):

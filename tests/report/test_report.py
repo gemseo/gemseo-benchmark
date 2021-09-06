@@ -21,75 +21,102 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the generation of a benchmarking report"""
+import shutil
+from typing import Dict, List
 
-from gemseo.problems.analytical.rosenbrock import Rosenbrock
-from gemseo.utils.py23_compat import Path
-from numpy import zeros
-from pytest import raises
+import pytest
+from gemseo.utils.py23_compat import mock, Path
+from gemseo_benchmark.report.report import Report
 
-from data_profiles.target_values import TargetValues
-from problems.problem import Problem
-from problems.problems_group import ProblemsGroup
-from report.report import Report
+ALGO_NAME = "SLSQP"
+PROBLEM_NAME = "A problem"
 
 
-def get_report_args(
-        histories_dir,  # type: Path
-        algo_name="An algo",  # type: str
+@pytest.fixture(scope="module")
+def algos_specifications():  # type: (...) -> Dict[str, Dict]
+    """The specifications of the algorithms."""
+    return {ALGO_NAME: dict()}
+
+
+@pytest.fixture(scope="module")
+def problem():  # type: (...) -> mock.Mock
+    """The problem."""
+    problem = mock.Mock()
+    problem.name = PROBLEM_NAME
+    return problem
+
+
+@pytest.fixture(scope="module")
+def group(problem):  # type: (...) -> mock.Mock
+    """The group of problems."""
+    group = mock.Mock()
+    group.name = "A group"
+    group.__iter__ = mock.Mock(return_value=iter([problem]))
+
+    def side_effect(algos_specifications, histories_paths, show, plot_path):
+        shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(plot_path))
+
+    group.compute_data_profile = mock.Mock(side_effect=side_effect)
+    return group
+
+
+@pytest.fixture(scope="module")
+def problems_groups(group):  # type: (...) -> List[mock.Mock]
+    """The groups of problems."""
+    return [group]
+
+
+@pytest.fixture
+def results():  # type: (...) -> mock.Mock
+    """The results of the benchmarking."""
+    results = mock.Mock()
+    results.algorithms = [ALGO_NAME]
+    results.get_problems = mock.Mock(return_value=[PROBLEM_NAME])
+    return results
+
+
+def test_init_missing_algorithms(
+        tmp_path, algos_specifications, problems_groups, results
 ):
-    """Return the arguments for the report initialization.
-
-    Args:
-        histories_dir: Path to the histories directory.
-        algo_name: The name of the algorithm.
-            If None, defaults to "An algo".
-
-    Returns:
-        The algorithms and their options, the groups of problems, the histories paths.
-    """
-    algos_specifications = {algo_name: dict()}
-    targets = TargetValues(list(range(1000, 0, -100)))
-    a_problem = Problem("A problem", Rosenbrock, [zeros(2)], targets)
-    problems_groups = [ProblemsGroup("A group", [a_problem], "A description")]
-    targets.to_file(str(histories_dir / "history.json"))
-    histories_path = {algo_name: {"A problem": [str(histories_dir / "history.json")]}}
-    return algos_specifications, problems_groups, histories_path
-
-
-def test_init(tmpdir):
-    """Check the initialization of the report."""
-    algos_specs, problems_groups, histories_path = get_report_args(tmpdir)
-    with raises(ValueError, match="Missing histories for algorithm 'An algo'"):
-        Report(
-            tmpdir, algos_specs, problems_groups,
-            {"Another algo": histories_path["An algo"]}
-        )
-    with raises(
-            ValueError,
-            match="Missing histories for algorithm 'An algo' on problem 'A problem'"
+    """Check the initialization of the report with missing algorithms histories."""
+    results.algorithms = ["Another algo"]
+    with pytest.raises(
+            ValueError, match="Missing histories for algorithm '{}'.".format(ALGO_NAME)
     ):
-        Report(tmpdir, algos_specs, problems_groups,
-               {"An algo": {"Another problem": histories_path["An algo"]["A problem"]}}
-               )
+        Report(tmp_path, algos_specifications, problems_groups, results)
 
 
-def test_generate_report_sources(tmpdir):
+def test_init_missing_problems(
+        tmp_path, algos_specifications, problems_groups, results
+):
+    """Check the initialization of the report with missing problems histories."""
+    results.get_problems = mock.Mock(return_value=["Another problem"])
+    with pytest.raises(
+            ValueError,
+            match="Missing histories for algorithm '{}' on problem 'A problem'.".format(
+                ALGO_NAME
+            )
+    ):
+        Report(tmp_path, algos_specifications, problems_groups, results)
+
+
+def test_generate_report_sources(
+        tmp_path, algos_specifications, problems_groups, results
+):
     """Check the generation of the report sources."""
-    algorithms, problems_groups, histories_path = get_report_args(tmpdir)
-    report = Report(tmpdir, algorithms, problems_groups, histories_path)
+    report = Report(tmp_path, algos_specifications, problems_groups, results)
     report.generate_report(to_pdf=True)
-    assert (tmpdir / "index.rst").isfile()
-    assert (tmpdir / "algorithms.rst").isfile()
-    assert (tmpdir / "problems_groups.rst").isfile()
-    assert (tmpdir / "groups" / "A_group.rst").isfile()
-    assert (tmpdir / "_build" / "html" / "index.html").isfile()
-    assert (tmpdir / "_build" / "latex" / "benchmarking_report.pdf").isfile()
+    assert (tmp_path / "index.rst").is_file()
+    assert (tmp_path / "algorithms.rst").is_file()
+    assert (tmp_path / "problems_groups.rst").is_file()
+    assert (tmp_path / "groups" / "A_group.rst").is_file()
+    assert (tmp_path / "_build" / "html" / "index.html").is_file()
+    assert (tmp_path / "_build" / "latex" / "benchmarking_report.pdf").is_file()
 
 
-def test_retrieve_description(tmpdir):
-    """Check the retrieval of a Gemseo algorithm description."""
-    algorithms, problems_groups, histories_path = get_report_args(tmpdir, "SLSQP")
-    report = Report(tmpdir, algorithms, problems_groups, histories_path)
+def test_retrieve_description(tmp_path, algos_specifications, problems_groups, results):
+    """Check the retrieval of a GEMSEO algorithm description."""
+    report = Report(tmp_path, algos_specifications, problems_groups, results)
     ref_contents = [
         "Algorithms\n",
         "==========\n",
@@ -99,8 +126,8 @@ def test_retrieve_description(tmpdir):
         "SLSQP\n",
         "   Sequential Least-Squares Quadratic Programming (SLSQP) implemented in the "
         "SciPy library\n"
-        ]
+    ]
     report.generate_report()
-    with open(tmpdir / "algorithms.rst") as file:
+    with open(tmp_path / "algorithms.rst") as file:
         contents = file.readlines()
     assert contents == ref_contents

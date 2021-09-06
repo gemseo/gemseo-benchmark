@@ -21,11 +21,10 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the performance history."""
 from gemseo.utils.py23_compat import Path
+from gemseo_benchmark.results.history_item import HistoryItem
+from gemseo_benchmark.results.performance_history import PerformanceHistory
 from numpy import inf
 from pytest import raises
-
-from data_profiles.history_item import HistoryItem
-from data_profiles.performance_history import PerformanceHistory
 
 
 def test_invalid_init_lengths():
@@ -91,10 +90,10 @@ def test_remove_leading_infeasible():
     assert truncation.history_items == reference.history_items
 
 
-def test_to_file(tmpdir):
+def test_to_file(tmp_path):
     """Check the writing of a performance history into a file."""
     history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
-    file_path = tmpdir / "history.json"
+    file_path = tmp_path / "history.json"
     history.to_file(str(file_path))
     with file_path.open("r") as file:
         contents = file.read()

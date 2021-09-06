@@ -34,15 +34,13 @@ boolean feasibility statuses.
 Performance histories can be used to generate target values for a problem,
 or to generate the data profile of an algorithm.
 """
-
 import json
 from functools import reduce
-from gemseo.utils.py23_compat import Path
 from typing import Iterable, List, Optional, Sequence, Union
 
+from gemseo.utils.py23_compat import Path
+from gemseo_benchmark.results.history_item import HistoryItem
 from numpy import inf
-
-from data_profiles.history_item import HistoryItem
 
 
 class PerformanceHistory(Sequence[HistoryItem]):

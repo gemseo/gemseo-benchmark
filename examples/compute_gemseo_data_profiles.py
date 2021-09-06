@@ -1,9 +1,9 @@
-from data_profiles.performance_history import PerformanceHistory
+from gemseo_benchmark.data_profiles import PerformanceHistory
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.problems.analytical.rosenbrock import Rosenbrock
 from gemseo.utils.py23_compat import Path
-from problems.problem import Problem
-from problems.problems_group import ProblemsGroup
+from gemseo_benchmark.problems import Problem
+from gemseo_benchmark.problems import ProblemsGroup
 
 # Set the reference problem
 problem = Problem("Rosenbrock", Rosenbrock, doe_algo_name="DiagonalDOE", doe_size=10)

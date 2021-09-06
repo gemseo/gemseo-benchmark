@@ -29,10 +29,9 @@ extracted.
 from itertools import chain, repeat
 from typing import Optional, Sequence
 
+from gemseo_benchmark.results.performance_history import PerformanceHistory
+from gemseo_benchmark.data_profiles.target_values import TargetValues
 from numpy import linspace, ndarray
-
-from data_profiles.performance_history import PerformanceHistory
-from data_profiles.target_values import TargetValues
 
 
 class TargetsGenerator(object):

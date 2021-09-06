@@ -21,11 +21,10 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the target values."""
 import pytest
+from gemseo_benchmark.results.performance_history import PerformanceHistory
+from gemseo_benchmark.data_profiles.target_values import TargetValues
 from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
-
-from data_profiles.performance_history import PerformanceHistory
-from data_profiles.target_values import TargetValues
 
 
 def test_count_targets_hist():
@@ -48,13 +47,13 @@ def test_plot_targets():
 
 
 @pytest.mark.parametrize("converter", [lambda _: _, str])
-def test_plot_save(tmpdir, converter):
+def test_plot_save(tmp_path, converter):
     """Check the saving of the target values plot.
 
     Args:
         converter: The Path converter.
     """
     targets = TargetValues([-2.0, 1.0, -1.0], [1.0, 0.0, 0.0])
-    path = tmpdir / "targets.png"
+    path = tmp_path / "targets.png"
     targets.plot(show=False, path=converter(path))
-    assert path.isfile()
+    assert path.is_file()
