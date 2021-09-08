@@ -1,0 +1,20 @@
+{
+    "responses": [
+        "f",
+        "g",
+        "h"
+    ],
+    "objective": [
+        3.0,
+        2.0
+    ],
+    "doe_size": 10,
+    "nbr_eval_iter": 1,
+    "num_const": [
+        2,
+        0
+    ],
+    "population": 1,
+    "name": "problem",
+    "total_time": 1.0
+}

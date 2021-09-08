@@ -20,6 +20,8 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the performance history."""
+import json
+
 from gemseo.utils.py23_compat import Path
 from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
@@ -122,3 +124,39 @@ def test_repr():
     """Check the representation of a performance history."""
     history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
     assert repr(history) == "[(-2.0, 1.0), (-3.0, 0.0)]"
+
+
+def test_to_postpro_json(tmp_path):
+    """Check the saving to a JSON a file."""
+    objective_values = [3.0, 2.0]
+    infeasibility_measures = [1.0, 0.0]
+    problem_name = "problem"
+    objective_name = "f"
+    constraints_names = ["g", "h"]
+    doe_size = 10
+    nbr_eval_iter = 1
+    n_unsatisfied_constraints = [2, 0]
+    population_size = 1
+    total_time = 1.0
+    history = PerformanceHistory(
+        objective_values, infeasibility_measures,
+        n_unsatisfied_constraints=n_unsatisfied_constraints, problem_name=problem_name,
+        objective_name=objective_name, constraints_names=constraints_names,
+        doe_size=doe_size, nbr_eval_iter=nbr_eval_iter, population_size=population_size,
+        total_time=total_time
+    )
+    path = tmp_path / "history_postpro.json"
+    path = Path(__file__).parent / path.name
+    history.to_postpro_json(path)
+    # Check the output JSON file
+    with path.open("r") as file:
+        contents = json.load(file)
+    assert isinstance(contents, dict)
+    assert contents["responses"] == ["f", "g", "h"]
+    assert contents["objective"] == objective_values
+    assert contents["doe_size"] == doe_size
+    assert contents["nbr_eval_iter"] == nbr_eval_iter
+    assert contents["num_const"] == n_unsatisfied_constraints
+    assert contents["population"] == population_size
+    assert contents["name"] == problem_name
+    assert contents["total_time"] == total_time
