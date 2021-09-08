@@ -36,11 +36,11 @@ or to generate the data profile of an algorithm.
 """
 import json
 from functools import reduce
+from typing import Iterable, List, Optional, Sequence, Union
 
 from gemseo.utils.py23_compat import Path
 from gemseo_benchmark.results.history_item import HistoryItem
 from numpy import inf
-from typing import Iterable, List, Optional, Sequence, Union
 
 
 class PerformanceHistory(Sequence[HistoryItem]):
@@ -53,21 +53,22 @@ class PerformanceHistory(Sequence[HistoryItem]):
     """
     PERFORMANCE = "performance"
     INFEASIBILITY = "infeasibility"
+    N_UNSATISFIED_CONSTRAINTS = "n_unsatisfied_constraints"
 
     def __init__(
             self,
             objective_values=None,  # type: Optional[Sequence[float]]
             infeasibility_measures=None,  # type: Optional[Sequence[float]]
             feasibility_statuses=None,  # type: Optional[Sequence[bool]]
+            n_unsatisfied_constraints=None,  # type: Optional[Sequence[int]]
             problem_name=None,  # type: Optional[str]
             objective_name=None,  # type: Optional[str]
             constraints_names=None,  # type: Optional[List[str]]
             doe_size=None,  # type: Optional[int]
             nbr_eval_iter=None,  # type: Optional[int]
             population_size=None,  # type: Optional[int]
-            total_time=None,  # type: Optional[int]
+            total_time=None,  # type: Optional[float]
     ):  # type: (...) -> None
-        # TODO: document last arguments
         """
         Args:
             objective_values: The history of the quantity to be minimized.
@@ -83,6 +84,16 @@ class PerformanceHistory(Sequence[HistoryItem]):
             feasibility_statuses: The history of the (boolean) feasibility statuses.
                 If `infeasibility_measures` is not None then `feasibility_statuses` is
                 disregarded.
+            n_unsatisfied_constraints: The history of the number of unsatisfied
+                constraints.
+            problem_name: The name of the problem.
+            objective_name: The name of the objective function.
+            constraints_names: The names the (scalar) constraints.
+                Each name must correspond to a scalar value.
+            doe_size: The size of the initial design of experiments.
+            nbr_eval_iter: The number of functions evaluations per iteration.
+            population_size: The size of the optimizer population.
+            total_time: The total time of the optimization, in seconds.
 
         Raises:
             ValueError: If the lengths of the histories do not match.
@@ -102,9 +113,11 @@ class PerformanceHistory(Sequence[HistoryItem]):
             ]
         else:
             infeasibility_measures = [0.0] * len(objective_values)
+        if n_unsatisfied_constraints is None:
+            n_unsatisfied_constraints = [None] * len(objective_values)
         self.history_items = [
-            HistoryItem(value, measure) for value, measure
-            in zip(objective_values, infeasibility_measures)
+            HistoryItem(value, measure, n_unsatisfied) for value, measure, n_unsatisfied
+            in zip(objective_values, infeasibility_measures, n_unsatisfied_constraints)
         ]
         self.__problem_name = problem_name
         self.__objective_name = objective_name
@@ -123,6 +136,11 @@ class PerformanceHistory(Sequence[HistoryItem]):
     def infeasibility_measures(self):  # type: (...) -> List[float]
         """The infeasibility measures."""
         return [item.infeasibility_measure for item in self.history_items]
+
+    @property
+    def n_unsatisfied_constraints(self):  # type: (...) -> List[int]
+        """The numbers of unsatisfied constraints."""
+        return [item.n_unsatisfied_constraints for item in self.history_items]
 
     @property
     def history_items(self):  # type: (...) -> List[HistoryItem]
@@ -233,33 +251,33 @@ class PerformanceHistory(Sequence[HistoryItem]):
         for item in self.history_items:
             data_item = {
                 PerformanceHistory.PERFORMANCE: item.objective_value,
-                PerformanceHistory.INFEASIBILITY: item.infeasibility_measure
+                PerformanceHistory.INFEASIBILITY: item.infeasibility_measure,
             }
+            if item.n_unsatisfied_constraints is not None:
+                data_item[PerformanceHistory.N_UNSATISFIED_CONSTRAINTS] = \
+                    item.n_unsatisfied_constraints
             data.append(data_item)
         with open(path, "w") as file:
             json.dump(data, file, indent=4, separators=(',', ': '))
 
-    def to_json(
+    def to_postpro_json(
             self,
             path,  # type: Union[str, Path]
-
     ):  # type: (...) -> None
-        """Save the performance history to a post-processing file.
+        """Save the performance history into a post-processing JSON file.
 
         Args:
             path: The path where to write the file.
         """
-        num_const = []  # TODO: compute
         data = {
             "responses": [self.__objective_name] + self.__constraints_names,
             "objective": self.objective_values,
             "doe_size": self.__doe_size,
             "nbr_eval_iter": self.__nbr_eval_iter,
-            "num_const": num_const,
+            "num_const": self.n_unsatisfied_constraints,
             "population": self.__population_size,
             "name": self.__problem_name,
             "total_time": self.__total_time,
-            "total_memory": None,  # TODO: grab
         }
         with Path(path).open("w") as file:
             json.dump(data, file, indent=4, separators=(',', ': '))
