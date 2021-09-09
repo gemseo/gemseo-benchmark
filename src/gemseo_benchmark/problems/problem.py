@@ -33,9 +33,10 @@ from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
 from gemseo.algos.doe.doe_factory import DOEFactory
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
+from numpy import ndarray
+
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
-from numpy import ndarray
 
 
 class Problem(object):
@@ -92,13 +93,13 @@ class Problem(object):
         # Set the starting points
         if start_points is None:
             if doe_size is None or doe_algo_name is None:
-                raise ValueError("The starting points, "
-                                 "or their number and the name of the algorithm to "
-                                 "generate them, "
-                                 "must be passed")
-            start_points = self.__generate_start_points(
-                doe_algo_name, doe_size, doe_options
-            )
+                start_points = [creator().design_space.get_current_x()]
+            #                raise ValueError("The starting points, "
+            #                                 "or their number and the name of the algorithm to "
+            #                                 "generate them, "
+            #                                 "must be passed")
+            else:
+                start_points = self.__generate_start_points(doe_algo_name, doe_size, doe_options)
         for point in start_points:
             if not isinstance(point, ndarray):
                 raise TypeError("Starting points must be of type ndarray")
