@@ -30,12 +30,15 @@ and its targets (refer to :mod:`target_values`).
 """
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
 
+from gemseo.algos.design_space import DesignSpace
 from gemseo.algos.doe.doe_factory import DOEFactory
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
+from numpy import ndarray
+
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
-from numpy import ndarray
+from gemseo_minamo.converters.gemseo2minamo.gemseo_to_minamo import Gems2Minamo
 
 
 class Problem(object):
@@ -88,6 +91,9 @@ class Problem(object):
         if not isinstance(problem, OptimizationProblem):
             raise TypeError("Creator must return an OptimizationProblem")
         self.__dimension = problem.dimension
+        self.objective_name = problem.objective.name
+        self.constraints_names = list()
+        self.__set_constraints_names(problem)
 
         # Set the starting points
         if start_points is None:
@@ -145,6 +151,26 @@ class Problem(object):
             problem = self.__creator()
             problem.design_space.set_current_x(start_point)
             yield problem
+
+    def __set_constraints_names(
+            self,
+            problem,  # type: OptimizationProblem
+    ):  # type: (...) -> None
+        """Set the names of the scalar constraints.
+
+        Args:
+            problem: The optimization problem.
+        """
+        dimensions = Gems2Minamo.get_dimensions(problem)
+        for name in problem.get_constraints_names():
+            dimension = dimensions[name]
+            if dimension == 1:
+                self.constraints_names.append(name)
+            else:
+                self.constraints_names.extend([
+                    "{}{}{}".format(name, DesignSpace.SEP, index)
+                    for index in range(dimension)
+                ])
 
     def is_algorithm_suited(
             self,
