@@ -334,9 +334,9 @@ class PerformanceHistory(Sequence[HistoryItem]):
             feasibility, measure = problem.get_violation_criteria(x_vect)
             infeas_measures.append(measure)
             feas_statuses.append(feasibility)
-            n_unsatisfied_constraints.append(get_n_unsatisfied_constraints(
+            n_unsatisfied_constraints.append(int(get_n_unsatisfied_constraints(
                 problem, x_vect
-            ))
+            )))
         return PerformanceHistory(
             obj_values, infeas_measures, feas_statuses, n_unsatisfied_constraints,
             problem_name, problem.objective.name, get_scalar_constraints_names(problem)
