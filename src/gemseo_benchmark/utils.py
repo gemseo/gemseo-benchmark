@@ -1,5 +1,7 @@
-from typing import Dict
+from typing import Dict, List
 
+from gemseo.algos.design_space import DesignSpace
+from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.core.function import MDOFunction
 from numpy import absolute, atleast_1d, ndarray
 
@@ -42,3 +44,28 @@ def get_n_unsatisfied_constraints(
         else:
             n_unsatisfied += sum(value > problem.ineq_tolerance)
     return n_unsatisfied
+
+
+def get_scalar_constraints_names(
+        problem,  # type: OptimizationProblem
+):  # type: (...) -> List[str]
+    """Get the names of the scalar constraints.
+
+    Args:
+        problem: The optimization problem.
+
+    Returns:
+        The names of the scalar constraints.
+    """
+    constraints_names = list()
+    dimensions = get_dimensions(problem)
+    for name in problem.get_constraints_names():
+        dimension = dimensions[name]
+        if dimension == 1:
+            constraints_names.append(name)
+        else:
+            constraints_names.extend([
+                "{}{}{}".format(name, DesignSpace.SEP, index)
+                for index in range(dimension)
+            ])
+    return constraints_names

@@ -43,7 +43,8 @@ from gemseo.utils.py23_compat import Path
 from numpy import inf
 
 from gemseo_benchmark.results.history_item import HistoryItem
-from gemseo_benchmark.utils import get_n_unsatisfied_constraints
+from gemseo_benchmark.utils import get_n_unsatisfied_constraints, \
+    get_scalar_constraints_names
 
 
 class PerformanceHistory(Sequence[HistoryItem]):
@@ -336,8 +337,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
             n_unsatisfied_constraints.append(get_n_unsatisfied_constraints(
                 problem, x_vect
             ))
-        constraints_names = None  # FIXME: create
         return PerformanceHistory(
             obj_values, infeas_measures, feas_statuses, n_unsatisfied_constraints,
-            problem_name, problem.objective.name, constraints_names
+            problem_name, problem.objective.name, get_scalar_constraints_names(problem)
         )

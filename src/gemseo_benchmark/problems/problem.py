@@ -30,7 +30,6 @@ and its targets (refer to :mod:`target_values`).
 """
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
 
-from gemseo.algos.design_space import DesignSpace
 from gemseo.algos.doe.doe_factory import DOEFactory
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
@@ -38,7 +37,7 @@ from numpy import ndarray
 
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
-from gemseo_benchmark.utils import get_dimensions
+from gemseo_benchmark.utils import get_scalar_constraints_names
 
 
 class Problem(object):
@@ -94,8 +93,7 @@ class Problem(object):
 
         # Set the functions names
         self.objective_name = problem.objective.name
-        self.constraints_names = list()
-        self.__set_constraints_names(problem)
+        self.constraints_names = get_scalar_constraints_names(problem)
 
         # Set the starting points
         self.start_points = None
@@ -194,26 +192,6 @@ class Problem(object):
             problem = self.__creator()
             problem.design_space.set_current_x(start_point)
             yield problem
-
-    def __set_constraints_names(
-            self,
-            problem,  # type: OptimizationProblem
-    ):  # type: (...) -> None
-        """Set the names of the scalar constraints.
-
-        Args:
-            problem: The optimization problem.
-        """
-        dimensions = get_dimensions(problem)
-        for name in problem.get_constraints_names():
-            dimension = dimensions[name]
-            if dimension == 1:
-                self.constraints_names.append(name)
-            else:
-                self.constraints_names.extend([
-                    "{}{}{}".format(name, DesignSpace.SEP, index)
-                    for index in range(dimension)
-                ])
 
     def is_algorithm_suited(
             self,
