@@ -38,7 +38,7 @@ from numpy import ndarray
 
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
-from gemseo_minamo.converters.gemseo2minamo.gemseo_to_minamo import Gems2Minamo
+from gemseo_benchmark.utils import get_dimensions
 
 
 class Problem(object):
@@ -204,7 +204,7 @@ class Problem(object):
         Args:
             problem: The optimization problem.
         """
-        dimensions = Gems2Minamo.get_dimensions(problem)
+        dimensions = get_dimensions(problem)
         for name in problem.get_constraints_names():
             dimension = dimensions[name]
             if dimension == 1:
