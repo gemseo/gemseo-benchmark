@@ -91,29 +91,55 @@ class Problem(object):
         if not isinstance(problem, OptimizationProblem):
             raise TypeError("Creator must return an OptimizationProblem")
         self.__dimension = problem.dimension
+
+        # Set the functions names
         self.objective_name = problem.objective.name
         self.constraints_names = list()
         self.__set_constraints_names(problem)
 
         # Set the starting points
-        if start_points is None:
-            if doe_size is None or doe_algo_name is None:
-                raise ValueError("The starting points, "
-                                 "or their number and the name of the algorithm to "
-                                 "generate them, "
-                                 "must be passed")
-            start_points = self.__generate_start_points(
-                doe_algo_name, doe_size, doe_options
-            )
-        for point in start_points:
-            if not isinstance(point, ndarray):
-                raise TypeError("Starting points must be of type ndarray")
-            if point.shape != (self.__dimension,):
-                raise ValueError("Starting points must be 1-dimensional with size {}"
-                                 .format(self.__dimension))
-        self.start_points = start_points
+        self.start_points = None
+        self.__set_start_points(start_points, doe_algo_name, doe_size, doe_options)
+        self.__check_start_points()
 
         self.__target_values = target_values
+
+    def __set_start_points(
+            self,
+            start_points=None,  # type: Optional[Iterable[ndarray]]
+            doe_algo_name=None,  # type: Optional[str]
+            doe_size=None,  # type: Optional[int]
+            doe_options=None,  # type: Optional[Dict[str, Any]]
+    ):  # type: (...) -> None
+        """Set the starting points of the benchmarking problem.
+
+        Args:
+            start_points: The starting points of the benchmarking problem.
+            doe_algo_name: The name of the DOE algorithm.
+            doe_size: The number of starting points.
+            doe_options: The options of the DOE algorithm.
+
+        Raises:
+            ValueError: If neither starting points nor DOE specifications are passed.
+        """
+        if start_points is None:
+            if doe_size is not None and doe_algo_name is not None:
+                self.start_points = self.__generate_start_points(
+                    doe_algo_name, doe_size, doe_options
+                )
+            elif doe_size is not None or doe_algo_name is not None:
+                raise ValueError(
+                    "Either the starting points,"
+                    "or both their number and the name of the algorithm to generate "
+                    "them,"
+                    "or none of the above,"
+                    "must be passed."
+                )
+            else:
+                # Set the current point is the design space as single starting point.
+                self.start_points = [self.__creator().design_space.get_current_x()]
+        else:
+            self.start_points = start_points
 
     def __generate_start_points(
             self,
@@ -137,6 +163,23 @@ class Problem(object):
         doe_options["n_samples"] = doe_size
         doe_library.execute(self.__creator(), **doe_options)
         return doe_library.samples
+
+    def __check_start_points(self):  # type: (...) -> None
+        """Check the starting points of the benchmarking problem.
+
+        Raises:
+            TypeError: If a starting point is not of type ndarray.
+            ValueError: If a starting point is of inappropriate shape.
+        """
+        for point in self.start_points:
+            if not isinstance(point, ndarray):
+                raise TypeError("The starting points must be of type ndarray.")
+            if point.shape != (self.__dimension,):
+                raise ValueError(
+                    "Starting points must be 1-dimensional with size {}.".format(
+                        self.__dimension
+                    )
+                )
 
     @property
     def target_values(self):  # type: (...) -> TargetValues
