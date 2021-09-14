@@ -129,7 +129,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
         self.__doe_size = doe_size
         self.__nbr_eval_iter = nbr_eval_iter
         self.__population_size = population_size
-        self.__total_time = total_time
+        self.total_time = total_time
 
     @property
     def objective_values(self):  # type: (...) -> List[float]
@@ -281,7 +281,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
             "num_const": self.n_unsatisfied_constraints,
             "population": self.__population_size,
             "name": self.__problem_name,
-            "total_time": self.__total_time,
+            "total_time": self.total_time,
         }
         with Path(path).open("w") as file:
             json.dump(data, file, indent=4, separators=(',', ': '))
