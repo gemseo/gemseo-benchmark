@@ -58,7 +58,7 @@ def test_invalid_doe_params(doe_kwargs):
 
 def test_wrong_start_points_type():
     """Check initialization with starting points of the wrong type."""
-    with raises(TypeError, match="Starting points must be of type ndarray"):
+    with raises(TypeError, match="The starting points must be of type ndarray."):
         Problem("Rosenbrock2D", Rosenbrock, [[0.0, 0.0]])
 
 
