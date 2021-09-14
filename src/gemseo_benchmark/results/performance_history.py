@@ -38,9 +38,12 @@ import json
 from functools import reduce
 from typing import Iterable, List, Optional, Sequence, Union
 
+from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.utils.py23_compat import Path
-from gemseo_benchmark.results.history_item import HistoryItem
 from numpy import inf
+
+from gemseo_benchmark.results.history_item import HistoryItem
+from gemseo_benchmark.utils import get_n_unsatisfied_constraints
 
 
 class PerformanceHistory(Sequence[HistoryItem]):
@@ -303,3 +306,38 @@ class PerformanceHistory(Sequence[HistoryItem]):
             objective_values.append(item[PerformanceHistory.PERFORMANCE])
             infeasibility_measures.append(item[PerformanceHistory.INFEASIBILITY])
         return cls(objective_values, infeasibility_measures)
+
+    @classmethod
+    def from_problem(
+            cls,
+            problem,  # type: OptimizationProblem
+            problem_name=None,  # type: Optional[str]
+    ):  # type: (...) -> PerformanceHistory
+        """Create a performance history from a solved optimization problem.
+
+        Args:
+            problem: The optimization problem.
+            problem_name: The name of the problem.
+                If None, the name of the problem is not set.
+
+        Returns:
+            The performance history.
+        """
+        obj_name = problem.objective.name
+        obj_values = list()
+        infeas_measures = list()
+        feas_statuses = list()
+        n_unsatisfied_constraints = list()
+        for x_vect, values in problem.database.items():
+            obj_values.append(values[obj_name])
+            feasibility, measure = problem.get_violation_criteria(x_vect)
+            infeas_measures.append(measure)
+            feas_statuses.append(feasibility)
+            n_unsatisfied_constraints.append(get_n_unsatisfied_constraints(
+                problem, x_vect
+            ))
+        constraints_names = None  # FIXME: create
+        return PerformanceHistory(
+            obj_values, infeas_measures, feas_statuses, n_unsatisfied_constraints,
+            problem_name, problem.objective.name, constraints_names
+        )
