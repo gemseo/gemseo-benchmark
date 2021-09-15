@@ -1,3 +1,5 @@
+"""Tools to extract data from an optimization problem."""
+
 from typing import Dict, List
 
 from gemseo.algos.design_space import DesignSpace
@@ -6,8 +8,13 @@ from gemseo.core.function import MDOFunction
 from numpy import absolute, atleast_1d, ndarray
 
 
-def get_dimensions(problem):  # type: (...) -> Dict[str, int]
+def get_dimensions(
+        problem,  # type: OptimizationProblem
+):  # type: (...) -> Dict[str, int]
     """Return the dimensions of the outputs of the problem functions.
+
+    Args:
+        problem: The optimization problem.
 
     Returns:
         The dimensions of the outputs of the problem functions.
@@ -24,12 +31,13 @@ def get_dimensions(problem):  # type: (...) -> Dict[str, int]
 
 
 def get_n_unsatisfied_constraints(
-        problem,
+        problem,  # type: OptimizationProblem
         x_vect,  # type: ndarray
 ):  # type: (...) -> int
     """Return the number of scalar unsatisfied constraints.
 
     Args:
+        problem: The optimization problem.
         x_vect: The design parameters.
 
     Returns:
