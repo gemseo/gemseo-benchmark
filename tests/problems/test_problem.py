@@ -20,31 +20,45 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for benchmarking reference problems."""
+import pytest
 from gemseo.problems.analytical.rosenbrock import Rosenbrock
-from gemseo_benchmark.problems.problem import Problem
 from numpy import ones, zeros
 from numpy.testing import assert_allclose
 from pytest import raises
+
+from gemseo_benchmark.problems.problem import Problem
 
 
 def test_invalid_creator():
     """Check initialization with an invalid problem creator."""
     with raises(TypeError, match="Creator must return an OptimizationProblem"):
-        Problem("A problem", lambda: None, [zeros(2)])
+        Problem("A problem", lambda: None)
 
 
-def test_missing_start_points():
-    """Check initialization without starting points."""
-    with raises(ValueError, match="The starting points, "
-                                  "or their number and the name of the algorithm to "
-                                  "generate them, "
-                                  "must be passed"):
-        Problem("Rosenbrock2D", Rosenbrock)
+def test_default_start_point():
+    """Check tha the default starting point is properly set."""
+    start_points = Problem("Rosenbrock2D", Rosenbrock).start_points
+    assert len(start_points) == 1
+    assert (start_points[0] == Rosenbrock().design_space.get_current_x()).all()
+
+
+@pytest.mark.parametrize("doe_kwargs", [{"doe_size": 10}, {"doe_algo_name": "LHS"}])
+def test_invalid_doe_params(doe_kwargs):
+    """Check initialization with an invalid DOE configuration."""
+    with raises(
+            ValueError,
+            match="Either the starting points,"
+                  "or both their number and the name of the algorithm to generate "
+                  "them,"
+                  "or none of the above,"
+                  "must be passed."
+    ):
+        Problem("Rosenbrock2D", Rosenbrock, **doe_kwargs)
 
 
 def test_wrong_start_points_type():
     """Check initialization with starting points of the wrong type."""
-    with raises(TypeError, match="Starting points must be of type ndarray"):
+    with raises(TypeError, match="The starting points must be of type ndarray."):
         Problem("Rosenbrock2D", Rosenbrock, [[0.0, 0.0]])
 
 
