@@ -40,11 +40,10 @@ from typing import Iterable, List, Optional, Sequence, Union
 
 from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.utils.py23_compat import Path
-from numpy import inf
-
 from gemseo_benchmark.results.history_item import HistoryItem
-from gemseo_benchmark.utils import get_n_unsatisfied_constraints, \
-    get_scalar_constraints_names
+from gemseo_benchmark.utils import (get_n_unsatisfied_constraints,
+                                    get_scalar_constraints_names)
+from numpy import inf
 
 
 class PerformanceHistory(Sequence[HistoryItem]):
@@ -54,6 +53,9 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
     Attributes:
         history_items (List[HistoryItem]): The items of the performance history.
+        problem_name (str): The name of the problem.
+        nbr_eval_iter (int): The number of functions evaluations per iteration.
+        total_time (float): The runtime of the algorithm.
     """
     PERFORMANCE = "performance"
     INFEASIBILITY = "infeasibility"
@@ -72,6 +74,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
             nbr_eval_iter=None,  # type: Optional[int]
             population_size=None,  # type: Optional[int]
             total_time=None,  # type: Optional[float]
+            algorithm=None,  # type: Optional[str]
     ):  # type: (...) -> None
         """
         Args:
@@ -98,6 +101,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
             nbr_eval_iter: The number of functions evaluations per iteration.
             population_size: The size of the optimizer population.
             total_time: The total time of the optimization, in seconds.
+            algorithm: The name of the algorithm which generated the history.
 
         Raises:
             ValueError: If the lengths of the histories do not match.
@@ -119,17 +123,23 @@ class PerformanceHistory(Sequence[HistoryItem]):
             infeasibility_measures = [0.0] * len(objective_values)
         if n_unsatisfied_constraints is None:
             n_unsatisfied_constraints = [None] * len(objective_values)
+        elif len(n_unsatisfied_constraints) != len(infeasibility_measures):
+            raise ValueError(
+                "The unsatisfied constraints history and the feasibility history"
+                " must have same length."
+            )
         self.history_items = [
             HistoryItem(value, measure, n_unsatisfied) for value, measure, n_unsatisfied
             in zip(objective_values, infeasibility_measures, n_unsatisfied_constraints)
         ]
-        self.__problem_name = problem_name
+        self.problem_name = problem_name
         self.__objective_name = objective_name
         self.__constraints_names = constraints_names
         self.__doe_size = doe_size
-        self.__nbr_eval_iter = nbr_eval_iter
+        self.nbr_eval_iter = nbr_eval_iter
         self.__population_size = population_size
         self.total_time = total_time
+        self.algorithm = algorithm
 
     @property
     def objective_values(self):  # type: (...) -> List[float]
@@ -272,15 +282,22 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
         Args:
             path: The path where to write the file.
+
+        Raises:
+            ValueError: If the algorithm name is not set.
         """
+        if self.algorithm is None:
+            raise ValueError("The algorithm name is not set.")
+        cumulated_minimum = self.compute_cumulated_minimum()
         data = {
+            "version": self.algorithm,
             "responses": [self.__objective_name] + self.__constraints_names,
-            "objective": self.objective_values,
+            "objective": cumulated_minimum.objective_values,
             "doe_size": self.__doe_size,
-            "nbr_eval_iter": self.__nbr_eval_iter,
-            "num_const": self.n_unsatisfied_constraints,
+            "nbr_eval_iter": self.nbr_eval_iter,
+            "num_const": cumulated_minimum.n_unsatisfied_constraints,
             "population": self.__population_size,
-            "name": self.__problem_name,
+            "name": self.problem_name,
             "total_time": self.total_time,
         }
         with Path(path).open("w") as file:
