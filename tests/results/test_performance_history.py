@@ -36,6 +36,12 @@ def test_invalid_init_lengths():
         PerformanceHistory([3.0, 2.0], [1.0])
     with raises(ValueError):
         PerformanceHistory([3.0, 2.0], feasibility_statuses=[False])
+    with pytest.raises(
+            ValueError,
+            match="The unsatisfied constraints history and the feasibility history"
+                  " must have same length."
+    ):
+        PerformanceHistory([3.0, 2.0], [1.0, 0.0], n_unsatisfied_constraints=[1])
 
 
 def test_negative_infeasibility_measures():
