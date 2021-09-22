@@ -32,9 +32,17 @@ from pytest import raises
 
 def test_invalid_init_lengths():
     """Check the initialization of a history with lists of inconsistent lengths."""
-    with raises(ValueError):
+    with raises(
+            ValueError,
+            match="The objective history and the infeasibility history must have same"
+                  " length."
+    ):
         PerformanceHistory([3.0, 2.0], [1.0])
-    with raises(ValueError):
+    with raises(
+            ValueError,
+            match="The objective history and the feasibility history must have same"
+                  " length."
+    ):
         PerformanceHistory([3.0, 2.0], feasibility_statuses=[False])
     with pytest.raises(
             ValueError,
