@@ -179,6 +179,12 @@ def test_to_postpro_json(tmp_path):
     assert contents["total_time"] == total_time
 
 
+def test_to_postpro_no_algo(tmp_path):
+    """Check the export to post-processing JSON when no algorithm is set."""
+    with pytest.raises(ValueError, match="The algorithm name is not set."):
+        PerformanceHistory().to_postpro_json(tmp_path)
+
+
 @pytest.fixture(scope="module")
 def objective():  # type: (...) -> mock.Mock
     """An objective constraint."""
