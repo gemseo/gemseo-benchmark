@@ -109,7 +109,9 @@ def test_remove_leading_infeasible():
 
 def test_to_file(tmp_path):
     """Check the writing of a performance history into a file."""
-    history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
+    history = PerformanceHistory(
+        [-2.0, -3.0], [1.0, 0.0], n_unsatisfied_constraints=[1, 0]
+    )
     file_path = tmp_path / "history.json"
     history.to_file(str(file_path))
     with file_path.open("r") as file:
