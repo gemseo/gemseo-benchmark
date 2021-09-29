@@ -56,6 +56,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
         problem_name (str): The name of the problem.
         nbr_eval_iter (int): The number of functions evaluations per iteration.
         total_time (float): The runtime of the algorithm.
+        max_eval (int): The maximum number of functions evaluations.
     """
     PERFORMANCE = "performance"
     INFEASIBILITY = "infeasibility"
@@ -75,6 +76,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
             population_size=None,  # type: Optional[int]
             total_time=None,  # type: Optional[float]
             algorithm=None,  # type: Optional[str]
+            max_eval=None,  # type: Optional[int]
     ):  # type: (...) -> None
         """
         Args:
@@ -102,6 +104,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
             population_size: The size of the optimizer population.
             total_time: The total time of the optimization, in seconds.
             algorithm: The name of the algorithm which generated the history.
+            max_eval: The maximum number of functions evaluations.
 
         Raises:
             ValueError: If the lengths of the histories do not match.
@@ -140,6 +143,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
         self.__population_size = population_size
         self.total_time = total_time
         self.algorithm = algorithm
+        self.max_eval = max_eval
 
     @property
     def objective_values(self):  # type: (...) -> List[float]
