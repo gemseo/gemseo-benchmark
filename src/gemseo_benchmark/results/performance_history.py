@@ -137,7 +137,10 @@ class PerformanceHistory(Sequence[HistoryItem]):
         ]
         self.problem_name = problem_name
         self.__objective_name = objective_name
-        self.__constraints_names = constraints_names
+        if constraints_names is None:
+            self.__constraints_names = []
+        else:
+            self.__constraints_names = constraints_names
         self.__doe_size = doe_size
         self.nbr_eval_iter = nbr_eval_iter
         self.__population_size = population_size
