@@ -186,6 +186,18 @@ def test_to_postpro_no_algo(tmp_path):
         PerformanceHistory().to_postpro_json(tmp_path)
 
 
+def test_to_postpro_budget(tmp_path):
+    """Check the export to post-processing JSON when an evaluations budget is set."""
+    objective_values = [0.0, -3.0, -1.0, 0.0, 1.0, -1.0]
+    max_eval = 10
+    history = PerformanceHistory(objective_values, algorithm="algo", max_eval=max_eval)
+    path = tmp_path / "history_postpro.json"
+    history.to_postpro_json(path)
+    with path.open("r") as file:
+        contents = json.load(file)
+    assert contents["objective"][6:10] == [-3.0] * 4
+
+
 @pytest.fixture(scope="module")
 def objective():  # type: (...) -> mock.Mock
     """An objective constraint."""
