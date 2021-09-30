@@ -164,7 +164,6 @@ def test_to_postpro_json(tmp_path):
         total_time=total_time, algorithm=algorithm
     )
     path = tmp_path / "history_postpro.json"
-    path = Path(__file__).parent / path.name
     history.to_postpro_json(path)
     # Check the output JSON file
     with path.open("r") as file:
