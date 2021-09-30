@@ -293,7 +293,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
         if self.algorithm is None:
             raise ValueError("The algorithm name is not set.")
         cumulated_minimum = self.compute_cumulated_minimum()
-        if len(cumulated_minimum) < self.max_eval:
+        if self.max_eval is not None and len(cumulated_minimum) < self.max_eval:
             # Extend the history up to the evaluations budget
             cumulated_minimum.history_items.extend(
                 [cumulated_minimum[-1]] * (self.max_eval - len(cumulated_minimum))
