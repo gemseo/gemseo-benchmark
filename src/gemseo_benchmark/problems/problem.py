@@ -83,7 +83,7 @@ class Problem(object):
                or if a starting point is of inappropriate shape.
         """
         self.name = name
-        self.__creator = creator
+        self.creator = creator
 
         # Set the dimension
         problem = creator()
@@ -135,7 +135,7 @@ class Problem(object):
                 )
             else:
                 # Set the current point is the design space as single starting point.
-                self.start_points = [self.__creator().design_space.get_current_x()]
+                self.start_points = [self.creator().design_space.get_current_x()]
         else:
             self.start_points = start_points
 
@@ -159,7 +159,7 @@ class Problem(object):
         if doe_options is None:
             doe_options = dict()
         doe_options["n_samples"] = doe_size
-        doe_library.execute(self.__creator(), **doe_options)
+        doe_library.execute(self.creator(), **doe_options)
         return doe_library.samples
 
     def __check_start_points(self):  # type: (...) -> None
@@ -189,7 +189,7 @@ class Problem(object):
     def __iter__(self):  # type: (...) -> OptimizationProblem
         """Iterate on the problem instances with respect to the starting points. """
         for start_point in self.start_points:
-            problem = self.__creator()
+            problem = self.creator()
             problem.design_space.set_current_x(start_point)
             yield problem
 
@@ -206,7 +206,7 @@ class Problem(object):
             True if the algorithm is suited to the problem, False otherwise.
         """
         library = OptimizersFactory().create(name)
-        return library.is_algorithm_suited(library.lib_dict[name], self.__creator())
+        return library.is_algorithm_suited(library.lib_dict[name], self.creator())
 
     def compute_targets(
             self,

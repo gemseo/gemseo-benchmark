@@ -141,9 +141,9 @@ class PerformanceHistory(Sequence[HistoryItem]):
             self.__constraints_names = []
         else:
             self.__constraints_names = constraints_names
-        self.__doe_size = doe_size
+        self.doe_size = doe_size
         self.nbr_eval_iter = nbr_eval_iter
-        self.__population_size = population_size
+        self.population_size = population_size
         self.total_time = total_time
         self.algorithm = algorithm
         self.max_eval = max_eval
@@ -305,10 +305,10 @@ class PerformanceHistory(Sequence[HistoryItem]):
             "version": self.algorithm,
             "responses": [self.__objective_name] + self.__constraints_names,
             "objective": cumulated_minimum.objective_values,
-            "doe_size": self.__doe_size,
+            "doe_size": self.doe_size,
             "nbr_eval_iter": self.nbr_eval_iter,
             "num_const": cumulated_minimum.n_unsatisfied_constraints,
-            "population": self.__population_size,
+            "population": self.population_size,
             "name": self.problem_name,
             "total_time": self.total_time,
         }
