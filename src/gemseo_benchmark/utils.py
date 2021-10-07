@@ -21,13 +21,7 @@ def get_dimensions(
     """
     x_vect = problem.design_space.get_current_x()
     outputs, _ = problem.evaluate_functions(x_vect, normalize=False)
-    dimensions = dict()
-    for name, value in outputs.items():
-        value = atleast_1d(value)
-        assert value.ndim == 1  # FIXME: get rid off this test
-        dimension, = value.shape
-        dimensions[name] = dimension
-    return dimensions
+    return {name: atleast_1d(value).size for name, value in outputs.items()}
 
 
 def get_n_unsatisfied_constraints(
