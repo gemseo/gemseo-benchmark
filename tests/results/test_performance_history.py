@@ -133,7 +133,7 @@ def test_from_file():
 def test_history_items_setter():
     """Check the setting of history items."""
     history = PerformanceHistory()
-    with raises(TypeError, match="History items must be of type HistoryItem"):
+    with raises(TypeError, match="History items must be of type HistoryItem."):
         history.history_items = [1.0, 2.0]
 
 

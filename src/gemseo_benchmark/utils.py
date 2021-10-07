@@ -39,12 +39,14 @@ def get_n_unsatisfied_constraints(
     """
     n_unsatisfied = 0
     values = problem.database.get(x_vect)
-    for constraint in problem.get_ineq_constraints() + problem.get_eq_constraints():
+    for constraint in problem.constraints:
         value = atleast_1d(values[constraint.name])
         if constraint.f_type == MDOFunction.TYPE_EQ:
-            n_unsatisfied += sum(absolute(value) > problem.eq_tolerance)
+            value = absolute(value)
+            tolerance = problem.eq_tolerance
         else:
-            n_unsatisfied += sum(value > problem.ineq_tolerance)
+            tolerance = problem.ineq_tolerance
+        n_unsatisfied += sum(value > tolerance)
     return n_unsatisfied
 
 

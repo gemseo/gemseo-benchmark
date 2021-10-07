@@ -31,12 +31,12 @@ from gemseo_benchmark.problems.problem import Problem
 
 def test_invalid_creator():
     """Check initialization with an invalid problem creator."""
-    with raises(TypeError, match="Creator must return an OptimizationProblem"):
+    with raises(TypeError, match="Creator must return an OptimizationProblem."):
         Problem("A problem", lambda: None)
 
 
 def test_default_start_point():
-    """Check tha the default starting point is properly set."""
+    """Check that the default starting point is properly set."""
     start_points = Problem("Rosenbrock2D", Rosenbrock).start_points
     assert len(start_points) == 1
     assert (start_points[0] == Rosenbrock().design_space.get_current_x()).all()
