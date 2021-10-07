@@ -109,44 +109,23 @@ class PerformanceHistory(Sequence[HistoryItem]):
         Raises:
             ValueError: If the lengths of the histories do not match.
         """
-        if objective_values is None:
-            objective_values = []
-        if infeasibility_measures is not None:
-            if len(infeasibility_measures) != len(objective_values):
-                raise ValueError("The objective history and the infeasibility history "
-                                 "must have same length.")
-        elif feasibility_statuses is not None:
-            if len(feasibility_statuses) != len(objective_values):
-                raise ValueError("The objective history and the feasibility history "
-                                 "must have same length.")
-            infeasibility_measures = [
-                0.0 if is_feas else inf for is_feas in feasibility_statuses
-            ]
-        else:
-            infeasibility_measures = [0.0] * len(objective_values)
-        if n_unsatisfied_constraints is None:
-            n_unsatisfied_constraints = [None] * len(objective_values)
-        elif len(n_unsatisfied_constraints) != len(infeasibility_measures):
-            raise ValueError(
-                "The unsatisfied constraints history and the feasibility history"
-                " must have same length."
-            )
-        self.history_items = [
-            HistoryItem(value, measure, n_unsatisfied) for value, measure, n_unsatisfied
-            in zip(objective_values, infeasibility_measures, n_unsatisfied_constraints)
-        ]
-        self.problem_name = problem_name
-        self.__objective_name = objective_name
         if constraints_names is None:
             self.__constraints_names = []
         else:
             self.__constraints_names = constraints_names
+
+        self.__objective_name = objective_name
+        self.algorithm = algorithm
         self.doe_size = doe_size
+        self.history_items = self.__get_history_items(
+            objective_values, infeasibility_measures, feasibility_statuses,
+            n_unsatisfied_constraints,
+        )
+        self.max_eval = max_eval
         self.nbr_eval_iter = nbr_eval_iter
         self.population_size = population_size
+        self.problem_name = problem_name
         self.total_time = total_time
-        self.algorithm = algorithm
-        self.max_eval = max_eval
 
     @property
     def objective_values(self):  # type: (...) -> List[float]
@@ -181,6 +160,72 @@ class PerformanceHistory(Sequence[HistoryItem]):
             if not isinstance(item, HistoryItem):
                 raise TypeError("History items must be of type HistoryItem")
         self.__items = list(history_items)
+    
+    @staticmethod
+    def __get_history_items(
+            objective_values=None,  # type: Optional[Sequence[float]]
+            infeasibility_measures=None,  # type: Optional[Sequence[float]]
+            feasibility_statuses=None,  # type: Optional[Sequence[bool]]
+            n_unsatisfied_constraints=None,  # type: Optional[Sequence[int]]
+    ):  # type: (...) -> List[HistoryItem]
+        """Return history items based on values histories.
+
+        Args:
+            objective_values: The history of the quantity to be minimized.
+                If None, will be considered empty.
+            infeasibility_measures: The history of infeasibility measures.
+                An infeasibility measure is a non-negative real number representing
+                the gap between the design and the feasible space,
+                a zero value meaning feasibility.
+                If None and `feasibility_statuses` is not None
+                then the infeasibility measures are set to zero in case of feasibility,
+                and set to infinity otherwise.
+                If None and `feasibility_statuses` is None
+                then every infeasibility measure is set to zero.
+            feasibility_statuses: The history of the (boolean) feasibility statuses.
+                If `infeasibility_measures` is not None then `feasibility_statuses` is
+                disregarded.
+                If None and 'infeasibility_measures' is None
+                then every infeasibility measure is set to zero.
+            n_unsatisfied_constraints: The history of the number of unsatisfied
+                constraints.
+                If None, the entries will be set to 0 for feasible entries
+                and None for infeasible entries.
+
+        Returns:
+            The history items.
+        """
+        if objective_values is None:
+            objective_values = []
+
+        if infeasibility_measures is not None:
+            if len(infeasibility_measures) != len(objective_values):
+                raise ValueError("The objective history and the infeasibility history "
+                                 "must have same length.")
+        elif feasibility_statuses is not None:
+            if len(feasibility_statuses) != len(objective_values):
+                raise ValueError("The objective history and the feasibility history "
+                                 "must have same length.")
+            infeasibility_measures = [
+                0.0 if is_feas else inf for is_feas in feasibility_statuses
+            ]
+        else:
+            infeasibility_measures = [0.0] * len(objective_values)
+
+        if n_unsatisfied_constraints is None:
+            n_unsatisfied_constraints = [
+                0 if entry == 0.0 else None for entry in infeasibility_measures
+            ]
+        elif len(n_unsatisfied_constraints) != len(infeasibility_measures):
+            raise ValueError(
+                "The unsatisfied constraints history and the feasibility history"
+                " must have same length."
+            )
+
+        return [
+            HistoryItem(value, measure, n_unsatisfied) for value, measure, n_unsatisfied
+            in zip(objective_values, infeasibility_measures, n_unsatisfied_constraints)
+        ]
 
     def __len__(self):  # type: (...) -> int
         return len(self.__items)
