@@ -100,48 +100,49 @@ class Problem(object):
         self.constraints_names = get_scalar_constraints_names(problem)
 
         # Set the starting points
-        self.start_points = None
-        self.__set_start_points(start_points, doe_algo_name, doe_size, doe_options)
+        if start_points is None:
+            self.start_points = self.__get_start_points(
+                doe_algo_name, doe_size, doe_options
+            )
+        else:
+            self.start_points = start_points
         self.__check_start_points()
 
         self.__target_values = target_values
 
-    def __set_start_points(
+    def __get_start_points(
             self,
-            start_points=None,  # type: Optional[Iterable[ndarray]]
             doe_algo_name=None,  # type: Optional[str]
             doe_size=None,  # type: Optional[int]
             doe_options=None,  # type: Optional[Dict[str, Any]]
-    ):  # type: (...) -> None
-        """Set the starting points of the benchmarking problem.
+    ):  # type: (...) -> Iterable[ndarray]
+        """Return the starting points of the benchmarking problem.
 
         Args:
-            start_points: The starting points of the benchmarking problem.
             doe_algo_name: The name of the DOE algorithm.
             doe_size: The number of starting points.
             doe_options: The options of the DOE algorithm.
 
+        Returns:
+            The starting points.
+
         Raises:
             ValueError: If neither starting points nor DOE specifications are passed.
         """
-        if start_points is None:
-            if doe_size is not None and doe_algo_name is not None:
-                self.start_points = self.__generate_start_points(
-                    doe_algo_name, doe_size, doe_options
-                )
-            elif doe_size is not None or doe_algo_name is not None:
-                raise ValueError(
-                    "Either the starting points,"
-                    "or both their number and the name of the algorithm to generate "
-                    "them,"
-                    "or none of the above,"
-                    "must be passed."
-                )
-            else:
-                # Set the current point is the design space as single starting point.
-                self.start_points = [self.creator().design_space.get_current_x()]
-        else:
-            self.start_points = start_points
+        if doe_size is not None and doe_algo_name is not None:
+            return self.__generate_start_points(
+                doe_algo_name, doe_size, doe_options
+            )
+        if doe_size is not None or doe_algo_name is not None:
+            raise ValueError(
+                "Either the starting points,"
+                "or both their number and the name of the algorithm to generate "
+                "them,"
+                "or none of the above,"
+                "must be passed."
+            )
+        # Set the current point is the design space as single starting point.
+        return [self.creator().design_space.get_current_x()]
 
     def __generate_start_points(
             self,
