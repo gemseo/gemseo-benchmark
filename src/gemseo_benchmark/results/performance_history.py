@@ -53,10 +53,10 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
     Attributes:
         history_items (List[HistoryItem]): The items of the performance history.
-        problem_name (str): The name of the problem.
-        nbr_eval_iter (int): The number of functions evaluations per iteration.
-        total_time (float): The runtime of the algorithm.
         max_eval (int): The maximum number of functions evaluations.
+        nbr_eval_iter (int): The number of functions evaluations per iteration.
+        problem_name (str): The name of the problem.
+        total_time (float): The runtime of the algorithm.
     """
     __PERFORMANCE = "performance"
     __INFEASIBILITY = "infeasibility"
@@ -81,30 +81,44 @@ class PerformanceHistory(Sequence[HistoryItem]):
         """
         Args:
             objective_values: The history of the quantity to be minimized.
+                If None, will be considered empty.
             infeasibility_measures: The history of infeasibility measures.
                 An infeasibility measure is a non-negative real number representing
                 the gap between the design and the feasible space,
                 a zero value meaning feasibility.
-                If None and `feasibility_history` is not None
+                If None and `feasibility_statuses` is not None
                 then the infeasibility measures are set to zero in case of feasibility,
                 and set to infinity otherwise.
-                If None and `feasibility_history` is None
+                If None and `feasibility_statuses` is None
                 then every infeasibility measure is set to zero.
             feasibility_statuses: The history of the (boolean) feasibility statuses.
                 If `infeasibility_measures` is not None then `feasibility_statuses` is
                 disregarded.
+                If None and 'infeasibility_measures' is None
+                then every infeasibility measure is set to zero.
             n_unsatisfied_constraints: The history of the number of unsatisfied
                 constraints.
+                If None, the entries will be set to 0 for feasible entries
+                and None for infeasible entries.
             problem_name: The name of the problem.
+                If None, will not be set.
             objective_name: The name of the objective function.
+                If None, will not be set.
             constraints_names: The names the (scalar) constraints.
                 Each name must correspond to a scalar value.
+                If None, will not be set.
             doe_size: The size of the initial design of experiments.
+                If None, will not be set.
             nbr_eval_iter: The number of functions evaluations per iteration.
+                If None, will not be set.
             population_size: The size of the optimizer population.
+                If None, will not be set.
             total_time: The total time of the optimization, in seconds.
+                If None, will not be set.
             algorithm: The name of the algorithm which generated the history.
+                If None, will not be set.
             max_eval: The maximum number of functions evaluations.
+                If None, will not be set.
 
         Raises:
             ValueError: If the lengths of the histories do not match.
