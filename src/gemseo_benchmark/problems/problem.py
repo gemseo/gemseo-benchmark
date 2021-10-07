@@ -93,6 +93,7 @@ class Problem(object):
         problem = creator()
         if not isinstance(problem, OptimizationProblem):
             raise TypeError("Creator must return an OptimizationProblem")
+
         self.__dimension = problem.dimension
 
         # Set the functions names
@@ -106,22 +107,27 @@ class Problem(object):
             )
         else:
             self.start_points = start_points
-        self.__check_start_points()
 
+        self.__check_start_points()
         self.__target_values = target_values
 
     def __get_start_points(
             self,
             doe_algo_name=None,  # type: Optional[str]
             doe_size=None,  # type: Optional[int]
-            doe_options=None,  # type: Optional[Dict[str, Any]]
+            doe_options=None,  # type: Optional[Mapping[str, Any]]
     ):  # type: (...) -> Iterable[ndarray]
         """Return the starting points of the benchmarking problem.
 
         Args:
             doe_algo_name: The name of the DOE algorithm.
+                If None, the current point of the problem design space is set as the
+                only starting point.
             doe_size: The number of starting points.
+                If None, the current point of the problem design space is set as the
+                only starting point.
             doe_options: The options of the DOE algorithm.
+                If None, no option other than the DOE size are passed to the algorithm.
 
         Returns:
             The starting points.
@@ -133,6 +139,7 @@ class Problem(object):
             return self.__generate_start_points(
                 doe_algo_name, doe_size, doe_options
             )
+
         if doe_size is not None or doe_algo_name is not None:
             raise ValueError(
                 "Either the starting points,"
@@ -141,14 +148,15 @@ class Problem(object):
                 "or none of the above,"
                 "must be passed."
             )
-        # Set the current point is the design space as single starting point.
+
+        # Set the current point of the design space as single starting point.
         return [self.creator().design_space.get_current_x()]
 
     def __generate_start_points(
             self,
             doe_algo_name,  # type: str
             doe_size,  # type: int
-            doe_options=None,  # type: Optional[Mapping[str, Any]]
+            doe_options,  # type: Mapping[str, Any]
     ):  # type: (...) -> Iterable[ndarray]
         """Generate the starting points of the benchmarking problem.
 
@@ -177,6 +185,7 @@ class Problem(object):
         for point in self.start_points:
             if not isinstance(point, ndarray):
                 raise TypeError("The starting points must be of type ndarray.")
+
             if point.shape != (self.__dimension,):
                 raise ValueError(
                     "Starting points must be 1-dimensional with size {}.".format(
