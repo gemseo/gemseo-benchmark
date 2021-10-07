@@ -336,8 +336,10 @@ class PerformanceHistory(Sequence[HistoryItem]):
             if item.n_unsatisfied_constraints is not None:
                 data_item[PerformanceHistory.__N_UNSATISFIED_CONSTRAINTS] = \
                     item.n_unsatisfied_constraints
+
             data.append(data_item)
-        with open(path, "w") as file:
+
+        with Path(path).open("w") as file:
             json.dump(data, file, indent=4, separators=(',', ': '))
 
     def to_postpro_json(
@@ -354,11 +356,13 @@ class PerformanceHistory(Sequence[HistoryItem]):
         """
         if self.algorithm is None:
             raise ValueError("The algorithm name is not set.")
+
         cumulated_minimum = self.compute_cumulated_minimum()
-        if self.max_eval is not None and len(cumulated_minimum) < self.max_eval:
+        cumulated_minimum_length = len(cumulated_minimum)
+        if self.max_eval is not None and cumulated_minimum_length < self.max_eval:
             # Extend the history up to the evaluations budget
             cumulated_minimum.history_items.extend(
-                [cumulated_minimum[-1]] * (self.max_eval - len(cumulated_minimum))
+                [cumulated_minimum[-1]] * (self.max_eval - cumulated_minimum_length)
             )
         data = {
             "version": self.algorithm,
@@ -417,14 +421,15 @@ class PerformanceHistory(Sequence[HistoryItem]):
         infeas_measures = list()
         feas_statuses = list()
         n_unsatisfied_constraints = list()
-        for x_vect, values in problem.database.items():
-            obj_values.append(values[obj_name])
-            feasibility, measure = problem.get_violation_criteria(x_vect)
+        for design_values, output_values in problem.database.items():
+            obj_values.append(output_values[obj_name])
+            feasibility, measure = problem.get_violation_criteria(design_values)
             infeas_measures.append(measure)
             feas_statuses.append(feasibility)
             n_unsatisfied_constraints.append(int(get_n_unsatisfied_constraints(
-                problem, x_vect
+                problem, design_values
             )))
+
         return PerformanceHistory(
             obj_values, infeas_measures, feas_statuses, n_unsatisfied_constraints,
             problem_name, problem.objective.name, get_scalar_constraints_names(problem)
