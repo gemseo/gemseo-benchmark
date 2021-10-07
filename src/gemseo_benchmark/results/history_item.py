@@ -87,7 +87,6 @@ class HistoryItem(object):
         return (
                 self.__infeas_measure == other.__infeas_measure
                 and self.objective_value == other.objective_value
-                and self.n_unsatisfied_constraints == other.n_unsatisfied_constraints
         )
 
     def __lt__(
