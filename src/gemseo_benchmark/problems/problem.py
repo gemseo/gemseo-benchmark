@@ -50,8 +50,12 @@ class Problem(object):
 
     Attributes:
         name (str): The name of the benchmarking problem.
+        creator (Callable[[], OptimizationProblem]): A callable that returns an instance
+            of the problem.
         start_points (Iterable[ndarray]): The starting points of the benchmarking
             problem.
+        objective_name (str): The name of the objective function.
+        constraints_names (List[str]): The names of the (scalar) constraints.
     """
 
     def __init__(
