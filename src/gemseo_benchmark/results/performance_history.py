@@ -58,9 +58,9 @@ class PerformanceHistory(Sequence[HistoryItem]):
         total_time (float): The runtime of the algorithm.
         max_eval (int): The maximum number of functions evaluations.
     """
-    PERFORMANCE = "performance"
-    INFEASIBILITY = "infeasibility"
-    N_UNSATISFIED_CONSTRAINTS = "n_unsatisfied_constraints"
+    __PERFORMANCE = "performance"
+    __INFEASIBILITY = "infeasibility"
+    __N_UNSATISFIED_CONSTRAINTS = "n_unsatisfied_constraints"
 
     def __init__(
             self,
@@ -271,11 +271,11 @@ class PerformanceHistory(Sequence[HistoryItem]):
         # Add each history item in dictionary format
         for item in self.history_items:
             data_item = {
-                PerformanceHistory.PERFORMANCE: item.objective_value,
-                PerformanceHistory.INFEASIBILITY: item.infeasibility_measure,
+                PerformanceHistory.__PERFORMANCE: item.objective_value,
+                PerformanceHistory.__INFEASIBILITY: item.infeasibility_measure,
             }
             if item.n_unsatisfied_constraints is not None:
-                data_item[PerformanceHistory.N_UNSATISFIED_CONSTRAINTS] = \
+                data_item[PerformanceHistory.__N_UNSATISFIED_CONSTRAINTS] = \
                     item.n_unsatisfied_constraints
             data.append(data_item)
         with open(path, "w") as file:
@@ -333,8 +333,8 @@ class PerformanceHistory(Sequence[HistoryItem]):
         objective_values = list()
         infeasibility_measures = list()
         for item in data:
-            objective_values.append(item[PerformanceHistory.PERFORMANCE])
-            infeasibility_measures.append(item[PerformanceHistory.INFEASIBILITY])
+            objective_values.append(item[PerformanceHistory.__PERFORMANCE])
+            infeasibility_measures.append(item[PerformanceHistory.__INFEASIBILITY])
         return cls(objective_values, infeasibility_measures)
 
     @classmethod
