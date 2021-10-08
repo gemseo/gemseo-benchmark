@@ -92,7 +92,7 @@ class Problem(object):
         # Set the dimension
         problem = creator()
         if not isinstance(problem, OptimizationProblem):
-            raise TypeError("Creator must return an OptimizationProblem")
+            raise TypeError("Creator must return an OptimizationProblem.")
 
         self.__dimension = problem.dimension
 
