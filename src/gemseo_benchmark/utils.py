@@ -4,7 +4,7 @@ from typing import Dict, List
 
 from gemseo.algos.design_space import DesignSpace
 from gemseo.algos.opt_problem import OptimizationProblem
-from gemseo.core.function import MDOFunction
+from gemseo.core.mdofunctions.mdo_function import MDOFunction
 from numpy import absolute, atleast_1d, ndarray
 
 
