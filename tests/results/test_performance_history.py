@@ -157,27 +157,34 @@ def test_to_postpro_json(tmp_path):
     total_time = 1.0
     algorithm = "algo"
     history = PerformanceHistory(
-        objective_values, infeasibility_measures,
-        n_unsatisfied_constraints=n_unsatisfied_constraints, problem_name=problem_name,
-        objective_name=objective_name, constraints_names=constraints_names,
-        doe_size=doe_size, nbr_eval_iter=nbr_eval_iter, population_size=population_size,
-        total_time=total_time, algorithm=algorithm
+        objective_values,
+        infeasibility_measures,
+        n_unsatisfied_constraints=n_unsatisfied_constraints,
+        problem_name=problem_name,
+        objective_name=objective_name,
+        constraints_names=constraints_names,
+        doe_size=doe_size,
+        nbr_eval_iter=nbr_eval_iter,
+        population_size=population_size,
+        total_time=total_time,
+        algorithm=algorithm
     )
     path = tmp_path / "history_postpro.json"
     history.to_postpro_json(path)
     # Check the output JSON file
     with path.open("r") as file:
         contents = json.load(file)
-    assert isinstance(contents, dict)
-    assert contents["version"] == algorithm
-    assert contents["responses"] == ["f", "g", "h"]
-    assert contents["objective"] == [0.0, 0.0, -1.0, 0.0, 0.0, -1.0]
-    assert contents["doe_size"] == doe_size
-    assert contents["nbr_eval_iter"] == nbr_eval_iter
-    assert contents["num_const"] == n_unsatisfied_constraints
-    assert contents["population"] == population_size
-    assert contents["name"] == problem_name
-    assert contents["total_time"] == total_time
+    assert contents == {
+        "version": algorithm,
+        "responses": ["f", "g", "h"],
+        "objective": [0.0, 0.0, -1.0, 0.0, 0.0, -1.0],
+        "doe_size": doe_size,
+        "nbr_eval_iter": nbr_eval_iter,
+        "num_const": n_unsatisfied_constraints,
+        "population": population_size,
+        "name": problem_name,
+        "total_time": total_time
+    }
 
 
 def test_to_postpro_no_algo(tmp_path):
@@ -238,8 +245,7 @@ def problem(objective, ineq_constr, eq_constr):  # type: (...) -> mock.Mock
     problem.eq_tolerance = 1e-2
     problem.design_space.get_current_x = mock.Mock(return_value=x_vect)
     problem.objective = objective
-    problem.get_ineq_constraints = mock.Mock(return_value=[ineq_constr])
-    problem.get_eq_constraints = mock.Mock(return_value=[eq_constr])
+    problem.constraints = [ineq_constr, eq_constr]
     problem.get_constraints_names = mock.Mock(
         return_value=[ineq_constr.name, eq_constr.name]
     )
