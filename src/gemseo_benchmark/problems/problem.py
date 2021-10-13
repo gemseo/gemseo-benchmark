@@ -124,8 +124,7 @@ class Problem(object):
                 If None, the current point of the problem design space is set as the
                 only starting point.
             doe_size: The number of starting points.
-                If None, the current point of the problem design space is set as the
-                only starting point.
+                If None, this number is set as the problem dimension or 10 if bigger.
             doe_options: The options of the DOE algorithm.
                 If None, no option other than the DOE size are passed to the algorithm.
 
@@ -133,24 +132,28 @@ class Problem(object):
             The starting points.
 
         Raises:
-            ValueError: If neither starting points nor DOE specifications are passed.
+            ValueError: If no DOE algorithm name is specified
+                and the problem has no current point.
         """
-        if doe_size is not None and doe_algo_name is not None:
-            return self.__generate_start_points(
-                doe_algo_name, doe_size, doe_options
-            )
+        if doe_algo_name is not None:
+            if doe_size is None:
+                doe_size = min([self.__dimension, 10])
 
-        if doe_size is not None or doe_algo_name is not None:
-            raise ValueError(
-                "Either the starting points,"
-                "or both their number and the name of the algorithm to generate "
-                "them,"
-                "or none of the above,"
-                "must be passed."
-            )
+            if doe_options is None:
+                doe_options = dict()
+
+            return self.__generate_start_points(doe_algo_name, doe_size, doe_options)
 
         # Set the current point of the design space as single starting point.
-        return [self.creator().design_space.get_current_x()]
+        problem = self.creator()
+        if not problem.design_space.has_current_x():
+            raise ValueError(
+                "The problem has neither DOE algorithm name"
+                "nor current point"
+                "to set the starting points."
+            )
+
+        return [problem.design_space.get_current_x()]
 
     def __generate_start_points(
             self,
