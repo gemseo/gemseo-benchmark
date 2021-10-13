@@ -35,25 +35,28 @@ def test_invalid_creator():
         Problem("A problem", lambda: None)
 
 
-def test_default_start_point():
+@pytest.fixture(scope="module")
+def creator(problem):
+    """An optimization problem creator."""
+    return lambda: problem
+
+
     """Check that the default starting point is properly set."""
     start_points = Problem("Rosenbrock2D", Rosenbrock).start_points
     assert len(start_points) == 1
     assert (start_points[0] == Rosenbrock().design_space.get_current_x()).all()
 
 
-@pytest.mark.parametrize("doe_kwargs", [{"doe_size": 10}, {"doe_algo_name": "LHS"}])
-def test_invalid_doe_params(doe_kwargs):
+def test_invalid_doe_params(creator, problem):
     """Check initialization with an invalid DOE configuration."""
+    problem.design_space.has_current_x = mock.Mock(return_value=False)
     with raises(
             ValueError,
-            match="Either the starting points,"
-                  "or both their number and the name of the algorithm to generate "
-                  "them,"
-                  "or none of the above,"
-                  "must be passed."
+            match="The problem has neither DOE algorithm name"
+                  "nor current point"
+                  "to set the starting points."
     ):
-        Problem("Rosenbrock2D", Rosenbrock, **doe_kwargs)
+        Problem("problem", creator)
 
 
 def test_wrong_start_points_type():

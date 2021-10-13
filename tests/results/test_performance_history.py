@@ -23,11 +23,12 @@
 import json
 
 import pytest
-from gemseo.utils.py23_compat import mock, Path
+from gemseo.utils.py23_compat import Path
+from numpy import inf
+from pytest import raises
+
 from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
-from numpy import array, inf
-from pytest import raises
 
 
 def test_invalid_init_lengths():
@@ -170,7 +171,7 @@ def test_to_postpro_json(tmp_path):
         algorithm=algorithm
     )
     path = tmp_path / "history_postpro.json"
-    history.to_postpro_json(path)
+    history.to_file(path, for_postpro=True)
     # Check the output JSON file
     with path.open("r") as file:
         contents = json.load(file)
@@ -190,7 +191,7 @@ def test_to_postpro_json(tmp_path):
 def test_to_postpro_no_algo(tmp_path):
     """Check the export to post-processing JSON when no algorithm is set."""
     with pytest.raises(ValueError, match="The algorithm name is not set."):
-        PerformanceHistory().to_postpro_json(tmp_path)
+        PerformanceHistory().to_file(tmp_path, for_postpro=True)
 
 
 def test_to_postpro_budget(tmp_path):
@@ -199,61 +200,10 @@ def test_to_postpro_budget(tmp_path):
     max_eval = 10
     history = PerformanceHistory(objective_values, algorithm="algo", max_eval=max_eval)
     path = tmp_path / "history_postpro.json"
-    history.to_postpro_json(path)
+    history.to_file(path, for_postpro=True)
     with path.open("r") as file:
         contents = json.load(file)
     assert contents["objective"][6:10] == [-3.0] * 4
-
-
-@pytest.fixture(scope="module")
-def objective():  # type: (...) -> mock.Mock
-    """An objective constraint."""
-    objective = mock.Mock()
-    objective.name = "f"
-    return objective
-
-
-@pytest.fixture(scope="module")
-def ineq_constr():  # type: (...) -> mock.Mock
-    """An inequality constraint."""
-    ineq_constr = mock.Mock()
-    ineq_constr.name = "g"
-    ineq_constr.f_type = "ineq"
-    return ineq_constr
-
-
-@pytest.fixture(scope="module")
-def eq_constr():  # type: (...) -> mock.Mock
-    """An equality constraint."""
-    eq_constr = mock.Mock()
-    eq_constr.name = "h"
-    eq_constr.f_type = "eq"
-    return eq_constr
-
-
-@pytest.fixture(scope="module")
-def problem(objective, ineq_constr, eq_constr):  # type: (...) -> mock.Mock
-    """A solved optimization problem."""
-    x_vect = array([0.0, 1.0])
-    values = {
-        objective.name: 2.0,
-        ineq_constr.name: array([1.0]),
-        eq_constr.name: array([0.0])
-    }
-    problem = mock.Mock()
-    problem.ineq_tolerance = 1e-4
-    problem.eq_tolerance = 1e-2
-    problem.design_space.get_current_x = mock.Mock(return_value=x_vect)
-    problem.objective = objective
-    problem.constraints = [ineq_constr, eq_constr]
-    problem.get_constraints_names = mock.Mock(
-        return_value=[ineq_constr.name, eq_constr.name]
-    )
-    problem.evaluate_functions = mock.Mock(return_value=(values, None))
-    problem.database.items = mock.Mock(return_value=[(x_vect, values)])
-    problem.database.get = mock.Mock(return_value=values)
-    problem.get_violation_criteria = mock.Mock(return_value=(False, 1.0))
-    return problem
 
 
 def test_from_problem(problem):
