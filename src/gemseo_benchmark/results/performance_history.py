@@ -39,7 +39,7 @@ from functools import reduce
 from typing import Iterable, List, Optional, Sequence, Union
 
 from gemseo.algos.opt_problem import OptimizationProblem
-from gemseo.utils.py23_compat import Path
+from gemseo.utils.py23_compat import Path, OrderedDict
 from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.utils import (get_n_unsatisfied_constraints,
                                     get_scalar_constraints_names)
@@ -364,17 +364,17 @@ class PerformanceHistory(Sequence[HistoryItem]):
             cumulated_minimum.history_items.extend(
                 [cumulated_minimum[-1]] * (self.max_eval - cumulated_minimum_length)
             )
-        data = {
-            "version": self.algorithm,
-            "responses": [self.__objective_name] + self.__constraints_names,
-            "objective": cumulated_minimum.objective_values,
-            "doe_size": self.doe_size,
-            "nbr_eval_iter": self.nbr_eval_iter,
-            "num_const": cumulated_minimum.n_unsatisfied_constraints,
-            "population": self.population_size,
-            "name": self.problem_name,
-            "total_time": self.total_time,
-        }
+        data = OrderedDict([
+            ("version", self.algorithm),
+            ("responses", [self.__objective_name] + self.__constraints_names),
+            ("objective", cumulated_minimum.objective_values),
+            ("doe_size", self.doe_size),
+            ("nbr_eval_iter", self.nbr_eval_iter),
+            ("num_const", cumulated_minimum.n_unsatisfied_constraints),
+            ("population", self.population_size),
+            ("name", self.problem_name),
+            ("total_time", self.total_time),
+        ])  # The keys order is deliberate.
         with Path(path).open("w") as file:
             json.dump(data, file, indent=4, separators=(',', ': '))
 
