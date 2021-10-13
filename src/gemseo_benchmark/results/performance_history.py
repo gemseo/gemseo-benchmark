@@ -320,29 +320,34 @@ class PerformanceHistory(Sequence[HistoryItem]):
     def to_file(
             self,
             path,  # type: Union[str, Path]
+            for_postpro=False  # type: bool
     ):  # type: (...) -> None
         """Save the performance history in a file.
 
         Args:
             path: The path where to write the file.
+            for_postpro: Whether the file is intended for post-processing.
         """
-        data = list()
-        # Add each history item in dictionary format
-        for item in self.history_items:
-            data_item = {
-                PerformanceHistory.__PERFORMANCE: item.objective_value,
-                PerformanceHistory.__INFEASIBILITY: item.infeasibility_measure,
-            }
-            if item.n_unsatisfied_constraints is not None:
-                data_item[PerformanceHistory.__N_UNSATISFIED_CONSTRAINTS] = \
-                    item.n_unsatisfied_constraints
+        if for_postpro:
+            self.__to_file_for_postpro(path)
+        else:
+            data = list()
+            # Add each history item in dictionary format
+            for item in self.history_items:
+                data_item = {
+                    PerformanceHistory.__PERFORMANCE: item.objective_value,
+                    PerformanceHistory.__INFEASIBILITY: item.infeasibility_measure,
+                }
+                if item.n_unsatisfied_constraints is not None:
+                    data_item[PerformanceHistory.__N_UNSATISFIED_CONSTRAINTS] = \
+                        item.n_unsatisfied_constraints
 
-            data.append(data_item)
+                data.append(data_item)
 
-        with Path(path).open("w") as file:
-            json.dump(data, file, indent=4, separators=(',', ': '))
+            with Path(path).open("w") as file:
+                json.dump(data, file, indent=4, separators=(',', ': '))
 
-    def to_postpro_json(
+    def __to_file_for_postpro(
             self,
             path,  # type: Union[str, Path]
     ):  # type: (...) -> None
