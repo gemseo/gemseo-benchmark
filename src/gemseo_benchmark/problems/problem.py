@@ -73,15 +73,21 @@ class Problem(object):
             name: The name of the benchmarking problem.
             creator: A callable object that returns an instance of the problem.
             start_points: The starting points of the benchmarking problem.
+                If None, the start points will generated as a DOE.
             target_values: The target values of the benchmarking problem.
                 If None, the target values will have to be generated later with the
                 `generate_targets` method.
             doe_algo_name: The name of the DOE algorithm.
+                If None, the current point of the problem design space is set as the
+                only starting point.
             doe_size: The number of starting points.
+                If None, this number is set as the problem dimension or 10 if bigger.
             doe_options: The options of the DOE algorithm.
+                If None, no option other than the DOE size is passed to the algorithm.
 
         Raises:
-            TypeError: If the return type of the creator is not :class:`.OptimizationProblem`,
+            TypeError: If the return type of the creator is not
+                :class:`.OptimizationProblem`,
                 or if a starting point is not of type ndarray.
             ValueError: If neither starting points nor DOE specifications are passed,
                or if a starting point is of inappropriate shape.
