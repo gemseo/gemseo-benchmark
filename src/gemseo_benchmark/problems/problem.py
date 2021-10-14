@@ -93,6 +93,7 @@ class Problem(object):
         problem = creator()
         if not isinstance(problem, OptimizationProblem):
             raise TypeError("Creator must return an OptimizationProblem.")
+        self.__problem = problem
 
         self.__dimension = problem.dimension
 
@@ -136,24 +137,23 @@ class Problem(object):
             ValueError: If no DOE algorithm name is specified
                 and the problem has no current point.
         """
-        problem = self.creator()
         if doe_algo_name is not None:
             if doe_size is None:
                 doe_size = min([self.__dimension, 10])
 
             return compute_doe(
-                problem.design_space, doe_size, doe_algo_name, **doe_options
+                self.__problem.design_space, doe_size, doe_algo_name, **doe_options
             )
 
         # Set the current point of the design space as single starting point.
-        if not problem.design_space.has_current_x():
+        if not self.__problem.design_space.has_current_x():
             raise ValueError(
                 "The problem has neither DOE algorithm name"
                 "nor current point"
                 "to set the starting points."
             )
 
-        return [problem.design_space.get_current_x()]
+        return [self.__problem.design_space.get_current_x()]
 
     def __check_start_points(self):  # type: (...) -> None
         """Check the starting points of the benchmarking problem.
@@ -200,7 +200,7 @@ class Problem(object):
             True if the algorithm is suited to the problem, False otherwise.
         """
         library = OptimizersFactory().create(name)
-        return library.is_algorithm_suited(library.lib_dict[name], self.creator())
+        return library.is_algorithm_suited(library.lib_dict[name], self.__problem)
 
     def compute_targets(
             self,
