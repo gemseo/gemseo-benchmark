@@ -51,11 +51,11 @@ class Problem(object):
     Attributes:
         name (str): The name of the benchmarking problem.
         creator (Callable[[], OptimizationProblem]): A callable that returns an instance
-            of the problem.
+            of the optimization problem.
         start_points (Iterable[ndarray]): The starting points of the benchmarking
             problem.
         objective_name (str): The name of the objective function.
-        constraints_names (List[str]): The names of the (scalar) constraints.
+        constraints_names (List[str]): The names of the scalar constraints.
     """
 
     def __init__(
@@ -81,7 +81,7 @@ class Problem(object):
             doe_options: The options of the DOE algorithm.
 
         Raises:
-            TypeError: If the return type of the creator is not OptimizationProblem,
+            TypeError: If the return type of the creator is not :class:`.OptimizationProblem`,
                 or if a starting point is not of type ndarray.
             ValueError: If neither starting points nor DOE specifications are passed,
                or if a starting point is of inappropriate shape.
@@ -126,7 +126,7 @@ class Problem(object):
             doe_size: The number of starting points.
                 If None, this number is set as the problem dimension or 10 if bigger.
             doe_options: The options of the DOE algorithm.
-                If None, no option other than the DOE size are passed to the algorithm.
+                If None, no option other than the DOE size is passed to the algorithm.
 
         Returns:
             The starting points.

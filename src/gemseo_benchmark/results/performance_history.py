@@ -104,7 +104,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
                 If None, will not be set.
             objective_name: The name of the objective function.
                 If None, will not be set.
-            constraints_names: The names the (scalar) constraints.
+            constraints_names: The names the scalar constraints.
                 Each name must correspond to a scalar value.
                 If None, will not be set.
             doe_size: The size of the initial design of experiments.

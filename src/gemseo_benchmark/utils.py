@@ -28,14 +28,14 @@ def get_n_unsatisfied_constraints(
         problem,  # type: OptimizationProblem
         x_vect,  # type: ndarray
 ):  # type: (...) -> int
-    """Return the number of scalar unsatisfied constraints.
+    """Return the number of unsatisfied scalar constraints.
 
     Args:
         problem: The optimization problem.
         x_vect: The design parameters.
 
     Returns:
-        The number of scalar unsatisfied constraints.
+        The number of unsatisfied scalar constraints.
     """
     n_unsatisfied = 0
     values = problem.database.get(x_vect)
