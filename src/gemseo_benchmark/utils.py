@@ -19,26 +19,26 @@ def get_dimensions(
     Returns:
         The dimensions of the outputs of the problem functions.
     """
-    x_vect = problem.design_space.get_current_x()
-    outputs, _ = problem.evaluate_functions(x_vect, normalize=False)
+    design_variables = problem.design_space.get_current_x()
+    outputs, _ = problem.evaluate_functions(design_variables, normalize=False)
     return {name: atleast_1d(value).size for name, value in outputs.items()}
 
 
 def get_n_unsatisfied_constraints(
         problem,  # type: OptimizationProblem
-        x_vect,  # type: ndarray
+        design_variables,  # type: ndarray
 ):  # type: (...) -> int
     """Return the number of unsatisfied scalar constraints.
 
     Args:
         problem: The optimization problem.
-        x_vect: The design parameters.
+        design_variables: The design variables.
 
     Returns:
         The number of unsatisfied scalar constraints.
     """
     n_unsatisfied = 0
-    values = problem.database.get(x_vect)
+    values = problem.database.get(design_variables)
     for constraint in problem.constraints:
         value = atleast_1d(values[constraint.name])
         if constraint.f_type == MDOFunction.TYPE_EQ:
