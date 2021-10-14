@@ -172,7 +172,10 @@ class PerformanceHistory(Sequence[HistoryItem]):
     ):  # type: (...) -> None
         for item in history_items:
             if not isinstance(item, HistoryItem):
-                raise TypeError("History items must be of type HistoryItem.")
+                raise TypeError(
+                    "History items must be of type HistoryItem."
+                    " The following type was passed: {}.".format(type(item))
+                )
         self.__items = list(history_items)
     
     @staticmethod
