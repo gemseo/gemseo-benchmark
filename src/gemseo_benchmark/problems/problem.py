@@ -30,9 +30,9 @@ and its targets (refer to :mod:`target_values`).
 """
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
 
-from gemseo.algos.doe.doe_factory import DOEFactory
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
+from gemseo.api import compute_doe
 from numpy import ndarray
 
 from gemseo_benchmark.data_profiles.target_values import TargetValues
@@ -102,8 +102,10 @@ class Problem(object):
 
         # Set the starting points
         if start_points is None:
+            if doe_options is None:
+                doe_options = dict()
             self.start_points = self.__get_start_points(
-                doe_algo_name, doe_size, doe_options
+                doe_algo_name, doe_size, **doe_options
             )
         else:
             self.start_points = start_points
@@ -115,7 +117,7 @@ class Problem(object):
             self,
             doe_algo_name=None,  # type: Optional[str]
             doe_size=None,  # type: Optional[int]
-            doe_options=None,  # type: Optional[Mapping[str, Any]]
+            **doe_options,  # type: Any
     ):  # type: (...) -> Iterable[ndarray]
         """Return the starting points of the benchmarking problem.
 
@@ -125,8 +127,7 @@ class Problem(object):
                 only starting point.
             doe_size: The number of starting points.
                 If None, this number is set as the problem dimension or 10 if bigger.
-            doe_options: The options of the DOE algorithm.
-                If None, no option other than the DOE size is passed to the algorithm.
+            **doe_options: The options of the DOE algorithm.
 
         Returns:
             The starting points.
@@ -135,17 +136,16 @@ class Problem(object):
             ValueError: If no DOE algorithm name is specified
                 and the problem has no current point.
         """
+        problem = self.creator()
         if doe_algo_name is not None:
             if doe_size is None:
                 doe_size = min([self.__dimension, 10])
 
-            if doe_options is None:
-                doe_options = dict()
-
-            return self.__generate_start_points(doe_algo_name, doe_size, doe_options)
+            return compute_doe(
+                problem.design_space, doe_size, doe_algo_name, **doe_options
+            )
 
         # Set the current point of the design space as single starting point.
-        problem = self.creator()
         if not problem.design_space.has_current_x():
             raise ValueError(
                 "The problem has neither DOE algorithm name"
@@ -154,29 +154,6 @@ class Problem(object):
             )
 
         return [problem.design_space.get_current_x()]
-
-    def __generate_start_points(
-            self,
-            doe_algo_name,  # type: str
-            doe_size,  # type: int
-            doe_options,  # type: Mapping[str, Any]
-    ):  # type: (...) -> Iterable[ndarray]
-        """Generate the starting points of the benchmarking problem.
-
-        Args:
-            doe_algo_name: The name of the DOE algorithm.
-            doe_size: The number of starting points.
-            doe_options: The options of the DOE algorithm.
-
-        Returns:
-            The starting points of the benchmarking problem.
-        """
-        doe_library = DOEFactory().create(doe_algo_name)
-        if doe_options is None:
-            doe_options = dict()
-        doe_options["n_samples"] = doe_size
-        doe_library.execute(self.creator(), **doe_options)
-        return doe_library.samples
 
     def __check_start_points(self):  # type: (...) -> None
         """Check the starting points of the benchmarking problem.
