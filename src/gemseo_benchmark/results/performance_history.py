@@ -39,11 +39,12 @@ from functools import reduce
 from typing import Iterable, List, Optional, Sequence, Union
 
 from gemseo.algos.opt_problem import OptimizationProblem
-from gemseo.utils.py23_compat import Path, OrderedDict
+from gemseo.utils.py23_compat import Path
+from numpy import inf
+
 from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.utils import (get_n_unsatisfied_constraints,
                                     get_scalar_constraints_names)
-from numpy import inf
 
 
 class PerformanceHistory(Sequence[HistoryItem]):
@@ -124,11 +125,11 @@ class PerformanceHistory(Sequence[HistoryItem]):
             ValueError: If the lengths of the histories do not match.
         """
         if constraints_names is None:
-            self.__constraints_names = []
+            self._constraints_names = []
         else:
-            self.__constraints_names = constraints_names
+            self._constraints_names = constraints_names
 
-        self.__objective_name = objective_name
+        self._objective_name = objective_name
         self.algorithm = algorithm
         self.doe_size = doe_size
         self.history_items = self.__get_history_items(
@@ -177,7 +178,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
                     " The following type was passed: {}.".format(type(item))
                 )
         self.__items = list(history_items)
-    
+
     @staticmethod
     def __get_history_items(
             objective_values=None,  # type: Optional[Sequence[float]]
@@ -323,66 +324,25 @@ class PerformanceHistory(Sequence[HistoryItem]):
     def to_file(
             self,
             path,  # type: Union[str, Path]
-            for_postpro=False  # type: bool
     ):  # type: (...) -> None
         """Save the performance history in a file.
 
         Args:
             path: The path where to write the file.
-            for_postpro: Whether the file is intended for post-processing.
         """
-        if for_postpro:
-            self.__to_file_for_postpro(path)
-        else:
-            data = list()
-            # Add each history item in dictionary format
-            for item in self.history_items:
-                data_item = {
-                    PerformanceHistory.__PERFORMANCE: item.objective_value,
-                    PerformanceHistory.__INFEASIBILITY: item.infeasibility_measure,
-                }
-                if item.n_unsatisfied_constraints is not None:
-                    data_item[PerformanceHistory.__N_UNSATISFIED_CONSTRAINTS] = \
-                        item.n_unsatisfied_constraints
+        data = list()
+        # Add each history item in dictionary format
+        for item in self.history_items:
+            data_item = {
+                PerformanceHistory.__PERFORMANCE: item.objective_value,
+                PerformanceHistory.__INFEASIBILITY: item.infeasibility_measure,
+            }
+            if item.n_unsatisfied_constraints is not None:
+                data_item[PerformanceHistory.__N_UNSATISFIED_CONSTRAINTS] = \
+                    item.n_unsatisfied_constraints
 
-                data.append(data_item)
+            data.append(data_item)
 
-            with Path(path).open("w") as file:
-                json.dump(data, file, indent=4, separators=(',', ': '))
-
-    def __to_file_for_postpro(
-            self,
-            path,  # type: Union[str, Path]
-    ):  # type: (...) -> None
-        """Save the performance history into a post-processing JSON file.
-
-        Args:
-            path: The path where to write the file.
-
-        Raises:
-            ValueError: If the algorithm name is not set.
-        """
-        if self.algorithm is None:
-            raise ValueError("The algorithm name is not set.")
-
-        cumulated_minimum = self.compute_cumulated_minimum()
-        cumulated_minimum_length = len(cumulated_minimum)
-        if self.max_eval is not None and cumulated_minimum_length < self.max_eval:
-            # Extend the history up to the evaluations budget
-            cumulated_minimum.history_items.extend(
-                [cumulated_minimum[-1]] * (self.max_eval - cumulated_minimum_length)
-            )
-        data = OrderedDict([
-            ("version", self.algorithm),
-            ("responses", [self.__objective_name] + self.__constraints_names),
-            ("objective", cumulated_minimum.objective_values),
-            ("doe_size", self.doe_size),
-            ("nbr_eval_iter", self.nbr_eval_iter),
-            ("num_const", cumulated_minimum.n_unsatisfied_constraints),
-            ("population", self.population_size),
-            ("name", self.problem_name),
-            ("total_time", self.total_time),
-        ])  # The keys order is deliberate.
         with Path(path).open("w") as file:
             json.dump(data, file, indent=4, separators=(',', ': '))
 

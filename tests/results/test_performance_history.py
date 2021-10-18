@@ -20,7 +20,6 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the performance history."""
-import json
 
 import pytest
 from gemseo.utils.py23_compat import Path
@@ -142,68 +141,6 @@ def test_repr():
     """Check the representation of a performance history."""
     history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
     assert repr(history) == "[(-2.0, 1.0), (-3.0, 0.0)]"
-
-
-def test_to_postpro_json(tmp_path):
-    """Check the saving to a JSON a file."""
-    objective_values = [0.0, -3.0, -1.0, 0.0, 1.0, -1.0]
-    infeasibility_measures = [2.0, 3.0, 1.0, 0.0, 0.0, 0.0]
-    problem_name = "problem"
-    objective_name = "f"
-    constraints_names = ["g", "h"]
-    doe_size = 10
-    nbr_eval_iter = 1
-    n_unsatisfied_constraints = [1, 1, 1, 0, 0, 0]
-    population_size = 1
-    total_time = 1.0
-    algorithm = "algo"
-    history = PerformanceHistory(
-        objective_values,
-        infeasibility_measures,
-        n_unsatisfied_constraints=n_unsatisfied_constraints,
-        problem_name=problem_name,
-        objective_name=objective_name,
-        constraints_names=constraints_names,
-        doe_size=doe_size,
-        nbr_eval_iter=nbr_eval_iter,
-        population_size=population_size,
-        total_time=total_time,
-        algorithm=algorithm
-    )
-    path = tmp_path / "history_postpro.json"
-    history.to_file(path, for_postpro=True)
-    # Check the output JSON file
-    with path.open("r") as file:
-        contents = json.load(file)
-    assert contents == {
-        "version": algorithm,
-        "responses": ["f", "g", "h"],
-        "objective": [0.0, 0.0, -1.0, 0.0, 0.0, -1.0],
-        "doe_size": doe_size,
-        "nbr_eval_iter": nbr_eval_iter,
-        "num_const": n_unsatisfied_constraints,
-        "population": population_size,
-        "name": problem_name,
-        "total_time": total_time
-    }
-
-
-def test_to_postpro_no_algo(tmp_path):
-    """Check the export to post-processing JSON when no algorithm is set."""
-    with pytest.raises(ValueError, match="The algorithm name is not set."):
-        PerformanceHistory().to_file(tmp_path, for_postpro=True)
-
-
-def test_to_postpro_budget(tmp_path):
-    """Check the export to post-processing JSON when an evaluations budget is set."""
-    objective_values = [0.0, -3.0, -1.0, 0.0, 1.0, -1.0]
-    max_eval = 10
-    history = PerformanceHistory(objective_values, algorithm="algo", max_eval=max_eval)
-    path = tmp_path / "history_postpro.json"
-    history.to_file(path, for_postpro=True)
-    with path.open("r") as file:
-        contents = json.load(file)
-    assert contents["objective"][6:10] == [-3.0] * 4
 
 
 def test_from_problem(problem):
