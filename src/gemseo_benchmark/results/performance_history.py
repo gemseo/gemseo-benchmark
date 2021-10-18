@@ -390,13 +390,14 @@ class PerformanceHistory(Sequence[HistoryItem]):
         feas_statuses = list()
         n_unsatisfied_constraints = list()
         for design_values, output_values in problem.database.items():
-            obj_values.append(output_values[obj_name])
-            feasibility, measure = problem.get_violation_criteria(design_values)
-            infeas_measures.append(measure)
-            feas_statuses.append(feasibility)
-            n_unsatisfied_constraints.append(int(get_n_unsatisfied_constraints(
-                problem, design_values
-            )))
+            if obj_name in output_values:
+                obj_values.append(output_values[obj_name])
+                feasibility, measure = problem.get_violation_criteria(design_values)
+                infeas_measures.append(measure)
+                feas_statuses.append(feasibility)
+                n_unsatisfied_constraints.append(int(get_n_unsatisfied_constraints(
+                    problem, design_values
+                )))
 
         return PerformanceHistory(
             obj_values, infeas_measures, feas_statuses, n_unsatisfied_constraints,
