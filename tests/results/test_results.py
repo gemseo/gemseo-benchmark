@@ -25,6 +25,7 @@ from typing import Dict, List
 
 import pytest
 from gemseo.utils.py23_compat import Path
+
 from gemseo_benchmark.results.results import Results
 
 
@@ -53,7 +54,9 @@ def test_to_file(tmp_path):
 @pytest.fixture(scope="module")
 def results_contents():  # type: (...) -> Dict[str, Dict[str, List[str]]]
     """The paths for the performance histories."""
-    return {"algo": {"problem": [str(Path(__file__).parent / "history.json")]}}
+    return {
+        "algo": {"problem": [str(Path(__file__).parent.resolve() / "history.json")]}
+    }
 
 
 @pytest.fixture

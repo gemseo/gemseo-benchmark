@@ -30,12 +30,14 @@ and its targets (refer to :mod:`target_values`).
 """
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
 
-from gemseo.algos.doe.doe_factory import DOEFactory
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
+from gemseo.api import compute_doe
+from numpy import ndarray
+
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
-from numpy import ndarray
+from gemseo_benchmark.utils import get_scalar_constraints_names
 
 
 class Problem(object):
@@ -48,6 +50,8 @@ class Problem(object):
 
     Attributes:
         name (str): The name of the benchmarking problem.
+        creator (Callable[[], OptimizationProblem]): A callable that returns an instance
+            of the optimization problem.
         start_points (Iterable[ndarray]): The starting points of the benchmarking
             problem.
     """
@@ -67,70 +71,109 @@ class Problem(object):
             name: The name of the benchmarking problem.
             creator: A callable object that returns an instance of the problem.
             start_points: The starting points of the benchmarking problem.
+                If None, the start points will generated as a DOE.
             target_values: The target values of the benchmarking problem.
                 If None, the target values will have to be generated later with the
                 `generate_targets` method.
             doe_algo_name: The name of the DOE algorithm.
+                If None, the current point of the problem design space is set as the
+                only starting point.
             doe_size: The number of starting points.
+                If None, this number is set as the problem dimension or 10 if bigger.
             doe_options: The options of the DOE algorithm.
+                If None, no option other than the DOE size is passed to the algorithm.
 
         Raises:
-            TypeError: If the return type of the creator is not OptimizationProblem,
+            TypeError: If the return type of the creator is not
+                :class:`.OptimizationProblem`,
                 or if a starting point is not of type ndarray.
             ValueError: If neither starting points nor DOE specifications are passed,
                or if a starting point is of inappropriate shape.
         """
         self.name = name
-        self.__creator = creator
+        self.creator = creator
 
         # Set the dimension
         problem = creator()
         if not isinstance(problem, OptimizationProblem):
-            raise TypeError("Creator must return an OptimizationProblem")
-        self.__dimension = problem.dimension
+            raise TypeError("Creator must return an OptimizationProblem.")
+        self.__problem = problem
 
         # Set the starting points
         if start_points is None:
-            if doe_size is None or doe_algo_name is None:
-                raise ValueError("The starting points, "
-                                 "or their number and the name of the algorithm to "
-                                 "generate them, "
-                                 "must be passed")
-            start_points = self.__generate_start_points(
-                doe_algo_name, doe_size, doe_options
+            if doe_options is None:
+                doe_options = dict()
+            self.start_points = self.__get_start_points(
+                doe_algo_name, doe_size, **doe_options
             )
-        for point in start_points:
-            if not isinstance(point, ndarray):
-                raise TypeError("Starting points must be of type ndarray")
-            if point.shape != (self.__dimension,):
-                raise ValueError("Starting points must be 1-dimensional with size {}"
-                                 .format(self.__dimension))
-        self.start_points = start_points
+        else:
+            self.start_points = start_points
 
+        self.__check_start_points()
         self.__target_values = target_values
 
-    def __generate_start_points(
+    def __get_start_points(
             self,
-            doe_algo_name,  # type: str
-            doe_size,  # type: int
-            doe_options=None,  # type: Optional[Mapping[str, Any]]
+            doe_algo_name=None,  # type: Optional[str]
+            doe_size=None,  # type: Optional[int]
+            **doe_options,  # type: Any
     ):  # type: (...) -> Iterable[ndarray]
-        """Generate the starting points of the benchmarking problem.
+        """Return the starting points of the benchmarking problem.
 
         Args:
             doe_algo_name: The name of the DOE algorithm.
+                If None, the current point of the problem design space is set as the
+                only starting point.
             doe_size: The number of starting points.
-            doe_options: The options of the DOE algorithm.
+                If None, this number is set as the problem dimension or 10 if bigger.
+            **doe_options: The options of the DOE algorithm.
 
         Returns:
-            The starting points of the benchmarking problem.
+            The starting points.
+
+        Raises:
+            ValueError: If no DOE algorithm name is specified
+                and the problem has no current point.
         """
-        doe_library = DOEFactory().create(doe_algo_name)
-        if doe_options is None:
-            doe_options = dict()
-        doe_options["n_samples"] = doe_size
-        doe_library.execute(self.__creator(), **doe_options)
-        return doe_library.samples
+        if doe_algo_name is not None:
+            if doe_size is None:
+                doe_size = min([self.__problem.dimension, 10])
+
+            return compute_doe(
+                self.__problem.design_space, doe_size, doe_algo_name, **doe_options
+            )
+
+        # Set the current point of the design space as single starting point.
+        if not self.__problem.design_space.has_current_x():
+            raise ValueError(
+                "The problem has neither DOE algorithm name"
+                "nor current point"
+                "to set the starting points."
+            )
+
+        return [self.__problem.design_space.get_current_x()]
+
+    def __check_start_points(self):  # type: (...) -> None
+        """Check the starting points of the benchmarking problem.
+
+        Raises:
+            TypeError: If a starting point is not of type ndarray.
+            ValueError: If a starting point is of inappropriate shape.
+        """
+        for point in self.start_points:
+            if not isinstance(point, ndarray):
+                raise TypeError(
+                    "The starting points must be of type ndarray."
+                    " The following type was passed: {}.".format(type(point))
+                )
+
+            if point.shape != (self.__problem.dimension,):
+                raise ValueError(
+                    "Starting points must be 1-dimensional with size {}."
+                    " The following shape was passed: {}.".format(
+                        self.__problem.dimension, point.shape
+                    )
+                )
 
     @property
     def target_values(self):  # type: (...) -> TargetValues
@@ -142,9 +185,19 @@ class Problem(object):
     def __iter__(self):  # type: (...) -> OptimizationProblem
         """Iterate on the problem instances with respect to the starting points. """
         for start_point in self.start_points:
-            problem = self.__creator()
+            problem = self.creator()
             problem.design_space.set_current_x(start_point)
             yield problem
+
+    @property
+    def objective_name(self):  # type: (...) -> str
+        """The name of the objective function."""
+        return self.__problem.objective.name
+
+    @property
+    def constraints_names(self):  # type: (...) -> List[str]
+        """The names of the scalar constraints."""
+        return get_scalar_constraints_names(self.__problem)
 
     def is_algorithm_suited(
             self,
@@ -159,7 +212,7 @@ class Problem(object):
             True if the algorithm is suited to the problem, False otherwise.
         """
         library = OptimizersFactory().create(name)
-        return library.is_algorithm_suited(library.lib_dict[name], self.__creator())
+        return library.is_algorithm_suited(library.lib_dict[name], self.__problem)
 
     def compute_targets(
             self,

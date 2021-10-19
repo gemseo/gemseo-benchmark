@@ -20,27 +20,36 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """A performance history item."""
+from typing import Optional
 
 
 class HistoryItem(object):
     """A performance history item.
 
     Attributes:
-        objective_value: The objective function value of the item.
+        objective_value (float): The objective function value of the item.
+        infeasibility_measure (float): The infeasibility measure of the item.
+        n_unsatisfied_constraints (Optional[int]): The number of unsatisfied constraints
+            of the item.
     """
 
     def __init__(
             self,
             objective_value,  # type: float
             infeasibility_measure,  # type: float
+            n_unsatisfied_constraints=None,  # type: Optional[int]
     ):  # type: (...) -> None
         """
         Args:
             objective_value: The objective function value of the item.
             infeasibility_measure: The infeasibility measure of the item.
+            n_unsatisfied_constraints: The number of unsatisfied constraints of the
+                item.
+                If None, it will not be taken into account.
         """
         self.objective_value = objective_value
         self.infeasibility_measure = infeasibility_measure
+        self.n_unsatisfied_constraints = n_unsatisfied_constraints
 
     @property
     def infeasibility_measure(self):  # type: (...) -> float
@@ -75,8 +84,10 @@ class HistoryItem(object):
         Returns:
             Whether the history item is equal to the other one.
         """
-        return (self.__infeas_measure == other.__infeas_measure
-                and self.objective_value == other.objective_value)
+        return (
+                self.__infeas_measure == other.__infeas_measure
+                and self.objective_value == other.objective_value
+        )
 
     def __lt__(
             self,

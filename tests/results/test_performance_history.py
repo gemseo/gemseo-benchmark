@@ -20,19 +20,36 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the performance history."""
+
+import pytest
 from gemseo.utils.py23_compat import Path
-from gemseo_benchmark.results.history_item import HistoryItem
-from gemseo_benchmark.results.performance_history import PerformanceHistory
 from numpy import inf
 from pytest import raises
+
+from gemseo_benchmark.results.history_item import HistoryItem
+from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 
 def test_invalid_init_lengths():
     """Check the initialization of a history with lists of inconsistent lengths."""
-    with raises(ValueError):
+    with raises(
+            ValueError,
+            match="The objective history and the infeasibility history must have same"
+                  " length."
+    ):
         PerformanceHistory([3.0, 2.0], [1.0])
-    with raises(ValueError):
+    with raises(
+            ValueError,
+            match="The objective history and the feasibility history must have same"
+                  " length."
+    ):
         PerformanceHistory([3.0, 2.0], feasibility_statuses=[False])
+    with pytest.raises(
+            ValueError,
+            match="The unsatisfied constraints history and the feasibility history"
+                  " must have same length."
+    ):
+        PerformanceHistory([3.0, 2.0], [1.0, 0.0], n_unsatisfied_constraints=[1])
 
 
 def test_negative_infeasibility_measures():
@@ -92,7 +109,9 @@ def test_remove_leading_infeasible():
 
 def test_to_file(tmp_path):
     """Check the writing of a performance history into a file."""
-    history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
+    history = PerformanceHistory(
+        [-2.0, -3.0], [1.0, 0.0], n_unsatisfied_constraints=[1, 0]
+    )
     file_path = tmp_path / "history.json"
     history.to_file(str(file_path))
     with file_path.open("r") as file:
@@ -114,7 +133,7 @@ def test_from_file():
 def test_history_items_setter():
     """Check the setting of history items."""
     history = PerformanceHistory()
-    with raises(TypeError, match="History items must be of type HistoryItem"):
+    with raises(TypeError, match="History items must be of type HistoryItem."):
         history.history_items = [1.0, 2.0]
 
 
@@ -122,3 +141,11 @@ def test_repr():
     """Check the representation of a performance history."""
     history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
     assert repr(history) == "[(-2.0, 1.0), (-3.0, 0.0)]"
+
+
+def test_from_problem(problem):
+    """Check the creation of a performance history out of a solved problem."""
+    history = PerformanceHistory.from_problem(problem, "problem")
+    assert history.objective_values == [2.0]
+    assert history.infeasibility_measures == [1.0]
+    assert history.n_unsatisfied_constraints == [1]
