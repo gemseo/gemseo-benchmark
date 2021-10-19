@@ -57,7 +57,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
         max_eval (int): The maximum number of functions evaluations.
         nbr_eval_iter (int): The number of functions evaluations per iteration.
         problem_name (str): The name of the problem.
-        total_time (float): The runtime of the algorithm.
+        total_time (float): The run time of the algorithm.
     """
     __PERFORMANCE = "performance"
     __INFEASIBILITY = "infeasibility"
@@ -102,24 +102,24 @@ class PerformanceHistory(Sequence[HistoryItem]):
                 If None, the entries will be set to 0 for feasible entries
                 and None for infeasible entries.
             problem_name: The name of the problem.
-                If None, will not be set.
+                If None, it will not be set.
             objective_name: The name of the objective function.
-                If None, will not be set.
+                If None, it will not be set.
             constraints_names: The names the scalar constraints.
                 Each name must correspond to a scalar value.
-                If None, will not be set.
+                If None, it will not be set.
             doe_size: The size of the initial design of experiments.
-                If None, will not be set.
+                If None, it will not be set.
             nbr_eval_iter: The number of functions evaluations per iteration.
-                If None, will not be set.
+                If None, it will not be set.
             population_size: The size of the optimizer population.
-                If None, will not be set.
+                If None, it will not be set.
             total_time: The total time of the optimization, in seconds.
-                If None, will not be set.
+                If None, it will not be set.
             algorithm: The name of the algorithm which generated the history.
-                If None, will not be set.
+                If None, it will not be set.
             max_eval: The maximum number of functions evaluations.
-                If None, will not be set.
+                If None, it will not be set.
 
         Raises:
             ValueError: If the lengths of the histories do not match.

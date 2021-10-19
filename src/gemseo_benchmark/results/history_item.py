@@ -45,7 +45,7 @@ class HistoryItem(object):
             infeasibility_measure: The infeasibility measure of the item.
             n_unsatisfied_constraints: The number of unsatisfied constraints of the
                 item.
-                If None, will not be taken into account.
+                If None, it will not be taken into account.
         """
         self.objective_value = objective_value
         self.infeasibility_measure = infeasibility_measure
