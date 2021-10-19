@@ -71,7 +71,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
             n_unsatisfied_constraints=None,  # type: Optional[Sequence[int]]
             problem_name=None,  # type: Optional[str]
             objective_name=None,  # type: Optional[str]
-            constraints_names=None,  # type: Optional[List[str]]
+            constraints_names=None,  # type: Optional[Sequence[str]]
             doe_size=None,  # type: Optional[int]
             nbr_eval_iter=None,  # type: Optional[int]
             population_size=None,  # type: Optional[int]
