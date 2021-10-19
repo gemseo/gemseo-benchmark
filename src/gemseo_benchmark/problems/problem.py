@@ -54,8 +54,6 @@ class Problem(object):
             of the optimization problem.
         start_points (Iterable[ndarray]): The starting points of the benchmarking
             problem.
-        objective_name (str): The name of the objective function.
-        constraints_names (List[str]): The names of the scalar constraints.
     """
 
     def __init__(
@@ -101,12 +99,6 @@ class Problem(object):
             raise TypeError("Creator must return an OptimizationProblem.")
         self.__problem = problem
 
-        self.__dimension = problem.dimension
-
-        # Set the functions names
-        self.objective_name = problem.objective.name
-        self.constraints_names = get_scalar_constraints_names(problem)
-
         # Set the starting points
         if start_points is None:
             if doe_options is None:
@@ -145,7 +137,7 @@ class Problem(object):
         """
         if doe_algo_name is not None:
             if doe_size is None:
-                doe_size = min([self.__dimension, 10])
+                doe_size = min([self.__problem.dimension, 10])
 
             return compute_doe(
                 self.__problem.design_space, doe_size, doe_algo_name, **doe_options
@@ -175,11 +167,11 @@ class Problem(object):
                     " The following type was passed: {}.".format(type(point))
                 )
 
-            if point.shape != (self.__dimension,):
+            if point.shape != (self.__problem.dimension,):
                 raise ValueError(
                     "Starting points must be 1-dimensional with size {}."
                     " The following shape was passed: {}.".format(
-                        self.__dimension, point.shape
+                        self.__problem.dimension, point.shape
                     )
                 )
 
@@ -196,6 +188,16 @@ class Problem(object):
             problem = self.creator()
             problem.design_space.set_current_x(start_point)
             yield problem
+
+    @property
+    def objective_name(self):  # type: (...) -> str
+        """The name of the objective function."""
+        return self.__problem.objective.name
+
+    @property
+    def constraints_names(self):  # type: (...) -> List[str]
+        """The names of the scalar constraints."""
+        return get_scalar_constraints_names(self.__problem)
 
     def is_algorithm_suited(
             self,
