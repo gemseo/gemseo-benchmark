@@ -21,11 +21,11 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for benchmarking reference problems."""
 import pytest
-from gemseo.utils.py23_compat import mock
 from numpy import ones, zeros
 from numpy.testing import assert_allclose
 from pytest import raises
 
+from gemseo.utils.py23_compat import mock
 from gemseo_benchmark.problems.problem import Problem
 
 

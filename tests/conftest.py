@@ -18,6 +18,7 @@ def design_space():  # type: (...) -> mock.Mock
     design_space.variables_sizes = {"x": 2}
     design_space.get_current_x = mock.Mock(return_value=design_variables)
     design_space.set_current_x = mock.Mock()
+    design_space.unnormalize_vect = lambda _: _
     return design_space
 
 

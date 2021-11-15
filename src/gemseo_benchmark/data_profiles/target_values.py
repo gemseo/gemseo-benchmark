@@ -34,14 +34,16 @@ and computes its data profile (see :mod:`data_profile`).
 from typing import List, Optional, Union
 
 import matplotlib.pyplot as plt
+from gemseo.utils.matplotlib_figure import save_show_figure
 from gemseo.utils.py23_compat import Path
-from gemseo_benchmark.results.performance_history import PerformanceHistory
-from gemseo_benchmark.data_profiles.plot_tools import save_show_close
+from matplotlib.figure import Figure
 from numpy import inf, linspace
+
+from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 
 class TargetValues(PerformanceHistory):
-    """Target values of a problem"""
+    """Target values of a problem."""
 
     def compute_target_hits_history(
             self,
@@ -66,19 +68,23 @@ class TargetValues(PerformanceHistory):
             show=True,  # type: bool
             path=None,  # type: Optional[Union[str, Path]]
     ):  # type: (...) -> None
-        """Compute and plot the target values.
+        """Plot the target values.
 
         Args:
-            show: If True, show the plot.
+            show: Whether to show the plot.
             path: The path where to save the plot.
                 If None, the plot is not saved.
         """
-        self._plot_targets()
-        save_show_close(show, path)
+        save_show_figure(self._plot_targets(), show, path)
 
-    def _plot_targets(self):  # type: (...) -> None
-        """Compute and plot the target values."""
+    def _plot_targets(self):  # type: (...) -> Figure
+        """Plot the target values.
+
+        Returns:
+            The targets values figure.
+        """
         objective_values = [
+            # set infinite values for infeasible target values
             inf if item.infeasibility_measure > 0.0 else item.objective_value
             for item in self
         ]
@@ -93,3 +99,4 @@ class TargetValues(PerformanceHistory):
         axes.semilogy(
             range(1, targets_number + 1), objective_values, marker="o", linestyle=""
         )
+        return fig
