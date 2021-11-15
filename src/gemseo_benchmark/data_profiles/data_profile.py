@@ -42,11 +42,12 @@ from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Union
 
 import matplotlib.pyplot as plt
 from gemseo.utils.py23_compat import Path
-from gemseo_benchmark.results.performance_history import PerformanceHistory
-from gemseo_benchmark.data_profiles.plot_tools import save_show_close
-from gemseo_benchmark.data_profiles.target_values import TargetValues
 from matplotlib import rcParams
+from matplotlib.figure import Figure
 from numpy import append, array, linspace, ndarray, zeros
+from gemseo.utils.matplotlib_figure import save_show_figure
+from gemseo_benchmark.data_profiles.target_values import TargetValues
+from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 
 class DataProfile(object):
@@ -155,8 +156,8 @@ class DataProfile(object):
         if algo_names is None:
             algo_names = tuple()
         data_profiles = self.compute_data_profiles(*algo_names)
-        DataProfile._plot_data_profiles(data_profiles)
-        save_show_close(show, path)
+        figure = DataProfile._plot_data_profiles(data_profiles)
+        save_show_figure(figure, show, path)
 
     def compute_data_profiles(
             self,
@@ -250,11 +251,14 @@ class DataProfile(object):
     @staticmethod
     def _plot_data_profiles(
             data_profiles,  # type: Mapping[str, Sequence[Number]]
-    ):  # type: (...) -> None
+    ):  # type: (...) -> Figure
         """Plot the data profiles.
 
         Args:
             data_profiles: The data profiles.
+
+        Returns:
+            The data profiles figure.
         """
         fig = plt.figure()
         axes = fig.add_subplot(1, 1, 1)
@@ -288,3 +292,5 @@ class DataProfile(object):
                       label=name, marker=marker)
             axes.plot(last_abscissa + 1, last_value, marker="*")
         plt.legend()
+
+        return fig
