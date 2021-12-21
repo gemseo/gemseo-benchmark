@@ -62,7 +62,7 @@ for ref_algo, start_point in product(reference_algos, STARTING_POINTS):
 
 # Compute the scale of target values
 targets_number = 20
-targets_values = {"Rosenbrock": targets_generator.run(targets_number, show=True)}
+targets_values = {"Rosenbrock": targets_generator.compute_target_values(targets_number, show=True)}
 print("Target values\n", targets_values["Rosenbrock"])
 
 # Set the algorithms to be compared

@@ -43,7 +43,7 @@ def test_plot_targets():
     """Check the target values figure."""
     targets = TargetValues([2.0, 1.0, 0.0])
     pyplot.close("all")
-    targets._plot_targets()
+    targets.plot(show=False)
 
 
 @pytest.mark.parametrize("converter", [lambda _: _, str])

@@ -140,7 +140,7 @@ class Report(object):
 
         # Create the file
         file_path = self.__root_directory / Report.ALGOS_FILENAME
-        Report.__fill_template(
+        self.__fill_template(
             file_path,
             Report.ALGOS_FILENAME,
             algorithms=algos_descriptions
@@ -152,7 +152,7 @@ class Report(object):
         for problems_group in self.__problems_groups:
             # Create the directory dedicated to the group
             group_directory = (self.__root_directory / Report.IMAGES_DIR_NAME /
-                               Report.__format_group_name(problems_group.name))
+                               self.__format_group_name(problems_group.name))
             group_directory.mkdir(exist_ok=True)
 
             # Generate the data profile
@@ -167,22 +167,24 @@ class Report(object):
 
             # Create the file
             group_path = (self.__root_directory / Report.GROUPS_DIR_NAME / "{}.rst"
-                          .format(Report.__format_group_name(problems_group.name)))
+                          .format(self.__format_group_name(problems_group.name)))
             groups_paths.append(
                 group_path.relative_to(self.__root_directory).as_posix()
             )
-            Report.__fill_template(
+            self.__fill_template(
                 group_path,
                 Report.GROUP_FILENAME,
                 name=problems_group.name,
                 description=problems_group.description,
-                problems={problem.name: problem.__doc__ for problem in problems_group},
+                problems={
+                    problem.name: problem.description for problem in problems_group
+                },
                 data_profile=data_profile,
             )
 
         # Create the file listing the problems groups
         groups_list_path = self.__root_directory / Report.GROUPS_LIST_FILENAME
-        Report.__fill_template(
+        self.__fill_template(
             groups_list_path, Report.GROUPS_LIST_FILENAME,
             documents=groups_paths
         )
@@ -194,7 +196,7 @@ class Report(object):
 
         # Create the file
         index_path = self.__root_directory / Report.INDEX_FILENAME
-        Report.__fill_template(
+        self.__fill_template(
             index_path, Report.INDEX_FILENAME, documents=toctree_contents
         )
 

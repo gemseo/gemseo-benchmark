@@ -25,13 +25,14 @@ from numpy import ones, zeros
 from numpy.testing import assert_allclose
 from pytest import raises
 
+from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.utils.py23_compat import mock
 from gemseo_benchmark.problems.problem import Problem
 
 
 def test_invalid_creator():
     """Check initialization with an invalid problem creator."""
-    with raises(TypeError, match="Creator must return an OptimizationProblem."):
+    with raises(TypeError, match="optimization_problem_creator must return an OptimizationProblem."):
         Problem("A problem", lambda: None)
 
 
@@ -48,27 +49,21 @@ def test_default_start_point(creator, problem):
     assert (start_points[0] == problem.design_space.get_current_x()).all()
 
 
-def test_invalid_doe_params(creator, problem):
-    """Check initialization with an invalid DOE configuration."""
-    problem.design_space.has_current_x = mock.Mock(return_value=False)
-    with raises(
-            ValueError,
-            match="The problem has neither DOE algorithm name"
-                  "nor current point"
-                  "to set the starting points."
-    ):
-        Problem("problem", creator)
-
-
 def test_wrong_start_points_type(creator):
     """Check initialization with starting points of the wrong type."""
-    with raises(TypeError, match="The starting points must be of type ndarray."):
+    with raises(
+            TypeError,
+            match="A starting point must be a 1-dimensional NumPy array of size 2."
+    ):
         Problem("problem", creator, [[0.0, 0.0]])
 
 
 def test_inconsistent_start_points(creator):
     """Check initialization with starting points of inadequate size."""
-    with raises(ValueError, match="Starting points must be 1-dimensional with size 2"):
+    with raises(
+            ValueError,
+            match="A starting point must be a 1-dimensional NumPy array of size 2."
+    ):
         Problem("problem", creator, [zeros(3)])
 
 
@@ -91,7 +86,7 @@ def test_start_points_iteration(creator):
 def test_undefined_targets(creator):
     """Check the access to undefined targets."""
     problem = Problem("problem", creator, [zeros(2)])
-    with raises(ValueError, match="Benchmarking problem has no target"):
+    with raises(ValueError, match="The benchmarking problem has no target value."):
         problem.target_values
 
 
@@ -100,4 +95,50 @@ def test_generate_start_points(creator):
     problem = Problem(
         "problem", creator, doe_algo_name="DiagonalDOE", doe_size=5
     )
-    assert len(list(problem.start_points)) == 5
+    assert len(problem.start_points) == 5
+
+
+def test_undefined_start_points(creator):
+    """Check the access to nonexistent starting points."""
+    opt_problem = mock.Mock(spec=OptimizationProblem)
+    opt_problem.design_space = mock.Mock()
+    opt_problem.design_space.has_current_x = mock.Mock(return_value=False)
+    problem = Problem("problem", lambda: opt_problem)
+    with raises(ValueError, match="The benchmarking problem has no starting point."):
+        problem.start_points
+
+
+@pytest.mark.parametrize(
+    [
+        "dimension",
+        "nonlinear_objective",
+        "linear_equality_constraints",
+        "linear_inequality_constraints",
+        "nonlinear_equality_constraints",
+        "nonlinear_inequality_constraints",
+        "description"
+    ],
+    [
+        (
+                1, False, 0, 0, 0, 0,
+                "A problem depending on 1 bounded variable, with a linear objective."
+        ),
+        (
+                2, True, 1, 0, 0, 0,
+                "A problem depending on 2 bounded variables,"
+                " with a nonlinear objective,"
+                " subject to 1 linear equality constraint."
+        ),
+    ]
+)
+def test__get_description(
+        dimension, nonlinear_objective, linear_equality_constraints,
+        linear_inequality_constraints, nonlinear_equality_constraints,
+        nonlinear_inequality_constraints, description
+):
+    """Check the description getter."""
+    assert Problem._get_description(
+        dimension, nonlinear_objective, linear_equality_constraints,
+        linear_inequality_constraints, nonlinear_equality_constraints,
+        nonlinear_inequality_constraints
+    ) == description

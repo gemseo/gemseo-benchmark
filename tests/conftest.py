@@ -2,9 +2,10 @@
 from typing import Dict, Union
 
 import pytest
+from numpy import array, ndarray
+
 from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.utils.py23_compat import mock
-from numpy import array, ndarray
 
 design_variables = array([0.0, 1.0])
 
@@ -19,6 +20,7 @@ def design_space():  # type: (...) -> mock.Mock
     design_space.get_current_x = mock.Mock(return_value=design_variables)
     design_space.set_current_x = mock.Mock()
     design_space.unnormalize_vect = lambda _: _
+    design_space.untransform_vect = lambda _: _
     return design_space
 
 
@@ -62,7 +64,9 @@ def functions_values(objective, inequality_constraint, equality_constraint):
 def database(functions_values):  # type: (...) -> mock.Mock
     """A database."""
     database = mock.Mock()
-    database.items = mock.Mock(return_value=[(design_variables, functions_values)])
+    hashable_array = mock.Mock()
+    hashable_array.unwrap = mock.Mock(return_value=design_variables)
+    database.items = mock.Mock(return_value=[(hashable_array, functions_values)])
     database.get = mock.Mock(return_value=functions_values)
     database.__len__ = mock.Mock(return_value=1)
     return database
@@ -80,6 +84,7 @@ def problem(
     problem.design_space = design_space
     problem.dimension = design_space.dimension
     problem.objective = objective
+    problem.nonproc_objective = None
     problem.constraints = [inequality_constraint, equality_constraint]
     problem.get_constraints_names = mock.Mock(
         return_value=[inequality_constraint.name, equality_constraint.name]

@@ -156,7 +156,7 @@ class DataProfile(object):
         if algo_names is None:
             algo_names = tuple()
         data_profiles = self.compute_data_profiles(*algo_names)
-        figure = DataProfile._plot_data_profiles(data_profiles)
+        figure = self._plot_data_profiles(data_profiles)
         save_show_figure(figure, show, path)
 
     def compute_data_profiles(

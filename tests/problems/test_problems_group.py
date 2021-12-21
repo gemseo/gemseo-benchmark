@@ -44,7 +44,7 @@ def test_is_algorithm_suited():
 def test_compute_targets():
     """Check the computation of target values."""
     rosenbrock = Problem("Rosenbrock", Rosenbrock, [zeros(2)])
-    with raises(ValueError, match="Benchmarking problem has no target"):
+    with raises(ValueError, match="The benchmarking problem has no target value."):
         rosenbrock.target_values
     ProblemsGroup("group", [rosenbrock]).compute_targets(2, {"L-BFGS-B": {}})
     assert isinstance(rosenbrock.target_values, TargetValues)

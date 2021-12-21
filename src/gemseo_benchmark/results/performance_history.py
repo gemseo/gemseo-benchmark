@@ -35,13 +35,15 @@ Performance histories can be used to generate target values for a problem,
 or to generate the data profile of an algorithm.
 """
 import json
+import statistics
 from functools import reduce
-from typing import Iterable, List, Optional, Sequence, Union
+from itertools import chain, repeat
+from typing import Iterable, List, Optional, Sequence, Tuple, Union
+
+from numpy import inf
 
 from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.utils.py23_compat import Path
-from numpy import inf
-
 from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.utils import (get_n_unsatisfied_constraints,
                                     get_scalar_constraints_names)
@@ -268,22 +270,28 @@ class PerformanceHistory(Sequence[HistoryItem]):
         minimum_history.history_items = minima
         return minimum_history
 
-    def __compute_median(self):  # type: (...) -> HistoryItem
-        """Return the median of the history of performance values.
+    def __compute_median(
+            self,
+            feasible  # type: bool
+    ):  # type: (...) -> HistoryItem
+        """Return the median item of the history of performance values.
+
+        Args:
+            feasible: Whether only feasible history items should be considered.
 
         Returns:
-            The median of the history of performance values.
+            The median item of the history of performance values.
         """
-        # Compute the middle index of the items (N.B. zero-based index)
-        if len(self) % 2 == 0:
-            middle_index = len(self) // 2 - 1
+        if feasible:
+            items = [item for item in self.__items if item.is_feasible]
         else:
-            middle_index = len(self) // 2
-        return sorted(self.__items)[middle_index]
+            items = self.__items
+
+        return statistics.median_low(items)
 
     @staticmethod
     def compute_median_history(
-            histories  # type: Iterable[PerformanceHistory]
+            histories,  # type: Iterable[PerformanceHistory]
     ):  # type: (...) -> PerformanceHistory
         """Return the history of the median of several performance histories.
 
@@ -293,14 +301,19 @@ class PerformanceHistory(Sequence[HistoryItem]):
         Returns:
             The median history.
         """
+        # Extend the histories to the same length
+        budget_max = max(len(history) for history in histories)
+        reference_histories = [history.extend(budget_max) for history in histories]
+
+        # Iterate over the sets of history items corresponding to the same evaluation
+        # budget and compute their medians
         medians = list()
-        # Iterate over the sets of history items corresponding to the same iteration
-        # and compute their medians
-        for snapshot in zip(*[hist.history_items for hist in histories]):
+        for snapshot in zip(*[hist.history_items for hist in reference_histories]):
             snapshot_as_hist = PerformanceHistory()
             snapshot_as_hist.history_items = snapshot
-            median = snapshot_as_hist.__compute_median()
+            median = snapshot_as_hist.__compute_median(feasible=False)
             medians.append(median)
+
         median_history = PerformanceHistory()
         median_history.history_items = medians
         return median_history
@@ -313,12 +326,14 @@ class PerformanceHistory(Sequence[HistoryItem]):
         """
         first_feasible = None
         for index, item in enumerate(self):
-            if item.infeasibility_measure == 0.0:
+            if item.is_feasible:
                 first_feasible = index
                 break
+
         truncated_history = PerformanceHistory()
         if first_feasible is not None:
             truncated_history.history_items = self.history_items[first_feasible:]
+
         return truncated_history
 
     def to_file(
@@ -396,10 +411,70 @@ class PerformanceHistory(Sequence[HistoryItem]):
                 infeas_measures.append(measure)
                 feas_statuses.append(feasibility)
                 n_unsatisfied_constraints.append(int(get_n_unsatisfied_constraints(
-                    problem, design_values
+                    problem, design_values.unwrap()
                 )))
 
-        return PerformanceHistory(
+        return cls(
             obj_values, infeas_measures, feas_statuses, n_unsatisfied_constraints,
             problem_name, problem.objective.name, get_scalar_constraints_names(problem)
         )
+
+    def get_plot_data(
+            self,
+            feasible=False,  # type: bool
+            minimum_history=False  # type: bool
+    ):  # type: (...) -> Tuple[List[int], List[HistoryItem]]
+        """Return the data to plot the performance history.
+
+        Args:
+            feasible: Whether to get only feasible values.
+            minimum_history: Whether to get the history of the cumulated minimum
+                instead of the history of the objective value.
+
+        Returns:
+            The abscissas and the ordinates of the plot.
+        """
+        if minimum_history:
+            history = self.compute_cumulated_minimum()
+        else:
+            history = self
+
+        # Find the index of the first feasible history item
+        index = 0
+        if feasible:
+            for index, item in enumerate(history):
+                if item.is_feasible:
+                    break
+
+        return (
+            list(range(index + 1, len(history) + 1)),
+            history[index:]
+        )
+
+    def extend(
+            self,
+            size  # type: int
+    ):  # type: (...) -> PerformanceHistory
+        """Extend the performance history by repeating its last item.
+
+        If the history is longer than the expected size then it will not be altered.
+
+        Args:
+            size: The expected size of the extended performance history.
+
+        Returns:
+            The extended performance history.
+
+        Raises:
+            ValueError: If the expected size is smaller than the history size.
+        """
+        if size < len(self):
+            raise ValueError(
+                "The expected size ({}) is smaller than the history size ({}).".format(
+                    size, len(self)
+                )
+            )
+
+        history = PerformanceHistory()
+        history.history_items = list(chain(self, repeat(self[-1], (size - len(self)))))
+        return history
