@@ -21,11 +21,11 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Grouping of reference problems for benchmarking."""
-from typing import Any, Iterable, Iterator, Mapping, Optional
+from typing import Iterable, Iterator, Optional
 
 from gemseo_benchmark.data_profiles.data_profile import DataProfile
+from gemseo_benchmark.problems.problem import AlgorithmsSpecifications, Problem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
-from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.results.results import Results
 
 
@@ -78,7 +78,7 @@ class ProblemsGroup(object):
     def compute_targets(
             self,
             targets_number,  # type: int
-            ref_algos_specifications,  # type: Mapping[str, Mapping[str, Any]]
+            ref_algos_specifications,  # type: AlgorithmsSpecifications
             only_feasible=True,  # type: bool
     ):  # type: (...) -> None
         """Generate targets for all the problems based on given reference algorithms.
@@ -95,7 +95,7 @@ class ProblemsGroup(object):
 
     def compute_data_profile(
             self,
-            algos_specifications,  # type: Mapping[str, Mapping[str, Any]]
+            algos_specifications,  # type: AlgorithmsSpecifications
             histories_paths,  # type: Results
             show=True,  # type: bool
             plot_path=None  # type: Optional[str]

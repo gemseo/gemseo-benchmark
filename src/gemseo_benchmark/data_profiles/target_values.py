@@ -34,11 +34,11 @@ and computes its data profile (see :mod:`data_profile`).
 from typing import List, Optional, Union
 
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from numpy import array, linspace, logical_not
+
 from gemseo.utils.matplotlib_figure import save_show_figure
 from gemseo.utils.py23_compat import Path
-from matplotlib.figure import Figure
-from numpy import inf, linspace
-
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 
@@ -67,27 +67,17 @@ class TargetValues(PerformanceHistory):
             self,
             show=True,  # type: bool
             path=None,  # type: Optional[Union[str, Path]]
-    ):  # type: (...) -> None
+    ):  # type: (...) -> Figure
         """Plot the target values.
 
         Args:
             show: Whether to show the plot.
             path: The path where to save the plot.
                 If None, the plot is not saved.
-        """
-        save_show_figure(self._plot_targets(), show, path)
-
-    def _plot_targets(self):  # type: (...) -> Figure
-        """Plot the target values.
 
         Returns:
-            The targets values figure.
+            A figure showing the target values.
         """
-        objective_values = [
-            # set infinite values for infeasible target values
-            inf if item.infeasibility_measure > 0.0 else item.objective_value
-            for item in self
-        ]
         targets_number = len(self)
         fig = plt.figure()
         axes = fig.add_subplot(1, 1, 1)
@@ -96,7 +86,27 @@ class TargetValues(PerformanceHistory):
         plt.xlim([0, targets_number + 1])
         plt.xticks(linspace(1, targets_number, dtype=int))
         plt.ylabel("Target value")
-        axes.semilogy(
-            range(1, targets_number + 1), objective_values, marker="o", linestyle=""
-        )
+        indexes, history_items = self.get_plot_data()
+
+        # Plot the feasible target values
+        objective_values = [item.objective_value for item in history_items]
+        is_feasible = array([item.is_feasible for item in history_items])
+        if is_feasible.any():
+            axes.plot(
+                array(indexes)[is_feasible], array(objective_values)[is_feasible],
+                color="black", marker="o", linestyle="", label="feasible"
+            )
+
+        # Plot the infeasible target values
+        is_infeasible = logical_not(is_feasible)
+        if is_infeasible.any():
+            axes.plot(
+                array(indexes)[is_infeasible], array(objective_values)[is_infeasible],
+                color="red", marker="x", linestyle="", label="infeasible"
+            )
+
+        plt.legend()
+
+        save_show_figure(fig, show, path)
+
         return fig

@@ -2,10 +2,11 @@
 
 from typing import Dict, List
 
+from numpy import absolute, atleast_1d, ndarray
+
 from gemseo.algos.design_space import DesignSpace
 from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.core.mdofunctions.mdo_function import MDOFunction
-from numpy import absolute, atleast_1d, ndarray
 
 
 def get_dimensions(
@@ -20,7 +21,10 @@ def get_dimensions(
         The dimensions of the outputs of the problem functions.
     """
     design_variables = problem.design_space.get_current_x()
-    outputs, _ = problem.evaluate_functions(design_variables, normalize=False)
+    outputs, _ = problem.evaluate_functions(
+        design_variables, normalize=False,
+        no_db_no_norm=problem.nonproc_objective is not None  # FIXME: unnecessary
+    )
     return {name: atleast_1d(value).size for name, value in outputs.items()}
 
 
@@ -38,7 +42,10 @@ def get_n_unsatisfied_constraints(
         The number of unsatisfied scalar constraints.
     """
     n_unsatisfied = 0
-    values = problem.database.get(design_variables)
+    values, _ = problem.evaluate_functions(
+        design_variables, normalize=False,
+        no_db_no_norm=problem.nonproc_objective is not None  # FIXME: unnecessary
+    )
     for constraint in problem.constraints:
         value = atleast_1d(values[constraint.name])
         if constraint.f_type == MDOFunction.TYPE_EQ:

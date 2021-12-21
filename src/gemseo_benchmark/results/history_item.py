@@ -119,3 +119,12 @@ class HistoryItem(object):
             Whether the history item is lower than or equal to the other one.
         """
         return self < other or self == other
+
+    @property
+    def is_feasible(self):  # type: (...) -> bool
+        """Check whether the history item is feasible.
+
+        Returns:
+            Whether the history item is feasible.
+        """
+        return self.infeasibility_measure == 0.0

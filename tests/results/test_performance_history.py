@@ -20,12 +20,13 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the performance history."""
+import re
 
 import pytest
-from gemseo.utils.py23_compat import Path
 from numpy import inf
 from pytest import raises
 
+from gemseo.utils.py23_compat import Path
 from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
@@ -149,3 +150,25 @@ def test_from_problem(problem):
     assert history.objective_values == [2.0]
     assert history.infeasibility_measures == [1.0]
     assert history.n_unsatisfied_constraints == [1]
+
+
+@pytest.mark.parametrize("size", [2, 5])
+def test_extend(size):
+    """Check the extension of a performance history."""
+    history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
+    extension = history.extend(size)
+    assert len(extension) == size
+    assert extension.history_items[:2] == history.history_items[:2]
+    assert extension[size - 1] == history[1]
+
+
+def test_extend_smaller():
+    """Check the extension of a performance history to a smaller size."""
+    history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
+    with pytest.raises(
+            ValueError,
+            match=re.escape(
+                "The expected size (1) is smaller than the history size (2)."
+            )
+    ):
+        history.extend(1)

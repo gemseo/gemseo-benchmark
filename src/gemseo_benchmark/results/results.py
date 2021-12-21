@@ -103,6 +103,7 @@ class Results(object):
             raise FileNotFoundError(
                 "The path to the JSON file does not exist: {}.".format(path)
             )
+
         with Path(path).open("r") as file:
             histories = json.load(file)
         for algo_name, problems in histories.items():
@@ -136,6 +137,7 @@ class Results(object):
         """
         if algo_name not in self.__dict:
             raise ValueError("Unknown algorithm name: {}.".format(algo_name))
+
         return list(self.__dict[algo_name])
 
     def get_paths(
@@ -154,6 +156,24 @@ class Results(object):
         """
         if algo_name not in self.__dict:
             raise ValueError("Unknown algorithm name: {}.".format(algo_name))
+
         if problem_name not in self.__dict[algo_name]:
             raise ValueError("Unknown problem name: {}.".format(problem_name))
+
         return self.__dict[algo_name][problem_name]
+
+    def contains(
+            self,
+            algo_name,  # type: str
+            problem_name,  # type: str
+    ):  # type: (...) -> bool
+        """Check whether a result is stored.
+
+        Args:
+            algo_name: The name of the algorithm.
+            problem_name: The name of the problem.
+
+        Returns:
+            Whether the result is stored.
+        """
+        return algo_name in self.__dict and problem_name in self.__dict[algo_name]
