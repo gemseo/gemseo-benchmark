@@ -106,8 +106,9 @@ def test_best_target(best_target_objective):
     generator = TargetsGenerator()
     generator.add_history([2.0, 1.0])
     generator.add_history([1.0, 0.0])
-    targets = generator.compute_target_values(2, show=False,
-                                              best_target_objective=best_target_objective)
+    targets = generator.compute_target_values(
+        2, show=False, best_target_objective=best_target_objective
+    )
     # Check that only the second history (reaching the best target) is kept
     assert targets.history_items == [HistoryItem(1.0, 0.0), HistoryItem(0.0, 0.0)]
 

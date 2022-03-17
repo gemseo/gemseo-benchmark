@@ -28,8 +28,16 @@ A benchmarking problem is characterized by its functions
 its starting points (each defining an instance of the problem)
 and its targets (refer to :mod:`target_values`).
 """
-from typing import Any, Callable, Iterable, List, Mapping, Optional, Tuple, Union
+from __future__ import annotations
 
+from itertools import cycle
+from typing import Any, Callable, Iterable, List, Mapping, Optional, Sequence, Tuple, \
+    Union
+
+import numpy
+from matplotlib import pyplot as plt
+from matplotlib.axes import Axes
+from matplotlib.ticker import MaxNLocator
 from numpy import array, atleast_2d, load, ndarray, save
 
 from gemseo import api
@@ -37,11 +45,15 @@ from gemseo.algos.doe.doe_lib import DOELibraryOptionType
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.api import compute_doe
+from gemseo.utils.matplotlib_figure import save_show_figure
 from gemseo.utils.py23_compat import Path
+from gemseo_benchmark import COLORS_CYCLE, MARKERS, MarkeveryType
+from gemseo_benchmark.data_profiles.data_profile import DataProfile
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
+from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
-from gemseo_benchmark.utils import get_scalar_constraints_names
+from gemseo_benchmark.results.results import Results
 
 InputStartPoints = Union[ndarray, Iterable[ndarray]]
 AlgorithmsSpecifications = Mapping[str, Mapping[str, Any]]
@@ -125,7 +137,9 @@ class Problem(object):
         # Set the dimension
         problem = optimization_problem_creator()
         if not isinstance(problem, OptimizationProblem):
-            raise TypeError("optimization_problem_creator must return an OptimizationProblem.")
+            raise TypeError(
+                "optimization_problem_creator must return an OptimizationProblem."
+            )
         self.__problem = problem
 
         # Set the starting points
@@ -178,10 +192,8 @@ class Problem(object):
                 iter(start_points)
             except TypeError:
                 raise TypeError(
-                    "{} The following type was passed: {}.".format(
-                        message, type(start_points)
+                    f"{message} The following type was passed: {type(start_points)}."
                     )
-                )
 
             self.__check_iterable_start_points(start_points)
             start_points_list = list(start_points)
@@ -190,17 +202,15 @@ class Problem(object):
             # the starting points are passed as a NumPy array
             if start_points.ndim != 2:
                 raise ValueError(
-                    "{} A {}-dimensional NumPy array was passed.".format(
-                        message, start_points.ndim
+                    f"{message} A {start_points.ndim}-dimensional NumPy array "
+                    f"was passed."
                     )
-                )
 
             if start_points.shape[1] != self.__problem.dimension:
                 raise ValueError(
-                    "{} The number of columns ({}) is different from the problem "
-                    "dimension ({}).".format(
-                        message, start_points.shape[1], self.__problem.dimension
-                    )
+                    f"{message} The number of columns ({start_points.shape[1]}) "
+                    f"is different from the problem dimension "
+                    f"({self.__problem.dimension})."
                 )
 
             start_points_list = [point for point in start_points]
@@ -227,12 +237,15 @@ class Problem(object):
         """
         error_message = (
             "A starting point must be a 1-dimensional NumPy array of size "
-            "{}.".format(self.__problem.dimension)
+            f"{self.__problem.dimension}."
         )
         if any(not isinstance(point, ndarray) for point in start_points):
             raise TypeError(error_message)
 
-        if any(point.ndim != 1 or point.size != self.__problem.dimension for point in start_points):
+        if any(
+                point.ndim != 1 or point.size != self.__problem.dimension
+                for point in start_points
+        ):
             raise ValueError(error_message)
 
     def __get_start_points(
@@ -310,7 +323,7 @@ class Problem(object):
     @property
     def constraints_names(self):  # type: (...) -> List[str]
         """The names of the scalar constraints."""
-        return get_scalar_constraints_names(self.__problem)
+        return self.__problem.get_scalar_constraints_names()
 
     def is_algorithm_suited(
             self,
@@ -453,11 +466,9 @@ class Problem(object):
             The description of the problem.
         """
         description = (
-            "A problem depending on {} bounded variable{}, "
-            "with a {}linear objective".format(
-                dimension, "s" if dimension > 1 else "",
-                "non" if nonlinear_objective else ""
-            )
+            f"A problem depending on {dimension} bounded "
+            f"variable{'s' if dimension > 1 else ''}, "
+            f"with a {'non' if nonlinear_objective else ''}linear objective"
         )
         if max(
                 linear_equality_constraints,
@@ -474,18 +485,218 @@ class Problem(object):
             ]:
                 if number > 0:
                     constraints.append(
-                        "{} {}linear {}equality constraint{}".format(
-                            number,
-                            "non" if is_nonlinear else "",
-                            "in" if is_inequality else "",
-                            "s" if number > 1 else ""
-                        )
+                        f"{number} {'non' if is_nonlinear else ''}linear "
+                        f"{'in' if is_inequality else ''}equality "
+                        f"constraint{'s' if number > 1 else ''}"
                     )
-            return "{}, subject to {}.".format(description, ", ".join(constraints))
+            return f"{description}, subject to {', '.join(constraints)}."
 
-        return "{}.".format(description)
+        return f"{description}."
 
     @property
     def dimension(self):  # type: (...) -> int
         """The dimension of the problem."""
         return self.__problem.dimension
+
+    def compute_data_profile(
+            self, algos_specifications: AlgorithmsSpecifications, results: Results,
+            show: bool = False, file_path: str | Path | None = None
+    ) -> None:
+        """Generate the data profiles of given algorithms.
+
+        Args:
+            algos_specifications: The algorithms and their options.
+            results: The paths to the reference histories for each algorithm.
+            show: Whether to display the plot.
+            file_path: The path where to save the plot.
+                If ``None``, the plot is not saved.
+        """
+        # Initialize the data profile
+        data_profile = DataProfile({self.name: self.target_values})
+
+        # Generate the performance histories
+        for algo_name, algo_options in algos_specifications.items():
+            for history_path in results.get_paths(algo_name, self.name):
+                history = PerformanceHistory.from_file(history_path)
+                data_profile.add_history(
+                    self.name, algo_name, history.objective_values,
+                    history.infeasibility_measures
+                )
+
+        # Plot and/or save the data profile
+        data_profile.plot(show=show, path=file_path)
+
+    def plot_histories(
+            self, algos_specifications: AlgorithmsSpecifications, results: Results,
+            show: bool = False, file_path: Optional[Path] = None,
+            plot_all_histories: bool = False, alpha: float = 0.3,
+            markevery: MarkeveryType = 0.1
+    ) -> None:
+        """Plot the histories of a problem.
+
+        Args:
+            algos_specifications: The algorithms and their options.
+            results: The paths to the reference histories for each algorithm.
+            show: Whether to display the plot.
+            file_path: The path where to save the plot.
+                If ``None``, the plot is not saved.
+            plot_all_histories: Whether to plot all the performance histories.
+            alpha: The opacity level for overlapping areas.
+                Refer to the Matplotlib documentation.
+            markevery: The sampling parameter for the markers of the plot.
+                Refer to the Matplotlib documentation.
+        """
+        figure = plt.figure()
+        axes = figure.gca()
+
+        # Plot the target values
+        objective_targets = [target.objective_value for target in self.target_values]
+        for objective_target in objective_targets:
+            plt.axhline(objective_target, color="red", linestyle="--")
+
+        minimum_values = list()
+        for algo_name, color, marker in zip(
+                algos_specifications, COLORS_CYCLE, cycle(MARKERS)
+        ):
+            # Load the histories of the best performance value
+            minima = [
+                PerformanceHistory.from_file(path).compute_cumulated_minimum()
+                for path in results.get_paths(algo_name, self.name)
+            ]
+
+            # Plot the histories
+            minimum_value = self.__plot_algorithm_histories(
+                axes, algo_name, minima, plot_all_histories, color=color,
+                marker=marker, alpha=alpha, markevery=markevery
+            )
+            if minimum_value is not None:
+                minimum_values.append(minimum_value)
+
+        plt.legend()
+
+        # Ensure the x-axis ticks are integers
+        axes.xaxis.set_major_locator(MaxNLocator(integer=True))
+        plt.margins(x=0.1)
+        plt.xlabel("Number of evaluations")
+        plt.autoscale(enable=True, axis="x", tight=True)
+
+        # Set the y-axis margins to zero to get the tight y-limits
+        plt.autoscale(enable=True, axis="y", tight=True)
+        y_min, y_max = axes.get_ylim()
+        # Adjust the y-limits relative to the target values
+        if len(objective_targets) > 1:
+            y_max = max(*objective_targets, *minimum_values)
+            y_min = min(*objective_targets, *minimum_values)
+        margin = 0.03 * (y_max - y_min)
+        plt.ylim(
+            bottom=y_min - margin,
+            top=y_max + margin
+        )
+        plt.ylabel("Objective value")
+
+        # Add ticks for the targets values on a right-side axis
+        twin_axes = axes.twinx()
+        twin_axes.set_ylim(axes.get_ylim())
+        twin_axes.set_yticks(objective_targets)
+        twin_axes.set_yticklabels([f"{value:.2g}" for value in objective_targets])
+        twin_axes.set_ylabel("Target values", rotation=270)
+
+        save_show_figure(figure, show, file_path)
+
+    @staticmethod
+    def __plot_algorithm_histories(
+            axes: Axes, algorithm_name: str, histories: Iterable[PerformanceHistory],
+            plot_all: bool, color: str, marker: str, alpha: float,
+            markevery: MarkeveryType
+    ) -> Optional[float]:
+        """Plot the histories associated with an algorithm.
+
+        Args:
+            axes: The axes on which to plot the performance histories.
+            algorithm_name: The name of the algorithm.
+            histories: The histories associated with the algorithm.
+            plot_all: Whether to plot all the performance histories.
+            color: The color of the plot.
+            marker: The marker type of the plot.
+            alpha: The opacity level for overlapping areas.
+                Refer to the Matplotlib documentation.
+            markevery: The sampling parameter for the markers of the plot.
+                Refer to the Matplotlib documentation.
+
+        Returns:
+            The minimum feasible objective value of the median history
+            or None if the median history has no feasible item.
+        """
+        # Plot all the performance histories
+        if plot_all:
+            for history in histories:
+                history.plot(axes, only_feasible=True, color=color, alpha=alpha)
+
+        # Get the minimum history, starting from its first feasible item        
+        minimum = PerformanceHistory.compute_minimum_history(histories)
+        abscissas, minimum_items = minimum.get_plot_data(feasible=True)
+        minimum_ordinates = [item.objective_value for item in minimum_items]
+
+        # Compute the maximal feasible objective function value
+        max_feasible_objectives = list()
+        for history in histories:
+            items = [item for item in history.items if item.is_feasible]
+            if items:
+                max_feasible_objectives.append(max(items))
+
+        if not max_feasible_objectives:
+            # There is not feasible item
+            return None
+
+        max_feasible_objective = max(max_feasible_objectives).objective_value
+
+        # Get the maximum history for the same abscissas as the minimum history
+        maximum = PerformanceHistory.compute_maximum_history(histories)
+        maximum_items = maximum.items
+        # Replace the infeasible objective values with the maximum value
+        # N.B. Axes.fill_between requires finite values, that is why the infeasible
+        # objective values are replaced with a finite value rather than with infinity.
+        maximum_ordinates = Problem.__get_penalized_objective_values(
+            maximum_items, abscissas, max_feasible_objective
+        )
+
+        # Plot the area between the minimum and maximum histories.
+        axes.fill_between(abscissas, minimum_ordinates, maximum_ordinates, alpha=alpha)
+        axes.plot(abscissas, minimum_ordinates, color=color, alpha=alpha)
+        # Replace the infeasible objective values with infinity
+        maximum_ordinates = Problem.__get_penalized_objective_values(
+            maximum_items, abscissas, numpy.inf
+        )
+        axes.plot(abscissas, maximum_ordinates, color=color, alpha=alpha)
+
+        # Plot the median history
+        median = PerformanceHistory.compute_median_history(histories)
+        median.plot(
+            axes, only_feasible=True, label=algorithm_name, color=color,
+            marker=marker, markevery=markevery
+        )
+
+        # Return the smallest objective value of the median
+        _, history_items = median.get_plot_data(feasible=True)
+        if history_items:
+            return min(history_items).objective_value
+
+    @staticmethod
+    def __get_penalized_objective_values(
+            history_items: Sequence[HistoryItem], indexes: Iterable[int], value: float
+    ) -> List[float]:
+        """Return the objectives of history items, replacing the infeasible ones.
+
+        Args:
+            history_items: The history items.
+            indexes: The 1-based indexes of the history items.
+            value: The replacement for infeasible objective values.
+
+        Returns:
+            The objective values.
+        """
+        return [
+            history_items[index - 1].objective_value
+            if history_items[index - 1].is_feasible else value
+            for index in indexes
+        ]

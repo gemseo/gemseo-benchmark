@@ -20,13 +20,18 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the performance history item."""
+import re
+
+import pytest
+
 from gemseo_benchmark.results.history_item import HistoryItem
-from pytest import raises
 
 
 def test_nonnegative_infeasibility_measure():
     """Check the non-negative infeasibility measure exception."""
-    with raises(ValueError):
+    with pytest.raises(
+            ValueError, match="The infeasibility measure is negative: -1.0."
+    ):
         HistoryItem(1.0, -1.0)
 
 
@@ -54,3 +59,30 @@ def test_le():
 def test_repr():
     """Check the representation of a history item."""
     assert repr(HistoryItem(1.0, 2.0)) == "(1.0, 2.0)"
+
+
+def test_unsatisfied_constraints_number():
+    """Check the setting of a negative number of unsatisfied constraints."""
+    with pytest.raises(
+            ValueError, match="The number of unsatisfied constraints is negative: -1."
+    ):
+        HistoryItem(1.0, 1.0, -1)
+
+
+@pytest.mark.parametrize(["measure", "number"], [(1.0, 0), (0.0, 1)])
+def test_inconsistent_unsatisfied_constraints_number(measure, number):
+    """Check the setting of an inconsistent number of unsatisfied constraints."""
+    with pytest.raises(
+            ValueError,
+            match=re.escape(
+                f"The infeasibility measure ({measure}) and the number of unsatisfied "
+                f"constraints ({number}) are not consistent."
+            )
+    ):
+        HistoryItem(1.0, measure, number)
+
+
+@pytest.mark.parametrize(["measure", "number"], [(1.0, None), (0.0, 0)])
+def test_default_unsatisfied_constraints_number(measure, number):
+    """Check the default number of unsatisfied constraints."""
+    assert HistoryItem(1.0, measure).n_unsatisfied_constraints == number

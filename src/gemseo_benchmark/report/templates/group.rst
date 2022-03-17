@@ -1,25 +1,49 @@
+{{ "#" * name|length }}
 {{ name }}
-{{ "=" * name|length }}
+{{ "#" * name|length }}
 
 
------------
 Description
------------
-{{ description }}
-{% for problem_name, problem_description in problems.items() %}
+***********
 
-^^^^^^^^
+{{ description }}
+
+
 Problems
-^^^^^^^^
-{{ problem_name }}
-   {{ problem_description }}
+========
+{% for problem_name in problems_figures %}* :ref:`{{ problem_name }}`
 {% endfor %}
 
 
-------------
-Data profile
-------------
+Benchmarking results
+********************
+
+Global results
+==============
+
 The performances of the algorithms on the reference problems of the group
 "{{ name }}" are represented in the following data profile.
 
-{{ data_profile }}
+.. figure:: /{{ data_profile }}
+   :alt: The data profiles for group {{ name }}.
+
+   The data profiles for group {{ name }}.
+
+
+Results for each problem
+========================
+{% for problem_name, figures in problems_figures.items() %}
+{{ problem_name }}
+{{ "-" * problem_name|length }}
+
+.. figure:: /{{ figures["data_profile"] }}
+   :alt: The data profiles for problem {{ problem_name }}.
+
+   The data profiles for problem {{ problem_name }}.
+
+.. figure:: /{{ figures["histories"] }}
+   :alt: The performance histories for problem {{ problem_name }}.
+
+   The performance histories for problem {{ problem_name }}.
+
+{% endfor %}

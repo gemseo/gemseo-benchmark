@@ -24,9 +24,42 @@ import json
 from typing import Dict, List
 
 import pytest
-from gemseo.utils.py23_compat import Path
 
+from gemseo.utils.py23_compat import Path
 from gemseo_benchmark.results.results import Results
+
+algorithm_name = "algorithm"
+problem_name = "problem"
+history_path = Path(__file__).parent / "history.json"
+
+
+@pytest.fixture(scope="module")
+def results() -> Results:
+    """A collection of performance histories."""
+    results = Results()
+    results.add_path(algorithm_name, problem_name, history_path)
+    return results
+
+
+@pytest.fixture(scope="module")
+def results_contents() -> Dict[str, Dict[str, List[str]]]:
+    """The paths for the performance histories."""
+    return {algorithm_name: {problem_name: [str(history_path.resolve())]}}
+
+
+@pytest.fixture(scope="function")
+def results_file(tmp_path, results_contents) -> Path:
+    """The path to the results file."""
+    results_path = tmp_path / "results_reference.json"
+    with results_path.open("w") as file:
+        json.dump(results_contents, file)
+    return results_path
+
+
+def test_init_from_file(results_file):
+    """Check the initialization from a file."""
+    results = Results(results_file)
+    assert results.get_paths(algorithm_name, problem_name) == [history_path]
 
 
 def test_add_invalid_path():
@@ -36,48 +69,23 @@ def test_add_invalid_path():
             FileNotFoundError,
             match="The path to the history does not exist: not_a_file.json."
     ):
-        results.add_path("algo", "problem", "not_a_file.json")
+        results.add_path(algorithm_name, problem_name, "not_a_file.json")
 
 
-def test_to_file(tmp_path):
+def test_to_file(tmp_path, results, results_contents):
     """Check the saving of a collection of paths to performance histories."""
-    results = Results()
-    history_path = Path(__file__).parent / "history.json"
-    results.add_path("algo", "problem", history_path)
     results_path = tmp_path / "results.json"
     results.to_file(results_path)
     with results_path.open("r") as file:
         contents = json.load(file)
-    assert contents == {"algo": {"problem": [str(history_path.resolve())]}}
-
-
-@pytest.fixture(scope="module")
-def results_contents():  # type: (...) -> Dict[str, Dict[str, List[str]]]
-    """The paths for the performance histories."""
-    return {
-        "algo": {"problem": [str(Path(__file__).parent.resolve() / "history.json")]}
-    }
-
-
-@pytest.fixture
-def results_file(tmp_path, results_contents):  # type: (...) -> Path
-    """The path to the results file."""
-    results_path = tmp_path / "results_reference.json"
-    with results_path.open("w") as file:
-        json.dump(results_contents, file)
-    return results_path
+    assert contents == results_contents
 
 
 def test_from_file(tmp_path, results_contents, results_file):
     """Check the loading of a collection of paths to performance histories."""
     results = Results()
     results.from_file(results_file)
-    # Save the results to check their contents as a file
-    results_path = tmp_path / "results.json"
-    results.to_file(results_path)
-    with results_path.open("r") as file:
-        contents = json.load(file)
-    assert contents == results_contents
+    assert results.get_paths(algorithm_name, problem_name) == [history_path]
 
 
 def test_from_invalid_file():
@@ -90,25 +98,48 @@ def test_from_invalid_file():
         results.from_file("not_a_path.json")
 
 
-def test_algorithms():
+def test_algorithms(results):
     """Check the accessor to the algorithms names."""
-    results = Results()
-    history_path = Path(__file__).parent / "history.json"
-    results.add_path("algo", "problem", history_path)
-    assert results.algorithms == ["algo"]
+    assert results.algorithms == [algorithm_name]
 
 
-def test_get_problems():
+def test_get_problems(results):
     """Check the accessor to the problems names."""
-    results = Results()
-    history_path = Path(__file__).parent / "history.json"
-    results.add_path("algo", "problem", history_path)
-    assert results.get_problems("algo") == ["problem"]
+    assert results.get_problems(algorithm_name) == [problem_name]
 
 
-def test_get_paths():
+def test_get_problems_unknown_algorithm(results):
+    """Check the accessor to the problems names for an unknown algorithm."""
+    with pytest.raises(ValueError, match="Unknown algorithm name: unknown."):
+        results.get_problems("unknown")
+
+
+def test_get_paths(results):
     """Check the accessor to the performance histories paths."""
-    results = Results()
-    history_path = Path(__file__).parent / "history.json"
-    results.add_path("algo", "problem", history_path)
-    assert results.get_paths("algo", "problem") == [history_path.resolve()]
+    assert results.get_paths(algorithm_name, problem_name) == [history_path.resolve()]
+
+
+def test_get_paths_unknown_algorithm(results):
+    """Check the accessor to the histories paths for an unknown algorithm."""
+    with pytest.raises(ValueError, match="Unknown algorithm name: unknown."):
+        results.get_paths("unknown", problem_name)
+
+
+def test_get_paths_unknown_problem(results):
+    """Check the accessor to the histories paths for an unknown problem."""
+    with pytest.raises(ValueError, match="Unknown problem name: unknown."):
+        results.get_paths(algorithm_name, "unknown")
+
+
+@pytest.mark.parametrize(
+    ["algorithm", "problem", "path", "contained"],
+    [
+        ("unknown", problem_name, history_path, False),
+        (algorithm_name, "unknown", history_path, False),
+        (algorithm_name, problem_name, Path(__file__).parent / "unknown", False),
+        (algorithm_name, problem_name, history_path, True)
+    ]
+)
+def test_contains(results, algorithm, problem, path, contained):
+    """Check the membership assessment of a history path to the results."""
+    assert results.contains(algorithm, problem, path) == contained

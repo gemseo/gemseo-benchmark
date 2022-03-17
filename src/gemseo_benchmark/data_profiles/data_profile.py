@@ -36,16 +36,17 @@ relative to the number of problems functions evaluations they make.
 The data profile is the empirical cumulated distribution function of the number of
 functions evaluations made by an algorithm to reach a problem target.
 """
-from itertools import cycle
+import itertools
 from numbers import Number
 from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Union
 
 import matplotlib.pyplot as plt
-from gemseo.utils.py23_compat import Path
-from matplotlib import rcParams
 from matplotlib.figure import Figure
 from numpy import append, array, linspace, ndarray, zeros
+
 from gemseo.utils.matplotlib_figure import save_show_figure
+from gemseo.utils.py23_compat import Path
+from gemseo_benchmark import COLORS_CYCLE, MARKERS, MarkeveryType
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
@@ -95,8 +96,9 @@ class DataProfile(object):
             raise TypeError("The target values be must passed as a mapping")
         targets_numbers = set(len(pb_targets) for pb_targets in target_values.values())
         if len(targets_numbers) != 1:
-            raise ValueError("The reference problems must have the same number of "
-                             "target values")
+            raise ValueError(
+                "The reference problems must have the same number of target values."
+            )
         self.__target_values = dict(target_values)
         self.__targets_number = targets_numbers.pop()
 
@@ -126,9 +128,7 @@ class DataProfile(object):
             ValueError: If the problem name is not the name of a reference problem.
         """
         if problem_name not in self.__target_values:
-            raise ValueError(
-                "{!r} is not the name of a reference problem".format(problem_name)
-            )
+            raise ValueError(f"{problem_name!r} is not the name of a reference problem")
         if algo_name not in self.__values_histories:
             self.__values_histories[algo_name] = {
                 pb_name: list() for pb_name in self.__target_values.keys()
@@ -139,11 +139,9 @@ class DataProfile(object):
         self.__values_histories[algo_name][problem_name].append(history)
 
     def plot(
-            self,
-            algo_names=None,  # type: Optional[Iterable[str]]
-            show=True,  # type: bool
-            path=None  # type: Optional[Union[str, Path]]
-    ):  # type: (...) -> None
+            self, algo_names: Iterable[str] = None, show: bool = True,
+            path: Union[str, Path] = None, markevery: MarkeveryType = 0.1
+    ) -> None:
         """Plot the data profiles of the required algorithms.
 
         Args:
@@ -152,11 +150,13 @@ class DataProfile(object):
             show: If True, show the plot.
             path: The path where to save the plot.
                 If None, the plot is not saved.
+            markevery: The sampling parameter for the markers of the plot.
+                Refer to the Matplotlib documentation.
         """
         if algo_names is None:
             algo_names = tuple()
         data_profiles = self.compute_data_profiles(*algo_names)
-        figure = self._plot_data_profiles(data_profiles)
+        figure = self._plot_data_profiles(data_profiles, markevery)
         save_show_figure(figure, show, path)
 
     def compute_data_profiles(
@@ -202,10 +202,12 @@ class DataProfile(object):
         algo_histories = self.__values_histories[algo_name]
 
         # Compute the maximal size of an optimization history
-        max_history_size = max([
-            max([len(pb_hist) for pb_hist in pb_histories])
-            for pb_histories in algo_histories.values()
-        ])
+        max_history_size = max(
+            [
+                max([len(pb_history) for pb_history in algo_history])
+                for algo_history in algo_histories.values()
+            ]
+        )
 
         # Compute the history of the number of target hits across all optimizations
         total_hits_history = zeros(max_history_size)
@@ -244,18 +246,21 @@ class DataProfile(object):
         )
         if len(histories_numbers) != 1:
             raise ValueError(
-                "Reference problems unequally represented for algorithm {!r}"
-                .format(algo_name))
+                f"Reference problems unequally represented for algorithm {algo_name!r}."
+            )
         return histories_numbers.pop()
 
     @staticmethod
     def _plot_data_profiles(
-            data_profiles,  # type: Mapping[str, Sequence[Number]]
-    ):  # type: (...) -> Figure
+            data_profiles: Mapping[str, Sequence[Number]],
+            markevery: MarkeveryType = 0.1
+    ) -> Figure:
         """Plot the data profiles.
 
         Args:
             data_profiles: The data profiles.
+            markevery: The sampling parameter for the markers of the plot.
+                Refer to the Matplotlib documentation.
 
         Returns:
             The data profiles figure.
@@ -264,12 +269,12 @@ class DataProfile(object):
         axes = fig.add_subplot(1, 1, 1)
 
         # Set the title and axes
-        axes.set_title("Data profile{}".format("s" if len(data_profiles) > 1 else ""))
+        axes.set_title(f"Data profile{'s' if len(data_profiles) > 1 else ''}")
         max_profile_size = max([len(profile) for profile in data_profiles.values()])
         plt.xlabel("Number of functions evaluations")
         plt.xlim([1, max_profile_size])
         y_ticks = linspace(0.0, 1.0, 11)
-        plt.yticks(y_ticks, ("{:02.0f}%".format(ratio * 100.0) for ratio in y_ticks))
+        plt.yticks(y_ticks, (f"{ratio * 100.0:02.0f}%" for ratio in y_ticks))
         plt.ylabel("Ratios of targets reached")
         plt.ylim([0.0, 1.05])
 
@@ -277,10 +282,8 @@ class DataProfile(object):
         axes.axhline(1.0, linestyle=":", color="black")
 
         # Plot the data profiles
-        color_cycle = rcParams["axes.prop_cycle"].by_key()["color"]
-        marker_cycle = cycle(('o', 's', 'D', 'v', '^', '<', '>', 'X', 'H', 'p'))
         for color, marker, (name, profile) in zip(
-                color_cycle, marker_cycle, data_profiles.items()
+                COLORS_CYCLE, itertools.cycle(MARKERS), data_profiles.items()
         ):
             last_abscissa = len(profile)
             last_value = profile[-1]
@@ -288,8 +291,10 @@ class DataProfile(object):
             if last_abscissa < max_profile_size:
                 tail = [last_value] * (max_profile_size - last_abscissa)
                 profile = append(profile, tail)
-            axes.plot(range(1, max_profile_size + 1), profile, color=color,
-                      label=name, marker=marker)
+            axes.plot(
+                range(1, max_profile_size + 1), profile, color=color, label=name,
+                marker=marker, markevery=markevery
+            )
             axes.plot(last_abscissa + 1, last_value, marker="*")
         plt.legend()
 

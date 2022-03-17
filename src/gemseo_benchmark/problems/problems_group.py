@@ -21,7 +21,8 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Grouping of reference problems for benchmarking."""
-from typing import Iterable, Iterator, Optional
+from pathlib import Path
+from typing import Iterable, Iterator, Optional, Union
 
 from gemseo_benchmark.data_profiles.data_profile import DataProfile
 from gemseo_benchmark.problems.problem import AlgorithmsSpecifications, Problem
@@ -98,7 +99,7 @@ class ProblemsGroup(object):
             algos_specifications,  # type: AlgorithmsSpecifications
             histories_paths,  # type: Results
             show=True,  # type: bool
-            plot_path=None  # type: Optional[str]
+            plot_path=None  # type: Optional[Union[str, Path]]
     ):  # type: (...) -> None
         """Generate the data profiles of given algorithms relative to the problems.
 

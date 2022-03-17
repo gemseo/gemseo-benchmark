@@ -92,6 +92,7 @@ def problem(
     problem.evaluate_functions = mock.Mock(return_value=(functions_values, None))
     problem.database = database
     problem.get_violation_criteria = mock.Mock(return_value=(False, 1.0))
+    problem.get_number_of_unsatisfied_constraints = mock.Mock(return_value=1)
     problem.get_optimum = mock.Mock(return_value=(
         functions_values[objective.name], design_variables, True, functions_values, None
     ))
