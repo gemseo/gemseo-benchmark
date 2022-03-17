@@ -25,11 +25,11 @@ import shutil
 from typing import Dict, List
 
 import pytest
+
 from gemseo.utils.py23_compat import mock, Path
 from gemseo_benchmark.report.report import Report
 
 ALGO_NAME = "SLSQP"
-PROBLEM_NAME = "A problem"
 
 
 @pytest.fixture(scope="module")
@@ -38,20 +38,47 @@ def algos_specifications():  # type: (...) -> Dict[str, Dict]
     return {ALGO_NAME: dict()}
 
 
+def side_effect(algos_specifications, results, show=False, file_path=None):
+    shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(file_path))
+
+
 @pytest.fixture(scope="module")
-def problem():  # type: (...) -> mock.Mock
-    """The problem."""
+def problem_a():  # type: (...) -> mock.Mock
+    """A problem."""
     problem = mock.Mock()
-    problem.name = PROBLEM_NAME
+    problem.name = "Problem A"
+    problem.description = "The description of problem A."
+    problem.optimum = 1.0
+    target = mock.Mock()
+    target.objective_value = problem.optimum
+    problem.target_values = [target]
+    problem.compute_data_profile = mock.Mock(side_effect=side_effect)
+    problem.plot_histories = mock.Mock(side_effect=side_effect)
     return problem
 
 
 @pytest.fixture(scope="module")
-def group(problem):  # type: (...) -> mock.Mock
+def problem_b() -> mock.Mock:
+    """Another problem."""
+    problem = mock.Mock()
+    problem.name = "Problem B"
+    problem.description = "The description of problem B."
+    problem.optimum = 2.0
+    target = mock.Mock()
+    target.objective_value = problem.optimum
+    problem.target_values = [target]
+    problem.compute_data_profile = mock.Mock(side_effect=side_effect)
+    problem.plot_histories = mock.Mock(side_effect=side_effect)
+    return problem
+
+
+@pytest.fixture(scope="module")
+def group(problem_a, problem_b):  # type: (...) -> mock.Mock
     """The group of problems."""
-    group = mock.Mock()
+    group = mock.MagicMock()
     group.name = "A group"
-    group.__iter__ = mock.Mock(return_value=iter([problem]))
+    group.description = "The description of the group."
+    group.__iter__.return_value = [problem_a, problem_b]
 
     def side_effect(algos_specifications, histories_paths, show, plot_path):
         shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(plot_path))
@@ -67,11 +94,11 @@ def problems_groups(group):  # type: (...) -> List[mock.Mock]
 
 
 @pytest.fixture
-def results():  # type: (...) -> mock.Mock
+def results(problem_a, problem_b):  # type: (...) -> mock.Mock
     """The results of the benchmarking."""
     results = mock.Mock()
     results.algorithms = [ALGO_NAME]
-    results.get_problems = mock.Mock(return_value=[PROBLEM_NAME])
+    results.get_problems = mock.Mock(return_value=[problem_a.name, problem_b.name])
     return results
 
 
@@ -81,21 +108,21 @@ def test_init_missing_algorithms(
     """Check the initialization of the report with missing algorithms histories."""
     results.algorithms = ["Another algo"]
     with pytest.raises(
-            ValueError, match="Missing histories for algorithm '{}'.".format(ALGO_NAME)
+            ValueError, match=f"Missing histories for algorithm '{ALGO_NAME}'."
     ):
         Report(tmp_path, algos_specifications, problems_groups, results)
 
 
 def test_init_missing_problems(
-        tmp_path, algos_specifications, problems_groups, results
+        tmp_path, algos_specifications, problem_a, problem_b, problems_groups, results
 ):
     """Check the initialization of the report with missing problems histories."""
     results.get_problems = mock.Mock(return_value=["Another problem"])
     with pytest.raises(
             ValueError,
-            match="Missing histories for algorithm '{}' on problem 'A problem'.".format(
-                ALGO_NAME
-            )
+            match=f"Missing histories for algorithm '{ALGO_NAME}' on problems "
+                  f"('{problem_a.name}', '{problem_b.name}')|('{problem_b.name}', "
+                  f"'{problem_a.name}')."
     ):
         Report(tmp_path, algos_specifications, problems_groups, results)
 
@@ -131,3 +158,30 @@ def test_retrieve_description(tmp_path, algos_specifications, problems_groups, r
     with open(tmp_path / "algorithms.rst") as file:
         contents = file.readlines()
     assert contents == ref_contents
+
+
+def test_problems_descriptions_files(
+        tmp_path, algos_specifications, problem_a, problem_b, problems_groups, results
+):
+    """Check the generation of the files describing the problems."""
+    report = Report(tmp_path, algos_specifications, problems_groups, results)
+    report.generate_report(to_html=False)
+    assert (tmp_path / "problems_list.rst").is_file()
+    assert (tmp_path / "problems" / f"{problem_a.name}.rst").is_file()
+    assert (tmp_path / "problems" / f"{problem_b.name}.rst").is_file()
+
+
+def test_figures(
+        tmp_path, algos_specifications, problem_a, problem_b, problems_groups, results
+):
+    """Check the generation of the figures."""
+    report = Report(tmp_path, algos_specifications, problems_groups, results)
+    report.generate_report(to_html=False)
+    group_dir = tmp_path / "images" / problems_groups[0].name.replace(" ", "_")
+    assert (group_dir / "data_profile.png").is_file()
+    problem_dir = group_dir / problem_a.name.replace(" ", "_")
+    assert (problem_dir / "data_profile.png").is_file()
+    assert (problem_dir / "histories.png").is_file()
+    problem_dir = group_dir / problem_b.name.replace(" ", "_")
+    assert (problem_dir / "data_profile.png").is_file()
+    assert (problem_dir / "histories.png").is_file()

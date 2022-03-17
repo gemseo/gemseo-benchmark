@@ -26,7 +26,7 @@ the median of the reference histories is computed
 and a uniformly distributed subset (of the required size) of this median history is
 extracted.
 """
-from typing import Optional, Sequence, Union, List, Iterable, Tuple
+from typing import Iterable, List, Optional, Sequence, Tuple, Union
 
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
@@ -102,7 +102,8 @@ class TargetsGenerator(object):
 
         Args:
             targets_number: The number of targets to compute.
-            budget_min: The number of functions evaluations to be used to define the first target.
+            budget_min: The number of functions evaluations to be used to define the
+                first target.
                 If argument ``feasible`` is set to ``True``, this argument will be
                 disregarded and the evaluation budget defining the easiest target
                 will be the budget of the first item in the histories reaching the
@@ -184,11 +185,9 @@ class TargetsGenerator(object):
         """
         if budgets_number > budget_max - budget_min + 1:
             raise ValueError(
-                "The number of targets required ({}) is greater "
-                "than the size the longest history ({}) "
-                "starting from budget_min ({}).".format(
-                    budgets_number, budget_max - budget_min + 1, budget_min
-                )
+                f"The number of targets required ({budgets_number}) is greater "
+                f"than the size the longest history ({budget_max - budget_min + 1}) "
+                f"starting from budget_min ({budget_min})."
             )
 
         return linspace(budget_min, budget_max, budgets_number, dtype=int)

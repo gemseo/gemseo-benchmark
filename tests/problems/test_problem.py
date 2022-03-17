@@ -20,19 +20,28 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for benchmarking reference problems."""
+from pathlib import Path
+
 import pytest
+from matplotlib import pyplot
+from matplotlib.testing.decorators import image_comparison
 from numpy import ones, zeros
 from numpy.testing import assert_allclose
 from pytest import raises
 
 from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.utils.py23_compat import mock
+from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.problems.problem import Problem
+from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 
 def test_invalid_creator():
     """Check initialization with an invalid problem creator."""
-    with raises(TypeError, match="optimization_problem_creator must return an OptimizationProblem."):
+    with raises(
+            TypeError,
+            match="optimization_problem_creator must return an OptimizationProblem."
+    ):
         Problem("A problem", lambda: None)
 
 
@@ -142,3 +151,99 @@ def test__get_description(
         linear_inequality_constraints, nonlinear_equality_constraints,
         nonlinear_inequality_constraints
     ) == description
+
+
+@pytest.fixture()
+def results():
+    """Paths to performance histories."""
+    paths = [Path(__file__).parent / "history.json"]
+    results = mock.Mock()
+    results.get_paths = mock.Mock(return_value=paths)
+    return results
+
+
+@pytest.fixture(scope="module")
+def target_values():
+    """Target values."""
+    # N.B. passing the specification is required for the setter.
+    target_values = mock.MagicMock(spec=TargetValues)
+    target1 = mock.Mock()
+    target1.objective_value = 1.0
+    target2 = mock.Mock()
+    target2.objective_value = 0.0
+    target_values.__iter__.return_value = [target1, target2]
+    return target_values
+
+
+@image_comparison(baseline_images=["histories"], remove_text=True, extensions=['png'])
+def test_plot_histories(creator, target_values, results):
+    """Check the histories graphs."""
+    problem = Problem("problem", creator, target_values=target_values)
+    algorithms_specs = {"algorithm": dict()}
+    pyplot.close("all")
+    problem.plot_histories(algorithms_specs, results, show=False)
+    results.get_paths.assert_called_once_with("algorithm", "problem")
+
+
+@image_comparison(
+    baseline_images=["histories_single_target"], remove_text=True, extensions=['png']
+)
+def test_plot_histories_single_target(creator, results):
+    """Check the histories graphs for a problem with a single target value."""
+    target_values = mock.MagicMock(spec=TargetValues)
+    target = mock.Mock()
+    target.objective_value = -1.0
+    target_values.__iter__.return_value = [target]
+    problem = Problem("problem", creator, target_values=target_values)
+    algorithms_specs = {"algorithm": dict()}
+    pyplot.close("all")
+    problem.plot_histories(algorithms_specs, results, show=False)
+    results.get_paths.assert_called_once_with("algorithm", "problem")
+
+
+@image_comparison(
+    baseline_images=["three_histories"], remove_text=True, extensions=['png']
+)
+def test_plot_3_histories(tmpdir, creator, target_values):
+    """Check the histories graph for three histories."""
+    histories = [
+        PerformanceHistory([1.3, 1.0, 0.6, 0.4, 0.3]),
+        PerformanceHistory([1.2, 1.0, 0.5, 0.4, 0.2]),
+        PerformanceHistory([1.1, 0.7, 0.5, 0.1, 0.0])
+    ]
+    paths = list()
+    for index, history in enumerate(histories):
+        path = tmpdir / f"history_{index + 1}.json"
+        history.to_file(path)
+        paths.append(path)
+    results = mock.Mock()
+    results.get_paths = mock.Mock(return_value=paths)
+    problem = Problem("problem", creator, target_values=target_values)
+    algorithms_specs = {"algorithm": dict()}
+    pyplot.close("all")
+    problem.plot_histories(algorithms_specs, results, show=False)
+    results.get_paths.assert_called_once_with("algorithm", "problem")
+
+
+@image_comparison(
+    baseline_images=["infeasible_histories"], remove_text=True, extensions=["png"]
+)
+def test_plot_infeasible_histories(tmpdir, creator, target_values):
+    """Check the histories graph for histories with infeasible items."""
+    histories = [
+        PerformanceHistory([1.5, 1.1, 0.2], [1.0, 1.0, 0.0]),
+        PerformanceHistory([1.0, 0.5, 0.1], [1.0, 0.0, 0.0]),
+        PerformanceHistory([0.5, 0.2, 0.0], [1.0, 0.0, 0.0])
+    ]
+    paths = list()
+    for index, history in enumerate(histories):
+        path = tmpdir / f"history_{index + 1}.json"
+        history.to_file(path)
+        paths.append(path)
+    results = mock.Mock()
+    results.get_paths = mock.Mock(return_value=paths)
+    problem = Problem("problem", creator, target_values=target_values)
+    algorithms_specs = {"algorithm": dict()}
+    pyplot.close("all")
+    problem.plot_histories(algorithms_specs, results, show=False)
+    results.get_paths.assert_called_once_with("algorithm", "problem")

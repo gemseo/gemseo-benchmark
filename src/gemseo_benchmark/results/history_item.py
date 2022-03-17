@@ -20,18 +20,11 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """A performance history item."""
-from typing import Optional
+from typing import Optional, Tuple
 
 
 class HistoryItem(object):
-    """A performance history item.
-
-    Attributes:
-        objective_value (float): The objective function value of the item.
-        infeasibility_measure (float): The infeasibility measure of the item.
-        n_unsatisfied_constraints (Optional[int]): The number of unsatisfied constraints
-            of the item.
-    """
+    """A performance history item."""
 
     def __init__(
             self,
@@ -45,14 +38,70 @@ class HistoryItem(object):
             infeasibility_measure: The infeasibility measure of the item.
             n_unsatisfied_constraints: The number of unsatisfied constraints of the
                 item.
-                If None, it will not be taken into account.
+                If None, it will be set to 0 if the infeasibility measure is zero,
+                and if the infeasibility measure is positive it will be set to None.
         """
-        self.objective_value = objective_value
-        self.infeasibility_measure = infeasibility_measure
-        self.n_unsatisfied_constraints = n_unsatisfied_constraints
+        self.__objective_value = objective_value
+        self.__infeas_measure, self.__n_unsatisfied_constraints = (
+            HistoryItem.__get_infeasibility(
+                infeasibility_measure, n_unsatisfied_constraints
+            )
+        )
+
+    @staticmethod
+    def __get_infeasibility(
+            infeasibility_measure: float, n_unsatisfied_constraints: Optional[int]
+    ) -> Tuple[float, Optional[int]]:
+        """Check the infeasibility measure and the number of unsatisfied constraints.
+
+        Args:
+            infeasibility_measure: The infeasibility measure.
+            n_unsatisfied_constraints: The number of unsatisfied constraints.
+
+        Returns:
+            The infeasibility measure and the number of unsatisfied constraints.
+
+        Raises:
+             ValueError: If the infeasibility measure is negative,
+                or if the number of unsatisfied constraints is negative,
+                or if the infeasibility measure and the number of unsatisfied
+                constraints are inconsistent.
+        """
+        if infeasibility_measure < 0.0:
+            raise ValueError(
+                f"The infeasibility measure is negative: {infeasibility_measure}."
+            )
+
+        if n_unsatisfied_constraints is None:
+            if infeasibility_measure == 0.0:
+                return infeasibility_measure, 0
+            else:
+                return infeasibility_measure, None
+
+        if n_unsatisfied_constraints < 0:
+            raise ValueError(
+                "The number of unsatisfied constraints is negative: "
+                f"{n_unsatisfied_constraints}."
+            )
+
+        if infeasibility_measure == 0.0 and n_unsatisfied_constraints != 0 or (
+                infeasibility_measure > 0.0 and n_unsatisfied_constraints == 0
+        ):
+            raise ValueError(
+                f"The infeasibility measure ({infeasibility_measure}) and the number "
+                f"of unsatisfied constraints ({n_unsatisfied_constraints}) are not "
+                f"consistent."
+            )
+
+        return infeasibility_measure, n_unsatisfied_constraints
 
     @property
-    def infeasibility_measure(self):  # type: (...) -> float
+    def objective_value(self) -> float:
+        """The objective value of the history item."""
+        return self.__objective_value
+
+    @property
+    def infeasibility_measure(self) -> float:
         """The infeasibility measure of the history item.
 
         Raises:
@@ -60,16 +109,12 @@ class HistoryItem(object):
         """
         return self.__infeas_measure
 
-    @infeasibility_measure.setter
-    def infeasibility_measure(
-            self,
-            infeasibility_measure,  # type: float
-    ):  # type: (...) -> None
-        if infeasibility_measure < 0.0:
-            raise ValueError("The infeasibility measure must be non-negative.")
-        self.__infeas_measure = infeasibility_measure
+    @property
+    def n_unsatisfied_constraints(self) -> Optional[int]:
+        """The number of unsatisfied constraints."""
+        return self.__n_unsatisfied_constraints
 
-    def __repr__(self):  # type: (...) -> str
+    def __repr__(self) -> str:
         return str((self.objective_value, self.infeasibility_measure))
 
     def __eq__(

@@ -87,17 +87,39 @@ def test_compute_cumulated_minimum():
         [0.0, 0.0, -1.0, 0.0, 0.0, -1.0], [2.0, 2.0, 1.0, 0.0, 0.0, 0.0]
     )
     cumulated_minimum = history.compute_cumulated_minimum()
-    assert cumulated_minimum.history_items == reference.history_items
+    assert cumulated_minimum.items == reference.items
+
+
+history_1 = PerformanceHistory([1.0, -1.0, 0.0], [2.0, 0.0, 3.0])
+history_2 = PerformanceHistory([-2.0, -2.0, 2.0], [0.0, 3.0, 0.0])
+history_3 = PerformanceHistory([3.0, -3.0, 3.0], [0.0, 0.0, 0.0])
+
+
+def test_compute_minimum_history():
+    """Check the computation of the minimum history."""
+    items = [HistoryItem(-2.0, 0.0), HistoryItem(-3.0, 0.0), HistoryItem(2.0, 0.0)]
+    minimum = PerformanceHistory.compute_minimum_history(
+        [history_1, history_2, history_3]
+    )
+    assert minimum.items == items
+
+
+def test_compute_maximum_history():
+    """Check the computation of the maximum history."""
+    items = [HistoryItem(1.0, 2.0), HistoryItem(-2.0, 3.0), HistoryItem(0.0, 3.0)]
+    maximum = PerformanceHistory.compute_maximum_history(
+        [history_1, history_2, history_3]
+    )
+    assert maximum.items == items
 
 
 def test_compute_median_history():
     """Check the computation of the median history."""
-    hist_1 = PerformanceHistory([1.0, -1.0, 0.0], [2.0, 0.0, 3.0])
-    hist_2 = PerformanceHistory([-2.0, -2.0, 2.0], [0.0, 3.0, 0.0])
-    hist_3 = PerformanceHistory([3.0, -3.0, 3.0], [0.0, 0.0, 0.0])
-    reference = PerformanceHistory([3.0, -1.0, 3.0], [0.0, 0.0, 0.0])
-    median = PerformanceHistory.compute_median_history([hist_1, hist_2, hist_3])
-    assert median.history_items == reference.history_items
+    items = [HistoryItem(3.0, 0.0), HistoryItem(-1.0, 0.0), HistoryItem(3.0, 0.0)]
+    median = PerformanceHistory.compute_median_history(
+        [history_1, history_2, history_3]
+    )
+    assert median.items == items
 
 
 def test_remove_leading_infeasible():
@@ -105,7 +127,7 @@ def test_remove_leading_infeasible():
     history = PerformanceHistory([2.0, 1.0, 0.0, 1.0, -1.0], [2.0, 1.0, 0.0, 3.0, 0.0])
     reference = PerformanceHistory([0.0, 1.0, -1.0], [0.0, 3.0, 0.0])
     truncation = history.remove_leading_infeasible()
-    assert truncation.history_items == reference.history_items
+    assert truncation.items == reference.items
 
 
 def test_to_file(tmp_path):
@@ -127,15 +149,19 @@ def test_from_file():
     """Check the initialization of a perfomance history from a file."""
     reference_path = Path(__file__).parent / "reference_history.json"
     history = PerformanceHistory.from_file(reference_path)
-    reference = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
-    assert history.history_items == reference.history_items
+    assert history.items[0].objective_value == -2.0
+    assert history.items[0].infeasibility_measure == 1.0
+    assert history.items[0].n_unsatisfied_constraints == 1
+    assert history.items[1].objective_value == -3.0
+    assert history.items[1].infeasibility_measure == 0.0
+    assert history.items[1].n_unsatisfied_constraints == 0
 
 
 def test_history_items_setter():
     """Check the setting of history items."""
     history = PerformanceHistory()
     with raises(TypeError, match="History items must be of type HistoryItem."):
-        history.history_items = [1.0, 2.0]
+        history.items = [1.0, 2.0]
 
 
 def test_repr():
@@ -158,7 +184,7 @@ def test_extend(size):
     history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
     extension = history.extend(size)
     assert len(extension) == size
-    assert extension.history_items[:2] == history.history_items[:2]
+    assert extension.items[:2] == history.items[:2]
     assert extension[size - 1] == history[1]
 
 
@@ -172,3 +198,9 @@ def test_extend_smaller():
             )
     ):
         history.extend(1)
+
+
+def test_get_plot_data_feasible():
+    """Check the retrieval of feasible data for plotting."""
+    history = PerformanceHistory([2.0, 1.0], [1.0, 1.0])
+    assert history.get_plot_data(feasible=True) == ([], [])

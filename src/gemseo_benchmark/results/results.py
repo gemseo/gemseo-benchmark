@@ -29,10 +29,7 @@ from gemseo.utils.py23_compat import Path
 class Results(object):
     """A collection of paths to performance histories."""
 
-    def __init__(
-            self,
-            path=None,  # type: Optional[Union[str, Path]]
-    ):  # type: (...) -> None
+    def __init__(self, path: Optional[Union[str, Path]] = None) -> None:
         """
         Args:
             path: The path to the JSON file from which to load the paths.
@@ -43,11 +40,8 @@ class Results(object):
             self.from_file(path)
 
     def add_path(
-            self,
-            algo_name,  # type: str
-            problem_name,  # type: str
-            path,  # type: Union[str, Path]
-    ):  # type: (...) -> None
+            self, algo_name: str, problem_name: str, path: Union[str, Path]
+    ) -> None:
         """Add a path to a performance history.
 
         Args:
@@ -61,20 +55,14 @@ class Results(object):
         try:
             absolute_path = Path(path).resolve(strict=True)
         except FileNotFoundError:
-            raise FileNotFoundError(
-                "The path to the history does not exist: {}.".format(path)
-            )
+            raise FileNotFoundError(f"The path to the history does not exist: {path}.")
         if algo_name not in self.__dict:
             self.__dict[algo_name] = dict()
         if problem_name not in self.__dict[algo_name]:
             self.__dict[algo_name][problem_name] = list()
         self.__dict[algo_name][problem_name].append(absolute_path)
 
-    def to_file(
-            self,
-            path,  # type: Union[str, Path]
-            indent=None,  # type: Optional[int]
-    ):  # type: (...) -> None
+    def to_file(self, path: Union[str, Path], indent: Optional[int] = None) -> None:
         """Save the histories paths to a JSON file.
 
         Args:
@@ -90,10 +78,7 @@ class Results(object):
         with Path(path).open("w") as file:
             json.dump(serializable, file, indent=indent)
 
-    def from_file(
-            self,
-            path,  # type: Union[str, Path]
-    ):  # type: (...) -> None
+    def from_file(self, path: Union[str, Path]) -> None:
         """Load paths to performance histories from a JSON file.
 
         Args:
@@ -101,7 +86,7 @@ class Results(object):
         """
         if not Path(path).is_file():
             raise FileNotFoundError(
-                "The path to the JSON file does not exist: {}.".format(path)
+                f"The path to the JSON file does not exist: {path}."
             )
 
         with Path(path).open("r") as file:
@@ -112,7 +97,7 @@ class Results(object):
                     self.add_path(algo_name, problem_name, path)
 
     @property
-    def algorithms(self):  # type: (...) -> List[str]
+    def algorithms(self) -> List[str]:
         """Return the names of the algorithms.
 
         Returns:
@@ -120,10 +105,7 @@ class Results(object):
         """
         return list(self.__dict)
 
-    def get_problems(
-            self,
-            algo_name,  # type: str
-    ):  # type: (...) -> List[str]
+    def get_problems(self, algo_name: str) -> List[str]:
         """Return the names of the problems for a given algorithm.
 
         Args:
@@ -136,15 +118,11 @@ class Results(object):
             ValueError: If the algorithm name is unknown.
         """
         if algo_name not in self.__dict:
-            raise ValueError("Unknown algorithm name: {}.".format(algo_name))
+            raise ValueError(f"Unknown algorithm name: {algo_name}.")
 
         return list(self.__dict[algo_name])
 
-    def get_paths(
-            self,
-            algo_name,  # type: str
-            problem_name,  # type: str
-    ):  # type: (...) -> List[Path]
+    def get_paths(self, algo_name: str, problem_name: str) -> List[Path]:
         """Return the paths associated with an algorithm and a problem.
 
         Args:
@@ -153,27 +131,31 @@ class Results(object):
 
         Returns:
             The paths to the performance histories.
+
+        Raises:
+            ValueError: If the algorithm name is unknown,
+                or if the problem name is unknown.
         """
         if algo_name not in self.__dict:
-            raise ValueError("Unknown algorithm name: {}.".format(algo_name))
+            raise ValueError(f"Unknown algorithm name: {algo_name}.")
 
         if problem_name not in self.__dict[algo_name]:
-            raise ValueError("Unknown problem name: {}.".format(problem_name))
+            raise ValueError(f"Unknown problem name: {problem_name}.")
 
         return self.__dict[algo_name][problem_name]
 
-    def contains(
-            self,
-            algo_name,  # type: str
-            problem_name,  # type: str
-    ):  # type: (...) -> bool
+    def contains(self, algo_name: str, problem_name: str, path: Path) -> bool:
         """Check whether a result is stored.
 
         Args:
             algo_name: The name of the algorithm.
             problem_name: The name of the problem.
+            path: The path to the performance history
 
         Returns:
             Whether the result is stored.
         """
-        return algo_name in self.__dict and problem_name in self.__dict[algo_name]
+        return (
+                algo_name in self.__dict and problem_name in self.__dict[algo_name]
+                and path in self.__dict[algo_name][problem_name]
+        )

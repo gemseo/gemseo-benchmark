@@ -1,3 +1,4 @@
+"""Compute data profiles for SciPy algorithms."""
 from __future__ import print_function
 
 from itertools import product
@@ -7,8 +8,8 @@ from numpy import array
 from numpy.core.multiarray import ndarray
 from scipy.optimize import minimize, rosen
 
-from gemseo_benchmark.data_profiles import DataProfile
-from gemseo_benchmark.data_profiles import TargetsGenerator
+from gemseo_benchmark.data_profiles.data_profile import DataProfile
+from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
 
 
 def generate_values_history(
@@ -62,7 +63,9 @@ for ref_algo, start_point in product(reference_algos, STARTING_POINTS):
 
 # Compute the scale of target values
 targets_number = 20
-targets_values = {"Rosenbrock": targets_generator.compute_target_values(targets_number, show=True)}
+targets_values = {
+    "Rosenbrock": targets_generator.compute_target_values(targets_number, show=True)
+}
 print("Target values\n", targets_values["Rosenbrock"])
 
 # Set the algorithms to be compared
