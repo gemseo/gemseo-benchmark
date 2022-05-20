@@ -31,14 +31,15 @@ Targets are used to estimate the efficiency
 of an algorithm to solve a problem (or several)
 and computes its data profile (see :mod:`data_profile`).
 """
-from typing import List, Optional, Union
+from __future__ import annotations
+
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from numpy import array, linspace, logical_not
 
 from gemseo.utils.matplotlib_figure import save_show_figure
-from gemseo.utils.py23_compat import Path
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 
@@ -46,9 +47,8 @@ class TargetValues(PerformanceHistory):
     """Target values of a problem."""
 
     def compute_target_hits_history(
-            self,
-            values_history  # type: PerformanceHistory
-    ):  # type: (...) -> List[int]
+            self, values_history: PerformanceHistory
+    ) -> list[int]:
         """Compute the history of the number of target hits for a performance history.
 
         Args:
@@ -63,17 +63,13 @@ class TargetValues(PerformanceHistory):
             for minimum in minimum_history
         ]
 
-    def plot(
-            self,
-            show=True,  # type: bool
-            path=None,  # type: Optional[Union[str, Path]]
-    ):  # type: (...) -> Figure
+    def plot(self, show: bool = True, file_path: str | Path = None) -> Figure:
         """Plot the target values.
 
         Args:
             show: Whether to show the plot.
-            path: The path where to save the plot.
-                If None, the plot is not saved.
+            file_path: The path where to save the plot.
+                If ``None``, the plot is not saved.
 
         Returns:
             A figure showing the target values.
@@ -107,6 +103,6 @@ class TargetValues(PerformanceHistory):
 
         plt.legend()
 
-        save_show_figure(fig, show, path)
+        save_show_figure(fig, show, file_path)
 
         return fig

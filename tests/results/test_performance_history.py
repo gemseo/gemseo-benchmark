@@ -21,25 +21,26 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the performance history."""
 import re
+from pathlib import Path
+from unittest import mock
 
+import numpy
 import pytest
-from numpy import inf
-from pytest import raises
 
-from gemseo.utils.py23_compat import Path
+from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 
 def test_invalid_init_lengths():
     """Check the initialization of a history with lists of inconsistent lengths."""
-    with raises(
+    with pytest.raises(
             ValueError,
             match="The objective history and the infeasibility history must have same"
                   " length."
     ):
         PerformanceHistory([3.0, 2.0], [1.0])
-    with raises(
+    with pytest.raises(
             ValueError,
             match="The objective history and the feasibility history must have same"
                   " length."
@@ -55,7 +56,7 @@ def test_invalid_init_lengths():
 
 def test_negative_infeasibility_measures():
     """Check the initialization of a history with negative infeasibility measures."""
-    with raises(ValueError):
+    with pytest.raises(ValueError):
         PerformanceHistory([3.0, 2.0], [1.0, -1.0])
 
 
@@ -74,7 +75,7 @@ def test_iter():
     history = PerformanceHistory([3.0, 2.0], [1.0, 0.0])
     assert list(iter(history)) == [HistoryItem(3.0, 1.0), HistoryItem(2.0, 0.0)]
     history = PerformanceHistory([3.0, 2.0], feasibility_statuses=[False, True])
-    assert list(iter(history)) == [HistoryItem(3.0, inf), HistoryItem(2.0, 0.0)]
+    assert list(iter(history)) == [HistoryItem(3.0, numpy.inf), HistoryItem(2.0, 0.0)]
 
 
 def test_compute_cumulated_minimum():
@@ -132,8 +133,11 @@ def test_remove_leading_infeasible():
 
 def test_to_file(tmp_path):
     """Check the writing of a performance history into a file."""
+    algorithm_configuration = AlgorithmConfiguration("algorithm")
     history = PerformanceHistory(
-        [-2.0, -3.0], [1.0, 0.0], n_unsatisfied_constraints=[1, 0]
+        [-2.0, -3.0], [1.0, 0.0], n_unsatisfied_constraints=[1, 0],
+        problem_name="problem", doe_size=7, total_time=123.45,
+        algorithm_configuration=algorithm_configuration
     )
     file_path = tmp_path / "history.json"
     history.to_file(str(file_path))
@@ -149,6 +153,12 @@ def test_from_file():
     """Check the initialization of a perfomance history from a file."""
     reference_path = Path(__file__).parent / "reference_history.json"
     history = PerformanceHistory.from_file(reference_path)
+    assert history.problem_name == "problem"
+    assert history.algorithm_configuration.algorithm_name == "algorithm"
+    assert history.algorithm_configuration.name == "algorithm"
+    assert history.algorithm_configuration.algorithm_options == {}
+    assert history.doe_size == 7
+    assert history.total_time == 123.45
     assert history.items[0].objective_value == -2.0
     assert history.items[0].infeasibility_measure == 1.0
     assert history.items[0].n_unsatisfied_constraints == 1
@@ -160,7 +170,7 @@ def test_from_file():
 def test_history_items_setter():
     """Check the setting of history items."""
     history = PerformanceHistory()
-    with raises(TypeError, match="History items must be of type HistoryItem."):
+    with pytest.raises(TypeError, match="History items must be of type HistoryItem."):
         history.items = [1.0, 2.0]
 
 
@@ -170,12 +180,34 @@ def test_repr():
     assert repr(history) == "[(-2.0, 1.0), (-3.0, 0.0)]"
 
 
-def test_from_problem(problem):
+def test_from_problem(problem, database):
     """Check the creation of a performance history out of a solved problem."""
+    problem.database = database
     history = PerformanceHistory.from_problem(problem, "problem")
     assert history.objective_values == [2.0]
     assert history.infeasibility_measures == [1.0]
     assert history.n_unsatisfied_constraints == [1]
+
+
+@pytest.fixture(scope="module")
+def incomplete_database(objective, equality_constraint, hashable_array) -> mock.Mock:
+    """An incomplete database."""
+    database = mock.Mock()
+    functions_values = {
+        objective.name: 2.0,
+        equality_constraint.name: numpy.array([0.0])
+    }
+    database.items = mock.Mock(return_value=[(hashable_array, functions_values)])
+    # database.get = mock.Mock(return_value=functions_values)  # FIXME
+    # database.__len__ = mock.Mock(return_value=1)  # FIXME
+    return database
+
+
+def test_from_problem_incomplete_database(problem, incomplete_database):
+    """Check the creation of a performance history out of an incomplete database."""
+    problem.database = incomplete_database
+    history = PerformanceHistory.from_problem(problem, "problem")
+    assert len(history) == 0
 
 
 @pytest.mark.parametrize("size", [2, 5])
@@ -198,6 +230,15 @@ def test_extend_smaller():
             )
     ):
         history.extend(1)
+
+
+@pytest.mark.parametrize("size", [1, 2])
+def test_shorten(size):
+    """Check the shortening of a performance history."""
+    history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
+    shortening = history.shorten(size)
+    assert len(shortening) == size
+    assert shortening.items == history.items[:size]
 
 
 def test_get_plot_data_feasible():

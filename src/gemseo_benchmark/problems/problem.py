@@ -30,9 +30,8 @@ and its targets (refer to :mod:`target_values`).
 """
 from __future__ import annotations
 
-from itertools import cycle
-from typing import Any, Callable, Iterable, List, Mapping, Optional, Sequence, Tuple, \
-    Union
+from pathlib import Path
+from typing import Callable, Iterable, Mapping, Sequence, Union
 
 import numpy
 from matplotlib import pyplot as plt
@@ -46,8 +45,9 @@ from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.api import compute_doe
 from gemseo.utils.matplotlib_figure import save_show_figure
-from gemseo.utils.py23_compat import Path
-from gemseo_benchmark import COLORS_CYCLE, MARKERS, MarkeveryType
+from gemseo_benchmark import COLORS_CYCLE, get_markers_cycle, MarkeveryType
+from gemseo_benchmark.algorithms.algorithms_configurations import \
+    AlgorithmsConfigurations
 from gemseo_benchmark.data_profiles.data_profile import DataProfile
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
@@ -56,7 +56,6 @@ from gemseo_benchmark.results.performance_history import PerformanceHistory
 from gemseo_benchmark.results.results import Results
 
 InputStartPoints = Union[ndarray, Iterable[ndarray]]
-AlgorithmsSpecifications = Mapping[str, Mapping[str, Any]]
 
 
 class Problem(object):
@@ -79,47 +78,49 @@ class Problem(object):
 
     def __init__(
             self,
-            name,  # type: str
-            optimization_problem_creator,  # type: Callable[[], OptimizationProblem]
-            start_points=None,  # type: Optional[InputStartPoints]
-            target_values=None,  # type: Optional[TargetValues]
-            doe_algo_name=None,  # type: Optional[str]
-            doe_size=None,  # type: Optional[int]
-            doe_options=None,  # type: Optional[Mapping[str, DOELibraryOptionType]]
-            description=None,  # type: Optional[str]
-            target_values_algorithms=None,  # type: Optional[AlgorithmsSpecifications]
-            target_values_number=None,  # type: Optional[int]
-            optimum=None,  # type: Optional[float]
-    ):  # type: (...) -> None
+            name: str,
+            optimization_problem_creator: Callable[[], OptimizationProblem],
+            start_points: InputStartPoints = None,
+            target_values: TargetValues = None,
+            doe_algo_name: str = None,
+            doe_size: int = None,
+            doe_options: Mapping[str, DOELibraryOptionType] = None,
+            description: str = None,
+            target_values_algorithms_configurations: AlgorithmsConfigurations = None,
+            target_values_number: int = None,
+            optimum: float = None,
+    ) -> None:
         """
         Args:
             name: The name of the benchmarking problem.
             optimization_problem_creator: A callable object that returns an instance
                 of the problem.
             start_points: The starting points of the benchmarking problem.
-                If None, the start points will generated as a DOE.
+                If ``None``, the start points will generated as a DOE.
             target_values: The target values of the benchmarking problem.
-                If None, the target values will have to be generated later with the
+                If ``None``, the target values will have to be generated later with the
                 `generate_targets` method.
             doe_algo_name: The name of the DOE algorithm.
-                If None, the current point of the problem design space is set as the
+                If ``None``, the current point of the problem design space is set as the
                 only starting point.
             doe_size: The number of starting points.
-                If None, this number is set as the problem dimension or 10 if bigger.
+                If ``None``, this number is set as the problem dimension or 10 if
+                bigger.
             doe_options: The options of the DOE algorithm.
-                If None, no option other than the DOE size is passed to the algorithm.
+                If ``None``, no option other than the DOE size is passed to the
+                algorithm.
             description: The description of the problem (to appear in a report).
-                If None, the problem will not have a description.
-            target_values_algorithms: The specifications of the optimization algorithms
-                for the computation of target values.
-                If None, the target values will not be computed.
+                If ``None``, the problem will not have a description.
+            target_values_algorithms_configurations: The configurations of the
+                optimization algorithms for the computation of target values.
+                If ``None``, the target values will not be computed.
             target_values_number: The number of target values to compute.
-                If None, the target values will not be computed.
+                If ``None``, the target values will not be computed.
                 N.B. the number of target values shall be the same for all the
                 benchmarking problems of a same group.
             optimum: The best feasible objective value of the problem.
-                If None, it will not be set.
-                If not None, it will be set as the hardest target value.
+                If ``None``, it will not be set.
+                If not ``None``, it will be set as the hardest target value.
 
         Raises:
             TypeError: If the return type of the creator is not
@@ -157,21 +158,20 @@ class Problem(object):
         self.__target_values = None
         if target_values is not None:
             self.target_values = target_values
-        elif target_values_algorithms is not None and target_values_number is not None:
+        elif target_values_algorithms_configurations is not None and \
+                target_values_number is not None:
             self.target_values = self.compute_targets(
-                target_values_number, target_values_algorithms,
+                target_values_number, target_values_algorithms_configurations,
             )
 
     @property
-    def start_points(self):  # type: (...) -> List[ndarray]
+    def start_points(self) -> list[ndarray]:
         """The starting points of the problem.
 
         Raises:
             ValueError: If the problem has no starting point,
                 or if the starting points are passed as a NumPy array with an invalid
                 shape.
-            TypeError: If the starting points are passed neither as a NumPy array
-                nor as an iterable.
         """
         if not self.__start_points:
             raise ValueError("The benchmarking problem has no starting point.")
@@ -179,10 +179,7 @@ class Problem(object):
         return self.__start_points
 
     @start_points.setter
-    def start_points(
-            self,
-            start_points,  # type: InputStartPoints
-    ):  # type: (...) -> None
+    def start_points(self, start_points: InputStartPoints) -> None:
         message = "The starting points shall be passed as (lines of) a 2-dimensional " \
                   "NumPy array, or as an iterable of 1-dimensional NumPy arrays."
 
@@ -193,7 +190,7 @@ class Problem(object):
             except TypeError:
                 raise TypeError(
                     f"{message} The following type was passed: {type(start_points)}."
-                    )
+                )
 
             self.__check_iterable_start_points(start_points)
             start_points_list = list(start_points)
@@ -203,8 +200,8 @@ class Problem(object):
             if start_points.ndim != 2:
                 raise ValueError(
                     f"{message} A {start_points.ndim}-dimensional NumPy array "
-                    f"was passed."
-                    )
+                    "was passed."
+                )
 
             if start_points.shape[1] != self.__problem.dimension:
                 raise ValueError(
@@ -221,10 +218,7 @@ class Problem(object):
 
         self.__start_points = start_points_list
 
-    def __check_iterable_start_points(
-            self,
-            start_points,  # type: Iterable[ndarray]
-    ):  # type: (...) -> None
+    def __check_iterable_start_points(self, start_points: Iterable[ndarray]) -> None:
         """Check starting points passed as an iterable.
 
         Args:
@@ -250,16 +244,17 @@ class Problem(object):
 
     def __get_start_points(
             self,
-            doe_algo_name,  # type: str
-            doe_size=None,  # type: Optional[int]
-            doe_options=None  # type: Optional[Mapping[str, DOELibraryOptionType]]
-    ):  # type: (...) -> ndarray
+            doe_algo_name: str,
+            doe_size: int = None,
+            doe_options: Mapping[str, DOELibraryOptionType] = None,
+    ) -> ndarray:
         """Return the starting points of the benchmarking problem.
 
         Args:
             doe_algo_name: The name of the DOE algorithm.
             doe_size: The number of starting points.
-                If None, this number is set as the problem dimension or 10 if bigger.
+                If ``None``, this number is set as the problem dimension or 10 if
+                bigger.
             **doe_options: The options of the DOE algorithm.
 
         Returns:
@@ -276,12 +271,12 @@ class Problem(object):
         )
 
     @property
-    def targets_generator(self):  # type: (...) -> TargetsGenerator
+    def targets_generator(self) -> TargetsGenerator:
         """The generator for target values."""
         return self.__targets_generator
 
     @property
-    def target_values(self):  # type: (...) -> TargetValues
+    def target_values(self) -> TargetValues:
         """The target values of the benchmarking problem.
 
         Raises:
@@ -293,15 +288,16 @@ class Problem(object):
         return self.__target_values
 
     @target_values.setter
-    def target_values(
-            self,
-            target_values  # type: TargetValues
-    ):
+    def target_values(self, target_values: TargetValues) -> None:
         if not isinstance(target_values, TargetValues):
-            raise TypeError
+            raise TypeError(
+                f"Target values must be of type TargetValues. "
+                f"Type {type(target_values)} was passed."
+            )
+
         self.__target_values = target_values
 
-    def __iter__(self):  # type: (...) -> OptimizationProblem
+    def __iter__(self) -> OptimizationProblem:
         """Iterate on the problem instances with respect to the starting points. """
         for start_point in self.start_points:
             problem = self.creator()
@@ -309,26 +305,23 @@ class Problem(object):
             yield problem
 
     @property
-    def description(self):  # type: (...) -> str
+    def description(self) -> str:
         """The description of the problem."""
         if self.__description is None:
             return "No description available."
         return self.__description
 
     @property
-    def objective_name(self):  # type: (...) -> str
+    def objective_name(self) -> str:
         """The name of the objective function."""
         return self.__problem.objective.name
 
     @property
-    def constraints_names(self):  # type: (...) -> List[str]
+    def constraints_names(self) -> list[str]:
         """The names of the scalar constraints."""
         return self.__problem.get_scalar_constraints_names()
 
-    def is_algorithm_suited(
-            self,
-            name,  # type: str
-    ):  # type: (...) -> bool
+    def is_algorithm_suited(self, name: str) -> bool:
         """Check whether an algorithm is suited to the problem.
 
         Args:
@@ -342,25 +335,25 @@ class Problem(object):
 
     def compute_targets(
             self,
-            targets_number,  # type: int
-            ref_algo_specifications,  # type: AlgorithmsSpecifications
-            only_feasible=True,  # type: bool
-            budget_min=1,  # type: int
-            show=False,  # type: bool
-            path=None,  # type: Optional[str]
-            best_target_tolerance=0.0,  # type: float
-            disable_stopping=True  # type: bool
-    ):  # type: (...) -> TargetValues
+            targets_number: int,
+            ref_algo_configurations: AlgorithmsConfigurations,
+            only_feasible: bool = True,
+            budget_min: int = 1,
+            show: bool = False,
+            file_path: str = None,
+            best_target_tolerance: float = 0.0,
+            disable_stopping: bool = True,
+    ) -> TargetValues:
         """Generate targets based on reference algorithms.
 
         Args:
             targets_number: The number of targets to generate.
-            ref_algo_specifications: The names and options of the reference algorithms.
+            ref_algo_configurations: The configurations of the reference algorithms.
             only_feasible: Whether to generate only feasible targets.
             budget_min: The evaluation budget to be used to define the easiest target.
             show: If True, show the plot.
-            path: The path where to save the plot.
-                If None, the plot is not saved.
+            file_path: The path where to save the plot.
+                If ``None``, the plot is not saved.
             best_target_tolerance: The relative tolerance for comparisons with the
                 best target value.
             disable_stopping: Whether to disable the stopping criteria.
@@ -371,9 +364,9 @@ class Problem(object):
         self.__targets_generator = TargetsGenerator()
 
         # Generate reference performance histories
-        for algo_name, algo_options in ref_algo_specifications.items():
+        for configuration in ref_algo_configurations:
             # Disable the stopping criteria
-            options = dict(algo_options)
+            options = dict(configuration.algorithm_options)
             if disable_stopping:
                 options["xtol_rel"] = 0.0
                 options["xtol_abs"] = 0.0
@@ -381,13 +374,13 @@ class Problem(object):
                 options["ftol_abs"] = 0.0
 
             for instance in self:
-                api.execute_algo(instance, algo_name, **options)
+                api.execute_algo(instance, configuration.algorithm_name, **options)
                 history = PerformanceHistory.from_problem(instance)
                 self.__targets_generator.add_history(history=history)
 
         # Compute the target values
         target_values = self.__targets_generator.compute_target_values(
-            targets_number, budget_min, only_feasible, show, path, self.optimum,
+            targets_number, budget_min, only_feasible, show, file_path, self.optimum,
             best_target_tolerance
         )
         self.__target_values = target_values
@@ -396,8 +389,8 @@ class Problem(object):
 
     @staticmethod
     def compute_performance(
-            problem  # type: OptimizationProblem
-    ):  # type: (...) -> Tuple[List[float], List[float], List[bool]]
+            problem: OptimizationProblem
+    ) -> tuple[list[float], list[float], list[bool]]:
         """Extract the performance history from a solved optimization problem.
 
         Args:
@@ -419,10 +412,7 @@ class Problem(object):
             feas_statuses.append(feasibility)
         return obj_values, infeas_measures, feas_statuses
 
-    def save_start_points(
-            self,
-            path,  # type: Path
-    ):  # type: (...) -> None
+    def save_start_points(self, path: Path) -> None:
         """Save the start points as a NumPy binary.
 
         Args:
@@ -430,10 +420,7 @@ class Problem(object):
         """
         save(path, array(self.start_points))
 
-    def load_start_point(
-            self,
-            path,  # type: Path
-    ):  # type: (...) -> None
+    def load_start_point(self, path: Path) -> None:
         """Load the start points from a NumPy binary.
 
         Args:
@@ -443,13 +430,13 @@ class Problem(object):
 
     @staticmethod
     def _get_description(
-            dimension,  # type: int
-            nonlinear_objective,  # type: bool
-            linear_equality_constraints,  # type: int
-            linear_inequality_constraints,  # type: int
-            nonlinear_equality_constraints,  # type: int
-            nonlinear_inequality_constraints,  # type: int
-    ):  # type: (...) -> str
+            dimension: int,
+            nonlinear_objective: bool,
+            linear_equality_constraints: int,
+            linear_inequality_constraints: int,
+            nonlinear_equality_constraints: int,
+            nonlinear_inequality_constraints: int,
+    ) -> str:
         """Return a formal description of the problem.
 
         Args:
@@ -494,48 +481,66 @@ class Problem(object):
         return f"{description}."
 
     @property
-    def dimension(self):  # type: (...) -> int
+    def dimension(self) -> int:
         """The dimension of the problem."""
         return self.__problem.dimension
 
     def compute_data_profile(
-            self, algos_specifications: AlgorithmsSpecifications, results: Results,
-            show: bool = False, file_path: str | Path | None = None
+            self,
+            algos_configurations: AlgorithmsConfigurations,
+            results: Results,
+            show: bool = False,
+            file_path: str | Path = None,
+            infeasibility_tolerance: float = 0.0,
+            max_eval_number: int = None
     ) -> None:
         """Generate the data profiles of given algorithms.
 
         Args:
-            algos_specifications: The algorithms and their options.
+            algos_configurations: The algorithms configurations.
             results: The paths to the reference histories for each algorithm.
             show: Whether to display the plot.
             file_path: The path where to save the plot.
                 If ``None``, the plot is not saved.
+            infeasibility_tolerance: The tolerance on the infeasibility measure.
+            max_eval_number: The maximum evaluations number to be displayed.
+                If ``None``, this value is inferred from the longest history.
         """
         # Initialize the data profile
         data_profile = DataProfile({self.name: self.target_values})
 
         # Generate the performance histories
-        for algo_name, algo_options in algos_specifications.items():
-            for history_path in results.get_paths(algo_name, self.name):
+        for configuration_name in algos_configurations.names:
+            for history_path in results.get_paths(configuration_name, self.name):
                 history = PerformanceHistory.from_file(history_path)
+                if max_eval_number is not None:
+                    history = history.shorten(max_eval_number)
+
+                history.apply_infeasibility_tolerance(infeasibility_tolerance)
                 data_profile.add_history(
-                    self.name, algo_name, history.objective_values,
+                    self.name, configuration_name, history.objective_values,
                     history.infeasibility_measures
                 )
 
         # Plot and/or save the data profile
-        data_profile.plot(show=show, path=file_path)
+        data_profile.plot(show=show, file_path=file_path)
 
     def plot_histories(
-            self, algos_specifications: AlgorithmsSpecifications, results: Results,
-            show: bool = False, file_path: Optional[Path] = None,
-            plot_all_histories: bool = False, alpha: float = 0.3,
-            markevery: MarkeveryType = 0.1
+            self,
+            algos_configurations: AlgorithmsConfigurations,
+            results: Results,
+            show: bool = False,
+            file_path: Path = None,
+            plot_all_histories: bool = False,
+            alpha: float = 0.3,
+            markevery: MarkeveryType = 0.1,
+            infeasibility_tolerance: float = 0.0,
+            max_eval_number: int = None
     ) -> None:
         """Plot the histories of a problem.
 
         Args:
-            algos_specifications: The algorithms and their options.
+            algos_configurations: The algorithms configurations.
             results: The paths to the reference histories for each algorithm.
             show: Whether to display the plot.
             file_path: The path where to save the plot.
@@ -545,6 +550,9 @@ class Problem(object):
                 Refer to the Matplotlib documentation.
             markevery: The sampling parameter for the markers of the plot.
                 Refer to the Matplotlib documentation.
+            infeasibility_tolerance: The tolerance on the infeasibility measure.
+            max_eval_number: The maximum evaluations number displayed.
+                If ``None``, this value is inferred from the longest history.
         """
         figure = plt.figure()
         axes = figure.gca()
@@ -554,19 +562,28 @@ class Problem(object):
         for objective_target in objective_targets:
             plt.axhline(objective_target, color="red", linestyle="--")
 
-        minimum_values = list()
-        for algo_name, color, marker in zip(
-                algos_specifications, COLORS_CYCLE, cycle(MARKERS)
-        ):
-            # Load the histories of the best performance value
-            minima = [
-                PerformanceHistory.from_file(path).compute_cumulated_minimum()
-                for path in results.get_paths(algo_name, self.name)
-            ]
+        # Get the histories of the cumulated minima
+        minima, max_feasible_objective = self.__get_cumulated_minimum_histories(
+            algos_configurations, results, infeasibility_tolerance, max_eval_number
+        )
+        if max_eval_number is None:
+            max_eval_number = max(
+                [len(hist) for histories in minima.values() for hist in histories]
+            )
 
-            # Plot the histories
+        y_relative_margin = 0.03
+        max_feasible_objective = self.__get_infeasible_items_objective(
+            max_feasible_objective, y_relative_margin
+        )
+
+        # Plot the histories
+        minimum_values = list()
+        for configuration_name, color, marker in zip(
+                algos_configurations.names, COLORS_CYCLE, get_markers_cycle()
+        ):
             minimum_value = self.__plot_algorithm_histories(
-                axes, algo_name, minima, plot_all_histories, color=color,
+                axes, configuration_name, minima[configuration_name],
+                max_feasible_objective, plot_all_histories, color=color,
                 marker=marker, alpha=alpha, markevery=markevery
             )
             if minimum_value is not None:
@@ -577,8 +594,8 @@ class Problem(object):
         # Ensure the x-axis ticks are integers
         axes.xaxis.set_major_locator(MaxNLocator(integer=True))
         plt.margins(x=0.1)
-        plt.xlabel("Number of evaluations")
-        plt.autoscale(enable=True, axis="x", tight=True)
+        plt.xlabel("Number of functions evaluations")
+        plt.xlim(1, max_eval_number)
 
         # Set the y-axis margins to zero to get the tight y-limits
         plt.autoscale(enable=True, axis="y", tight=True)
@@ -601,20 +618,102 @@ class Problem(object):
         twin_axes.set_yticklabels([f"{value:.2g}" for value in objective_targets])
         twin_axes.set_ylabel("Target values", rotation=270)
 
+        plt.title("Convergence histories")
         save_show_figure(figure, show, file_path)
+
+    def __get_cumulated_minimum_histories(
+            self,
+            algos_configurations: AlgorithmsConfigurations,
+            results: Results,
+            infeasibility_tolerance: float = 0.0,
+            max_eval_number: int = None
+    ) -> tuple[dict[str, list[PerformanceHistory]], float | None]:
+        """Return the histories of the cumulated minimum.
+
+        Args:
+            algos_configurations: The algorithms configurations.
+            results: The paths to the reference histories for each algorithm.
+            infeasibility_tolerance: The tolerance on the infeasibility measure.
+            max_eval_number: The maximum evaluations number displayed.
+                If ``None``, this value is inferred from the longest history.
+
+        Returns:
+            The histories of the cumulated minima and the maximum feasible value.
+        """
+        minima = dict()
+        max_feasible_objective = None
+        for configuration_name in algos_configurations.names:
+            minima[configuration_name] = list()
+            for path in results.get_paths(configuration_name, self.name):
+                # Get the history of the cumulated minimum
+                history = PerformanceHistory.from_file(path)
+                if max_eval_number is not None:
+                    history = history.shorten(max_eval_number)
+
+                history.apply_infeasibility_tolerance(infeasibility_tolerance)
+                history = history.compute_cumulated_minimum()
+                minima[configuration_name].append(history)
+
+                # Update the maximum feasible objective value
+                feasible_objectives = [
+                    item.objective_value for item in history if item.is_feasible
+                ]
+                if max_feasible_objective is None:
+                    max_feasible_objective = max(feasible_objectives, default=None)
+                else:
+                    max_feasible_objective = max(
+                        feasible_objectives + [max_feasible_objective]
+                    )
+
+        return minima, max_feasible_objective
+
+    def __get_infeasible_items_objective(
+            self, max_feasible_objective: float | None, y_relative_margin: float
+    ) -> float:
+        """Return the objective value to set for the infeasible history items.
+
+        This finite value will serve for the graph of the maximum history.
+
+        Args:
+            max_feasible_objective: The maximum feasible objective value.
+                None means there is no feasible objective value.
+            y_relative_margin: The vertical relative margin for the histories plot.
+
+        Returns:
+            The objective value to set for the infeasible history items.
+        """
+        objective_targets = [target.objective_value for target in self.target_values]
+        if max_feasible_objective is None:
+            max_feasible_objective = max(objective_targets)
+        else:
+            max_feasible_objective = max(max_feasible_objective, *objective_targets)
+
+        if self.optimum is None:
+            return max_feasible_objective
+
+        return max_feasible_objective + y_relative_margin * (
+                max_feasible_objective - self.optimum
+        )
 
     @staticmethod
     def __plot_algorithm_histories(
-            axes: Axes, algorithm_name: str, histories: Iterable[PerformanceHistory],
-            plot_all: bool, color: str, marker: str, alpha: float,
+            axes: Axes,
+            algorithm_name: str,
+            histories: Iterable[PerformanceHistory],
+            max_feasible_objective: float,
+            plot_all: bool,
+            color: str,
+            marker: str,
+            alpha: float,
             markevery: MarkeveryType
-    ) -> Optional[float]:
+    ) -> float | None:
         """Plot the histories associated with an algorithm.
 
         Args:
             axes: The axes on which to plot the performance histories.
             algorithm_name: The name of the algorithm.
             histories: The histories associated with the algorithm.
+            max_feasible_objective: The ordinate for infeasible history items.
             plot_all: Whether to plot all the performance histories.
             color: The color of the plot.
             marker: The marker type of the plot.
@@ -632,23 +731,10 @@ class Problem(object):
             for history in histories:
                 history.plot(axes, only_feasible=True, color=color, alpha=alpha)
 
-        # Get the minimum history, starting from its first feasible item        
+        # Get the minimum history, starting from its first feasible item
         minimum = PerformanceHistory.compute_minimum_history(histories)
         abscissas, minimum_items = minimum.get_plot_data(feasible=True)
         minimum_ordinates = [item.objective_value for item in minimum_items]
-
-        # Compute the maximal feasible objective function value
-        max_feasible_objectives = list()
-        for history in histories:
-            items = [item for item in history.items if item.is_feasible]
-            if items:
-                max_feasible_objectives.append(max(items))
-
-        if not max_feasible_objectives:
-            # There is not feasible item
-            return None
-
-        max_feasible_objective = max(max_feasible_objectives).objective_value
 
         # Get the maximum history for the same abscissas as the minimum history
         maximum = PerformanceHistory.compute_maximum_history(histories)
@@ -684,7 +770,7 @@ class Problem(object):
     @staticmethod
     def __get_penalized_objective_values(
             history_items: Sequence[HistoryItem], indexes: Iterable[int], value: float
-    ) -> List[float]:
+    ) -> list[float]:
         """Return the objectives of history items, replacing the infeasible ones.
 
         Args:

@@ -20,12 +20,13 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the collection of paths to performance histories."""
+from __future__ import annotations
+
 import json
-from typing import Dict, List
+from pathlib import Path
 
 import pytest
 
-from gemseo.utils.py23_compat import Path
 from gemseo_benchmark.results.results import Results
 
 algorithm_name = "algorithm"
@@ -42,7 +43,7 @@ def results() -> Results:
 
 
 @pytest.fixture(scope="module")
-def results_contents() -> Dict[str, Dict[str, List[str]]]:
+def results_contents() -> dict[str, dict[str, list[str]]]:
     """The paths for the performance histories."""
     return {algorithm_name: {problem_name: [str(history_path.resolve())]}}
 
@@ -110,7 +111,10 @@ def test_get_problems(results):
 
 def test_get_problems_unknown_algorithm(results):
     """Check the accessor to the problems names for an unknown algorithm."""
-    with pytest.raises(ValueError, match="Unknown algorithm name: unknown."):
+    with pytest.raises(
+            ValueError,
+            match="Unknown algorithm name: unknown."
+    ):
         results.get_problems("unknown")
 
 

@@ -20,32 +20,36 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """A class to collect the paths to performance histories."""
-import json
-from typing import List, Optional, Union
+from __future__ import annotations
 
-from gemseo.utils.py23_compat import Path
+import json
+from pathlib import Path
 
 
 class Results(object):
     """A collection of paths to performance histories."""
 
-    def __init__(self, path: Optional[Union[str, Path]] = None) -> None:
+    def __init__(self, path: str | Path = None) -> None:
         """
         Args:
             path: The path to the JSON file from which to load the paths.
-                If None, the collection is initially empty.
+                If ``None``, the collection is initially empty.
         """
         self.__dict = dict()
         if path is not None:
             self.from_file(path)
 
     def add_path(
-            self, algo_name: str, problem_name: str, path: Union[str, Path]
+            self,
+            algorithm_configuration_name: str,
+            problem_name: str,
+            path: str | Path
     ) -> None:
         """Add a path to a performance history.
 
         Args:
-            algo_name: The name of the algorithm associated with the history.
+            algorithm_configuration_name: The name of the algorithm configuration
+                associated with the history.
             problem_name: The name of the problem associated with the history.
             path: The path to the history.
 
@@ -56,13 +60,15 @@ class Results(object):
             absolute_path = Path(path).resolve(strict=True)
         except FileNotFoundError:
             raise FileNotFoundError(f"The path to the history does not exist: {path}.")
-        if algo_name not in self.__dict:
-            self.__dict[algo_name] = dict()
-        if problem_name not in self.__dict[algo_name]:
-            self.__dict[algo_name][problem_name] = list()
-        self.__dict[algo_name][problem_name].append(absolute_path)
+        if algorithm_configuration_name not in self.__dict:
+            self.__dict[algorithm_configuration_name] = dict()
 
-    def to_file(self, path: Union[str, Path], indent: Optional[int] = None) -> None:
+        if problem_name not in self.__dict[algorithm_configuration_name]:
+            self.__dict[algorithm_configuration_name][problem_name] = list()
+
+        self.__dict[algorithm_configuration_name][problem_name].append(absolute_path)
+
+    def to_file(self, path: str | Path, indent: int = None) -> None:
         """Save the histories paths to a JSON file.
 
         Args:
@@ -78,7 +84,7 @@ class Results(object):
         with Path(path).open("w") as file:
             json.dump(serializable, file, indent=indent)
 
-    def from_file(self, path: Union[str, Path]) -> None:
+    def from_file(self, path: str | Path) -> None:
         """Load paths to performance histories from a JSON file.
 
         Args:
@@ -97,32 +103,32 @@ class Results(object):
                     self.add_path(algo_name, problem_name, path)
 
     @property
-    def algorithms(self) -> List[str]:
-        """Return the names of the algorithms.
+    def algorithms(self) -> list[str]:
+        """Return the names of the algorithms configurations.
 
         Returns:
-            The names of the algorithms.
+            The names of the algorithms configurations.
         """
         return list(self.__dict)
 
-    def get_problems(self, algo_name: str) -> List[str]:
-        """Return the names of the problems for a given algorithm.
+    def get_problems(self, algo_name: str) -> list[str]:
+        """Return the names of the problems for a given algorithm configuration.
 
         Args:
-            algo_name: The name of the algorithm.
+            algo_name: The name of the algorithm configuration.
 
         Returns:
             The names of the problems.
 
         Raises:
-            ValueError: If the algorithm name is unknown.
+            ValueError: If the algorithm configuration name is unknown.
         """
         if algo_name not in self.__dict:
             raise ValueError(f"Unknown algorithm name: {algo_name}.")
 
         return list(self.__dict[algo_name])
 
-    def get_paths(self, algo_name: str, problem_name: str) -> List[Path]:
+    def get_paths(self, algo_name: str, problem_name: str) -> list[Path]:
         """Return the paths associated with an algorithm and a problem.
 
         Args:
@@ -148,7 +154,7 @@ class Results(object):
         """Check whether a result is stored.
 
         Args:
-            algo_name: The name of the algorithm.
+            algo_name: The name of the algorithm configuration.
             problem_name: The name of the problem.
             path: The path to the performance history
 

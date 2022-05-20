@@ -21,11 +21,15 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Grouping of reference problems for benchmarking."""
-from pathlib import Path
-from typing import Iterable, Iterator, Optional, Union
+from __future__ import annotations
 
+from pathlib import Path
+from typing import Iterable, Iterator
+
+from gemseo_benchmark.algorithms.algorithms_configurations import \
+    AlgorithmsConfigurations
 from gemseo_benchmark.data_profiles.data_profile import DataProfile
-from gemseo_benchmark.problems.problem import AlgorithmsSpecifications, Problem
+from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 from gemseo_benchmark.results.results import Results
 
@@ -44,28 +48,25 @@ class ProblemsGroup(object):
 
     def __init__(
             self,
-            name,  # type: str
-            problems,  # type: Iterable[Problem]
-            description=None,  # type: Optional[str]
-    ):  # type: (...) -> None
+            name: str,
+            problems: Iterable[Problem],
+            description: str = None,
+    ) -> None:
         """
         Args:
             name: The name of the group of problems.
             problems: The benchmarking problems of the group.
             description: The description of the group of problems.
-                If None, the description is set to None.
+                If ``None``, the description is set to None.
         """
         self.name = name
         self.__problems = problems
         self.description = description
 
-    def __iter__(self):  # type: (...) -> Iterator[Problem]
+    def __iter__(self) -> Iterator[Problem]:
         return iter(self.__problems)
 
-    def is_algorithm_suited(
-            self,
-            name,  # type: str
-    ):  # type: (...) -> bool
+    def is_algorithm_suited(self, name: str) -> bool:
         """Check whether an algorithm is suited to all the problems in the group.
 
         Args:
@@ -78,37 +79,42 @@ class ProblemsGroup(object):
 
     def compute_targets(
             self,
-            targets_number,  # type: int
-            ref_algos_specifications,  # type: AlgorithmsSpecifications
-            only_feasible=True,  # type: bool
-    ):  # type: (...) -> None
+            targets_number: int,
+            ref_algos_configurations: AlgorithmsConfigurations,
+            only_feasible: bool = True,
+    ) -> None:
         """Generate targets for all the problems based on given reference algorithms.
 
         Args:
             targets_number: The number of targets to generate.
-            ref_algos_specifications: The names and options of the reference algorithms.
+            ref_algos_configurations: The configurations of the reference algorithms.
             only_feasible: Whether to generate only feasible targets.
         """
         for problem in self.__problems:
             problem.compute_targets(
-                targets_number, ref_algos_specifications, only_feasible
+                targets_number, ref_algos_configurations, only_feasible
             )
 
     def compute_data_profile(
             self,
-            algos_specifications,  # type: AlgorithmsSpecifications
-            histories_paths,  # type: Results
-            show=True,  # type: bool
-            plot_path=None  # type: Optional[Union[str, Path]]
-    ):  # type: (...) -> None
+            algos_configurations: AlgorithmsConfigurations,
+            histories_paths: Results,
+            show: bool = True,
+            plot_path: str | Path = None,
+            infeasibility_tolerance: float = 0.0,
+            max_eval_number: int = None
+    ) -> None:
         """Generate the data profiles of given algorithms relative to the problems.
 
         Args:
-            algos_specifications: The algorithms and their options.
+            algos_configurations: The algorithms configurations.
             histories_paths: The paths to the reference histories for each algorithm.
             show: If True, show the plot.
             plot_path: The path where to save the plot.
                 By default the plot is not saved.
+            infeasibility_tolerance: The tolerance on the infeasibility measure.
+            max_eval_number: The maximum evaluations number to be displayed.
+                If ``None``, this value is inferred from the longest history.
         """
         # Initialize the data profile
         target_values = {
@@ -117,14 +123,19 @@ class ProblemsGroup(object):
         data_profile = DataProfile(target_values)
 
         # Generate the performance histories
-        for algo_name, algo_options in algos_specifications.items():
+        for configuration_name in algos_configurations.names:
             for problem in self.__problems:
-                for history_path in histories_paths.get_paths(algo_name, problem.name):
+                for history_path in histories_paths.get_paths(
+                        configuration_name, problem.name
+                ):
                     history = PerformanceHistory.from_file(history_path)
+                    if max_eval_number is not None:
+                        history = history.shorten(max_eval_number)
+                    history.apply_infeasibility_tolerance(infeasibility_tolerance)
                     data_profile.add_history(
-                        problem.name, algo_name, history.objective_values,
+                        problem.name, configuration_name, history.objective_values,
                         history.infeasibility_measures
                     )
 
         # Plot and/or save the data profile
-        data_profile.plot(show=show, path=plot_path)
+        data_profile.plot(show=show, file_path=plot_path)

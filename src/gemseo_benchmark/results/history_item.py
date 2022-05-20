@@ -20,7 +20,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """A performance history item."""
-from typing import Optional, Tuple
+from __future__ import annotations
 
 
 class HistoryItem(object):
@@ -28,17 +28,17 @@ class HistoryItem(object):
 
     def __init__(
             self,
-            objective_value,  # type: float
-            infeasibility_measure,  # type: float
-            n_unsatisfied_constraints=None,  # type: Optional[int]
-    ):  # type: (...) -> None
+            objective_value: float,
+            infeasibility_measure: float,
+            n_unsatisfied_constraints: int = None,
+    ) -> None:
         """
         Args:
             objective_value: The objective function value of the item.
             infeasibility_measure: The infeasibility measure of the item.
             n_unsatisfied_constraints: The number of unsatisfied constraints of the
                 item.
-                If None, it will be set to 0 if the infeasibility measure is zero,
+                If ``None``, it will be set to 0 if the infeasibility measure is zero,
                 and if the infeasibility measure is positive it will be set to None.
         """
         self.__objective_value = objective_value
@@ -50,8 +50,8 @@ class HistoryItem(object):
 
     @staticmethod
     def __get_infeasibility(
-            infeasibility_measure: float, n_unsatisfied_constraints: Optional[int]
-    ) -> Tuple[float, Optional[int]]:
+            infeasibility_measure: float, n_unsatisfied_constraints: int | None
+    ) -> tuple[float, int | None]:
         """Check the infeasibility measure and the number of unsatisfied constraints.
 
         Args:
@@ -110,17 +110,14 @@ class HistoryItem(object):
         return self.__infeas_measure
 
     @property
-    def n_unsatisfied_constraints(self) -> Optional[int]:
+    def n_unsatisfied_constraints(self) -> int | None:
         """The number of unsatisfied constraints."""
         return self.__n_unsatisfied_constraints
 
     def __repr__(self) -> str:
         return str((self.objective_value, self.infeasibility_measure))
 
-    def __eq__(
-            self,
-            other,  # type: HistoryItem
-    ):  # type: (...) -> bool
+    def __eq__(self, other: HistoryItem) -> bool:
         """Compare the history item with another one for equality.
 
         Args:
@@ -134,10 +131,7 @@ class HistoryItem(object):
                 and self.objective_value == other.objective_value
         )
 
-    def __lt__(
-            self,
-            other,  # type: HistoryItem
-    ):  # type: (...) -> bool
+    def __lt__(self, other: HistoryItem) -> bool:
         """Compare the history item to another one for lower inequality.
 
         Args:
@@ -151,10 +145,7 @@ class HistoryItem(object):
                 and self.objective_value < other.objective_value
         )
 
-    def __le__(
-            self,
-            other,  # type: HistoryItem
-    ):  # type: (...) -> bool
+    def __le__(self, other: HistoryItem) -> bool:
         """Compare the history item to another one for lower inequality or equality.
 
         Args:
@@ -166,10 +157,19 @@ class HistoryItem(object):
         return self < other or self == other
 
     @property
-    def is_feasible(self):  # type: (...) -> bool
-        """Check whether the history item is feasible.
-
-        Returns:
-            Whether the history item is feasible.
-        """
+    def is_feasible(self) -> bool:
+        """Whether the history item is feasible."""
         return self.infeasibility_measure == 0.0
+
+    def apply_infeasibility_tolerance(self, infeasibility_tolerance: float) -> None:
+        """Apply a tolerance on the infeasibility measure.
+
+        Mark the history item as feasible if its infeasibility measure is below the
+        tolerance.
+
+        Args:
+            infeasibility_tolerance: the tolerance on the infeasibility measure.
+        """
+        if self.__infeas_measure <= infeasibility_tolerance:
+            self.__infeas_measure = 0.0
+            self.__n_unsatisfied_constraints = 0

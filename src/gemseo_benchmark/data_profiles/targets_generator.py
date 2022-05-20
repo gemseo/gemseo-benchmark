@@ -26,14 +26,16 @@ the median of the reference histories is computed
 and a uniformly distributed subset (of the required size) of this median history is
 extracted.
 """
-from typing import Iterable, List, Optional, Sequence, Tuple, Union
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Iterable, Sequence
 
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from numpy import linspace, ndarray
 
 from gemseo.utils.matplotlib_figure import save_show_figure
-from gemseo.utils.py23_compat import Path
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
@@ -44,30 +46,30 @@ class TargetsGenerator(object):
 
     __NO_HISTORIES_MESSAGE = "There are no histories to generate the targets from."
 
-    def __init__(self):  # type: (...) -> None
+    def __init__(self) -> None:
         self.__histories = list()
 
     def add_history(
             self,
-            objective_values=None,  # type: Optional[Sequence[float]]
-            infeasibility_measures=None,  # type: Optional[Sequence[float]]
-            feasibility_statuses=None,  # type: Optional[Sequence[bool]]
-            history=None  # type: Optional[PerformanceHistory]
-    ):  # type: (...) -> None
+            objective_values: Sequence[float] = None,
+            infeasibility_measures: Sequence[float] = None,
+            feasibility_statuses: Sequence[bool] = None,
+            history: PerformanceHistory = None,
+    ) -> None:
         """Add a history of objective values.
 
         Args:
             objective_values: A history of objective values.
-                If None, a performance history must be passed.
+                If ``None``, a performance history must be passed.
                 N.B. the value at index i is assumed to have been obtained with i+1
                 evaluations.
             infeasibility_measures: A history of infeasibility measures.
-                If None then measures are set to zero in case of feasibility and set
+                If ``None`` then measures are set to zero in case of feasibility and set
                 to infinity otherwise.
             feasibility_statuses: A history of (boolean) feasibility statuses.
-                If None then feasibility is always assumed.
+                If ``None`` then feasibility is always assumed.
             history: A performance history.
-                If None, objective values must be passed.
+                If ``None``, objective values must be passed.
 
         Raises:
             ValueError: If neither a performance history nor objective values are
@@ -90,14 +92,14 @@ class TargetsGenerator(object):
 
     def compute_target_values(
             self,
-            targets_number,  # type: int
-            budget_min=1,  # type: int
-            feasible=True,  # type: bool
-            show=False,  # type: bool
-            path=None,  # type: Optional[Union[str, Path]]
-            best_target_objective=None,  # type: Optional[float]
-            best_target_tolerance=0.0,  # type: float
-    ):  # type: (...) -> TargetValues
+            targets_number: int,
+            budget_min: int = 1,
+            feasible: bool = True,
+            show: bool = False,
+            file_path: str | Path = None,
+            best_target_objective: float = None,
+            best_target_tolerance: float = 0.0,
+    ) -> TargetValues:
         """Compute the target values for a function from the histories of its values.
 
         Args:
@@ -110,10 +112,10 @@ class TargetsGenerator(object):
                 best target value.
             feasible: Whether to generate only feasible targets.
             show: Whether to show the plot.
-            path: The file path to save the plot.
-                If None, the plot is not saved.
+            file_path: The file path to save the plot.
+                If ``None``, the plot is not saved.
             best_target_objective: The objective value of the best target value.
-                If None, it will be inferred from the performance histories.
+                If ``None``, it will be inferred from the performance histories.
             best_target_tolerance: The relative tolerance for comparison with the
                 best target value.
 
@@ -147,22 +149,18 @@ class TargetsGenerator(object):
 
         # Compute the target values
         target_values = TargetValues()
-        target_values.history_items = [
-            median_history[item - 1] for item in budget_scale
-        ]
+        target_values.items = [median_history[item - 1] for item in budget_scale]
 
         # Plot the target values
-        if show or path is not None:
-            target_values.plot(show, path)
+        if show or file_path is not None:
+            target_values.plot(show, file_path)
 
         return target_values
 
     @staticmethod
     def __compute_budget_scale(
-            budget_min,  # type: int
-            budget_max,  # type: int
-            budgets_number  # type: int
-    ):  # type: (...) -> ndarray
+            budget_min: int, budget_max: int, budgets_number: int,
+    ) -> ndarray:
         """Compute a scale of evaluation budgets.
 
          The progression of the scale relates to complexity in terms of evaluation cost.
@@ -179,7 +177,7 @@ class TargetsGenerator(object):
             The distribution of evaluation budgets.
 
         Raises:
-        ValueError: If the number of targets required is larger 
+            ValueError: If the number of targets required is larger
                 than the size the longest history
                 starting from budget_min.
         """
@@ -194,10 +192,8 @@ class TargetsGenerator(object):
 
     @staticmethod
     def __get_best_target(
-            objective_value,  # type: float
-            infeasibility_measure,  # type: float
-            tolerance,  # type: float
-    ):  # type: (...) -> HistoryItem
+            objective_value: float, infeasibility_measure: float, tolerance: float,
+    ) -> HistoryItem:
         """Return the best target value.
 
         Args:
@@ -221,11 +217,11 @@ class TargetsGenerator(object):
 
     @staticmethod
     def __get_reference_histories(
-            histories,  # type: Iterable[PerformanceHistory]
-            best_target_objective,  # type: Optional[float]
-            best_target_tolerance,  # type: float
-            feasible,  # type: bool
-    ):  # type: (...) -> Tuple[List[PerformanceHistory], HistoryItem]
+            histories: Iterable[PerformanceHistory],
+            best_target_objective: float | None,
+            best_target_tolerance: float,
+            feasible: bool,
+    ) -> tuple[list[PerformanceHistory], HistoryItem]:
         """Return the performance histories of reference.
 
         1. Compute the histories of the cumulated minima.
@@ -281,19 +277,19 @@ class TargetsGenerator(object):
 
     def plot_histories(
             self,
-            best_target_value=None,  # type: Optional[float]
-            show=False,  # type: bool
-            file_path=None  # type: Optional[Union[str, Path]]
-    ):  # type: (...) -> Figure
+            best_target_value: float = None,
+            show: bool = False,
+            file_path: str | Path = None,
+    ) -> Figure:
         """Plot the histories used as a basis to compute the target values.
 
         Args:
             best_target_value: The best target value
                 to be represented with a horizontal line.
-                If None, no best target value will be plotted.
+                If ``None``, no best target value will be plotted.
             show: Whether to show the figure.
             file_path: The path where to save the figure.
-                If None, the figure will not be saved.
+                If ``None``, the figure will not be saved.
 
         Returns:
             The histories figure.
