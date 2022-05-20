@@ -21,9 +21,11 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the targets generator."""
 import re
+from unittest import mock
 
 import pytest
-from pytest import raises
+from matplotlib import pyplot
+from matplotlib.testing.decorators import image_comparison
 
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
 from gemseo_benchmark.results.history_item import HistoryItem
@@ -32,16 +34,36 @@ from gemseo_benchmark.results.history_item import HistoryItem
 def test_add_inconsistent_histories():
     """Check the addition of inconsistent performance histories."""
     generator = TargetsGenerator()
-    with raises(ValueError):
+    with pytest.raises(ValueError):
         generator.add_history([3.0, 2.0], [1.0])
-    with raises(ValueError):
+    with pytest.raises(ValueError):
         generator.add_history([3.0, 2.0], feasibility_statuses=[False])
+
+
+@pytest.mark.parametrize(
+    ["objective_values", "history", "message"],
+    [
+        (
+                (3.0, 2.0), mock.Mock(),
+                "Both a performance history and objective values were passed."
+        ),
+        (
+                None, None,
+                "Either a performance history or objective values must be passed."
+        )
+    ]
+)
+def test_add_history_redundant_arguments(objective_values, history, message):
+    """Check the addition of a performance history with redundant arguments."""
+    generator = TargetsGenerator()
+    with pytest.raises(ValueError, match=message):
+        generator.add_history(objective_values, history=history)
 
 
 def test_negative_infeasibility_measures():
     """Check the addition of a history with negative infeasibility measures."""
     generator = TargetsGenerator()
-    with raises(ValueError):
+    with pytest.raises(ValueError):
         generator.add_history([3.0, 2.0], [1.0, -1.0])
 
 
@@ -49,7 +71,7 @@ def test_too_many_targets():
     """Check that requiring more targets than are iterations raises an exception."""
     generator = TargetsGenerator()
     generator.add_history([3.0, 2.0])
-    with raises(
+    with pytest.raises(
             ValueError,
             match=re.escape(
                 "The number of targets required (3) is greater than the size the "
@@ -65,7 +87,7 @@ def test_infeasible_targets():
     generator.add_history([3.0, 2.0], [0.0, 1.0])
     generator.add_history([2.0, 1.0], [1.0, 1.0])
     targets = generator.compute_target_values(1, feasible=False, show=False)
-    assert targets.history_items == [HistoryItem(3.0, 0.0)]
+    assert targets.items == [HistoryItem(3.0, 0.0)]
 
 
 def test_various_lengths_histories():
@@ -74,7 +96,7 @@ def test_various_lengths_histories():
     generator.add_history([3.0, 2.0])
     generator.add_history([2.0])
     targets = generator.compute_target_values(1, show=False)
-    assert targets.history_items == [HistoryItem(2.0, 0.0)]
+    assert targets.items == [HistoryItem(2.0, 0.0)]
 
 
 def test_run(tmp_path):
@@ -86,8 +108,8 @@ def test_run(tmp_path):
     generator.add_history([0.0, 2.0])
     generator.add_history([3.0, 0.0])
     path = tmp_path / "targets.png"
-    targets = generator.compute_target_values(2, show=False, path=path)
-    assert targets.history_items == [HistoryItem(1.0, 0.0), HistoryItem(0.0, 0.0)]
+    targets = generator.compute_target_values(2, show=False, file_path=path)
+    assert targets.items == [HistoryItem(1.0, 0.0), HistoryItem(0.0, 0.0)]
     assert path.is_file()
 
 
@@ -110,7 +132,16 @@ def test_best_target(best_target_objective):
         2, show=False, best_target_objective=best_target_objective
     )
     # Check that only the second history (reaching the best target) is kept
-    assert targets.history_items == [HistoryItem(1.0, 0.0), HistoryItem(0.0, 0.0)]
+    assert targets.items == [HistoryItem(1.0, 0.0), HistoryItem(0.0, 0.0)]
+
+
+def test_infeasible_best_target():
+    """Check the handling of an infeasible best target."""
+    generator = TargetsGenerator()
+    generator.add_history([2.0, 1.0], [1.0, 1.0])
+    generator.add_history([1.0, 0.0], [1.0, 1.0])
+    with pytest.raises(RuntimeError, match="The best target value is not feasible."):
+        generator.compute_target_values(2, show=False)
 
 
 def test_best_target_not_reached():
@@ -122,3 +153,15 @@ def test_best_target_not_reached():
             match="There is no performance history that reaches the best target value."
     ):
         generator.compute_target_values(2, show=False, best_target_objective=0.0)
+
+
+@image_comparison(
+    baseline_images=["plot_histories"], remove_text=True, extensions=['png']
+)
+def test_plot_histories():
+    """Check the plotting of histories."""
+    generator = TargetsGenerator()
+    generator.add_history([2.0, 1.0])
+    generator.add_history([3.0, 0.0])
+    pyplot.close("all")
+    generator.plot_histories(best_target_value=0.0, show=False)

@@ -34,17 +34,20 @@ boolean feasibility statuses.
 Performance histories can be used to generate target values for a problem,
 or to generate the data profile of an algorithm.
 """
+from __future__ import annotations
+
 import json
 import statistics
 from functools import reduce
 from itertools import chain, repeat
-from typing import Callable, Iterable, List, Optional, Sequence, Tuple, Union
+from pathlib import Path
+from typing import Callable, Iterable, Sequence
 
 from matplotlib.axes import Axes
 from numpy import inf
 
 from gemseo.algos.opt_problem import OptimizationProblem
-from gemseo.utils.py23_compat import Path
+from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.results.history_item import HistoryItem
 
 
@@ -54,73 +57,67 @@ class PerformanceHistory(Sequence[HistoryItem]):
     A `PerformanceHistory` is a sequence of `HistoryItem`s.
 
     Attributes:
-        history_items (List[HistoryItem]): The items of the performance history.
-        max_eval (int): The maximum number of functions evaluations.
-        nbr_eval_iter (int): The number of functions evaluations per iteration.
         problem_name (str): The name of the problem.
         total_time (float): The run time of the algorithm.
     """
-    __PERFORMANCE = "performance"
+    __ALGORITHM_CONFIGURATION = "algorithm_configuration"
+    __DOE_SIZE = "DOE_size"
+    __EXECUTION_TIME = "execution_time"
+    __HISTORY_ITEMS = "history_items"
     __INFEASIBILITY = "infeasibility"
     __N_UNSATISFIED_CONSTRAINTS = "n_unsatisfied_constraints"
+    __PERFORMANCE = "performance"
+    __PROBLEM = "problem"
 
     def __init__(
             self,
-            objective_values=None,  # type: Optional[Sequence[float]]
-            infeasibility_measures=None,  # type: Optional[Sequence[float]]
-            feasibility_statuses=None,  # type: Optional[Sequence[bool]]
-            n_unsatisfied_constraints=None,  # type: Optional[Sequence[int]]
-            problem_name=None,  # type: Optional[str]
-            objective_name=None,  # type: Optional[str]
-            constraints_names=None,  # type: Optional[Sequence[str]]
-            doe_size=None,  # type: Optional[int]
-            nbr_eval_iter=None,  # type: Optional[int]
-            population_size=None,  # type: Optional[int]
-            total_time=None,  # type: Optional[float]
-            algorithm=None,  # type: Optional[str]
-            max_eval=None,  # type: Optional[int]
-    ):  # type: (...) -> None
+            objective_values: Sequence[float] = None,
+            infeasibility_measures: Sequence[float] = None,
+            feasibility_statuses: Sequence[bool] = None,
+            n_unsatisfied_constraints: Sequence[int] = None,
+            problem_name: str = None,
+            objective_name: str = None,
+            constraints_names: Sequence[str] = None,
+            doe_size: int = None,
+            total_time: float = None,
+            algorithm_configuration: AlgorithmConfiguration = None,
+    ) -> None:
         """
         Args:
             objective_values: The history of the quantity to be minimized.
-                If None, will be considered empty.
+                If ``None``, will be considered empty.
             infeasibility_measures: The history of infeasibility measures.
                 An infeasibility measure is a non-negative real number representing
                 the gap between the design and the feasible space,
                 a zero value meaning feasibility.
-                If None and `feasibility_statuses` is not None
+                If ``None`` and `feasibility_statuses` is not None
                 then the infeasibility measures are set to zero in case of feasibility,
                 and set to infinity otherwise.
-                If None and `feasibility_statuses` is None
+                If ``None`` and `feasibility_statuses` is None
                 then every infeasibility measure is set to zero.
             feasibility_statuses: The history of the (boolean) feasibility statuses.
                 If `infeasibility_measures` is not None then `feasibility_statuses` is
                 disregarded.
-                If None and 'infeasibility_measures' is None
+                If ``None`` and 'infeasibility_measures' is None
                 then every infeasibility measure is set to zero.
             n_unsatisfied_constraints: The history of the number of unsatisfied
                 constraints.
-                If None, the entries will be set to 0 for feasible entries
+                If ``None``, the entries will be set to 0 for feasible entries
                 and None for infeasible entries.
             problem_name: The name of the problem.
-                If None, it will not be set.
+                If ``None``, it will not be set.
             objective_name: The name of the objective function.
-                If None, it will not be set.
+                If ``None``, it will not be set.
             constraints_names: The names the scalar constraints.
                 Each name must correspond to a scalar value.
-                If None, it will not be set.
+                If ``None``, it will not be set.
             doe_size: The size of the initial design of experiments.
-                If None, it will not be set.
-            nbr_eval_iter: The number of functions evaluations per iteration.
-                If None, it will not be set.
-            population_size: The size of the optimizer population.
-                If None, it will not be set.
+                If ``None``, it will not be set.
             total_time: The total time of the optimization, in seconds.
-                If None, it will not be set.
-            algorithm: The name of the algorithm which generated the history.
-                If None, it will not be set.
-            max_eval: The maximum number of functions evaluations.
-                If None, it will not be set.
+                If ``None``, it will not be set.
+            algorithm_configuration: The name of the algorithm which generated the
+                history.
+                If ``None``, it will not be set.
 
         Raises:
             ValueError: If the lengths of the histories do not match.
@@ -131,35 +128,32 @@ class PerformanceHistory(Sequence[HistoryItem]):
             self._constraints_names = constraints_names
 
         self._objective_name = objective_name
-        self.algorithm = algorithm
+        self.algorithm_configuration = algorithm_configuration
         self.doe_size = doe_size
         self.items = self.__get_history_items(
             objective_values, infeasibility_measures, feasibility_statuses,
             n_unsatisfied_constraints,
         )
-        self.max_eval = max_eval
-        self.nbr_eval_iter = nbr_eval_iter
-        self.population_size = population_size
         self.problem_name = problem_name
         self.total_time = total_time
 
     @property
-    def objective_values(self):  # type: (...) -> List[float]
+    def objective_values(self) -> list[float]:
         """The objective values."""
         return [item.objective_value for item in self.items]
 
     @property
-    def infeasibility_measures(self):  # type: (...) -> List[float]
+    def infeasibility_measures(self) -> list[float]:
         """The infeasibility measures."""
         return [item.infeasibility_measure for item in self.items]
 
     @property
-    def n_unsatisfied_constraints(self):  # type: (...) -> List[int]
+    def n_unsatisfied_constraints(self) -> list[int]:
         """The numbers of unsatisfied constraints."""
         return [item.n_unsatisfied_constraints for item in self.items]
 
     @property
-    def items(self):  # type: (...) -> List[HistoryItem]
+    def items(self) -> list[HistoryItem]:
         """The history items.
 
         Raises:
@@ -168,47 +162,45 @@ class PerformanceHistory(Sequence[HistoryItem]):
         return self.__items
 
     @items.setter
-    def items(
-            self,
-            history_items,  # type: Iterable[HistoryItem]
-    ):  # type: (...) -> None
+    def items(self, history_items: Iterable[HistoryItem], ) -> None:
         for item in history_items:
             if not isinstance(item, HistoryItem):
                 raise TypeError(
                     "History items must be of type HistoryItem."
                     f" The following type was passed: {type(item)}."
                 )
+
         self.__items = list(history_items)
 
     @staticmethod
     def __get_history_items(
-            objective_values=None,  # type: Optional[Sequence[float]]
-            infeasibility_measures=None,  # type: Optional[Sequence[float]]
-            feasibility_statuses=None,  # type: Optional[Sequence[bool]]
-            n_unsatisfied_constraints=None,  # type: Optional[Sequence[int]]
-    ):  # type: (...) -> List[HistoryItem]
+            objective_values: Sequence[float] = None,
+            infeasibility_measures: Sequence[float] = None,
+            feasibility_statuses: Sequence[bool] = None,
+            n_unsatisfied_constraints: Sequence[int] = None,
+    ) -> list[HistoryItem]:
         """Return history items based on values histories.
 
         Args:
             objective_values: The history of the quantity to be minimized.
-                If None, will be considered empty.
+                If ``None``, will be considered empty.
             infeasibility_measures: The history of infeasibility measures.
                 An infeasibility measure is a non-negative real number representing
                 the gap between the design and the feasible space,
                 a zero value meaning feasibility.
-                If None and `feasibility_statuses` is not None
+                If ``None`` and `feasibility_statuses` is not None
                 then the infeasibility measures are set to zero in case of feasibility,
                 and set to infinity otherwise.
-                If None and `feasibility_statuses` is None
+                If ``None`` and `feasibility_statuses` is None
                 then every infeasibility measure is set to zero.
             feasibility_statuses: The history of the (boolean) feasibility statuses.
                 If `infeasibility_measures` is not None then `feasibility_statuses` is
                 disregarded.
-                If None and 'infeasibility_measures' is None
+                If ``None`` and 'infeasibility_measures' is None
                 then every infeasibility measure is set to zero.
             n_unsatisfied_constraints: The history of the number of unsatisfied
                 constraints.
-                If None, the entries will be set to 0 for feasible entries
+                If ``None``, the entries will be set to 0 for feasible entries
                 and None for infeasible entries.
 
         Returns:
@@ -250,19 +242,16 @@ class PerformanceHistory(Sequence[HistoryItem]):
             in zip(objective_values, infeasibility_measures, n_unsatisfied_constraints)
         ]
 
-    def __len__(self):  # type: (...) -> int
+    def __len__(self) -> int:
         return len(self.__items)
 
-    def __getitem__(
-            self,
-            i,  # type: int
-    ):  # type: (...) -> HistoryItem
+    def __getitem__(self, i: int, ) -> HistoryItem:
         return self.__items[i]
 
-    def __repr__(self):  # type: (...) -> str
+    def __repr__(self) -> str:
         return str([item for item in self])
 
-    def compute_cumulated_minimum(self):  # type: (...) -> PerformanceHistory
+    def compute_cumulated_minimum(self) -> PerformanceHistory:
         """Return the history of the cumulated minimum.
 
         Returns:
@@ -275,8 +264,8 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
     @staticmethod
     def compute_minimum_history(
-            histories,  # type: Iterable[PerformanceHistory]
-    ):  # type: (...) -> PerformanceHistory
+            histories: Iterable[PerformanceHistory],
+    ) -> PerformanceHistory:
         """Return the minimum of several performance histories.
 
         Args:
@@ -289,8 +278,8 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
     @staticmethod
     def compute_maximum_history(
-            histories,  # type: Iterable[PerformanceHistory]
-    ):  # type: (...) -> PerformanceHistory
+            histories: Iterable[PerformanceHistory],
+    ) -> PerformanceHistory:
         """Return the maximum of several performance histories.
 
         Args:
@@ -303,8 +292,8 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
     @staticmethod
     def compute_median_history(
-            histories,  # type: Iterable[PerformanceHistory]
-    ):  # type: (...) -> PerformanceHistory
+            histories: Iterable[PerformanceHistory],
+    ) -> PerformanceHistory:
         """Return the median of several performance histories.
 
         Args:
@@ -317,9 +306,9 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
     @staticmethod
     def __compute_statistic(
-            histories,  # type: Iterable[PerformanceHistory]
-            statistic  # type: Callable[[Tuple[HistoryItem]], HistoryItem]
-    ):  # type: (...) -> PerformanceHistory
+            histories: Iterable[PerformanceHistory],
+            statistic: Callable[[tuple[HistoryItem]], HistoryItem]
+    ) -> PerformanceHistory:
         """Return the history of a statistic of several performance histories.
 
         The histories are extended to the same length before being split.
@@ -344,7 +333,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
         ]
         return history
 
-    def remove_leading_infeasible(self):  # type: (...) -> PerformanceHistory
+    def remove_leading_infeasible(self) -> PerformanceHistory:
         """Return the history starting from the first feasible item.
 
         Returns:
@@ -362,16 +351,13 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
         return truncated_history
 
-    def to_file(
-            self,
-            path,  # type: Union[str, Path]
-    ):  # type: (...) -> None
+    def to_file(self, path: str | Path, ) -> None:
         """Save the performance history in a file.
 
         Args:
             path: The path where to write the file.
         """
-        data = list()
+        items_data = list()
         # Add each history item in dictionary format
         for item in self.items:
             data_item = {
@@ -384,16 +370,29 @@ class PerformanceHistory(Sequence[HistoryItem]):
                     item.n_unsatisfied_constraints
                 )
 
-            data.append(data_item)
+            items_data.append(data_item)
 
+        data = dict()
+        if self.problem_name is not None:
+            data[self.__PROBLEM] = self.problem_name
+
+        if self.algorithm_configuration is not None:
+            data[
+                self.__ALGORITHM_CONFIGURATION
+            ] = self.algorithm_configuration.to_dict()
+
+        if self.doe_size is not None:
+            data[self.__DOE_SIZE] = self.doe_size
+
+        if self.total_time is not None:
+            data[self.__EXECUTION_TIME] = self.total_time
+
+        data[self.__HISTORY_ITEMS] = items_data
         with Path(path).open("w") as file:
             json.dump(data, file, indent=4, separators=(',', ': '))
 
     @classmethod
-    def from_file(
-            cls,
-            path,  # type: Union[str, Path]
-    ):  # type: (...) -> PerformanceHistory
+    def from_file(cls, path: str | Path) -> PerformanceHistory:
         """Create a new performance history from a file.
 
         Args:
@@ -405,36 +404,54 @@ class PerformanceHistory(Sequence[HistoryItem]):
         with Path(path).open("r") as file:
             data = json.load(file)
 
+        # Cover deprecated performance history files
+        if isinstance(data, list):
+            print(
+                "Performance histories without algorithm configuration are deprecated."
+            )
+            history = cls()
+            history.items = [
+                HistoryItem(
+                    item_data[PerformanceHistory.__PERFORMANCE],
+                    item_data[PerformanceHistory.__INFEASIBILITY],
+                    item_data.get(PerformanceHistory.__N_UNSATISFIED_CONSTRAINTS)
+                )
+                for item_data in data
+            ]
+            return history
+
         history = cls()
+        history.problem_name = data.get(cls.__PROBLEM)
+        if cls.__ALGORITHM_CONFIGURATION in data:
+            history.algorithm_configuration = AlgorithmConfiguration.from_dict(
+                data[cls.__ALGORITHM_CONFIGURATION]
+            )
+
+        history.doe_size = data.get(cls.__DOE_SIZE)
+        history.total_time = data.get(cls.__EXECUTION_TIME)
         history.items = [
             HistoryItem(
                 item_data[PerformanceHistory.__PERFORMANCE],
                 item_data[PerformanceHistory.__INFEASIBILITY],
                 item_data.get(PerformanceHistory.__N_UNSATISFIED_CONSTRAINTS)
             )
-            for item_data in data
+            for item_data in data[cls.__HISTORY_ITEMS]
         ]
         return history
 
     @classmethod
     def from_problem(
-            cls,
-            problem,  # type: OptimizationProblem
-            problem_name=None,  # type: Optional[str]
-    ):  # type: (...) -> PerformanceHistory
+            cls, problem: OptimizationProblem, problem_name: str = None,
+    ) -> PerformanceHistory:
         """Create a performance history from a solved optimization problem.
 
         Args:
             problem: The optimization problem.
             problem_name: The name of the problem.
-                If None, the name of the problem is not set.
+                If ``None``, the name of the problem is not set.
 
         Returns:
             The performance history.
-
-        Raises:
-            RuntimeError: If the number of unsatisfied constraints is inconsistent
-                with the feasibility.
         """
         obj_name = problem.objective.name
         obj_values = list()
@@ -453,15 +470,6 @@ class PerformanceHistory(Sequence[HistoryItem]):
             number_of_unsatisfied_constraints = (
                 problem.get_number_of_unsatisfied_constraints(x_vect)
             )
-
-            # Check the number of unsatisfied constraints
-            if (number_of_unsatisfied_constraints == 0) != feasibility:
-                raise RuntimeError(
-                    f"The number of unsatisfied constraints "
-                    f"({number_of_unsatisfied_constraints}) is inconsistent "
-                    f"with the feasibility ({feasibility})."
-                )
-
             infeas_measures.append(measure)
             feas_statuses.append(feasibility)
             n_unsatisfied_constraints.append(number_of_unsatisfied_constraints)
@@ -472,10 +480,8 @@ class PerformanceHistory(Sequence[HistoryItem]):
         )
 
     def get_plot_data(
-            self,
-            feasible=False,  # type: bool
-            minimum_history=False  # type: bool
-    ):  # type: (...) -> Tuple[List[int], List[HistoryItem]]
+            self, feasible: bool = False, minimum_history: bool = False
+    ) -> tuple[list[int], list[HistoryItem]]:
         """Return the data to plot the performance history.
 
         Args:
@@ -506,10 +512,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
             history[first_feasible_index:]
         )
 
-    def extend(
-            self,
-            size  # type: int
-    ):  # type: (...) -> PerformanceHistory
+    def extend(self, size: int) -> PerformanceHistory:
         """Extend the performance history by repeating its last item.
 
         If the history is longer than the expected size then it will not be altered.
@@ -526,14 +529,30 @@ class PerformanceHistory(Sequence[HistoryItem]):
         if size < len(self):
             raise ValueError(
                 f"The expected size ({size}) is smaller than "
-                f"the history size ({len(self)}).")
+                f"the history size ({len(self)})."
+            )
 
         history = PerformanceHistory()
         history.items = list(chain(self, repeat(self[-1], (size - len(self)))))
         return history
 
+    def shorten(self, size: int) -> "PerformanceHistory":
+        """Shorten the performance history to a given size.
+
+        If the history is shorter than the expected size then it will not be altered.
+
+        Args:
+            size: The expected size of the shortened performance history.
+
+        Returns:
+            The shortened performance history.
+        """
+        history = PerformanceHistory()
+        history.items = self.items[:size]
+        return history
+
     def plot(
-            self, axes: Axes, only_feasible: bool, **kwargs: Union[str, float]
+            self, axes: Axes, only_feasible: bool, **kwargs: str | float
     ) -> None:
         """Plot the performance history.
 
@@ -545,3 +564,15 @@ class PerformanceHistory(Sequence[HistoryItem]):
         abscissas, history_items = self.get_plot_data(feasible=only_feasible)
         ordinates = [item.objective_value for item in history_items]
         axes.plot(abscissas, ordinates, **kwargs)
+
+    def apply_infeasibility_tolerance(self, infeasibility_tolerance: float) -> None:
+        """Apply a tolerance on the infeasibility measures of the history items.
+
+        Mark the history items with an infeasibility measure below the tolerance
+        as feasible.
+
+        Args:
+            infeasibility_tolerance: the tolerance on the infeasibility measure.
+        """
+        for item in self.items:
+            item.apply_infeasibility_tolerance(infeasibility_tolerance)

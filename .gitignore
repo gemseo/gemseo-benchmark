@@ -2,5 +2,8 @@
 *.pyc
 result_images/
 
+examples/generate_report/
+examples/plot_histories/
+
 .coverage
 htmlcov/

@@ -21,10 +21,11 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the target values."""
 import pytest
-from gemseo_benchmark.results.performance_history import PerformanceHistory
-from gemseo_benchmark.data_profiles.target_values import TargetValues
 from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
+
+from gemseo_benchmark.data_profiles.target_values import TargetValues
+from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 
 def test_count_targets_hist():
@@ -55,5 +56,5 @@ def test_plot_save(tmp_path, converter):
     """
     targets = TargetValues([-2.0, 1.0, -1.0], [1.0, 0.0, 0.0])
     path = tmp_path / "targets.png"
-    targets.plot(show=False, path=converter(path))
+    targets.plot(show=False, file_path=converter(path))
     assert path.is_file()

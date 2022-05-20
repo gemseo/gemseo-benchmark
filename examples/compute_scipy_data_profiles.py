@@ -1,8 +1,8 @@
 """Compute data profiles for SciPy algorithms."""
-from __future__ import print_function
+from __future__ import annotations, print_function
 
 from itertools import product
-from typing import Any, Callable, List
+from typing import Any, Callable
 
 from numpy import array
 from numpy.core.multiarray import ndarray
@@ -13,10 +13,10 @@ from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
 
 
 def generate_values_history(
-        objective,  # type: Callable[[Any], float]
-        method_name,  # type: str
-        start_point  # type: ndarray
-):  # type: (...) -> List[float]
+        objective: Callable[[Any], float],
+        method_name: str,
+        start_point: ndarray,
+) -> list[float]:
     """Minimize a function with a SciPy method.
 
     Args:

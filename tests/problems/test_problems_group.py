@@ -20,13 +20,21 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the problems group."""
+from matplotlib import pyplot
+from matplotlib.testing.decorators import image_comparison
+from numpy import zeros
+from pytest import raises
+
 from gemseo.problems.analytical.power_2 import Power2
 from gemseo.problems.analytical.rosenbrock import Rosenbrock
+from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
+from gemseo_benchmark.algorithms.algorithms_configurations import \
+    AlgorithmsConfigurations
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
-from numpy import zeros
-from pytest import raises
+
+algorithms_configurations = AlgorithmsConfigurations(AlgorithmConfiguration("L-BFGS-B"))
 
 
 def test_is_algorithm_suited():
@@ -46,5 +54,23 @@ def test_compute_targets():
     rosenbrock = Problem("Rosenbrock", Rosenbrock, [zeros(2)])
     with raises(ValueError, match="The benchmarking problem has no target value."):
         rosenbrock.target_values
-    ProblemsGroup("group", [rosenbrock]).compute_targets(2, {"L-BFGS-B": {}})
+    ProblemsGroup("group", [rosenbrock]).compute_targets(2, algorithms_configurations)
     assert isinstance(rosenbrock.target_values, TargetValues)
+
+
+@image_comparison(
+    baseline_images=["data_profile"], remove_text=True, extensions=['png']
+)
+def test_compute_data_profile(problem_a, problem_b, results):
+    """Check the computation of data profiles."""
+    group = ProblemsGroup("A group", [problem_a, problem_b])
+    pyplot.close("all")
+    group.compute_data_profile(
+        algorithms_configurations, results, show=False, max_eval_number=5
+    )
+
+
+def test_iter(problem_a, problem_b):
+    """Check the iteration over a group of problems."""
+    group = ProblemsGroup("A group", [problem_a, problem_b])
+    assert list(group) == [problem_a, problem_b]

@@ -36,17 +36,19 @@ relative to the number of problems functions evaluations they make.
 The data profile is the empirical cumulated distribution function of the number of
 functions evaluations made by an algorithm to reach a problem target.
 """
-import itertools
-from numbers import Number
-from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Union
+from __future__ import annotations
 
+from numbers import Number
+from pathlib import Path
+from typing import Iterable, Mapping, Sequence
+
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
-from numpy import append, array, linspace, ndarray, zeros
+from numpy import array, linspace, ndarray, zeros
 
 from gemseo.utils.matplotlib_figure import save_show_figure
-from gemseo.utils.py23_compat import Path
-from gemseo_benchmark import COLORS_CYCLE, MARKERS, MarkeveryType
+from gemseo_benchmark import COLORS_CYCLE, get_markers_cycle, MarkeveryType
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
@@ -59,10 +61,7 @@ class DataProfile(object):
     target.
     """
 
-    def __init__(
-            self,
-            target_values  # type: Mapping[str, TargetValues]
-    ):  # type: (...) -> None
+    def __init__(self, target_values: Mapping[str, TargetValues]) -> None:
         """
         Args:
             target_values: The target values of each of the reference problems.
@@ -72,7 +71,7 @@ class DataProfile(object):
         self.__values_histories = dict()
 
     @property
-    def target_values(self):  # type: (...) -> Dict[str, TargetValues]
+    def target_values(self) -> dict[str, TargetValues]:
         """The target values of each reference problem.
 
         Target values are a scale of objective function values,
@@ -88,81 +87,83 @@ class DataProfile(object):
         return self.__target_values
 
     @target_values.setter
-    def target_values(
-            self,
-            target_values  # type: Mapping[str, TargetValues]
-    ):  # type: (...) -> None
+    def target_values(self, target_values: Mapping[str, TargetValues]) -> None:
         if not isinstance(target_values, Mapping):
             raise TypeError("The target values be must passed as a mapping")
+
         targets_numbers = set(len(pb_targets) for pb_targets in target_values.values())
         if len(targets_numbers) != 1:
             raise ValueError(
                 "The reference problems must have the same number of target values."
             )
+
         self.__target_values = dict(target_values)
         self.__targets_number = targets_numbers.pop()
 
     def add_history(
             self,
-            problem_name,  # type: str
-            algo_name,  # type: str
-            objective_values,  # type: Sequence[float]
-            infeasibility_measures=None,  # type: Optional[Sequence[float]]
-            feasibility_statuses=None,  # type: Optional[Sequence[bool]]
-    ):  # type: (...) -> None
+            problem_name: str,
+            algorithm_configuration_name: str,
+            objective_values: Sequence[float],
+            infeasibility_measures: Sequence[float] = None,
+            feasibility_statuses: Sequence[bool] = None,
+    ) -> None:
         """Add a history of performance values.
 
         Args:
             problem_name: The name of the problem.
-            algo_name: The name of the algorithm.
+            algorithm_configuration_name: The name of the algorithm configuration.
             objective_values: A history of objective values.
                 N.B. the value at index ``i`` is assumed to have been obtained with
                 ``i+1`` evaluations.
             infeasibility_measures: A history of infeasibility measures.
-                If None then measures are set to zero in case of feasibility and set
+                If ``None`` then measures are set to zero in case of feasibility and set
                 to infinity otherwise.
             feasibility_statuses: A history of (boolean) feasibility statuses.
-                If None then feasibility is always assumed.
+                If ``None`` then feasibility is always assumed.
 
         Raises:
             ValueError: If the problem name is not the name of a reference problem.
         """
         if problem_name not in self.__target_values:
             raise ValueError(f"{problem_name!r} is not the name of a reference problem")
-        if algo_name not in self.__values_histories:
-            self.__values_histories[algo_name] = {
+        if algorithm_configuration_name not in self.__values_histories:
+            self.__values_histories[algorithm_configuration_name] = {
                 pb_name: list() for pb_name in self.__target_values.keys()
             }
         history = PerformanceHistory(
             objective_values, infeasibility_measures, feasibility_statuses
         )
-        self.__values_histories[algo_name][problem_name].append(history)
+        self.__values_histories[algorithm_configuration_name][problem_name].append(
+            history
+        )
 
     def plot(
-            self, algo_names: Iterable[str] = None, show: bool = True,
-            path: Union[str, Path] = None, markevery: MarkeveryType = 0.1
+            self,
+            algo_names: Iterable[str] = None,
+            show: bool = True,
+            file_path: str | Path = None,
+            markevery: MarkeveryType = 0.1
     ) -> None:
         """Plot the data profiles of the required algorithms.
 
         Args:
             algo_names: The names of the algorithms.
-                If None then all the algorithms are considered.
+                If ``None`` then all the algorithms are considered.
             show: If True, show the plot.
-            path: The path where to save the plot.
-                If None, the plot is not saved.
+            file_path: The path where to save the plot.
+                If ``None``, the plot is not saved.
             markevery: The sampling parameter for the markers of the plot.
                 Refer to the Matplotlib documentation.
         """
         if algo_names is None:
             algo_names = tuple()
+
         data_profiles = self.compute_data_profiles(*algo_names)
         figure = self._plot_data_profiles(data_profiles, markevery)
-        save_show_figure(figure, show, path)
+        save_show_figure(figure, show, file_path)
 
-    def compute_data_profiles(
-            self,
-            *algo_names  # type: str
-    ):  # type: (...) -> Dict[str, List[Number]]
+    def compute_data_profiles(self, *algo_names: str) -> dict[str, list[Number]]:
         """Compute the data profiles of the required algorithms.
 
         For each algorithm, compute the cumulative distribution function of the number
@@ -170,7 +171,7 @@ class DataProfile(object):
 
         Args:
             algo_names: The names of the algorithms.
-                If None then all the algorithms are considered.
+                If ``None`` then all the algorithms are considered.
 
         Returns:
             The data profiles.
@@ -178,6 +179,7 @@ class DataProfile(object):
         data_profiles = dict()
         if not algo_names:
             algo_names = self.__values_histories.keys()
+
         for name in algo_names:
             total_hits_history = self.__compute_hits_history(name)
             problems_number = len(self.__target_values)
@@ -187,10 +189,7 @@ class DataProfile(object):
             data_profiles[name] = ratios.tolist()
         return data_profiles
 
-    def __compute_hits_history(
-            self,
-            algo_name,  # type: str
-    ):  # type: (...) -> ndarray
+    def __compute_hits_history(self, algo_name: str) -> ndarray:
         """Compute the history of the number of target hits of an algorithm.
 
         Args:
@@ -218,14 +217,12 @@ class DataProfile(object):
                 if len(hits_history) < max_history_size:
                     tail = [hits_history[-1]] * (max_history_size - len(hits_history))
                     hits_history.extend(tail)
+
                 total_hits_history += array(hits_history)
 
         return total_hits_history
 
-    def __get_repeat_number(
-            self,
-            algo_name  # type: str
-    ):  # type: (...) -> int
+    def __get_repeat_number(self, algo_name: str) -> int:
         """Check that an algorithm has the same number of histories for each problem.
 
         Make sure that the reference problems are equally represented with respect to
@@ -271,6 +268,7 @@ class DataProfile(object):
         # Set the title and axes
         axes.set_title(f"Data profile{'s' if len(data_profiles) > 1 else ''}")
         max_profile_size = max([len(profile) for profile in data_profiles.values()])
+        axes.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
         plt.xlabel("Number of functions evaluations")
         plt.xlim([1, max_profile_size])
         y_ticks = linspace(0.0, 1.0, 11)
@@ -283,19 +281,26 @@ class DataProfile(object):
 
         # Plot the data profiles
         for color, marker, (name, profile) in zip(
-                COLORS_CYCLE, itertools.cycle(MARKERS), data_profiles.items()
+                COLORS_CYCLE, get_markers_cycle(), data_profiles.items()
         ):
-            last_abscissa = len(profile)
-            last_value = profile[-1]
-            # Extend the profile if necessary
-            if last_abscissa < max_profile_size:
-                tail = [last_value] * (max_profile_size - last_abscissa)
-                profile = append(profile, tail)
+            # Plot the data profile
+            profile_size = len(profile)
             axes.plot(
-                range(1, max_profile_size + 1), profile, color=color, label=name,
+                range(1, profile_size + 1), profile, color=color, label=name,
                 marker=marker, markevery=markevery
             )
-            axes.plot(last_abscissa + 1, last_value, marker="*")
+
+            # Extend the profile with an horizontal line if necessary
+            if profile_size < max_profile_size:
+                tail_size = max_profile_size - profile_size + 1
+                last_value = profile[-1]
+                axes.plot(
+                    range(profile_size, profile_size + tail_size),
+                    [last_value] * tail_size, color=color,
+                    linestyle="dotted"
+                )
+                # Mark the last entry of the data profile
+                axes.plot(profile_size, last_value, marker="*", color=color)
         plt.legend()
 
         return fig

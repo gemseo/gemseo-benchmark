@@ -21,12 +21,13 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the data profile."""
 import pytest
-from gemseo_benchmark.data_profiles.data_profile import DataProfile
-from gemseo_benchmark.results.history_item import HistoryItem
-from gemseo_benchmark.data_profiles.target_values import TargetValues
 from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
 from pytest import raises
+
+from gemseo_benchmark.data_profiles.data_profile import DataProfile
+from gemseo_benchmark.data_profiles.target_values import TargetValues
+from gemseo_benchmark.results.history_item import HistoryItem
 
 
 def test_target_values_as_mapping():
@@ -37,12 +38,16 @@ def test_target_values_as_mapping():
 
 def test_consistent_target_values():
     """Check the setting of consistent target values."""
-    with raises(ValueError, match="The reference problems must have the same number "
-                                  "of target values"):
-        DataProfile({
-            "problem_1": TargetValues([1.0, 0.0]),
-            "problem_2": TargetValues([2.0]),
-        })
+    with raises(
+            ValueError, match="The reference problems must have the same number "
+                              "of target values"
+    ):
+        DataProfile(
+            {
+                "problem_1": TargetValues([1.0, 0.0]),
+                "problem_2": TargetValues([2.0]),
+            }
+        )
 
 
 def test_add_history_unknown_problem():
@@ -83,7 +88,7 @@ def test_plot_save(tmp_path, converter):
     data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
     data_profile.add_history("problem", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
     path = tmp_path / "data_profile.png"
-    data_profile.plot(show=False, path=converter(path))
+    data_profile.plot(show=False, file_path=converter(path))
     assert path.is_file()
 
 
@@ -107,10 +112,12 @@ def test_different_sizes_histories():
 
 def test_unevenly_represented_problems():
     """Check the handling of unevenly represented reference problems."""
-    data_profile = DataProfile({
-        "problem1": TargetValues([1.0, 0.0]),
-        "problem2": TargetValues([1.0, 0.0]),
-    })
+    data_profile = DataProfile(
+        {
+            "problem1": TargetValues([1.0, 0.0]),
+            "problem2": TargetValues([1.0, 0.0]),
+        }
+    )
     data_profile.add_history("problem1", "algo", [2.0, 2.0])
     data_profile.add_history("problem1", "algo", [2.0, 2.0])
     data_profile.add_history("problem2", "algo", [2.0, 2.0])
