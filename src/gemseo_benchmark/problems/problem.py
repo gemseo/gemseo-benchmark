@@ -126,7 +126,7 @@ class Problem(object):
             TypeError: If the return type of the creator is not
                 :class:`.OptimizationProblem`,
                 or if a starting point is not of type ndarray.
-            ValueError: If neither starting points nor DOE specifications are passed,
+            ValueError: If neither starting points nor DOE configurations are passed,
                or if a starting point is of inappropriate shape.
         """
         self.name = name
