@@ -250,7 +250,7 @@ class Report(object):
             # Create the directory dedicated to the group
             group_dir = (
                     self.__root_directory / DirectoryName.IMAGES.value /
-                    self.__format_name(problems_group.name)
+                    join_substrings(problems_group.name)
             )
             group_dir.mkdir(exist_ok=False)
 
@@ -267,7 +267,7 @@ class Report(object):
             # Create the file
             group_path = (
                     self.__root_directory / DirectoryName.GROUPS.value /
-                    f"{self.__format_name(problems_group.name)}.rst"
+                    f"{join_substrings(problems_group.name)}.rst"
             )
             groups_paths.append(
                 group_path.relative_to(self.__root_directory).as_posix()
@@ -344,18 +344,6 @@ class Report(object):
                 )
         finally:
             os.chdir(initial_dir)
-
-    @staticmethod
-    def __format_name(name: str) -> str:
-        """Format a name for the report source paths.
-
-        Args:
-            name: The name.
-
-        Returns:
-            The formatted name.
-        """
-        return name.replace(" ", "_")
 
     def __compute_group_data_profile(
             self,
