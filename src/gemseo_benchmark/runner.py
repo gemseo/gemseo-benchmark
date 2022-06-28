@@ -92,13 +92,10 @@ class Runner(object):
 
             # Check that the algorithm is available
             algorithm_name = algorithm_configuration.algorithm_name
-            if not OptimizersFactory().is_available(
-                    algorithm_configuration.algorithm_name
-            ):
-                raise ValueError(
-                    f"The algorithm is not available: {algorithm_name}."
-                )
+            if not OptimizersFactory().is_available(algorithm_name):
+                raise ValueError(f"The algorithm is not available: {algorithm_name}.")
 
+            # Run the algorithm
             algo_config = self.__disable_stopping_criteria(algorithm_configuration)
             for bench_problem in problems:
                 self._solve_problem(
@@ -241,7 +238,8 @@ class Runner(object):
         return AlgorithmConfiguration(
             algorithm_configuration.algorithm_name,
             algorithm_configuration.name,
-            **algorithm_configuration.algorithm_options, log_path=str(log_path)
+            **algorithm_configuration.algorithm_options,
+            log_path=str(log_path)
         )
 
     def _run_algorithm(
