@@ -46,7 +46,7 @@ class Runner(object):
     def __init__(
             self,
             histories_dir: Path,
-            results_file: Path,
+            results_file: Path = None,
             databases_dir: Path = None,
             pseven_dir: Path = None
     ) -> None:
@@ -64,7 +64,7 @@ class Runner(object):
         self.__histories_dir = histories_dir
         self.__pseven_dir = pseven_dir
         self.__results_file = results_file
-        if results_file.is_file():
+        if results_file is not None and results_file.is_file():
             self._results = Results(results_file)
         else:
             self._results = Results()
@@ -169,7 +169,8 @@ class Runner(object):
             )
 
             # Update the results file
-            self._results.to_file(self.__results_file, indent=4)
+            if self.__results_file is not None:
+                self._results.to_file(self.__results_file, indent=4)
 
     def __skip_instance(
             self,
