@@ -157,7 +157,7 @@ class Report(object):
                     # The algorithm is unavailable
                     algos_descriptions[algo_name] = "N/A"
                 else:
-                    algos_descriptions[algo_name] = library.lib_dict[
+                    algos_descriptions[algo_name] = library.descriptions[
                         algo_name
                     ].description
 
