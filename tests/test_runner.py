@@ -106,3 +106,15 @@ def test___skip_instance(tmp_path, rosenbrock, rastrigin, caplog):
            f"configuration {algo_config.name}." in caplog.text
     assert f"Skipping instance 2 of problem {rosenbrock.name} for algorithm " \
            f"configuration {algo_config.name}." in caplog.text
+
+
+def test___set_pseven_log_file(tmp_path, rosenbrock):
+    """Check the setting of the pSeven log file."""
+    results_path = tmp_path / "results.json"
+    algo_config = AlgorithmConfiguration("PSEVEN")
+    Runner(tmp_path, results_path, pseven_dir=tmp_path).execute(
+        [rosenbrock], AlgorithmsConfigurations(algo_config)
+    )
+    algo_pb_dir = tmp_path / algo_config.name / rosenbrock.name
+    assert (algo_pb_dir / f"{algo_config.name}.1.txt").is_file()
+    assert (algo_pb_dir / f"{algo_config.name}.2.txt").is_file()
