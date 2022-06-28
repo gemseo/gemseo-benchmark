@@ -122,3 +122,4 @@ def test___set_pseven_log_file(tmp_path, rosenbrock):
     algo_pb_dir = tmp_path / algo_config.name / rosenbrock.name
     assert (algo_pb_dir / f"{algo_config.name}.1.txt").is_file()
     assert (algo_pb_dir / f"{algo_config.name}.2.txt").is_file()
+
