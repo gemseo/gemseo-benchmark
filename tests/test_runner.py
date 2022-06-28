@@ -24,6 +24,7 @@
 import pytest
 from numpy import array
 
+from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.problems.analytical.rastrigin import Rastrigin
 from gemseo.problems.analytical.rosenbrock import Rosenbrock
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -108,6 +109,9 @@ def test___skip_instance(tmp_path, rosenbrock, rastrigin, caplog):
            f"configuration {algo_config.name}." in caplog.text
 
 
+@pytest.mark.skipif(
+    not OptimizersFactory().is_available("PSEVEN"), reason="pSeven is not available."
+)
 def test___set_pseven_log_file(tmp_path, rosenbrock):
     """Check the setting of the pSeven log file."""
     results_path = tmp_path / "results.json"
