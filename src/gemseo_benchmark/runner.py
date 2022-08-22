@@ -81,7 +81,8 @@ class Runner(object):
         Args:
             problems: The benchmarking problems.
             algorithms: The algorithms configurations.
-            overwrite_histories: Whether to overwrite the existing performance histories.
+            overwrite_histories: Whether to overwrite the existing performance
+                histories.
 
         Returns:
             The results of the optimization.
@@ -96,10 +97,13 @@ class Runner(object):
                 raise ValueError(f"The algorithm is not available: {algorithm_name}.")
 
             # Run the algorithm
-            algorithm_configuration = self.__disable_stopping_criteria(algorithm_configuration)
+            algorithm_configuration = self.__disable_stopping_criteria(
+                algorithm_configuration
+                )
             for problem in problems:
                 self._solve_problem(
-                    problem, algorithm_configuration, overwrite_histories=overwrite_histories
+                    problem, algorithm_configuration,
+                    overwrite_histories=overwrite_histories
                 )
 
         return self._results
@@ -192,8 +196,8 @@ class Runner(object):
         problem_name = bench_problem.name
 
         if not overwrite_histories and self._results.contains(
-                algorithm_configuration.name, 
-                problem_name, 
+                algorithm_configuration.name,
+                problem_name,
                 self.__get_history_path(algorithm_configuration, problem_name, index)
         ):
             LOGGER.info(
@@ -235,7 +239,9 @@ class Runner(object):
             algorithm_configuration.algorithm_name,
             algorithm_configuration.name,
             **algorithm_configuration.algorithm_options,
-            log_path=self.__get_pseven_log_path(algorithm_configuration, problem.name, index)
+            log_path=self.__get_pseven_log_path(
+                algorithm_configuration, problem.name, index
+                )
         )
 
     def _run_algorithm(
@@ -404,10 +410,10 @@ class Runner(object):
 
         database.export_hdf(
             self._get_path(
-                self._databases_dir, 
-                algorithm_configuration, 
-                problem_name, 
-                index, 
+                self._databases_dir,
+                algorithm_configuration,
+                problem_name,
+                index,
                 "h5",
                 make_parents=True
             )
