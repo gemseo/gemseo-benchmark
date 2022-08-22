@@ -169,7 +169,7 @@ class Benchmarker(object):
                 problem_instance_index
             )
 
-            self._save_history(history, algorithm_configuration, problem_instance_index)
+            self._save_history(history, problem_instance_index)
 
             self.__save_database(
                 database, algorithm_configuration, problem.name, problem_instance_index
@@ -290,21 +290,15 @@ class Benchmarker(object):
         history.total_time = total_time
         return problem.database, history
 
-    def _save_history(
-            self,
-            history: PerformanceHistory,
-            algorithm_configuration: AlgorithmConfiguration,
-            index: int
-    ) -> None:
-        # TODO: pass the algorithm configuration through the history
+    def _save_history(self, history: PerformanceHistory, index: int) -> None:
         """Save a performance history into a history file.
 
         Args:
             history: The performance history.
-            algorithm_configuration: The algorithm configuration.
             index: The index of the problem instance.
         """
         problem_name = history.problem_name
+        algorithm_configuration = history.algorithm_configuration
         path = self.__get_history_path(
             algorithm_configuration, problem_name, index, make_parents=True
         )
