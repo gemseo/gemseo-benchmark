@@ -33,12 +33,12 @@ from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.report.report import Report
 from gemseo_benchmark.runner import Runner
 
-# Select the algorithms configurations to be benchmarked
+# Select the algorithms configurations to be benchmarked.
 l_bfgs_b = AlgorithmConfiguration("L-BFGS-B")
 slsqp = AlgorithmConfiguration("SLSQP")
 algorithms_configurations = AlgorithmsConfigurations(l_bfgs_b, slsqp)
 
-# Select the reference problems
+# Select the reference problems.
 optimum = 0.0
 target_values = TargetValues([10 ** -i for i in range(4, 7)] + [optimum])
 rastrigin = Problem(
@@ -49,13 +49,13 @@ rosenbrock = Problem(
 )
 reference_problems = [rastrigin, rosenbrock]
 
-# Run the algorithms on the reference problems
+# Run the algorithms on the reference problems.
 histories_dir = Path(__file__).parent / "histories"
 histories_dir.mkdir()
 runner = Runner(histories_dir)
 results = runner.execute(reference_problems, algorithms_configurations)
 
-# Generate the benchmarking report
+# Generate the benchmarking report.
 report_dir = Path(__file__).parent.absolute() / "report"
 group = ProblemsGroup("Unconstrained problems", reference_problems)
 report = Report(report_dir, algorithms_configurations, [group], results)

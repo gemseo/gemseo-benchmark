@@ -19,7 +19,7 @@
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
-"""A benchmarking runner to run optimization algorithms on reference problems."""
+"""A runner to benchmark optimization algorithms on reference problems."""
 import time
 from pathlib import Path
 from typing import Iterable, Tuple
@@ -40,7 +40,7 @@ LOGGER = configure_logger()
 
 
 class Runner(object):
-    """A benchmarking runner to run optimization algorithms on reference problems."""
+    """A runner to benchmark optimization algorithms on reference problems."""
     _HISTORY_CLASS = PerformanceHistory
 
     def __init__(
@@ -80,7 +80,7 @@ class Runner(object):
         Args:
             problems: The benchmarking problems.
             algorithms: The algorithms configurations.
-            overwrite_histories: Whether to overwrite existing performance histories.
+            overwrite_histories: Whether to overwrite the existing performance histories.
 
         Returns:
             The results of the optimization.
@@ -90,16 +90,15 @@ class Runner(object):
         """
         for algorithm_configuration in algorithms:
 
-            # Check that the algorithm is available
             algorithm_name = algorithm_configuration.algorithm_name
             if not OptimizersFactory().is_available(algorithm_name):
                 raise ValueError(f"The algorithm is not available: {algorithm_name}.")
 
             # Run the algorithm
-            algo_config = self.__disable_stopping_criteria(algorithm_configuration)
-            for bench_problem in problems:
+            algorithm_configuration = self.__disable_stopping_criteria(algorithm_configuration)
+            for problem in problems:
                 self._solve_problem(
-                    bench_problem, algo_config, overwrite_histories=overwrite_histories
+                    problem, algorithm_configuration, overwrite_histories=overwrite_histories
                 )
 
         return self._results
@@ -121,7 +120,7 @@ class Runner(object):
             "xtol_abs": 0.0,
             "ftol_rel": 0.0,
             "ftol_abs": 0.0,
-            "stop_crit_n_x": int(1e10),  # value larger than the database size
+            "stop_crit_n_x": maxsize,
         }
         options.update(algorithm_configuration.algorithm_options)
         return AlgorithmConfiguration(
@@ -136,7 +135,7 @@ class Runner(object):
             algorithm_configuration: AlgorithmConfiguration,
             overwrite_histories: bool
     ) -> None:
-        """Run an algorithm on a benchmarking problem for all its starting points.
+        """Solve a benchmarking problem for all its starting points.
 
         Args:
             problem: The benchmarking problem.
@@ -146,7 +145,6 @@ class Runner(object):
         # Run an optimization from each starting point
         for index, instance in enumerate(problem):
 
-            # Check whether the instance should be skipped
             if self.__skip_instance(
                     algorithm_configuration, problem, index, overwrite_histories
             ):
@@ -163,7 +161,6 @@ class Runner(object):
             # Save the performance history
             self._save_history(history, algorithm_configuration, index)
 
-            # Save the database
             self.__save_database(
                 database, algorithm_configuration, problem.name, index
             )
@@ -193,10 +190,10 @@ class Runner(object):
         instance = index + 1
         problem_name = bench_problem.name
 
-        # Check whether the result is already stored
-        path = self.__get_history_path(algorithm_configuration, problem_name, index)
         if not overwrite_histories and self._results.contains(
-                algorithm_configuration.name, problem_name, path
+                algorithm_configuration.name, 
+                problem_name, 
+                self.__get_history_path(algorithm_configuration, problem_name, index)
         ):
             LOGGER.info(
                 f"Skipping instance {instance} of problem {problem_name} for algorithm "
@@ -216,7 +213,7 @@ class Runner(object):
             problem: Problem,
             index: int
     ) -> AlgorithmConfiguration:
-        """Return a copy of a configuration including the path to the pSeven log file.
+        """Copy an algorithm configuration by adding the path to the pSeven log file.
 
         Args:
             algorithm_configuration: The algorithm configuration.
@@ -233,14 +230,11 @@ class Runner(object):
         if algorithm_configuration.algorithm_name not in PSevenOpt().descriptions:
             return algorithm_configuration
 
-        log_path = self.__get_pseven_log_path(
-            algorithm_configuration, problem.name, index
-        )
         return AlgorithmConfiguration(
             algorithm_configuration.algorithm_name,
             algorithm_configuration.name,
             **algorithm_configuration.algorithm_options,
-            log_path=str(log_path)
+            log_path=self.__get_pseven_log_path(algorithm_configuration, problem.name, index)
         )
 
     def _run_algorithm(
@@ -264,10 +258,9 @@ class Runner(object):
         algo_name = algorithm_configuration.algorithm_name
         algo_options = algorithm_configuration.algorithm_options
 
-        # Run the algorithm on the optimization problem.
         start_time = time.time()
         execute_algo(problem, algo_name, **algo_options)
-        runtime = time.time() - start_time
+        total_time = time.time() - start_time
 
         history = self._HISTORY_CLASS.from_problem(problem, problem_name)
         history.algorithm_configuration = algorithm_configuration
@@ -375,7 +368,7 @@ class Runner(object):
             problem_name: The name of the problem.
             index: The index of the problem instance.
             extension: The extension of the path.
-                If None, the extension is for a JSON file.
+                If ``None``, the extension is for a JSON file.
             make_parents: Whether to make the parent directories
 
         Returns:
@@ -408,8 +401,13 @@ class Runner(object):
         if self._databases_dir is None:
             return
 
-        path = self._get_path(
-            self._databases_dir, algorithm_configuration, problem_name, index, "h5",
-            make_parents=True
+        database.export_hdf(
+            self._get_path(
+                self._databases_dir, 
+                algorithm_configuration, 
+                problem_name, 
+                index, 
+                "h5",
+                make_parents=True
+            )
         )
-        database.export_hdf(path)
