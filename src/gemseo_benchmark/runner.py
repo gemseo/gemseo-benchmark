@@ -94,7 +94,7 @@ class Runner(object):
         for algorithm_configuration in algorithms:
 
             algorithm_name = algorithm_configuration.algorithm_name
-            if not OptimizersFactory().is_available(algorithm_name):
+            if not self.__is_algorithm_available(algorithm_name):
                 raise ValueError(f"The algorithm is not available: {algorithm_name}.")
 
             # Run the algorithm
