@@ -277,7 +277,7 @@ class Runner(object):
         else:
             history.doe_size = 1
 
-        history.total_time = runtime
+        history.total_time = total_time
         return problem.database, history
 
     def _save_history(
