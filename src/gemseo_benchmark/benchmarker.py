@@ -23,12 +23,14 @@
 import sys
 import time
 from pathlib import Path
-from typing import Iterable, Tuple
+from typing import Iterable
+from typing import Tuple
 
 from gemseo.algos.database import Database
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
-from gemseo.api import configure_logger, execute_algo
+from gemseo.api import configure_logger
+from gemseo.api import execute_algo
 from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.algorithms.algorithms_configurations import \
@@ -101,7 +103,7 @@ class Benchmarker(object):
             # Run the algorithm
             algorithm_configuration = self.__disable_stopping_criteria(
                 algorithm_configuration
-                )
+            )
             for problem in problems:
                 self._solve_problem(
                     problem, algorithm_configuration,
@@ -174,10 +176,10 @@ class Benchmarker(object):
 
             if self._databases_dir is not None:
                 self.__save_database(
-                database,
-                algorithm_configuration,
-                problem.name,
-                problem_instance_index
+                    database,
+                    algorithm_configuration,
+                    problem.name,
+                    problem_instance_index
                 )
 
             if self.__results_file:
@@ -250,7 +252,7 @@ class Benchmarker(object):
             **algorithm_configuration.algorithm_options,
             log_path=self.__get_pseven_log_path(
                 algorithm_configuration, problem.name, index
-                )
+            )
         )
 
     def _run_algorithm(
