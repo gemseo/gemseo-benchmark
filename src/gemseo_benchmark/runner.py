@@ -166,7 +166,7 @@ class Runner(object):
             self._save_history(history, algorithm_configuration, problem_instance_index)
 
             self.__save_database(
-                database, algorithm_configuration, problem.name, index
+                database, algorithm_configuration, problem.name, problem_instance_index
             )
 
             if self.__results_file:
