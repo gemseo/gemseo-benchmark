@@ -19,7 +19,7 @@
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
-"""Tests for the benchmarking runner."""
+"""Tests for the benchmarker."""
 
 import pytest
 from numpy import array
@@ -30,8 +30,8 @@ from gemseo.problems.analytical.rosenbrock import Rosenbrock
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.algorithms.algorithms_configurations import \
     AlgorithmsConfigurations
+from gemseo_benchmark.benchmarker import Benchmarker
 from gemseo_benchmark.problems.problem import Problem
-from gemseo_benchmark.runner import Runner
 
 
 @pytest.fixture(scope="module")
@@ -50,7 +50,7 @@ def test_save_history(tmp_path, rosenbrock):
     """Check the saving of performance histories."""
     results_path = tmp_path / "results.json"
     algo_config = AlgorithmConfiguration("L-BFGS-B")
-    results = Runner(tmp_path, results_path).execute(
+    results = Benchmarker(tmp_path, results_path).execute(
         [rosenbrock], AlgorithmsConfigurations(algo_config)
     )
     algo_pb_dir = tmp_path / algo_config.name / rosenbrock.name
@@ -69,7 +69,7 @@ def test_save_history(tmp_path, rosenbrock):
 def test_save_database(tmp_path, rosenbrock):
     """Check the saving of optimization databases."""
     algo_config = AlgorithmConfiguration("L-BFGS-B")
-    Runner(tmp_path, tmp_path / "results.json", tmp_path).execute(
+    Benchmarker(tmp_path, tmp_path / "results.json", tmp_path).execute(
         [rosenbrock], AlgorithmsConfigurations(algo_config)
     )
     algo_pb_dir = tmp_path / algo_config.name / rosenbrock.name
@@ -86,7 +86,7 @@ def test_unavailable_algorithm(
             ValueError, match="The algorithm is not available: "
                               f"{unknown_algorithm_configuration.algorithm_name}."
     ):
-        Runner(tmp_path, tmp_path / "results.json").execute(
+        Benchmarker(tmp_path, tmp_path / "results.json").execute(
             [rosenbrock], unknown_algorithms_configurations
         )
 
@@ -96,11 +96,11 @@ def test___skip_instance(tmp_path, rosenbrock, rastrigin, caplog):
     results_path = tmp_path / "results.json"
     algo_config = AlgorithmConfiguration("L-BFGS-B")
     # Run the algorithm on the Rosenbrock problem
-    Runner(tmp_path, results_path).execute(
+    Benchmarker(tmp_path, results_path).execute(
         [rosenbrock], AlgorithmsConfigurations(algo_config)
     )
     # Run the algorithm on the Rastrigin problem
-    Runner(tmp_path, results_path).execute(
+    Benchmarker(tmp_path, results_path).execute(
         [rosenbrock, rastrigin], AlgorithmsConfigurations(algo_config)
     )
     assert f"Skipping instance 1 of problem {rosenbrock.name} for algorithm " \
@@ -116,10 +116,9 @@ def test___set_pseven_log_file(tmp_path, rosenbrock):
     """Check the setting of the pSeven log file."""
     results_path = tmp_path / "results.json"
     algo_config = AlgorithmConfiguration("PSEVEN")
-    Runner(tmp_path, results_path, pseven_dir=tmp_path).execute(
+    Benchmarker(tmp_path, results_path, pseven_dir=tmp_path).execute(
         [rosenbrock], AlgorithmsConfigurations(algo_config)
     )
     algo_pb_dir = tmp_path / algo_config.name / rosenbrock.name
     assert (algo_pb_dir / f"{algo_config.name}.1.txt").is_file()
     assert (algo_pb_dir / f"{algo_config.name}.2.txt").is_file()
-

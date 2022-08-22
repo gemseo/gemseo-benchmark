@@ -27,11 +27,11 @@ from gemseo.problems.analytical.rosenbrock import Rosenbrock
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.algorithms.algorithms_configurations import \
     AlgorithmsConfigurations
+from gemseo_benchmark.benchmarker import Benchmarker
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.report.report import Report
-from gemseo_benchmark.runner import Runner
 
 # Select the algorithms configurations to be benchmarked.
 l_bfgs_b = AlgorithmConfiguration("L-BFGS-B")
@@ -52,8 +52,8 @@ reference_problems = [rastrigin, rosenbrock]
 # Run the algorithms on the reference problems.
 histories_dir = Path(__file__).parent / "histories"
 histories_dir.mkdir()
-runner = Runner(histories_dir)
-results = runner.execute(reference_problems, algorithms_configurations)
+benchmarker = Benchmarker(histories_dir)
+results = benchmarker.execute(reference_problems, algorithms_configurations)
 
 # Generate the benchmarking report in HTML format.
 report_dir = Path(__file__).parent.absolute() / "report"

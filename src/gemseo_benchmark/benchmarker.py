@@ -40,7 +40,7 @@ from gemseo_benchmark.results.results import Results
 LOGGER = configure_logger()
 
 
-class Runner(object):
+class Benchmarker(object):
     """A runner to benchmark optimization algorithms on reference problems."""
     _HISTORY_CLASS = PerformanceHistory
 
