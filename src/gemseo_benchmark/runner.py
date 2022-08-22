@@ -63,6 +63,7 @@ class Runner(object):
         """
         self._databases_dir = databases_dir
         self.__histories_dir = histories_dir
+        self.__is_algorithm_available = OptimizersFactory().is_available
         self.__pseven_dir = pseven_dir
         self.__results_file = results_file
         if results_file is not None and results_file.is_file():
