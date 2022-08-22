@@ -380,7 +380,7 @@ class Runner(object):
             index: The index of the problem instance.
             extension: The extension of the path.
                 If ``None``, the extension is for a JSON file.
-            make_parents: Whether to make the parent directories
+            make_parents: Whether to make the parent directories of the path.
 
         Returns:
             The path for the file.
