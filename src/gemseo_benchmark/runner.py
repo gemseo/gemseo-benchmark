@@ -152,7 +152,10 @@ class Runner(object):
         for problem_instance_index, problem_instance in enumerate(problem):
 
             if self.__skip_instance(
-                    algorithm_configuration, problem, problem_instance_index, overwrite_histories
+                    algorithm_configuration,
+                    problem,
+                    problem_instance_index,
+                    overwrite_histories
             ):
                 continue
 
@@ -160,7 +163,10 @@ class Runner(object):
                 algorithm_configuration, problem, problem_instance_index
             )
             database, history = self._run_algorithm(
-                problem_instance, algorithm_configuration_copy, problem.name, problem_instance_index
+                problem_instance,
+                algorithm_configuration_copy,
+                problem.name,
+                problem_instance_index
             )
 
             self._save_history(history, algorithm_configuration, problem_instance_index)
