@@ -46,7 +46,7 @@ def rastrigin() -> Problem:
     return Problem("Rastrigin", Rastrigin, [array([0.0, 0.1]), array([0.1, 0.0])])
 
 
-def test__save_history(tmp_path, rosenbrock):
+def test_save_history(tmp_path, rosenbrock):
     """Check the saving of performance histories."""
     results_path = tmp_path / "results.json"
     algo_config = AlgorithmConfiguration("L-BFGS-B")
@@ -66,7 +66,7 @@ def test__save_history(tmp_path, rosenbrock):
            f"configuration {algo_config.name}."
 
 
-def test___save_database(tmp_path, rosenbrock):
+def test_save_database(tmp_path, rosenbrock):
     """Check the saving of optimization databases."""
     algo_config = AlgorithmConfiguration("L-BFGS-B")
     Runner(tmp_path, tmp_path / "results.json", tmp_path).execute(

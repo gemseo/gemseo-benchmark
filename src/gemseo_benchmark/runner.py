@@ -65,10 +65,7 @@ class Runner(object):
         self.__histories_dir = histories_dir
         self.__pseven_dir = pseven_dir
         self.__results_file = results_file
-        if results_file is not None and results_file.is_file():
-            self._results = Results(results_file)
-        else:
-            self._results = Results()
+        self._results = Results(results_file)
 
     def execute(
             self,
@@ -148,30 +145,27 @@ class Runner(object):
             overwrite_histories: Whether to overwrite existing performance histories.
         """
         # Run an optimization from each starting point
-        for index, instance in enumerate(problem):
+        for problem_instance_index, problem_instance in enumerate(problem):
 
             if self.__skip_instance(
-                    algorithm_configuration, problem, index, overwrite_histories
+                    algorithm_configuration, problem, problem_instance_index, overwrite_histories
             ):
                 continue
 
-            # Run the optimization
-            algo_config = self.__set_pseven_log_file(
-                algorithm_configuration, problem, index
+            algorithm_configuration_copy = self.__set_pseven_log_file(
+                algorithm_configuration, problem, problem_instance_index
             )
             database, history = self._run_algorithm(
-                instance, algo_config, problem.name, index
+                problem_instance, algorithm_configuration_copy, problem.name, problem_instance_index
             )
 
-            # Save the performance history
-            self._save_history(history, algorithm_configuration, index)
+            self._save_history(history, algorithm_configuration, problem_instance_index)
 
             self.__save_database(
                 database, algorithm_configuration, problem.name, index
             )
 
-            # Update the results file
-            if self.__results_file is not None:
+            if self.__results_file:
                 self._results.to_file(self.__results_file, indent=4)
 
     def __skip_instance(
@@ -273,7 +267,7 @@ class Runner(object):
         history.algorithm_configuration = algorithm_configuration
 
         # Set the DOE size
-        if OptimizersFactory().is_available("PSEVEN"):
+        if self.__is_algorithm_available("PSEVEN"):
             from gemseo.algos.opt.lib_pseven import PSevenOpt
             if algo_name in PSevenOpt().descriptions and "sample_x" in algo_options:
                 history.doe_size = len(algo_options["sample_x"])
