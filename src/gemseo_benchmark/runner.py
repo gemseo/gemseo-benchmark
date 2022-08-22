@@ -232,7 +232,7 @@ class Runner(object):
         Returns:
             A copy of the configuration including the path to the pSeven log file.
         """
-        if self.__pseven_dir is None or not OptimizersFactory().is_available("PSEVEN"):
+        if not self.__pseven_dir or not self.__is_algorithm_available("PSEVEN"):
             return algorithm_configuration
 
         from gemseo.algos.opt.lib_pseven import PSevenOpt
@@ -354,7 +354,7 @@ class Runner(object):
             ValueError: If the path to the destination directory for the
                 pSeven files is not set.
         """
-        if self.__pseven_dir is None:
+        if not self.__pseven_dir:
             raise ValueError("The directory for the pSeven files is not set.")
 
         return self._get_path(
