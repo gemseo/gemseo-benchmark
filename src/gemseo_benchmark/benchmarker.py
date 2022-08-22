@@ -277,15 +277,11 @@ class Benchmarker(object):
         history.algorithm_configuration = algorithm_configuration
 
         # Set the DOE size
+        history.doe_size = 1
         if self.__is_algorithm_available("PSEVEN"):
             from gemseo.algos.opt.lib_pseven import PSevenOpt
-            if algo_name in PSevenOpt().descriptions and "sample_x" in algo_options:
-                history.doe_size = len(algo_options["sample_x"])
-            else:
-                # The DOE is made of the single starting point
-                history.doe_size = 1
-        else:
-            history.doe_size = 1
+            if algo_name in PSevenOpt().descriptions:
+                history.doe_size = len(algo_options.get("sample_x", [None]))
 
         history.total_time = total_time
         return problem.database, history
