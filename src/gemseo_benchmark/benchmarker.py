@@ -55,8 +55,9 @@ class Benchmarker(object):
         Args:
             histories_dir: The path to the directory where to save the performance
                 histories.
-            results_file: The path to the file for loading/saving the performance
-                histories paths.
+            results_file: The path to the file for saving the performance histories
+                paths.
+                If exists, the file is updated with the new performance histories paths.
             databases_dir: The path to the destination directory for the databases.
             pseven_dir: The path to the destination directory for the pSeven output
                 files.
