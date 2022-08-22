@@ -65,7 +65,10 @@ class Runner(object):
         self.__histories_dir = histories_dir
         self.__pseven_dir = pseven_dir
         self.__results_file = results_file
-        self._results = Results(results_file)
+        if results_file is not None and results_file.is_file():
+            self._results = Results(results_file)
+        else:
+            self._results = Results()
 
     def execute(
             self,
