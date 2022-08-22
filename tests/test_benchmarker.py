@@ -20,6 +20,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the benchmarker."""
+from pathlib import Path
 
 import pytest
 from numpy import array
@@ -32,6 +33,7 @@ from gemseo_benchmark.algorithms.algorithms_configurations import \
     AlgorithmsConfigurations
 from gemseo_benchmark.benchmarker import Benchmarker
 from gemseo_benchmark.problems.problem import Problem
+from gemseo_benchmark.results.results import Results
 
 
 @pytest.fixture(scope="module")
@@ -46,24 +48,34 @@ def rastrigin() -> Problem:
     return Problem("Rastrigin", Rastrigin, [array([0.0, 0.1]), array([0.1, 0.0])])
 
 
-def test_save_history(tmp_path, rosenbrock):
-    """Check the saving of performance histories."""
-    results_path = tmp_path / "results.json"
-    algo_config = AlgorithmConfiguration("L-BFGS-B")
-    results = Benchmarker(tmp_path, results_path).execute(
-        [rosenbrock], AlgorithmsConfigurations(algo_config)
+lbfgsb_configuration = AlgorithmConfiguration("L-BFGS-B")
+
+
+@pytest.fixture(scope="module")
+def results_root(tmp_path_factory) -> Path:
+    """The root the L-BFGS-B results file tree."""
+    return tmp_path_factory.mktemp("results")
+
+
+@pytest.fixture(scope="module")
+def lbfgsb_results(results_root, rosenbrock) -> Results:
+    """The results of L-BFGS-B on the Rosenbrock function."""
+    return Benchmarker(results_root, results_root / "results.json").execute(
+        [rosenbrock], AlgorithmsConfigurations(lbfgsb_configuration)
     )
-    algo_pb_dir = tmp_path / algo_config.name / rosenbrock.name
-    path = algo_pb_dir / f"{algo_config.name}.1.json"
+
+
+@pytest.mark.parametrize("index", [1, 2])
+def test_save_history(results_root, rosenbrock, lbfgsb_results, index):
+    """Check the saving of performance histories."""
+    algo_pb_dir = results_root / lbfgsb_configuration.name / rosenbrock.name
+    path = algo_pb_dir / f"{lbfgsb_configuration.name}.{index}.json"
     assert path.is_file()
-    assert results.contains(algo_config.algorithm_name, rosenbrock.name, path)
-    assert f"Solving instance 1 of problem {rosenbrock.name} with algorithm " \
-           f"configuration {algo_config.name}."
-    path = algo_pb_dir / f"{algo_config.name}.2.json"
-    assert path.is_file()
-    assert results.contains(algo_config.algorithm_name, rosenbrock.name, path)
-    assert f"Solving instance 2 of problem {rosenbrock.name} with algorithm " \
-           f"configuration {algo_config.name}."
+    assert lbfgsb_results.contains(
+        lbfgsb_configuration.algorithm_name, rosenbrock.name, path
+    )
+    assert f"Solving instance {index} of problem {rosenbrock.name} with algorithm " \
+           f"configuration {lbfgsb_configuration.name}."
 
 
 def test_save_database(tmp_path, rosenbrock):
