@@ -171,9 +171,13 @@ class Benchmarker(object):
 
             self._save_history(history, problem_instance_index)
 
-            self.__save_database(
-                database, algorithm_configuration, problem.name, problem_instance_index
-            )
+            if self._databases_dir is not None:
+                self.__save_database(
+                database,
+                algorithm_configuration,
+                problem.name,
+                problem_instance_index
+                )
 
             if self.__results_file:
                 self._results.to_file(self.__results_file, indent=4)
@@ -398,9 +402,6 @@ class Benchmarker(object):
             problem_name: The name of the problem.
             index: The index of the problem instance.
         """
-        if self._databases_dir is None:
-            return
-
         database.export_hdf(
             self._get_path(
                 self._databases_dir,
