@@ -19,7 +19,7 @@
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
-"""A runner to benchmark optimization algorithms on reference problems."""
+"""A benchmarker of optimization algorithms on reference problems."""
 import sys
 import time
 from pathlib import Path
