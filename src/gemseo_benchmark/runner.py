@@ -20,6 +20,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """A runner to benchmark optimization algorithms on reference problems."""
+import sys
 import time
 from pathlib import Path
 from typing import Iterable, Tuple
@@ -120,7 +121,7 @@ class Runner(object):
             "xtol_abs": 0.0,
             "ftol_rel": 0.0,
             "ftol_abs": 0.0,
-            "stop_crit_n_x": maxsize,
+            "stop_crit_n_x": sys.maxsize,
         }
         options.update(algorithm_configuration.algorithm_options)
         return AlgorithmConfiguration(
