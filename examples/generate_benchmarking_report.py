@@ -59,4 +59,4 @@ results = runner.execute(reference_problems, algorithms_configurations)
 report_dir = Path(__file__).parent.absolute() / "report"
 group = ProblemsGroup("Unconstrained problems", reference_problems)
 report = Report(report_dir, algorithms_configurations, [group], results)
-report.generate_report()
+report.generate()

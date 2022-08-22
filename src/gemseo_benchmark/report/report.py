@@ -115,7 +115,7 @@ class Report(object):
             group.name: None for group in problems_groups
         }
 
-    def generate_report(
+    def generate(
             self,
             to_html: bool = True,
             to_pdf: bool = False,
