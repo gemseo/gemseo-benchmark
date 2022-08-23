@@ -127,7 +127,7 @@ def test___set_pseven_log_file(tmp_path, rosenbrock):
     """Check the setting of the pSeven log file."""
     results_path = tmp_path / "results.json"
     algo_config = AlgorithmConfiguration("PSEVEN")
-    Benchmarker(tmp_path, results_path, pseven_dir=tmp_path).execute(
+    Benchmarker(tmp_path, results_path, pseven_outputs_path=tmp_path).execute(
         [rosenbrock], AlgorithmsConfigurations(algo_config)
     )
     algo_pb_dir = tmp_path / algo_config.name / rosenbrock.name

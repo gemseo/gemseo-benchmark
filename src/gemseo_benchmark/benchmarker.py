@@ -47,29 +47,30 @@ class Benchmarker(object):
 
     def __init__(
         self,
-        histories_dir: Path,
-        results_file: Path = None,
-        databases_dir: Path = None,
-        pseven_dir: Path = None
+        histories_path: Path,
+        results_path: Path = None,
+        databases_path: Path = None,
+        pseven_outputs_path: Path = None
     ) -> None:
         """
         Args:
-            histories_dir: The path to the directory where to save the performance
+            histories_path: The path to the directory where to save the performance
                 histories.
-            results_file: The path to the file for saving the performance histories
+            results_path: The path to the file for saving the performance histories
                 paths.
                 If exists, the file is updated with the new performance histories paths.
-            databases_dir: The path to the destination directory for the databases.
-            pseven_dir: The path to the destination directory for the pSeven output
+            databases_path: The path to the destination directory for the databases.
+            pseven_outputs_path: The path to the destination directory for the pSeven
+            output
                 files.
         """
-        self._databases_dir = databases_dir
-        self.__histories_dir = histories_dir
+        self._databases_dir = databases_path
+        self.__histories_dir = histories_path
         self.__is_algorithm_available = OptimizersFactory().is_available
-        self.__pseven_dir = pseven_dir
-        self.__results_file = results_file
-        if results_file is not None and results_file.is_file():
-            self._results = Results(results_file)
+        self.__pseven_dir = pseven_outputs_path
+        self.__results_file = results_path
+        if results_path is not None and results_path.is_file():
+            self._results = Results(results_path)
         else:
             self._results = Results()
 
