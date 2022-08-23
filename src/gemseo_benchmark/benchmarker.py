@@ -61,14 +61,13 @@ class Benchmarker(object):
                 If exists, the file is updated with the new performance histories paths.
             databases_path: The path to the destination directory for the databases.
             pseven_outputs_path: The path to the destination directory for the pSeven
-            output
-                files.
+                output files.
         """
-        self._databases_dir = databases_path
-        self.__histories_dir = histories_path
+        self._databases_path = databases_path
+        self.__histories_path = histories_path
         self.__is_algorithm_available = OptimizersFactory().is_available
-        self.__pseven_dir = pseven_outputs_path
-        self.__results_file = results_path
+        self.__pseven_outputs_path = pseven_outputs_path
+        self.__results_path = results_path
         if results_path is not None and results_path.is_file():
             self._results = Results(results_path)
         else:
@@ -106,7 +105,8 @@ class Benchmarker(object):
             )
             for problem in problems:
                 self._solve_problem(
-                    problem, algorithm_configuration,
+                    problem,
+                    algorithm_configuration,
                     overwrite_histories=overwrite_histories
                 )
 
@@ -174,7 +174,7 @@ class Benchmarker(object):
 
             self._save_history(history, problem_instance_index)
 
-            if self._databases_dir is not None:
+            if self._databases_path is not None:
                 self.__save_database(
                     database,
                     algorithm_configuration,
@@ -182,8 +182,8 @@ class Benchmarker(object):
                     problem_instance_index
                 )
 
-            if self.__results_file:
-                self._results.to_file(self.__results_file, indent=4)
+            if self.__results_path:
+                self._results.to_file(self.__results_path, indent=4)
 
     def __skip_instance(
         self,
@@ -239,7 +239,9 @@ class Benchmarker(object):
         Returns:
             A copy of the configuration including the path to the pSeven log file.
         """
-        if not self.__pseven_dir or not self.__is_algorithm_available("PSEVEN"):
+        if not self.__pseven_outputs_path or not self.__is_algorithm_available(
+                "PSEVEN"
+        ):
             return algorithm_configuration
 
         from gemseo.algos.opt.lib_pseven import PSevenOpt
@@ -326,7 +328,11 @@ class Benchmarker(object):
             The path for the history file.
         """
         return self._get_path(
-            self.__histories_dir, algorithm_configuration, problem_name, index, "json",
+            self.__histories_path,
+            algorithm_configuration,
+            problem_name,
+            index,
+            "json",
             make_parents=make_parents
         )
 
@@ -350,11 +356,15 @@ class Benchmarker(object):
             ValueError: If the path to the destination directory for the
                 pSeven files is not set.
         """
-        if not self.__pseven_dir:
+        if not self.__pseven_outputs_path:
             raise ValueError("The directory for the pSeven files is not set.")
 
         return self._get_path(
-            self.__pseven_dir, algorithm_configuration, problem_name, index, "txt",
+            self.__pseven_outputs_path,
+            algorithm_configuration,
+            problem_name,
+            index,
+            "txt",
             make_parents=True
         )
 
@@ -407,7 +417,7 @@ class Benchmarker(object):
         """
         database.export_hdf(
             self._get_path(
-                self._databases_dir,
+                self._databases_path,
                 algorithm_configuration,
                 problem_name,
                 index,
