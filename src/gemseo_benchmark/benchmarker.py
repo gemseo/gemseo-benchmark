@@ -60,8 +60,10 @@ class Benchmarker(object):
                 paths.
                 If exists, the file is updated with the new performance histories paths.
             databases_path: The path to the destination directory for the databases.
+                If `None` the databases will not be saved.
             pseven_outputs_path: The path to the destination directory for the pSeven
                 output files.
+                If `None` the pSeven log files will not be saved.
         """
         self._databases_path = databases_path
         self.__histories_path = histories_path
