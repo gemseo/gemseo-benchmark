@@ -19,7 +19,7 @@ problem = Problem(
 design_space = problem.creator().design_space
 problem.start_points = compute_doe(design_space, "OT_OPT_LHS", 10)
 
-# Define the convergence specifications for the optimization algorithms.
+# Define the convergence configurations for the optimization algorithms.
 algorithms_configurations = AlgorithmsConfigurations(
     AlgorithmConfiguration(
         "NLOPT_COBYLA", max_iter=100, eq_tolerance=1e-4, ineq_tolerance=0.

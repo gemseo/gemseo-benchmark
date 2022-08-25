@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2021 IRT Saint Exupéry, https://www.irt-saintexupery.com
+# Copyright 2022 IRT Saint Exupéry, https://www.irt-saintexupery.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -64,7 +63,7 @@ def test_default_start_point(benchmarking_problem, problem):
     """Check that the default starting point is properly set."""
     start_points = benchmarking_problem.start_points
     assert len(start_points) == 1
-    assert (start_points[0] == problem.design_space.get_current_x()).all()
+    assert (start_points[0] == problem.design_space.get_current_value()).all()
 
 
 def test_wrong_start_points_type(creator):
@@ -92,11 +91,11 @@ def test_start_points_iteration(creator):
     problem_instances = list(problem)
     assert len(problem_instances) == 2
     assert_allclose(
-        problem_instances[0].design_space.set_current_x.call_args_list[0][0][0],
+        problem_instances[0].design_space.set_current_value.call_args_list[0][0][0],
         start_points[0]
     )
     assert_allclose(
-        problem_instances[1].design_space.set_current_x.call_args_list[1][0][0],
+        problem_instances[1].design_space.set_current_value.call_args_list[1][0][0],
         start_points[1]
     )
 
@@ -120,7 +119,7 @@ def test_undefined_start_points(creator):  # TODO: use creator
     """Check the access to nonexistent starting points."""
     opt_problem = mock.Mock(spec=OptimizationProblem)
     opt_problem.design_space = mock.Mock()
-    opt_problem.design_space.has_current_x = mock.Mock(return_value=False)
+    opt_problem.design_space.has_current_value = mock.Mock(return_value=False)
     problem = Problem("problem", lambda: opt_problem)
     with raises(ValueError, match="The benchmarking problem has no starting point."):
         problem.start_points

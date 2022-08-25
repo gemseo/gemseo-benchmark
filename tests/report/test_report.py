@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2021 IRT Saint Exupéry, https://www.irt-saintexupery.com
+# Copyright 2022 IRT Saint Exupéry, https://www.irt-saintexupery.com
 #
 # This work is licensed under a BSD 0-Clause License.
 #
@@ -56,7 +55,7 @@ def test_generate_report_sources(
 ):
     """Check the generation of the report sources."""
     report = Report(tmp_path, algorithms_configurations, problems_groups, results)
-    report.generate_report(to_pdf=True)
+    report.generate(to_pdf=True)
     assert (tmp_path / "index.rst").is_file()
     assert (tmp_path / "algorithms.rst").is_file()
     assert (tmp_path / "problems_groups.rst").is_file()
@@ -85,7 +84,7 @@ def test_retrieve_description(
         "Algorithm\n",
         "   N/A\n"
     ]
-    report.generate_report()
+    report.generate()
     with open(tmp_path / "algorithms.rst") as file:
         contents = file.readlines()
     assert contents == ref_contents
@@ -97,7 +96,7 @@ def test_problems_descriptions_files(
 ):
     """Check the generation of the files describing the problems."""
     report = Report(tmp_path, algorithms_configurations, problems_groups, results)
-    report.generate_report(to_html=False)
+    report.generate(to_html=False)
     assert (tmp_path / "problems_list.rst").is_file()
     assert (tmp_path / "problems" / f"{problem_a.name}.rst").is_file()
     assert (tmp_path / "problems" / f"{problem_b.name}.rst").is_file()
@@ -109,7 +108,7 @@ def test_figures(
 ):
     """Check the generation of the figures."""
     report = Report(tmp_path, algorithms_configurations, problems_groups, results)
-    report.generate_report(to_html=False)
+    report.generate(to_html=False)
     group_dir = tmp_path / "images" / problems_groups[0].name.replace(" ", "_")
     assert (group_dir / "data_profile.png").is_file()
     problem_dir = group_dir / problem_a.name.replace(" ", "_")
@@ -143,4 +142,4 @@ def test_problem_without_optimum(
     groups = [incomplete_group]
     report = Report(tmp_path, algorithms_configurations, groups, results)
     with pytest.raises(AttributeError, match="The optimum of the problem is not set."):
-        report.generate_report()
+        report.generate()

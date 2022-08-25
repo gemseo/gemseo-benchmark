@@ -1,3 +1,23 @@
+# Copyright 2022 IRT Saint Exupéry, https://www.irt-saintexupery.com
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License version 3 as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+# Contributors:
+#    INITIAL AUTHORS - initial API and implementation and/or initial
+#                           documentation
+#        :author: Benoit Pauwels
+#    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Fixtures for the tests."""
 from __future__ import annotations
 
@@ -21,8 +41,8 @@ def design_space() -> mock.Mock:
     design_space.dimension = 2
     design_space.variables_names = ["x"]
     design_space.variables_sizes = {"x": 2}
-    design_space.get_current_x = mock.Mock(return_value=design_variables)
-    design_space.set_current_x = mock.Mock()
+    design_space.get_current_value = mock.Mock(return_value=design_variables)
+    design_space.set_current_value = mock.Mock()
     design_space.unnormalize_vect = lambda _: _
     design_space.untransform_vect = lambda x, no_check: x
     return design_space

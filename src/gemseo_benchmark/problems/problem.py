@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2021 IRT Saint Exupéry, https://www.irt-saintexupery.com
+# Copyright 2022 IRT Saint Exupéry, https://www.irt-saintexupery.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -126,7 +125,7 @@ class Problem(object):
             TypeError: If the return type of the creator is not
                 :class:`.OptimizationProblem`,
                 or if a starting point is not of type ndarray.
-            ValueError: If neither starting points nor DOE specifications are passed,
+            ValueError: If neither starting points nor DOE configurations are passed,
                or if a starting point is of inappropriate shape.
         """
         self.name = name
@@ -151,8 +150,8 @@ class Problem(object):
             self.start_points = self.__get_start_points(
                 doe_algo_name, doe_size, doe_options
             )
-        elif problem.design_space.has_current_x():
-            self.start_points = atleast_2d(self.__problem.design_space.get_current_x())
+        elif problem.design_space.has_current_value():
+            self.start_points = atleast_2d(self.__problem.design_space.get_current_value())
 
         # Set the target values:
         self.__target_values = None
@@ -301,7 +300,7 @@ class Problem(object):
         """Iterate on the problem instances with respect to the starting points. """
         for start_point in self.start_points:
             problem = self.creator()
-            problem.design_space.set_current_x(start_point)
+            problem.design_space.set_current_value(start_point)
             yield problem
 
     @property
@@ -331,7 +330,7 @@ class Problem(object):
             True if the algorithm is suited to the problem, False otherwise.
         """
         library = OptimizersFactory().create(name)
-        return library.is_algorithm_suited(library.lib_dict[name], self.__problem)
+        return library.is_algorithm_suited(library.descriptions[name], self.__problem)
 
     def compute_targets(
             self,
