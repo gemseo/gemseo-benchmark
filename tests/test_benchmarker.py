@@ -19,14 +19,11 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the benchmarker."""
-from pathlib import Path
-
 import pytest
 from numpy import array
 
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.problems.analytical.rastrigin import Rastrigin
-from gemseo.problems.analytical.rosenbrock import Rosenbrock
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.algorithms.algorithms_configurations import \
     AlgorithmsConfigurations
@@ -36,24 +33,12 @@ from gemseo_benchmark.results.results import Results
 
 
 @pytest.fixture(scope="module")
-def rosenbrock() -> Problem:
-    """A benchmarking problem based on the 2-dimensional Rosenbrock function."""
-    return Problem("Rosenbrock", Rosenbrock, [array([0.0, 1.0]), array([1.0, 0.0])])
-
-
-@pytest.fixture(scope="module")
 def rastrigin() -> Problem:
     """A benchmarking problem based on the 2-dimensional Rastrigin function."""
     return Problem("Rastrigin", Rastrigin, [array([0.0, 0.1]), array([0.1, 0.0])])
 
 
 lbfgsb_configuration = AlgorithmConfiguration("L-BFGS-B")
-
-
-@pytest.fixture(scope="module")
-def results_root(tmp_path_factory) -> Path:
-    """The root the L-BFGS-B results file tree."""
-    return tmp_path_factory.mktemp("results")
 
 
 @pytest.fixture(scope="module")
@@ -89,8 +74,10 @@ def test_save_database(tmp_path, rosenbrock):
 
 
 def test_unavailable_algorithm(
-        tmp_path, rosenbrock, unknown_algorithm_configuration,
-        unknown_algorithms_configurations
+    tmp_path,
+    rosenbrock,
+    unknown_algorithm_configuration,
+    unknown_algorithms_configurations
 ):
     """Check the handling of an unavailable algorithm."""
     with pytest.raises(
@@ -127,7 +114,7 @@ def test___set_pseven_log_file(tmp_path, rosenbrock):
     """Check the setting of the pSeven log file."""
     results_path = tmp_path / "results.json"
     algo_config = AlgorithmConfiguration("PSEVEN")
-    Benchmarker(tmp_path, results_path, pseven_outputs_path=tmp_path).execute(
+    Benchmarker(tmp_path, results_path, pseven_logs_path=tmp_path).execute(
         [rosenbrock], AlgorithmsConfigurations(algo_config)
     )
     algo_pb_dir = tmp_path / algo_config.name / rosenbrock.name

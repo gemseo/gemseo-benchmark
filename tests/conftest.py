@@ -26,10 +26,13 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
-from numpy import array, ndarray
+from numpy import array
+from numpy import ndarray
 
 from gemseo.algos.opt_problem import OptimizationProblem
+from gemseo.problems.analytical.rosenbrock import Rosenbrock
 from gemseo_benchmark.data_profiles.target_values import TargetValues
+from gemseo_benchmark.problems.problem import Problem
 
 design_variables = array([0.0, 1.0])
 
@@ -76,7 +79,7 @@ def equality_constraint() -> mock.Mock:
 
 @pytest.fixture(scope="package")
 def functions_values(
-        objective, inequality_constraint, equality_constraint
+    objective, inequality_constraint, equality_constraint
 ) -> dict[str, float | ndarray]:
     """The values of the functions of a problem."""
     return {
@@ -106,8 +109,8 @@ def database(hashable_array, functions_values) -> mock.Mock:
 
 @pytest.fixture(scope="package")
 def problem(
-        design_space, objective, inequality_constraint, equality_constraint,
-        functions_values
+    design_space, objective, inequality_constraint, equality_constraint,
+    functions_values
 ) -> mock.Mock:
     """A solved optimization problem."""
     problem = mock.Mock(spec=OptimizationProblem)
@@ -135,8 +138,8 @@ def problem(
 
 
 def side_effect(
-        algos_configurations, results, show=False, file_path=None,
-        plot_all_histories=False, infeasibility_tolerance=0.0, max_eval_number=None
+    algos_configurations, results, show=False, file_path=None,
+    plot_all_histories=False, infeasibility_tolerance=0.0, max_eval_number=None
 ):
     shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(file_path))
 
@@ -176,8 +179,8 @@ def group(problem_a, problem_b) -> mock.Mock:
     group.__iter__.return_value = [problem_a, problem_b]
 
     def side_effect(
-            algos_configurations, histories_paths, show=False, plot_path=None,
-            infeasibility_tolerance=0.0, max_eval_number=None
+        algos_configurations, histories_paths, show=False, plot_path=None,
+        infeasibility_tolerance=0.0, max_eval_number=None
     ):
         shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(plot_path))
 
@@ -190,7 +193,7 @@ def algorithm_configuration() -> mock.Mock():
     """The configuration of an algorithm."""
     algo_config = mock.Mock()
     algo_config.algorithm_name = "SLSQP"
-    algo_config.algorithm_options = {"normalize_design_space": False}
+    algo_config.algorithm_options = {"normalize_design_space": False, "max_iter": 3}
     algo_config.name = "SLSQP"
     return algo_config
 
@@ -217,7 +220,7 @@ def unknown_algorithm_configuration():
 
 @pytest.fixture(scope="package")
 def unknown_algorithms_configurations(
-        algorithm_configuration, unknown_algorithm_configuration
+    algorithm_configuration, unknown_algorithm_configuration
 ) -> mock.Mock():
     """The configurations of algorithms unknown to GEMSEO."""
     algos_configs = mock.MagicMock()
@@ -239,7 +242,7 @@ ALGO_NAME = "SLSQP"
 
 @pytest.fixture(scope="function")
 def results(
-        algorithm_configuration, unknown_algorithm_configuration, problem_a, problem_b
+    algorithm_configuration, unknown_algorithm_configuration, problem_a, problem_b
 ) -> mock.Mock:
     """The results of the benchmarking."""
     results = mock.Mock()
@@ -250,3 +253,21 @@ def results(
     paths = [Path(__file__).parent / "history.json"]
     results.get_paths = mock.Mock(return_value=paths)
     return results
+
+
+@pytest.fixture(scope="module")
+def rosenbrock() -> Problem:
+    """A benchmarking problem based on the 2-dimensional Rosenbrock function."""
+    return Problem(
+        "Rosenbrock",
+        Rosenbrock,
+        [array([0.0, 1.0]), array([1.0, 0.0])],
+        TargetValues([1e-2, 1e-4, 1e-6, 0.0]),
+        optimum=0.0
+    )
+
+
+@pytest.fixture(scope="module")
+def results_root(tmp_path_factory) -> Path:
+    """The root the L-BFGS-B results file tree."""
+    return tmp_path_factory.mktemp("results")
