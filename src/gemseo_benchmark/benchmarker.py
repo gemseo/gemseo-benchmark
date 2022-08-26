@@ -20,7 +20,6 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """A benchmarker of optimization algorithms on reference problems."""
 import sys
-import time
 from pathlib import Path
 from typing import Iterable
 from typing import Tuple
@@ -30,6 +29,7 @@ from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.api import configure_logger
 from gemseo.api import execute_algo
+from gemseo.utils.timer import Timer
 from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.algorithms.algorithms_configurations import \
@@ -280,9 +280,8 @@ class Benchmarker(object):
         algo_name = algorithm_configuration.algorithm_name
         algo_options = algorithm_configuration.algorithm_options
 
-        start_time = time.time()
-        execute_algo(problem, algo_name, **algo_options)
-        total_time = time.time() - start_time
+        with Timer() as timer:
+            execute_algo(problem, algo_name, **algo_options)
 
         history = self._HISTORY_CLASS.from_problem(problem, problem_name)
         history.algorithm_configuration = algorithm_configuration
@@ -293,7 +292,7 @@ class Benchmarker(object):
             if algo_name in PSevenOpt().descriptions:
                 history.doe_size = len(algo_options.get("sample_x", [None]))
 
-        history.total_time = total_time
+        history.total_time = timer.elapsed_time
         return problem.database, history
 
     def _save_history(self, history: PerformanceHistory, index: int) -> None:
