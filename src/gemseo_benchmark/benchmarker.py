@@ -252,8 +252,10 @@ class Benchmarker(object):
             algorithm_configuration.algorithm_name,
             algorithm_configuration.name,
             **algorithm_configuration.algorithm_options,
-            log_path=self.__get_pseven_log_path(
-                algorithm_configuration, problem.name, index
+            log_path=str(
+                self.__get_pseven_log_path(
+                    algorithm_configuration, problem.name, index
+                )
             )
         )
 
