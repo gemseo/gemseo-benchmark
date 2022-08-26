@@ -140,7 +140,7 @@ class Problem(object):
             raise TypeError(
                 "optimization_problem_creator must return an OptimizationProblem."
             )
-        self.__problem = problem
+        self._problem = problem
 
         # Set the starting points
         self.__start_points = list()
@@ -151,7 +151,7 @@ class Problem(object):
                 doe_algo_name, doe_size, doe_options
             )
         elif problem.design_space.has_current_value():
-            self.start_points = atleast_2d(self.__problem.design_space.get_current_value())
+            self.start_points = atleast_2d(self._problem.design_space.get_current_value())
 
         # Set the target values:
         self.__target_values = None
@@ -202,18 +202,18 @@ class Problem(object):
                     "was passed."
                 )
 
-            if start_points.shape[1] != self.__problem.dimension:
+            if start_points.shape[1] != self._problem.dimension:
                 raise ValueError(
                     f"{message} The number of columns ({start_points.shape[1]}) "
                     f"is different from the problem dimension "
-                    f"({self.__problem.dimension})."
+                    f"({self._problem.dimension})."
                 )
 
             start_points_list = [point for point in start_points]
 
         # Check that the starting points are within the bounds of the design space
         for point in start_points_list:
-            self.__problem.design_space.check_membership(point)
+            self._problem.design_space.check_membership(point)
 
         self.__start_points = start_points_list
 
@@ -230,13 +230,13 @@ class Problem(object):
         """
         error_message = (
             "A starting point must be a 1-dimensional NumPy array of size "
-            f"{self.__problem.dimension}."
+            f"{self._problem.dimension}."
         )
         if any(not isinstance(point, ndarray) for point in start_points):
             raise TypeError(error_message)
 
         if any(
-                point.ndim != 1 or point.size != self.__problem.dimension
+                point.ndim != 1 or point.size != self._problem.dimension
                 for point in start_points
         ):
             raise ValueError(error_message)
@@ -260,13 +260,13 @@ class Problem(object):
             The starting points.
         """
         if doe_size is None:
-            doe_size = min([self.__problem.dimension, 10])
+            doe_size = min([self._problem.dimension, 10])
 
         if doe_options is None:
             doe_options = dict()
 
         return compute_doe(
-            self.__problem.design_space, doe_algo_name, doe_size, **doe_options
+            self._problem.design_space, doe_algo_name, doe_size, **doe_options
         )
 
     @property
@@ -313,12 +313,12 @@ class Problem(object):
     @property
     def objective_name(self) -> str:
         """The name of the objective function."""
-        return self.__problem.objective.name
+        return self._problem.objective.name
 
     @property
     def constraints_names(self) -> list[str]:
         """The names of the scalar constraints."""
-        return self.__problem.get_scalar_constraints_names()
+        return self._problem.get_scalar_constraints_names()
 
     def is_algorithm_suited(self, name: str) -> bool:
         """Check whether an algorithm is suited to the problem.
@@ -330,7 +330,7 @@ class Problem(object):
             True if the algorithm is suited to the problem, False otherwise.
         """
         library = OptimizersFactory().create(name)
-        return library.is_algorithm_suited(library.descriptions[name], self.__problem)
+        return library.is_algorithm_suited(library.descriptions[name], self._problem)
 
     def compute_targets(
             self,
@@ -482,7 +482,7 @@ class Problem(object):
     @property
     def dimension(self) -> int:
         """The dimension of the problem."""
-        return self.__problem.dimension
+        return self._problem.dimension
 
     def compute_data_profile(
             self,
