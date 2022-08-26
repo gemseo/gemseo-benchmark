@@ -50,7 +50,7 @@ class Benchmarker(object):
         histories_path: Path,
         results_path: Path = None,
         databases_path: Path = None,
-        pseven_outputs_path: Path = None
+        pseven_logs_path: Path = None
     ) -> None:
         """
         Args:
@@ -60,15 +60,15 @@ class Benchmarker(object):
                 paths.
                 If exists, the file is updated with the new performance histories paths.
             databases_path: The path to the destination directory for the databases.
-                If `None` the databases will not be saved.
-            pseven_outputs_path: The path to the destination directory for the pSeven
-                output files.
-                If `None` the pSeven log files will not be saved.
+                If ``None``, the databases will not be saved.
+            pseven_logs_path: The path to the destination directory for the pSeven
+                log files.
+                If ``None``, the pSeven log files will not be saved.
         """
         self._databases_path = databases_path
         self.__histories_path = histories_path
         self.__is_algorithm_available = OptimizersFactory().is_available
-        self.__pseven_outputs_path = pseven_outputs_path
+        self.__pseven_logs_path = pseven_logs_path
         self.__results_path = results_path
         if results_path is not None and results_path.is_file():
             self._results = Results(results_path)
@@ -241,9 +241,7 @@ class Benchmarker(object):
         Returns:
             A copy of the configuration including the path to the pSeven log file.
         """
-        if not self.__pseven_outputs_path or not self.__is_algorithm_available(
-                "PSEVEN"
-        ):
+        if not self.__pseven_logs_path or not self.__is_algorithm_available("PSEVEN"):
             return algorithm_configuration
 
         from gemseo.algos.opt.lib_pseven import PSevenOpt
@@ -357,11 +355,11 @@ class Benchmarker(object):
             ValueError: If the path to the destination directory for the
                 pSeven files is not set.
         """
-        if not self.__pseven_outputs_path:
+        if not self.__pseven_logs_path:
             raise ValueError("The directory for the pSeven files is not set.")
 
         return self._get_path(
-            self.__pseven_outputs_path,
+            self.__pseven_logs_path,
             algorithm_configuration,
             problem_name,
             index,
