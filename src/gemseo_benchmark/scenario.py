@@ -37,12 +37,12 @@ class Scenario(object):
         Raises:
             ValueError: If the path to outputs directory does not exist.
         """
-        self._algorithms = algorithms
         if not Path(outputs_path).is_dir():
             raise NotADirectoryError(
                 f"The path to the outputs directory does not exist: {outputs_path}."
             )
 
+        self._algorithms = algorithms
         self._outputs_path = Path(outputs_path).resolve()
 
     def execute(
@@ -116,7 +116,7 @@ class Scenario(object):
             self._get_pseven_logs_path() if save_pseven_logs else None
         )
         benchmarker.execute(
-            set([problem for group in problems_groups for problem in group]),
+            {problem for group in problems_groups for problem in group},
             self._algorithms,
             overwrite_histories,
         )
@@ -177,6 +177,5 @@ class Scenario(object):
         report.generate(to_html, to_pdf, infeasibility_tolerance)
 
     def __get_report_path(self) -> Path:
-        """Return the path to the report root directory.
-        """
+        """Return the path to the report root directory."""
         return self._get_dir_path(self.__REPORT_DIRNAME, overwrite=True)
