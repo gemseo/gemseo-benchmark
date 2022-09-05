@@ -51,8 +51,8 @@ class Scenario(object):
         overwrite_histories: bool = False,
         skip_solvers: bool = False,
         skip_report: bool = False,
-        html_report: bool = True,
-        pdf_report: bool = False,
+        generate_html_report: bool = True,
+        generate_pdf_report: bool = False,
         infeasibility_tolerance: float = 0.0,
         save_databases: bool = False,
         save_pseven_logs: bool = False
@@ -64,8 +64,8 @@ class Scenario(object):
             overwrite_histories: Whether to overwrite the performance histories.
             skip_solvers: Whether to skip the running of solvers.
             skip_report: Whether to skip the generation of the report.
-            html_report: Whether to generate the report in HTML format.
-            pdf_report: Whether to generate the report in PDF format.
+            generate_html_report: Whether to generate the report in HTML format.
+            generate_pdf_report: Whether to generate the report in PDF format.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             save_databases: Whether to save the databases of the optimizations.
             save_pseven_logs: Whether to save the logs of pSeven.
@@ -79,7 +79,10 @@ class Scenario(object):
         if not skip_report:
             LOGGER.info("Generate the benchmarking report")
             self.__generate_report(
-                problems_groups, html_report, pdf_report, infeasibility_tolerance
+                problems_groups,
+                generate_html_report,
+                generate_pdf_report,
+                infeasibility_tolerance
             )
 
     def _run_solvers(
@@ -156,16 +159,16 @@ class Scenario(object):
     def __generate_report(
         self,
         problems_groups: Iterable[ProblemsGroup],
-        to_html: bool,
-        to_pdf: bool,
+        generate_to_html: bool,
+        generate_to_pdf: bool,
         infeasibility_tolerance: float
     ) -> None:
         """Generate the benchmarking report.
 
         Args:
             problems_groups: The groups of benchmarking problems.
-            to_html: Whether to generate the report in HTML format.
-            to_pdf: Whether to generate the report in PDF format.
+            generate_to_html: Whether to generate the report in HTML format.
+            generate_to_pdf: Whether to generate the report in PDF format.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
         """
         report = Report(
@@ -174,7 +177,7 @@ class Scenario(object):
             problems_groups,
             Results(self._get_results_path())
         )
-        report.generate(to_html, to_pdf, infeasibility_tolerance)
+        report.generate(generate_to_html, generate_to_pdf, infeasibility_tolerance)
 
     def __get_report_path(self) -> Path:
         """Return the path to the report root directory."""
