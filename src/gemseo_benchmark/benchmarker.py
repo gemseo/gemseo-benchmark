@@ -417,7 +417,6 @@ class Benchmarker(object):
             index: The index of the problem instance.
         """
         database.export_hdf(
-            str(
                 self._get_path(
                     self._databases_path,
                     algorithm_configuration,
@@ -426,5 +425,4 @@ class Benchmarker(object):
                     "h5",
                     make_parents=True
                 )
-            )
         )
