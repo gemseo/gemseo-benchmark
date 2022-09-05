@@ -44,6 +44,10 @@ class Scenario(object):
 
         self._algorithms = algorithms
         self._outputs_path = Path(outputs_path).resolve()
+        self._databases_path = self._get_dir_path(self.__DATABASES_DIRNAME)
+        self._histories_path = self._get_dir_path(self.__HISTORIES_DIRNAME)
+        self._pseven_logs_path = self._get_dir_path(self.__PSEVEN_LOGS_DIRNAME)
+        self._results_path = self._outputs_path / self.__RESULTS_FILENAME
 
     def execute(
         self,
@@ -113,32 +117,16 @@ class Scenario(object):
             )
 
         benchmarker = Benchmarker(
-            self._get_histories_path(),
-            self._get_results_path(),
-            self._get_databases_path() if save_databases else None,
-            self._get_pseven_logs_path() if save_pseven_logs else None
+            self._histories_path,
+            self._results_path,
+            self._databases_path if save_databases else None,
+            self._pseven_logs_path if save_pseven_logs else None
         )
         benchmarker.execute(
             {problem for group in problems_groups for problem in group},
             self._algorithms,
             overwrite_histories,
         )
-
-    def _get_histories_path(self) -> Path:
-        """Return the path to the histories directory."""
-        return self._get_dir_path(self.__HISTORIES_DIRNAME)
-
-    def _get_results_path(self) -> Path:
-        """Return the path to the results file."""
-        return self._outputs_path / self.__RESULTS_FILENAME
-
-    def _get_databases_path(self) -> Path:
-        """Return the path to the databases directory."""
-        return self._get_dir_path(self.__DATABASES_DIRNAME)
-
-    def _get_pseven_logs_path(self) -> Path:
-        """Return the path to the pSeven output files directory."""
-        return self._get_dir_path(self.__PSEVEN_LOGS_DIRNAME)
 
     def _get_dir_path(self, name: str, overwrite: bool = False) -> Path:
         """Return the path to a directory.
@@ -175,7 +163,7 @@ class Scenario(object):
             self.__get_report_path(),
             self._algorithms,
             problems_groups,
-            Results(self._get_results_path())
+            Results(self._results_path)
         )
         report.generate(generate_to_html, generate_to_pdf, infeasibility_tolerance)
 
