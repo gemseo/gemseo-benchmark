@@ -132,7 +132,8 @@ class Scenario(object):
         """Return the path to a directory.
 
         Args:
-            name: the name of the directory.
+            name: The name of the directory.
+            overwrite: Whether to remove and remake the directory if it already exists.
 
         Returns:
             The path to the directory.
