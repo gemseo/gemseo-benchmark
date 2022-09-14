@@ -44,9 +44,7 @@ class Scenario(object):
 
         self._algorithms = algorithms
         self._outputs_path = Path(outputs_path).resolve()
-        self._databases_path = self._get_dir_path(self.__DATABASES_DIRNAME)
         self._histories_path = self._get_dir_path(self.__HISTORIES_DIRNAME)
-        self._pseven_logs_path = self._get_dir_path(self.__PSEVEN_LOGS_DIRNAME)
         self._results_path = self._outputs_path / self.__RESULTS_FILENAME
 
     def execute(
@@ -119,8 +117,8 @@ class Scenario(object):
         benchmarker = Benchmarker(
             self._histories_path,
             self._results_path,
-            self._databases_path if save_databases else None,
-            self._pseven_logs_path if save_pseven_logs else None
+            self._get_dir_path(self.__DATABASES_DIRNAME) if save_databases else None,
+            self._get_dir_path(self.__PSEVEN_LOGS_DIRNAME) if save_pseven_logs else None
         )
         benchmarker.execute(
             {problem for group in problems_groups for problem in group},
