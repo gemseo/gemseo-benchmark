@@ -41,8 +41,10 @@ def test_execute(
     not OptimizersFactory().is_available("PSEVEN"), reason="pSeven is not available."
 )
 @pytest.mark.parametrize("save_pseven_logs", [False, True])
-def test_execute(algorithms_configurations, tmp_path, rosenbrock, save_pseven_logs):
-    """Check the execution of a benchmarking scenario."""
+def test_execute_pseven(
+    algorithms_configurations, tmp_path, rosenbrock, save_pseven_logs
+):
+    """Check the execution of a benchmarking scenario including pSeven."""
     Scenario(
         AlgorithmsConfigurations(AlgorithmConfiguration("PSEVEN")), tmp_path
     ).execute(
