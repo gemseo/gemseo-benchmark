@@ -29,6 +29,7 @@ from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.api import configure_logger
 from gemseo.api import execute_algo
+from gemseo.utils.string_tools import pretty_str
 from gemseo.utils.timer import Timer
 from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -252,7 +253,7 @@ class Benchmarker(object):
             algorithm_configuration.algorithm_name,
             algorithm_configuration.name,
             **algorithm_configuration.algorithm_options,
-            log_path=str(
+            log_path=pretty_str(
                 self.__get_pseven_log_path(
                     algorithm_configuration, problem.name, index
                 )
