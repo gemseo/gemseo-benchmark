@@ -1,12 +1,15 @@
 """Compute data profiles for GEMSEO optimizers."""
+from __future__ import annotations
+
 from pathlib import Path
 from shutil import rmtree
 
 from gemseo.api import execute_algo
 from gemseo.problems.analytical.rosenbrock import Rosenbrock
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
-from gemseo_benchmark.algorithms.algorithms_configurations import \
-    AlgorithmsConfigurations
+from gemseo_benchmark.algorithms.algorithms_configurations import (
+    AlgorithmsConfigurations,
+)
 from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.results.performance_history import PerformanceHistory
@@ -17,8 +20,9 @@ problem = Problem("Rosenbrock", Rosenbrock, doe_algo_name="DiagonalDOE", doe_siz
 
 # Set the algorithms to be compared
 algorithms_configurations = AlgorithmsConfigurations(
-    AlgorithmConfiguration("SLSQP"), AlgorithmConfiguration("DUAL_ANNEALING"),
-    AlgorithmConfiguration("L-BFGS-B")
+    AlgorithmConfiguration("SLSQP"),
+    AlgorithmConfiguration("DUAL_ANNEALING"),
+    AlgorithmConfiguration("L-BFGS-B"),
 )
 
 # Run the algorithms on the reference problem

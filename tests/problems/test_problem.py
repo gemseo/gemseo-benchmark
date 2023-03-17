@@ -12,37 +12,39 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for benchmarking reference problems."""
+from __future__ import annotations
+
 import re
 from pathlib import Path
 from unittest import mock
 
 import numpy
 import pytest
-from matplotlib import pyplot
-from matplotlib.testing.decorators import image_comparison
-from numpy import ones, zeros
-from numpy.testing import assert_allclose, assert_equal
-from pytest import raises
-
 from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.problems.analytical.rosenbrock import Rosenbrock
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
+from matplotlib import pyplot
+from matplotlib.testing.decorators import image_comparison
+from numpy import ones
+from numpy import zeros
+from numpy.testing import assert_allclose
+from numpy.testing import assert_equal
+from pytest import raises
 
 
 def test_invalid_creator():
     """Check initialization with an invalid problem creator."""
     with raises(
-            TypeError,
-            match="optimization_problem_creator must return an OptimizationProblem."
+        TypeError,
+        match="optimization_problem_creator must return an OptimizationProblem.",
     ):
         Problem("A problem", lambda: None)
 
@@ -69,8 +71,8 @@ def test_default_start_point(benchmarking_problem, problem):
 def test_wrong_start_points_type(creator):
     """Check initialization with starting points of the wrong type."""
     with raises(
-            TypeError,
-            match="A starting point must be a 1-dimensional NumPy array of size 2."
+        TypeError,
+        match="A starting point must be a 1-dimensional NumPy array of size 2.",
     ):
         Problem("problem", creator, [[0.0, 0.0]])
 
@@ -78,8 +80,8 @@ def test_wrong_start_points_type(creator):
 def test_inconsistent_start_points(creator):
     """Check initialization with starting points of inadequate size."""
     with raises(
-            ValueError,
-            match="A starting point must be a 1-dimensional NumPy array of size 2."
+        ValueError,
+        match="A starting point must be a 1-dimensional NumPy array of size 2.",
     ):
         Problem("problem", creator, [zeros(3)])
 
@@ -92,11 +94,11 @@ def test_start_points_iteration(creator):
     assert len(problem_instances) == 2
     assert_allclose(
         problem_instances[0].design_space.set_current_value.call_args_list[0][0][0],
-        start_points[0]
+        start_points[0],
     )
     assert_allclose(
         problem_instances[1].design_space.set_current_value.call_args_list[1][0][0],
-        start_points[1]
+        start_points[1],
     )
 
 
@@ -109,9 +111,7 @@ def test_undefined_targets(creator):
 
 def test_generate_start_points(creator):
     """Check the generation of starting points."""
-    problem = Problem(
-        "problem", creator, doe_algo_name="DiagonalDOE", doe_size=5
-    )
+    problem = Problem("problem", creator, doe_algo_name="DiagonalDOE", doe_size=5)
     assert len(problem.start_points) == 5
 
 
@@ -133,32 +133,52 @@ def test_undefined_start_points(creator):  # TODO: use creator
         "linear_inequality_constraints",
         "nonlinear_equality_constraints",
         "nonlinear_inequality_constraints",
-        "description"
+        "description",
     ],
     [
         (
-                1, False, 0, 0, 0, 0,
-                "A problem depending on 1 bounded variable, with a linear objective."
+            1,
+            False,
+            0,
+            0,
+            0,
+            0,
+            "A problem depending on 1 bounded variable, with a linear objective.",
         ),
         (
-                2, True, 1, 0, 0, 0,
-                "A problem depending on 2 bounded variables,"
-                " with a nonlinear objective,"
-                " subject to 1 linear equality constraint."
+            2,
+            True,
+            1,
+            0,
+            0,
+            0,
+            "A problem depending on 2 bounded variables,"
+            " with a nonlinear objective,"
+            " subject to 1 linear equality constraint.",
         ),
-    ]
+    ],
 )
 def test__get_description(
-        dimension, nonlinear_objective, linear_equality_constraints,
-        linear_inequality_constraints, nonlinear_equality_constraints,
-        nonlinear_inequality_constraints, description
+    dimension,
+    nonlinear_objective,
+    linear_equality_constraints,
+    linear_inequality_constraints,
+    nonlinear_equality_constraints,
+    nonlinear_inequality_constraints,
+    description,
 ):
     """Check the description getter."""
-    assert Problem._get_description(
-        dimension, nonlinear_objective, linear_equality_constraints,
-        linear_inequality_constraints, nonlinear_equality_constraints,
-        nonlinear_inequality_constraints
-    ) == description
+    assert (
+        Problem._get_description(
+            dimension,
+            nonlinear_objective,
+            linear_equality_constraints,
+            linear_inequality_constraints,
+            nonlinear_equality_constraints,
+            nonlinear_inequality_constraints,
+        )
+        == description
+    )
 
 
 @pytest.fixture()
@@ -187,17 +207,17 @@ def target_values():
 def test_init_targets_computation(creator, algorithms_configurations):
     """Check the computation of targets at the problem creation."""
     problem = Problem(
-        "Problem", lambda: Rosenbrock(),
+        "Problem",
+        lambda: Rosenbrock(),
         target_values_algorithms_configurations=algorithms_configurations,
-        target_values_number=2
+        target_values_number=2,
     )
     assert isinstance(problem.target_values, TargetValues)
 
 
-@image_comparison(baseline_images=["histories"], remove_text=True, extensions=['png'])
+@image_comparison(baseline_images=["histories"], remove_text=True, extensions=["png"])
 def test_plot_histories(
-        creator, target_values, algorithms_configurations, results,
-        algorithm_configuration
+    creator, target_values, algorithms_configurations, results, algorithm_configuration
 ):
     """Check the histories graphs."""
     problem = Problem("problem", creator, target_values=target_values)
@@ -207,10 +227,10 @@ def test_plot_histories(
 
 
 @image_comparison(
-    baseline_images=["histories_single_target"], remove_text=True, extensions=['png']
+    baseline_images=["histories_single_target"], remove_text=True, extensions=["png"]
 )
 def test_plot_histories_single_target(
-        creator, algorithms_configurations, results, algorithm_configuration
+    creator, algorithms_configurations, results, algorithm_configuration
 ):
     """Check the histories graphs for a problem with a single target value."""
     target_values = mock.MagicMock(spec=TargetValues)
@@ -224,17 +244,16 @@ def test_plot_histories_single_target(
 
 
 @image_comparison(
-    baseline_images=["three_histories"], remove_text=True, extensions=['png']
+    baseline_images=["three_histories"], remove_text=True, extensions=["png"]
 )
 def test_plot_3_histories(
-        tmpdir, creator, target_values, algorithms_configurations,
-        algorithm_configuration
+    tmpdir, creator, target_values, algorithms_configurations, algorithm_configuration
 ):
     """Check the histories graph for three histories."""
     histories = [
         PerformanceHistory([1.3, 1.0, 0.6, 0.4, 0.3]),
         PerformanceHistory([1.2, 1.0, 0.5, 0.4, 0.2]),
-        PerformanceHistory([1.1, 0.7, 0.5, 0.1, 0.0])
+        PerformanceHistory([1.1, 0.7, 0.5, 0.1, 0.0]),
     ]
     paths = list()
     for index, history in enumerate(histories):
@@ -253,14 +272,13 @@ def test_plot_3_histories(
     baseline_images=["infeasible_histories"], remove_text=True, extensions=["png"]
 )
 def test_plot_infeasible_histories(
-        tmpdir, creator, target_values, algorithms_configurations,
-        algorithm_configuration
+    tmpdir, creator, target_values, algorithms_configurations, algorithm_configuration
 ):
     """Check the histories graph for histories with infeasible items."""
     histories = [
         PerformanceHistory([1.5, 1.1, 0.2], [1.0, 1.0, 0.0]),
         PerformanceHistory([1.0, 0.5, 0.1], [1.0, 0.0, 0.0]),
-        PerformanceHistory([0.5, 0.2, 0.0], [1.0, 0.0, 0.0])
+        PerformanceHistory([0.5, 0.2, 0.0], [1.0, 0.0, 0.0]),
     ]
     paths = list()
     for index, history in enumerate(histories):
@@ -276,11 +294,10 @@ def test_plot_infeasible_histories(
 
 
 @image_comparison(
-    baseline_images=["histories_plot_all"], remove_text=True, extensions=['png']
+    baseline_images=["histories_plot_all"], remove_text=True, extensions=["png"]
 )
 def test_plot_histories_plot_all(
-        creator, target_values, algorithms_configurations, results,
-        algorithm_configuration
+    creator, target_values, algorithms_configurations, results, algorithm_configuration
 ):
     """Check the plotting of all the histories."""
     problem = Problem("Problem", creator, target_values=target_values)
@@ -291,11 +308,10 @@ def test_plot_histories_plot_all(
 
 
 @image_comparison(
-    baseline_images=["histories_optimum"], remove_text=True, extensions=['png']
+    baseline_images=["histories_optimum"], remove_text=True, extensions=["png"]
 )
 def test_plot_histories_optimum(
-        creator, target_values, algorithms_configurations, results,
-        algorithm_configuration
+    creator, target_values, algorithms_configurations, results, algorithm_configuration
 ):
     """Check the plotting the histories when the optimum is set."""
     problem = Problem("Problem", creator, target_values=target_values)
@@ -305,11 +321,10 @@ def test_plot_histories_optimum(
 
 
 @image_comparison(
-    baseline_images=["histories_max_eval_number"], remove_text=True, extensions=['png']
+    baseline_images=["histories_max_eval_number"], remove_text=True, extensions=["png"]
 )
 def test_plot_histories_max_eval_number(
-        creator, target_values, algorithms_configurations, results,
-        algorithm_configuration
+    creator, target_values, algorithms_configurations, results, algorithm_configuration
 ):
     """Check the plotting the histories when the number of evaluations is limited."""
     problem = Problem("Problem", creator, target_values=target_values)
@@ -320,15 +335,17 @@ def test_plot_histories_max_eval_number(
     )
 
 
-message = "The starting points shall be passed as (lines of) a 2-dimensional NumPy " \
-          "array, or as an iterable of 1-dimensional NumPy arrays."
+message = (
+    "The starting points shall be passed as (lines of) a 2-dimensional NumPy "
+    "array, or as an iterable of 1-dimensional NumPy arrays."
+)
 
 
 def test_start_points_non_2d_array(benchmarking_problem):
     """Check the setting of starting points as a non 2-dimensional NumPy array."""
     with pytest.raises(
-            ValueError,
-            match=re.escape(f"{message} A 1-dimensional NumPy array was passed.")
+        ValueError,
+        match=re.escape(f"{message} A 1-dimensional NumPy array was passed."),
     ):
         benchmarking_problem.start_points = zeros(2)
 
@@ -337,10 +354,10 @@ def test_start_points_non_iterable(benchmarking_problem):
     """Check the setting of starting points as a non-iterable object."""
     start_points = 0.0
     with pytest.raises(
-            TypeError,
-            match=re.escape(
-                f"{message} The following type was passed: {type(start_points)}."
-            )
+        TypeError,
+        match=re.escape(
+            f"{message} The following type was passed: {type(start_points)}."
+        ),
     ):
         benchmarking_problem.start_points = start_points
 
@@ -348,11 +365,11 @@ def test_start_points_non_iterable(benchmarking_problem):
 def test_start_points_wrong_dimension(benchmarking_problem):
     """Check the setting of starting points of the wrong dimension."""
     with pytest.raises(
-            ValueError,
-            match=re.escape(
-                f"{message} The number of columns (1) is different from the problem "
-                "dimension (2)."
-            )
+        ValueError,
+        match=re.escape(
+            f"{message} The number of columns (1) is different from the problem "
+            "dimension (2)."
+        ),
     ):
         benchmarking_problem.start_points = zeros((3, 1))
 
@@ -372,9 +389,9 @@ def test_target_values_wrong_type(benchmarking_problem):
     """Check the setting of target values of the wrong type."""
     target_values = [1.0, 0.0]
     with pytest.raises(
-            TypeError,
-            match="Target values must be of type TargetValues. "
-                  f"Type {type(target_values)} was passed."
+        TypeError,
+        match="Target values must be of type TargetValues. "
+        f"Type {type(target_values)} was passed.",
     ):
         benchmarking_problem.target_values = target_values
 
@@ -383,14 +400,15 @@ def test_target_values_wrong_type(benchmarking_problem):
     ["input_description", "description"],
     [
         (None, "No description available."),
-        ("A description of the problem.", "A description of the problem.")
-    ]
+        ("A description of the problem.", "A description of the problem."),
+    ],
 )
 def test_default_description(creator, input_description, description):
     """Check the default description of a problem."""
-    assert Problem(
-        "problem", creator, description=input_description
-    ).description == description
+    assert (
+        Problem("problem", creator, description=input_description).description
+        == description
+    )
 
 
 def test_objective_name(benchmarking_problem, creator):
@@ -400,8 +418,10 @@ def test_objective_name(benchmarking_problem, creator):
 
 def test_constraints_names(benchmarking_problem, creator):
     """Check the accessor to the constraints names."""
-    assert benchmarking_problem.constraints_names == creator(
-    ).get_scalar_constraints_names()
+    assert (
+        benchmarking_problem.constraints_names
+        == creator().get_scalar_constraints_names()
+    )
 
 
 def test_save_start_points(tmp_path, creator):
@@ -440,7 +460,7 @@ def test_compute_performance(problem, database):
     baseline_images=["data_profiles"], remove_text=True, extensions=["png"]
 )
 def test_compute_data_profile(
-        creator, target_values, algorithms_configurations, results
+    creator, target_values, algorithms_configurations, results
 ):
     """Check the computation of data profiles."""
     target_values.compute_target_hits_history = mock.Mock(
@@ -452,11 +472,12 @@ def test_compute_data_profile(
 
 
 @image_comparison(
-    baseline_images=["data_profiles_max_eval_number"], remove_text=True,
-    extensions=["png"]
+    baseline_images=["data_profiles_max_eval_number"],
+    remove_text=True,
+    extensions=["png"],
 )
 def test_compute_data_profile_max_eval_number(
-        creator, target_values, algorithms_configurations, results
+    creator, target_values, algorithms_configurations, results
 ):
     """Check the computation of data profiles when the evaluations number is limited."""
     bench_problem = Problem("Problem", creator, target_values=target_values)

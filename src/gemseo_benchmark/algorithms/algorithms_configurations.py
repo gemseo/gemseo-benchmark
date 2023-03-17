@@ -12,7 +12,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
@@ -22,7 +21,8 @@
 from __future__ import annotations
 
 import bisect
-from typing import Iterator, MutableSet
+from typing import Iterator
+from typing import MutableSet
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 
@@ -31,7 +31,7 @@ class AlgorithmsConfigurations(MutableSet[AlgorithmConfiguration]):
     """A collection of algorithms configurations."""
 
     def __init__(self, *algorithms_configurations: AlgorithmConfiguration) -> None:
-        """
+        """# noqa: D205, D212, D415
         Args:
             *algorithms_configurations: The algorithms configurations.
         """

@@ -12,22 +12,22 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the targets generator."""
+from __future__ import annotations
+
 import re
 from unittest import mock
 
 import pytest
-from matplotlib import pyplot
-from matplotlib.testing.decorators import image_comparison
-
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
 from gemseo_benchmark.results.history_item import HistoryItem
+from matplotlib import pyplot
+from matplotlib.testing.decorators import image_comparison
 
 
 def test_add_inconsistent_histories():
@@ -43,14 +43,16 @@ def test_add_inconsistent_histories():
     ["objective_values", "history", "message"],
     [
         (
-                (3.0, 2.0), mock.Mock(),
-                "Both a performance history and objective values were passed."
+            (3.0, 2.0),
+            mock.Mock(),
+            "Both a performance history and objective values were passed.",
         ),
         (
-                None, None,
-                "Either a performance history or objective values must be passed."
-        )
-    ]
+            None,
+            None,
+            "Either a performance history or objective values must be passed.",
+        ),
+    ],
 )
 def test_add_history_redundant_arguments(objective_values, history, message):
     """Check the addition of a performance history with redundant arguments."""
@@ -71,11 +73,11 @@ def test_too_many_targets():
     generator = TargetsGenerator()
     generator.add_history([3.0, 2.0])
     with pytest.raises(
-            ValueError,
-            match=re.escape(
-                "The number of targets required (3) is greater than the size the "
-                "longest history (2) starting from budget_min (1)."
-            )
+        ValueError,
+        match=re.escape(
+            "The number of targets required (3) is greater than the size the "
+            "longest history (2) starting from budget_min (1)."
+        ),
     ):
         generator.compute_target_values(3)
 
@@ -116,7 +118,7 @@ def test_no_histories():
     """Check the computation of target values without histories."""
     generator = TargetsGenerator()
     with pytest.raises(
-            RuntimeError, match="There are no histories to generate the targets from."
+        RuntimeError, match="There are no histories to generate the targets from."
     ):
         generator.compute_target_values(2, show=False)
 
@@ -148,14 +150,14 @@ def test_best_target_not_reached():
     generator = TargetsGenerator()
     generator.add_history([2.0, 1.0])
     with pytest.raises(
-            RuntimeError,
-            match="There is no performance history that reaches the best target value."
+        RuntimeError,
+        match="There is no performance history that reaches the best target value.",
     ):
         generator.compute_target_values(2, show=False, best_target_objective=0.0)
 
 
 @image_comparison(
-    baseline_images=["plot_histories"], remove_text=True, extensions=['png']
+    baseline_images=["plot_histories"], remove_text=True, extensions=["png"]
 )
 def test_plot_histories():
     """Check the plotting of histories."""

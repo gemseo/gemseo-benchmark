@@ -12,7 +12,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
@@ -21,32 +20,41 @@
 """Reference problem for benchmarking.
 
 A benchmarking problem is a problem class to be solved by iterative algorithms for
-comparison purposes.
-A benchmarking problem is characterized by its functions
-(e.g. objective and constraints for an optimization problem),
-its starting points (each defining an instance of the problem)
-and its targets (refer to :mod:`target_values`).
+comparison purposes. A benchmarking problem is characterized by its functions (e.g.
+objective and constraints for an optimization problem), its starting points (each
+defining an instance of the problem) and its targets (refer to :mod:`target_values`).
 """
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Callable, Iterable, Mapping, Sequence, Union
+from typing import Callable
+from typing import Iterable
+from typing import Mapping
+from typing import Sequence
+from typing import Union
 
 import numpy
-from matplotlib import pyplot as plt
-from matplotlib.axes import Axes
-from matplotlib.ticker import MaxNLocator
-from numpy import array, atleast_2d, load, ndarray, save
-
 from gemseo import api
 from gemseo.algos.doe.doe_lib import DOELibraryOptionType
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.api import compute_doe
 from gemseo.utils.matplotlib_figure import save_show_figure
-from gemseo_benchmark import COLORS_CYCLE, get_markers_cycle, MarkeveryType
-from gemseo_benchmark.algorithms.algorithms_configurations import \
-    AlgorithmsConfigurations
+from matplotlib import pyplot as plt
+from matplotlib.axes import Axes
+from matplotlib.ticker import MaxNLocator
+from numpy import array
+from numpy import atleast_2d
+from numpy import load
+from numpy import ndarray
+from numpy import save
+
+from gemseo_benchmark import COLORS_CYCLE
+from gemseo_benchmark import get_markers_cycle
+from gemseo_benchmark import MarkeveryType
+from gemseo_benchmark.algorithms.algorithms_configurations import (
+    AlgorithmsConfigurations,
+)
 from gemseo_benchmark.data_profiles.data_profile import DataProfile
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
@@ -57,7 +65,7 @@ from gemseo_benchmark.results.results import Results
 InputStartPoints = Union[ndarray, Iterable[ndarray]]
 
 
-class Problem(object):
+class Problem:
     """An optimization benchmarking problem.
 
     An optimization benchmarking problem is characterized by
@@ -76,20 +84,20 @@ class Problem(object):
     """
 
     def __init__(
-            self,
-            name: str,
-            optimization_problem_creator: Callable[[], OptimizationProblem],
-            start_points: InputStartPoints = None,
-            target_values: TargetValues = None,
-            doe_algo_name: str = None,
-            doe_size: int = None,
-            doe_options: Mapping[str, DOELibraryOptionType] = None,
-            description: str = None,
-            target_values_algorithms_configurations: AlgorithmsConfigurations = None,
-            target_values_number: int = None,
-            optimum: float = None,
+        self,
+        name: str,
+        optimization_problem_creator: Callable[[], OptimizationProblem],
+        start_points: InputStartPoints = None,
+        target_values: TargetValues = None,
+        doe_algo_name: str = None,
+        doe_size: int = None,
+        doe_options: Mapping[str, DOELibraryOptionType] = None,
+        description: str = None,
+        target_values_algorithms_configurations: AlgorithmsConfigurations = None,
+        target_values_number: int = None,
+        optimum: float = None,
     ) -> None:
-        """
+        """# noqa: D205, D212, D415
         Args:
             name: The name of the benchmarking problem.
             optimization_problem_creator: A callable object that returns an instance
@@ -151,16 +159,21 @@ class Problem(object):
                 doe_algo_name, doe_size, doe_options
             )
         elif problem.design_space.has_current_value():
-            self.start_points = atleast_2d(self._problem.design_space.get_current_value())
+            self.start_points = atleast_2d(
+                self._problem.design_space.get_current_value()
+            )
 
         # Set the target values:
         self.__target_values = None
         if target_values is not None:
             self.target_values = target_values
-        elif target_values_algorithms_configurations is not None and \
-                target_values_number is not None:
+        elif (
+            target_values_algorithms_configurations is not None
+            and target_values_number is not None
+        ):
             self.target_values = self.compute_targets(
-                target_values_number, target_values_algorithms_configurations,
+                target_values_number,
+                target_values_algorithms_configurations,
             )
 
     @property
@@ -179,8 +192,10 @@ class Problem(object):
 
     @start_points.setter
     def start_points(self, start_points: InputStartPoints) -> None:
-        message = "The starting points shall be passed as (lines of) a 2-dimensional " \
-                  "NumPy array, or as an iterable of 1-dimensional NumPy arrays."
+        message = (
+            "The starting points shall be passed as (lines of) a 2-dimensional "
+            "NumPy array, or as an iterable of 1-dimensional NumPy arrays."
+        )
 
         if not isinstance(start_points, ndarray):
             try:
@@ -236,16 +251,16 @@ class Problem(object):
             raise TypeError(error_message)
 
         if any(
-                point.ndim != 1 or point.size != self._problem.dimension
-                for point in start_points
+            point.ndim != 1 or point.size != self._problem.dimension
+            for point in start_points
         ):
             raise ValueError(error_message)
 
     def __get_start_points(
-            self,
-            doe_algo_name: str,
-            doe_size: int = None,
-            doe_options: Mapping[str, DOELibraryOptionType] = None,
+        self,
+        doe_algo_name: str,
+        doe_size: int = None,
+        doe_options: Mapping[str, DOELibraryOptionType] = None,
     ) -> ndarray:
         """Return the starting points of the benchmarking problem.
 
@@ -297,7 +312,7 @@ class Problem(object):
         self.__target_values = target_values
 
     def __iter__(self) -> OptimizationProblem:
-        """Iterate on the problem instances with respect to the starting points. """
+        """Iterate on the problem instances with respect to the starting points."""
         for start_point in self.start_points:
             problem = self.creator()
             problem.design_space.set_current_value(start_point)
@@ -333,15 +348,15 @@ class Problem(object):
         return library.is_algorithm_suited(library.descriptions[name], self._problem)
 
     def compute_targets(
-            self,
-            targets_number: int,
-            ref_algo_configurations: AlgorithmsConfigurations,
-            only_feasible: bool = True,
-            budget_min: int = 1,
-            show: bool = False,
-            file_path: str = None,
-            best_target_tolerance: float = 0.0,
-            disable_stopping: bool = True,
+        self,
+        targets_number: int,
+        ref_algo_configurations: AlgorithmsConfigurations,
+        only_feasible: bool = True,
+        budget_min: int = 1,
+        show: bool = False,
+        file_path: str = None,
+        best_target_tolerance: float = 0.0,
+        disable_stopping: bool = True,
     ) -> TargetValues:
         """Generate targets based on reference algorithms.
 
@@ -379,8 +394,13 @@ class Problem(object):
 
         # Compute the target values
         target_values = self.__targets_generator.compute_target_values(
-            targets_number, budget_min, only_feasible, show, file_path, self.optimum,
-            best_target_tolerance
+            targets_number,
+            budget_min,
+            only_feasible,
+            show,
+            file_path,
+            self.optimum,
+            best_target_tolerance,
         )
         self.__target_values = target_values
 
@@ -388,7 +408,7 @@ class Problem(object):
 
     @staticmethod
     def compute_performance(
-            problem: OptimizationProblem
+        problem: OptimizationProblem,
     ) -> tuple[list[float], list[float], list[bool]]:
         """Extract the performance history from a solved optimization problem.
 
@@ -429,12 +449,12 @@ class Problem(object):
 
     @staticmethod
     def _get_description(
-            dimension: int,
-            nonlinear_objective: bool,
-            linear_equality_constraints: int,
-            linear_inequality_constraints: int,
-            nonlinear_equality_constraints: int,
-            nonlinear_inequality_constraints: int,
+        dimension: int,
+        nonlinear_objective: bool,
+        linear_equality_constraints: int,
+        linear_inequality_constraints: int,
+        nonlinear_equality_constraints: int,
+        nonlinear_inequality_constraints: int,
     ) -> str:
         """Return a formal description of the problem.
 
@@ -456,18 +476,21 @@ class Problem(object):
             f"variable{'s' if dimension > 1 else ''}, "
             f"with a {'non' if nonlinear_objective else ''}linear objective"
         )
-        if max(
+        if (
+            max(
                 linear_equality_constraints,
                 linear_inequality_constraints,
                 nonlinear_equality_constraints,
-                nonlinear_inequality_constraints
-        ) > 0:
+                nonlinear_inequality_constraints,
+            )
+            > 0
+        ):
             constraints = []
             for number, is_nonlinear, is_inequality in [
                 (linear_equality_constraints, False, False),
                 (linear_inequality_constraints, False, True),
                 (nonlinear_equality_constraints, True, False),
-                (nonlinear_inequality_constraints, True, True)
+                (nonlinear_inequality_constraints, True, True),
             ]:
                 if number > 0:
                     constraints.append(
@@ -485,13 +508,13 @@ class Problem(object):
         return self._problem.dimension
 
     def compute_data_profile(
-            self,
-            algos_configurations: AlgorithmsConfigurations,
-            results: Results,
-            show: bool = False,
-            file_path: str | Path = None,
-            infeasibility_tolerance: float = 0.0,
-            max_eval_number: int = None
+        self,
+        algos_configurations: AlgorithmsConfigurations,
+        results: Results,
+        show: bool = False,
+        file_path: str | Path = None,
+        infeasibility_tolerance: float = 0.0,
+        max_eval_number: int = None,
     ) -> None:
         """Generate the data profiles of given algorithms.
 
@@ -517,24 +540,26 @@ class Problem(object):
 
                 history.apply_infeasibility_tolerance(infeasibility_tolerance)
                 data_profile.add_history(
-                    self.name, configuration_name, history.objective_values,
-                    history.infeasibility_measures
+                    self.name,
+                    configuration_name,
+                    history.objective_values,
+                    history.infeasibility_measures,
                 )
 
         # Plot and/or save the data profile
         data_profile.plot(show=show, file_path=file_path)
 
     def plot_histories(
-            self,
-            algos_configurations: AlgorithmsConfigurations,
-            results: Results,
-            show: bool = False,
-            file_path: Path = None,
-            plot_all_histories: bool = False,
-            alpha: float = 0.3,
-            markevery: MarkeveryType = 0.1,
-            infeasibility_tolerance: float = 0.0,
-            max_eval_number: int = None
+        self,
+        algos_configurations: AlgorithmsConfigurations,
+        results: Results,
+        show: bool = False,
+        file_path: Path = None,
+        plot_all_histories: bool = False,
+        alpha: float = 0.3,
+        markevery: MarkeveryType = 0.1,
+        infeasibility_tolerance: float = 0.0,
+        max_eval_number: int = None,
     ) -> None:
         """Plot the histories of a problem.
 
@@ -578,12 +603,18 @@ class Problem(object):
         # Plot the histories
         minimum_values = list()
         for configuration_name, color, marker in zip(
-                algos_configurations.names, COLORS_CYCLE, get_markers_cycle()
+            algos_configurations.names, COLORS_CYCLE, get_markers_cycle()
         ):
             minimum_value = self.__plot_algorithm_histories(
-                axes, configuration_name, minima[configuration_name],
-                max_feasible_objective, plot_all_histories, color=color,
-                marker=marker, alpha=alpha, markevery=markevery
+                axes,
+                configuration_name,
+                minima[configuration_name],
+                max_feasible_objective,
+                plot_all_histories,
+                color=color,
+                marker=marker,
+                alpha=alpha,
+                markevery=markevery,
             )
             if minimum_value is not None:
                 minimum_values.append(minimum_value)
@@ -604,10 +635,7 @@ class Problem(object):
             y_max = max(*objective_targets, *minimum_values)
             y_min = min(*objective_targets, *minimum_values)
         margin = 0.03 * (y_max - y_min)
-        plt.ylim(
-            bottom=y_min - margin,
-            top=y_max + margin
-        )
+        plt.ylim(bottom=y_min - margin, top=y_max + margin)
         plt.ylabel("Objective value")
 
         # Add ticks for the targets values on a right-side axis
@@ -621,11 +649,11 @@ class Problem(object):
         save_show_figure(figure, show, file_path)
 
     def __get_cumulated_minimum_histories(
-            self,
-            algos_configurations: AlgorithmsConfigurations,
-            results: Results,
-            infeasibility_tolerance: float = 0.0,
-            max_eval_number: int = None
+        self,
+        algos_configurations: AlgorithmsConfigurations,
+        results: Results,
+        infeasibility_tolerance: float = 0.0,
+        max_eval_number: int = None,
     ) -> tuple[dict[str, list[PerformanceHistory]], float | None]:
         """Return the histories of the cumulated minimum.
 
@@ -667,7 +695,7 @@ class Problem(object):
         return minima, max_feasible_objective
 
     def __get_infeasible_items_objective(
-            self, max_feasible_objective: float | None, y_relative_margin: float
+        self, max_feasible_objective: float | None, y_relative_margin: float
     ) -> float:
         """Return the objective value to set for the infeasible history items.
 
@@ -691,20 +719,20 @@ class Problem(object):
             return max_feasible_objective
 
         return max_feasible_objective + y_relative_margin * (
-                max_feasible_objective - self.optimum
+            max_feasible_objective - self.optimum
         )
 
     @staticmethod
     def __plot_algorithm_histories(
-            axes: Axes,
-            algorithm_name: str,
-            histories: Iterable[PerformanceHistory],
-            max_feasible_objective: float,
-            plot_all: bool,
-            color: str,
-            marker: str,
-            alpha: float,
-            markevery: MarkeveryType
+        axes: Axes,
+        algorithm_name: str,
+        histories: Iterable[PerformanceHistory],
+        max_feasible_objective: float,
+        plot_all: bool,
+        color: str,
+        marker: str,
+        alpha: float,
+        markevery: MarkeveryType,
     ) -> float | None:
         """Plot the histories associated with an algorithm.
 
@@ -757,8 +785,12 @@ class Problem(object):
         # Plot the median history
         median = PerformanceHistory.compute_median_history(histories)
         median.plot(
-            axes, only_feasible=True, label=algorithm_name, color=color,
-            marker=marker, markevery=markevery
+            axes,
+            only_feasible=True,
+            label=algorithm_name,
+            color=color,
+            marker=marker,
+            markevery=markevery,
         )
 
         # Return the smallest objective value of the median
@@ -768,7 +800,7 @@ class Problem(object):
 
     @staticmethod
     def __get_penalized_objective_values(
-            history_items: Sequence[HistoryItem], indexes: Iterable[int], value: float
+        history_items: Sequence[HistoryItem], indexes: Iterable[int], value: float
     ) -> list[float]:
         """Return the objectives of history items, replacing the infeasible ones.
 
@@ -782,6 +814,7 @@ class Problem(object):
         """
         return [
             history_items[index - 1].objective_value
-            if history_items[index - 1].is_feasible else value
+            if history_items[index - 1].is_feasible
+            else value
             for index in indexes
         ]

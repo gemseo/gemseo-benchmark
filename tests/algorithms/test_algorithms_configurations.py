@@ -12,27 +12,28 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the algorithms configurations."""
+from __future__ import annotations
+
 from unittest import mock
 
 import pytest
-
-from gemseo_benchmark.algorithms.algorithms_configurations import \
-    AlgorithmsConfigurations
+from gemseo_benchmark.algorithms.algorithms_configurations import (
+    AlgorithmsConfigurations,
+)
 
 
 def test_init(algorithm_configuration):
     """Check the initialization of algorithms configurations."""
     with pytest.raises(
-            ValueError,
-            match="The collection already contains an algorithm configuration named "
-                  f"{algorithm_configuration.algorithm_name}."
+        ValueError,
+        match="The collection already contains an algorithm configuration named "
+        f"{algorithm_configuration.algorithm_name}.",
     ):
         AlgorithmsConfigurations(algorithm_configuration, algorithm_configuration)
 
@@ -70,7 +71,9 @@ def test_names(configuration_b, configuration_c, configuration_a):
         configuration_b, configuration_c, configuration_a
     )
     assert algorithms_configurations.names == [
-        configuration_a.name, configuration_b.name, configuration_c.name
+        configuration_a.name,
+        configuration_b.name,
+        configuration_c.name,
     ]
 
 
@@ -80,8 +83,9 @@ def test_algorithms(configuration_b, configuration_c, configuration_a):
         configuration_b, configuration_c, configuration_a
     )
     assert algorithms_configurations.algorithms == [
-        configuration_a.algorithm_name, configuration_b.algorithm_name,
-        configuration_c.algorithm_name
+        configuration_a.algorithm_name,
+        configuration_b.algorithm_name,
+        configuration_c.algorithm_name,
     ]
 
 
@@ -91,7 +95,9 @@ def test_configurations(configuration_b, configuration_c, configuration_a):
         configuration_b, configuration_c, configuration_a
     )
     assert algorithms_configurations.configurations == [
-        configuration_a, configuration_b, configuration_c
+        configuration_a,
+        configuration_b,
+        configuration_c,
     ]
 
 
@@ -102,5 +108,6 @@ def test_discard(configuration_b, configuration_c, configuration_a):
     )
     algorithms_configurations.discard(configuration_a)
     assert algorithms_configurations.configurations == [
-        configuration_b, configuration_c
+        configuration_b,
+        configuration_c,
     ]

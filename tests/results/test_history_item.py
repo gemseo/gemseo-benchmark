@@ -12,24 +12,24 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the performance history item."""
+from __future__ import annotations
+
 import re
 
 import pytest
-
 from gemseo_benchmark.results.history_item import HistoryItem
 
 
 def test_nonnegative_infeasibility_measure():
     """Check the non-negative infeasibility measure exception."""
     with pytest.raises(
-            ValueError, match="The infeasibility measure is negative: -1.0."
+        ValueError, match="The infeasibility measure is negative: -1.0."
     ):
         HistoryItem(1.0, -1.0)
 
@@ -63,7 +63,7 @@ def test_repr():
 def test_unsatisfied_constraints_number():
     """Check the setting of a negative number of unsatisfied constraints."""
     with pytest.raises(
-            ValueError, match="The number of unsatisfied constraints is negative: -1."
+        ValueError, match="The number of unsatisfied constraints is negative: -1."
     ):
         HistoryItem(1.0, 1.0, -1)
 
@@ -72,11 +72,11 @@ def test_unsatisfied_constraints_number():
 def test_inconsistent_unsatisfied_constraints_number(measure, number):
     """Check the setting of an inconsistent number of unsatisfied constraints."""
     with pytest.raises(
-            ValueError,
-            match=re.escape(
-                f"The infeasibility measure ({measure}) and the number of unsatisfied "
-                f"constraints ({number}) are not consistent."
-            )
+        ValueError,
+        match=re.escape(
+            f"The infeasibility measure ({measure}) and the number of unsatisfied "
+            f"constraints ({number}) are not consistent."
+        ),
     ):
         HistoryItem(1.0, measure, number)
 

@@ -1,21 +1,22 @@
 """Compute data profiles for SciPy algorithms."""
-from __future__ import annotations, print_function
+from __future__ import annotations
 
 from itertools import product
-from typing import Any, Callable
-
-from numpy import array
-from numpy.core.multiarray import ndarray
-from scipy.optimize import minimize, rosen
+from typing import Any
+from typing import Callable
 
 from gemseo_benchmark.data_profiles.data_profile import DataProfile
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
+from numpy import array
+from numpy.core.multiarray import ndarray
+from scipy.optimize import minimize
+from scipy.optimize import rosen
 
 
 def generate_values_history(
-        objective: Callable[[Any], float],
-        method_name: str,
-        start_point: ndarray,
+    objective: Callable[[Any], float],
+    method_name: str,
+    start_point: ndarray,
 ) -> list[float]:
     """Minimize a function with a SciPy method.
 
@@ -30,7 +31,7 @@ def generate_values_history(
     objective_values = list()
 
     # Wrap the objective function to save its values
-    def wrapped_objective(x):
+    def wrapped_objective(x: ndarray) -> float:
         value = objective(x)
         objective_values.append(value)
         return value
@@ -48,7 +49,7 @@ STARTING_POINTS = [
     array([-2.0, 2.0]),
     array([2.0, -2.0]),
     array([2.0, 2.0]),
-    array([0.0, 0.0])
+    array([0.0, 0.0]),
 ]
 
 # Set the reference algorithms
@@ -66,12 +67,18 @@ targets_number = 20
 targets_values = {
     "Rosenbrock": targets_generator.compute_target_values(targets_number, show=True)
 }
-print("Target values\n", targets_values["Rosenbrock"])
 
 # Set the algorithms to be compared
 methods = [
-    'nelder-mead', 'powell', 'cg', 'bfgs', 'l-bfgs-b', 'tnc', 'cobyla', 'slsqp',
-    'trust-constr',
+    "nelder-mead",
+    "powell",
+    "cg",
+    "bfgs",
+    "l-bfgs-b",
+    "tnc",
+    "cobyla",
+    "slsqp",
+    "trust-constr",
 ]
 
 # Compute and plot data profiles

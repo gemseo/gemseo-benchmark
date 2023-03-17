@@ -12,17 +12,17 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """A benchmarker of optimization algorithms on reference problems."""
+from __future__ import annotations
+
 import sys
 from pathlib import Path
 from typing import Iterable
-from typing import Tuple
 
 from gemseo.algos.database import Database
 from gemseo.algos.opt.opt_factory import OptimizersFactory
@@ -31,10 +31,12 @@ from gemseo.api import configure_logger
 from gemseo.api import execute_algo
 from gemseo.utils.string_tools import pretty_str
 from gemseo.utils.timer import Timer
+
 from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
-from gemseo_benchmark.algorithms.algorithms_configurations import \
-    AlgorithmsConfigurations
+from gemseo_benchmark.algorithms.algorithms_configurations import (
+    AlgorithmsConfigurations,
+)
 from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 from gemseo_benchmark.results.results import Results
@@ -42,8 +44,9 @@ from gemseo_benchmark.results.results import Results
 LOGGER = configure_logger()
 
 
-class Benchmarker(object):
+class Benchmarker:
     """A benchmarker of optimization algorithms on reference problems."""
+
     _HISTORY_CLASS = PerformanceHistory
 
     def __init__(
@@ -51,9 +54,9 @@ class Benchmarker(object):
         histories_path: Path,
         results_path: Path = None,
         databases_path: Path = None,
-        pseven_logs_path: Path = None
+        pseven_logs_path: Path = None,
     ) -> None:
-        """
+        """# noqa: D205, D212, D415
         Args:
             histories_path: The path to the directory where to save the performance
                 histories.
@@ -80,7 +83,7 @@ class Benchmarker(object):
         self,
         problems: Iterable[Problem],
         algorithms: AlgorithmsConfigurations,
-        overwrite_histories: bool = False
+        overwrite_histories: bool = False,
     ) -> Results:
         """Run optimization algorithms on reference problems.
 
@@ -110,14 +113,14 @@ class Benchmarker(object):
                 self._solve_problem(
                     problem,
                     algorithm_configuration,
-                    overwrite_histories=overwrite_histories
+                    overwrite_histories=overwrite_histories,
                 )
 
         return self._results
 
     @staticmethod
     def __disable_stopping_criteria(
-        algorithm_configuration: AlgorithmConfiguration
+        algorithm_configuration: AlgorithmConfiguration,
     ) -> AlgorithmConfiguration:
         """Disable the stopping criteria.
 
@@ -138,14 +141,14 @@ class Benchmarker(object):
         return AlgorithmConfiguration(
             algorithm_configuration.algorithm_name,
             algorithm_configuration.name,
-            **options
+            **options,
         )
 
     def _solve_problem(
         self,
         problem: Problem,
         algorithm_configuration: AlgorithmConfiguration,
-        overwrite_histories: bool
+        overwrite_histories: bool,
     ) -> None:
         """Solve a benchmarking problem for all its starting points.
 
@@ -158,10 +161,10 @@ class Benchmarker(object):
         for problem_instance_index, problem_instance in enumerate(problem):
 
             if self.__skip_instance(
-                    algorithm_configuration,
-                    problem,
-                    problem_instance_index,
-                    overwrite_histories
+                algorithm_configuration,
+                problem,
+                problem_instance_index,
+                overwrite_histories,
             ):
                 continue
 
@@ -172,7 +175,7 @@ class Benchmarker(object):
                 problem_instance,
                 algorithm_configuration_copy,
                 problem.name,
-                problem_instance_index
+                problem_instance_index,
             )
 
             self._save_history(history, problem_instance_index)
@@ -182,7 +185,7 @@ class Benchmarker(object):
                     database,
                     algorithm_configuration,
                     problem.name,
-                    problem_instance_index
+                    problem_instance_index,
                 )
 
             if self.__results_path:
@@ -193,7 +196,7 @@ class Benchmarker(object):
         algorithm_configuration: AlgorithmConfiguration,
         bench_problem: Problem,
         index: int,
-        overwrite_histories: bool
+        overwrite_histories: bool,
     ) -> bool:
         """Check whether a problem instance has already been solved.
 
@@ -210,19 +213,23 @@ class Benchmarker(object):
         problem_name = bench_problem.name
 
         if not overwrite_histories and self._results.contains(
-                algorithm_configuration.name,
-                problem_name,
-                self.__get_history_path(algorithm_configuration, problem_name, index)
+            algorithm_configuration.name,
+            problem_name,
+            self.__get_history_path(algorithm_configuration, problem_name, index),
         ):
             LOGGER.info(
-                f"Skipping instance {instance} of problem {problem_name} for algorithm "
-                f"configuration {algorithm_configuration.name}."
+                "Skipping instance %s of problem %s for algorithm configuration %s.",
+                instance,
+                problem_name,
+                algorithm_configuration.name,
             )
             return True
 
         LOGGER.info(
-            f"Solving instance {instance} of problem {problem_name} with algorithm "
-            f"configuration {algorithm_configuration.name}."
+            "Solving instance %s of problem %s with algorithm configuration %s.",
+            instance,
+            problem_name,
+            algorithm_configuration.name,
         )
         return False
 
@@ -230,7 +237,7 @@ class Benchmarker(object):
         self,
         algorithm_configuration: AlgorithmConfiguration,
         problem: Problem,
-        index: int
+        index: int,
     ) -> AlgorithmConfiguration:
         """Copy an algorithm configuration by adding the path to the pSeven log file.
 
@@ -246,6 +253,7 @@ class Benchmarker(object):
             return algorithm_configuration
 
         from gemseo.algos.opt.lib_pseven import PSevenOpt
+
         if algorithm_configuration.algorithm_name not in PSevenOpt().descriptions:
             return algorithm_configuration
 
@@ -254,10 +262,8 @@ class Benchmarker(object):
             algorithm_configuration.name,
             **algorithm_configuration.algorithm_options,
             log_path=pretty_str(
-                self.__get_pseven_log_path(
-                    algorithm_configuration, problem.name, index
-                )
-            )
+                self.__get_pseven_log_path(algorithm_configuration, problem.name, index)
+            ),
         )
 
     def _run_algorithm(
@@ -265,8 +271,8 @@ class Benchmarker(object):
         problem: OptimizationProblem,
         algorithm_configuration: AlgorithmConfiguration,
         problem_name: str,
-        index: int
-    ) -> Tuple[Database, PerformanceHistory]:
+        index: int,
+    ) -> tuple[Database, PerformanceHistory]:
         """Run an algorithm on a benchmarking problem for a particular starting point.
 
         Args:
@@ -290,6 +296,7 @@ class Benchmarker(object):
         history.doe_size = 1
         if self.__is_algorithm_available("PSEVEN"):
             from gemseo.algos.opt.lib_pseven import PSevenOpt
+
             if algo_name in PSevenOpt().descriptions:
                 history.doe_size = len(algo_options.get("sample_x", [None]))
 
@@ -316,7 +323,7 @@ class Benchmarker(object):
         algorithm_configuration: AlgorithmConfiguration,
         problem_name: str,
         index: int,
-        make_parents: bool = False
+        make_parents: bool = False,
     ) -> Path:
         """Return a path for a history file.
 
@@ -335,14 +342,14 @@ class Benchmarker(object):
             problem_name,
             index,
             "json",
-            make_parents=make_parents
+            make_parents=make_parents,
         )
 
     def __get_pseven_log_path(
         self,
         algorithm_configuration: AlgorithmConfiguration,
         problem_name: str,
-        index: int
+        index: int,
     ) -> Path:
         """Return a path for a pSeven log file.
 
@@ -367,7 +374,7 @@ class Benchmarker(object):
             problem_name,
             index,
             "txt",
-            make_parents=True
+            make_parents=True,
         )
 
     @staticmethod
@@ -377,7 +384,7 @@ class Benchmarker(object):
         problem_name: str,
         index: int,
         extension: str = "json",
-        make_parents: bool = False
+        make_parents: bool = False,
     ) -> Path:
         """Return a path in the file tree dedicated to a specific optimization run.
 
@@ -394,9 +401,12 @@ class Benchmarker(object):
             The path for the file.
         """
         configuration_name = join_substrings(algorithm_configuration.name)
-        path = root_dir.resolve() / configuration_name / join_substrings(
-            problem_name
-        ) / f"{configuration_name}.{index + 1}.{extension}"
+        path = (
+            root_dir.resolve()
+            / configuration_name
+            / join_substrings(problem_name)
+            / f"{configuration_name}.{index + 1}.{extension}"
+        )
         if make_parents:
             path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -407,7 +417,7 @@ class Benchmarker(object):
         database: Database,
         algorithm_configuration: AlgorithmConfiguration,
         problem_name: str,
-        index: int
+        index: int,
     ) -> None:
         """Save the database of a problem.
 
@@ -424,6 +434,6 @@ class Benchmarker(object):
                 problem_name,
                 index,
                 "h5",
-                make_parents=True
+                make_parents=True,
             )
         )

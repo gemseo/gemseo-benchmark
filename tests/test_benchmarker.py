@@ -12,24 +12,25 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the benchmarker."""
-import pytest
-from numpy import array
+from __future__ import annotations
 
+import pytest
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.problems.analytical.rastrigin import Rastrigin
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
-from gemseo_benchmark.algorithms.algorithms_configurations import \
-    AlgorithmsConfigurations
+from gemseo_benchmark.algorithms.algorithms_configurations import (
+    AlgorithmsConfigurations,
+)
 from gemseo_benchmark.benchmarker import Benchmarker
 from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.results.results import Results
+from numpy import array
 
 
 @pytest.fixture(scope="module")
@@ -58,8 +59,10 @@ def test_save_history(results_root, rosenbrock, lbfgsb_results, index):
     assert lbfgsb_results.contains(
         lbfgsb_configuration.algorithm_name, rosenbrock.name, path
     )
-    assert f"Solving instance {index} of problem {rosenbrock.name} with algorithm " \
-           f"configuration {lbfgsb_configuration.name}."
+    assert (
+        f"Solving instance {index} of problem {rosenbrock.name} with algorithm "
+        f"configuration {lbfgsb_configuration.name}."
+    )
 
 
 def test_save_database(tmp_path, rosenbrock):
@@ -77,12 +80,13 @@ def test_unavailable_algorithm(
     tmp_path,
     rosenbrock,
     unknown_algorithm_configuration,
-    unknown_algorithms_configurations
+    unknown_algorithms_configurations,
 ):
     """Check the handling of an unavailable algorithm."""
     with pytest.raises(
-            ValueError, match="The algorithm is not available: "
-                              f"{unknown_algorithm_configuration.algorithm_name}."
+        ValueError,
+        match="The algorithm is not available: "
+        f"{unknown_algorithm_configuration.algorithm_name}.",
     ):
         Benchmarker(tmp_path, tmp_path / "results.json").execute(
             [rosenbrock], unknown_algorithms_configurations
@@ -101,10 +105,14 @@ def test___skip_instance(tmp_path, rosenbrock, rastrigin, caplog):
     Benchmarker(tmp_path, results_path).execute(
         [rosenbrock, rastrigin], AlgorithmsConfigurations(algo_config)
     )
-    assert f"Skipping instance 1 of problem {rosenbrock.name} for algorithm " \
-           f"configuration {algo_config.name}." in caplog.text
-    assert f"Skipping instance 2 of problem {rosenbrock.name} for algorithm " \
-           f"configuration {algo_config.name}." in caplog.text
+    assert (
+        f"Skipping instance 1 of problem {rosenbrock.name} for algorithm "
+        f"configuration {algo_config.name}." in caplog.text
+    )
+    assert (
+        f"Skipping instance 2 of problem {rosenbrock.name} for algorithm "
+        f"configuration {algo_config.name}." in caplog.text
+    )
 
 
 @pytest.mark.skipif(

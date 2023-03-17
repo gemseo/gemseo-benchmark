@@ -12,7 +12,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
@@ -20,40 +19,41 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Generation of targets for a problem to be solved by an iterative algorithm.
 
-The targets are generated out of algorithms histories considered to be of reference:
-the median of the reference histories is computed
-and a uniformly distributed subset (of the required size) of this median history is
-extracted.
+The targets are generated out of algorithms histories considered to be of reference: the
+median of the reference histories is computed and a uniformly distributed subset (of the
+required size) of this median history is extracted.
 """
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Iterable, Sequence
+from typing import Iterable
+from typing import Sequence
 
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
-from numpy import linspace, ndarray
-
 from gemseo.utils.matplotlib_figure import save_show_figure
+from matplotlib.figure import Figure
+from numpy import linspace
+from numpy import ndarray
+
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 
-class TargetsGenerator(object):
+class TargetsGenerator:
     """Compute the target values for an objective to minimize."""
 
     __NO_HISTORIES_MESSAGE = "There are no histories to generate the targets from."
 
-    def __init__(self) -> None:
+    def __init__(self) -> None:  # noqa: D107
         self.__histories = list()
 
     def add_history(
-            self,
-            objective_values: Sequence[float] = None,
-            infeasibility_measures: Sequence[float] = None,
-            feasibility_statuses: Sequence[bool] = None,
-            history: PerformanceHistory = None,
+        self,
+        objective_values: Sequence[float] = None,
+        infeasibility_measures: Sequence[float] = None,
+        feasibility_statuses: Sequence[bool] = None,
+        history: PerformanceHistory = None,
     ) -> None:
         """Add a history of objective values.
 
@@ -90,14 +90,14 @@ class TargetsGenerator(object):
         self.__histories.append(history)
 
     def compute_target_values(
-            self,
-            targets_number: int,
-            budget_min: int = 1,
-            feasible: bool = True,
-            show: bool = False,
-            file_path: str | Path = None,
-            best_target_objective: float = None,
-            best_target_tolerance: float = 0.0,
+        self,
+        targets_number: int,
+        budget_min: int = 1,
+        feasible: bool = True,
+        show: bool = False,
+        file_path: str | Path = None,
+        best_target_objective: float = None,
+        best_target_tolerance: float = 0.0,
     ) -> TargetValues:
         """Compute the target values for a function from the histories of its values.
 
@@ -138,7 +138,7 @@ class TargetsGenerator(object):
         # Truncate the values that stagnate near the best target
         for index, item in enumerate(median_history):
             if item <= best_target:
-                median_history = median_history[:index + 1]
+                median_history = median_history[: index + 1]
                 break
 
         # Compute a budget scale
@@ -158,7 +158,9 @@ class TargetsGenerator(object):
 
     @staticmethod
     def __compute_budget_scale(
-            budget_min: int, budget_max: int, budgets_number: int,
+        budget_min: int,
+        budget_max: int,
+        budgets_number: int,
     ) -> ndarray:
         """Compute a scale of evaluation budgets.
 
@@ -191,7 +193,9 @@ class TargetsGenerator(object):
 
     @staticmethod
     def __get_best_target(
-            objective_value: float, infeasibility_measure: float, tolerance: float,
+        objective_value: float,
+        infeasibility_measure: float,
+        tolerance: float,
     ) -> HistoryItem:
         """Return the best target value.
 
@@ -206,20 +210,20 @@ class TargetsGenerator(object):
         if infeasibility_measure == 0.0:
             return HistoryItem(
                 objective_value + max(tolerance * abs(objective_value), tolerance),
-                infeasibility_measure
+                infeasibility_measure,
             )
 
         return HistoryItem(
             objective_value,
-            infeasibility_measure + tolerance * abs(infeasibility_measure)
+            infeasibility_measure + tolerance * abs(infeasibility_measure),
         )
 
     @staticmethod
     def __get_reference_histories(
-            histories: Iterable[PerformanceHistory],
-            best_target_objective: float | None,
-            best_target_tolerance: float,
-            feasible: bool,
+        histories: Iterable[PerformanceHistory],
+        best_target_objective: float | None,
+        best_target_tolerance: float,
+        feasible: bool,
     ) -> tuple[list[PerformanceHistory], HistoryItem]:
         """Return the performance histories of reference.
 
@@ -253,7 +257,7 @@ class TargetsGenerator(object):
             best_target = TargetsGenerator.__get_best_target(
                 best_item.objective_value,
                 best_item.infeasibility_measure,
-                best_target_tolerance
+                best_target_tolerance,
             )
         else:
             best_target = TargetsGenerator.__get_best_target(
@@ -275,10 +279,10 @@ class TargetsGenerator(object):
         return reference_histories, best_target
 
     def plot_histories(
-            self,
-            best_target_value: float = None,
-            show: bool = False,
-            file_path: str | Path = None,
+        self,
+        best_target_value: float = None,
+        show: bool = False,
+        file_path: str | Path = None,
     ) -> Figure:
         """Plot the histories used as a basis to compute the target values.
 
@@ -312,8 +316,10 @@ class TargetsGenerator(object):
             # Update the minimum budget
             minimum_budget = min(budgets[0], minimum_budget)
             axes.plot(
-                budgets, [item.objective_value for item in items],
-                marker="o", linestyle=":"
+                budgets,
+                [item.objective_value for item in items],
+                marker="o",
+                linestyle=":",
             )
 
         plt.xlim(left=minimum_budget - 1, right=maximum_budget + 1)

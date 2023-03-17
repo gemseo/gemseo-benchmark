@@ -12,20 +12,22 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """A simple script to generate a benchmarking report."""
+from __future__ import annotations
+
 from pathlib import Path
 
 from gemseo.problems.analytical.rastrigin import Rastrigin
 from gemseo.problems.analytical.rosenbrock import Rosenbrock
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
-from gemseo_benchmark.algorithms.algorithms_configurations import \
-    AlgorithmsConfigurations
+from gemseo_benchmark.algorithms.algorithms_configurations import (
+    AlgorithmsConfigurations,
+)
 from gemseo_benchmark.benchmarker import Benchmarker
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.problems.problem import Problem
@@ -39,7 +41,7 @@ algorithms_configurations = AlgorithmsConfigurations(l_bfgs_b, slsqp)
 
 # Select the reference problems.
 optimum = 0.0
-target_values = TargetValues([10 ** -i for i in range(4, 7)] + [optimum])
+target_values = TargetValues([10**-i for i in range(4, 7)] + [optimum])
 rastrigin = Problem(
     "Rastrigin 2D", Rastrigin, target_values=target_values, optimum=optimum
 )

@@ -12,21 +12,21 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the data profile."""
-import pytest
-from matplotlib import pyplot
-from matplotlib.testing.decorators import image_comparison
-from pytest import raises
+from __future__ import annotations
 
+import pytest
 from gemseo_benchmark.data_profiles.data_profile import DataProfile
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.results.history_item import HistoryItem
+from matplotlib import pyplot
+from matplotlib.testing.decorators import image_comparison
+from pytest import raises
 
 
 def test_target_values_as_mapping():
@@ -38,8 +38,8 @@ def test_target_values_as_mapping():
 def test_consistent_target_values():
     """Check the setting of consistent target values."""
     with raises(
-            ValueError, match="The reference problems must have the same number "
-                              "of target values"
+        ValueError,
+        match="The reference problems must have the same number " "of target values",
     ):
         DataProfile(
             {
@@ -66,7 +66,7 @@ def test_compute_data_profiles():
 
 
 @image_comparison(
-    baseline_images=["data_profile"], remove_text=True, extensions=['png']
+    baseline_images=["data_profile"], remove_text=True, extensions=["png"]
 )
 def test_plot_data_profiles():
     """Check the data profiles figure."""
@@ -83,7 +83,7 @@ def test_plot_save(tmp_path, converter):
 
     Args:
         converter: The Path converter.
-    """
+    """  # noqa: D417
     data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
     data_profile.add_history("problem", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
     path = tmp_path / "data_profile.png"
@@ -121,14 +121,14 @@ def test_unevenly_represented_problems():
     data_profile.add_history("problem1", "algo", [2.0, 2.0])
     data_profile.add_history("problem2", "algo", [2.0, 2.0])
     with raises(
-            ValueError,
-            match="Reference problems unequally represented for algorithm 'algo'"
+        ValueError,
+        match="Reference problems unequally represented for algorithm 'algo'",
     ):
         data_profile.compute_data_profiles()
 
 
 @image_comparison(
-    baseline_images=["two_data_profiles"], remove_text=True, extensions=['png']
+    baseline_images=["two_data_profiles"], remove_text=True, extensions=["png"]
 )
 def test_different_sizes_data_profiles():
     """Check the plotting of data profiles of different sizes."""

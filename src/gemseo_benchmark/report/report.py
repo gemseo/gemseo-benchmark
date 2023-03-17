@@ -13,13 +13,12 @@
 # FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION
 # WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
-"""Generation of a benchmarking report"""
+"""Generation of a benchmarking report."""
 from __future__ import annotations
 
 import enum
@@ -27,14 +26,18 @@ import os
 from pathlib import Path
 from shutil import copy
 from subprocess import call
-from typing import Any, Iterable, Mapping
-
-from jinja2 import Environment, FileSystemLoader
+from typing import Any
+from typing import Iterable
+from typing import Mapping
 
 from gemseo.algos.opt.opt_factory import OptimizersFactory
+from jinja2 import Environment
+from jinja2 import FileSystemLoader
+
 from gemseo_benchmark import join_substrings
-from gemseo_benchmark.algorithms.algorithms_configurations import \
-    AlgorithmsConfigurations
+from gemseo_benchmark.algorithms.algorithms_configurations import (
+    AlgorithmsConfigurations,
+)
 from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.results.results import Results
@@ -42,6 +45,7 @@ from gemseo_benchmark.results.results import Results
 
 class FileName(enum.Enum):
     """The name of a report file."""
+
     CONF = "conf.py"
     INDEX = "index.rst"
     PROBLEM = "problem.rst"
@@ -55,28 +59,30 @@ class FileName(enum.Enum):
 
 class DirectoryName(enum.Enum):
     """The name of a report directory."""
+
     PROBLEMS = "problems"
     GROUPS = "groups"
     IMAGES = "images"
     BUILD = "_build"
 
 
-class Report(object):
+class Report:
     """A benchmarking report."""
+
     __FILE_DIRECTORY = Path(__file__).parent
     __TEMPLATES_DIR_PATH = __FILE_DIRECTORY / "templates"
     __CONF_PATH = __FILE_DIRECTORY / "conf.py"
 
     def __init__(
-            self,
-            root_directory_path: str | Path,
-            algos_configurations: AlgorithmsConfigurations,
-            problems_groups: Iterable[ProblemsGroup],
-            histories_paths: Results,
-            custom_algos_descriptions: Mapping[str, str] = None,
-            max_eval_number_per_group: dict[str, int] = None
+        self,
+        root_directory_path: str | Path,
+        algos_configurations: AlgorithmsConfigurations,
+        problems_groups: Iterable[ProblemsGroup],
+        histories_paths: Results,
+        custom_algos_descriptions: Mapping[str, str] = None,
+        max_eval_number_per_group: dict[str, int] = None,
     ) -> None:
-        """
+        """# noqa: D205, D212, D415
         Args:
             root_directory_path: The path to the root directory of the report.
             algos_configurations: The algorithms configurations.
@@ -115,10 +121,10 @@ class Report(object):
         }
 
     def generate(
-            self,
-            to_html: bool = True,
-            to_pdf: bool = False,
-            infeasibility_tolerance: float = 0.0,
+        self,
+        to_html: bool = True,
+        to_pdf: bool = False,
+        infeasibility_tolerance: float = 0.0,
     ) -> None:
         """Generate the benchmarking report.
 
@@ -163,9 +169,7 @@ class Report(object):
         # Create the file
         file_path = self.__root_directory / FileName.ALGORITHMS.value
         self.__fill_template(
-            file_path,
-            FileName.ALGORITHMS.value,
-            algorithms=algos_descriptions
+            file_path, FileName.ALGORITHMS.value, algorithms=algos_descriptions
         )
 
     def __create_problems_files(self) -> None:
@@ -199,7 +203,7 @@ class Report(object):
                 optimum=f"{problem.optimum:.6g}",
                 target_values=[
                     f"{target.objective_value:.6g}" for target in problem.target_values
-                ]
+                ],
             )
             problems_paths.append(path.relative_to(self.__root_directory).as_posix())
 
@@ -207,7 +211,7 @@ class Report(object):
         self.__fill_template(
             file_path=self.__root_directory / FileName.PROBLEMS_LIST.value,
             template_name=FileName.PROBLEMS_LIST.value,
-            problems_paths=problems_paths
+            problems_paths=problems_paths,
         )
 
     def __get_problem_path(self, problem: Problem) -> Path:
@@ -220,8 +224,7 @@ class Report(object):
             The path to the problem file.
         """
         return (
-                self.__root_directory / DirectoryName.PROBLEMS.value /
-                f"{problem.name}.rst"
+            self.__root_directory / DirectoryName.PROBLEMS.value / f"{problem.name}.rst"
         )
 
     def __create_groups_files(self, infeasibility_tolerance: float = 0.0) -> None:
@@ -237,9 +240,10 @@ class Report(object):
             problems_names = {problem.name for problem in problems_group}
             algorithms_configurations = AlgorithmsConfigurations(
                 *[
-                    algo_config for algo_config in self.__algos_configs if set(
-                        self.__histories_paths.get_problems(algo_config.name)
-                    ) >= problems_names
+                    algo_config
+                    for algo_config in self.__algos_configs
+                    if set(self.__histories_paths.get_problems(algo_config.name))
+                    >= problems_names
                 ]
             )
             if not algorithms_configurations:
@@ -248,25 +252,31 @@ class Report(object):
 
             # Create the directory dedicated to the group
             group_dir = (
-                    self.__root_directory / DirectoryName.IMAGES.value /
-                    join_substrings(problems_group.name)
+                self.__root_directory
+                / DirectoryName.IMAGES.value
+                / join_substrings(problems_group.name)
             )
             group_dir.mkdir(exist_ok=False)
 
             # Generate the figures
             group_profile = self.__compute_group_data_profile(
-                problems_group, algorithms_configurations, group_dir,
-                infeasibility_tolerance
+                problems_group,
+                algorithms_configurations,
+                group_dir,
+                infeasibility_tolerance,
             )
             problems_figures = self.__plot_problems_figures(
-                problems_group, algorithms_configurations, group_dir,
-                infeasibility_tolerance
+                problems_group,
+                algorithms_configurations,
+                group_dir,
+                infeasibility_tolerance,
             )
 
             # Create the file
             group_path = (
-                    self.__root_directory / DirectoryName.GROUPS.value /
-                    f"{join_substrings(problems_group.name)}.rst"
+                self.__root_directory
+                / DirectoryName.GROUPS.value
+                / f"{join_substrings(problems_group.name)}.rst"
             )
             groups_paths.append(
                 group_path.relative_to(self.__root_directory).as_posix()
@@ -283,8 +293,7 @@ class Report(object):
         # Create the file listing the problems groups
         groups_list_path = self.__root_directory / FileName.GROUPS_LIST.value
         self.__fill_template(
-            groups_list_path, FileName.GROUPS_LIST.value,
-            documents=groups_paths
+            groups_list_path, FileName.GROUPS_LIST.value, documents=groups_paths
         )
 
     def __create_index(self) -> None:
@@ -293,7 +302,7 @@ class Report(object):
         toctree_contents = [
             FileName.ALGORITHMS.value,
             FileName.PROBLEMS_LIST.value,
-            FileName.GROUPS_LIST.value
+            FileName.GROUPS_LIST.value,
         ]
 
         # Create the file
@@ -339,17 +348,17 @@ class Report(object):
                 call(
                     f"sphinx-build -M {builder} {self.__root_directory} "
                     f"{DirectoryName.BUILD.value}",
-                    shell=True
+                    shell=True,
                 )
         finally:
             os.chdir(initial_dir)
 
     def __compute_group_data_profile(
-            self,
-            group: ProblemsGroup,
-            algorithms_configurations: AlgorithmsConfigurations,
-            destination_dir: Path,
-            infeasibility_tolerance: float = 0.0
+        self,
+        group: ProblemsGroup,
+        algorithms_configurations: AlgorithmsConfigurations,
+        destination_dir: Path,
+        infeasibility_tolerance: float = 0.0,
     ) -> str:
         """Compute the data profile for a group of benchmarking problems.
 
@@ -364,18 +373,21 @@ class Report(object):
         """
         group_path = destination_dir / FileName.DATA_PROFILE.value
         group.compute_data_profile(
-            algorithms_configurations, self.__histories_paths, show=False,
-            plot_path=group_path, infeasibility_tolerance=infeasibility_tolerance,
-            max_eval_number=self.__max_eval_numbers.get(group.name)
+            algorithms_configurations,
+            self.__histories_paths,
+            show=False,
+            plot_path=group_path,
+            infeasibility_tolerance=infeasibility_tolerance,
+            max_eval_number=self.__max_eval_numbers.get(group.name),
         )
         return group_path.relative_to(self.__root_directory).as_posix()
 
     def __plot_problems_figures(
-            self,
-            group: ProblemsGroup,
-            algorithms_configurations: AlgorithmsConfigurations,
-            group_dir: Path,
-            infeasibility_tolerance: float = 0.0
+        self,
+        group: ProblemsGroup,
+        algorithms_configurations: AlgorithmsConfigurations,
+        group_dir: Path,
+        infeasibility_tolerance: float = 0.0,
     ) -> dict[str, dict[str, str]]:
         """Plot the results figures for each problem of a group.
 
@@ -398,28 +410,32 @@ class Report(object):
             problem_dir.mkdir()
             figures[problem.name] = {
                 "data_profile": self.__plot_problem_data_profile(
-                    problem, algorithms_configurations, problem_dir,
-                    infeasibility_tolerance, max_eval_number
+                    problem,
+                    algorithms_configurations,
+                    problem_dir,
+                    infeasibility_tolerance,
+                    max_eval_number,
                 ),
                 "histories": self.__plot_problem_histories(
-                    problem, algorithms_configurations, problem_dir,
-                    infeasibility_tolerance, max_eval_number
-                )
+                    problem,
+                    algorithms_configurations,
+                    problem_dir,
+                    infeasibility_tolerance,
+                    max_eval_number,
+                ),
             }
 
         # Sort the keys of the dictionary
-        figures = {
-            key: figures[key] for key in sorted(figures.keys(), key=str.lower)
-        }
+        figures = {key: figures[key] for key in sorted(figures.keys(), key=str.lower)}
         return figures
 
     def __plot_problem_data_profile(
-            self,
-            problem: Problem,
-            algorithms_configurations: AlgorithmsConfigurations,
-            destination_dir: Path,
-            infeasibility_tolerance: float = 0.0,
-            max_eval_number: int = None
+        self,
+        problem: Problem,
+        algorithms_configurations: AlgorithmsConfigurations,
+        destination_dir: Path,
+        infeasibility_tolerance: float = 0.0,
+        max_eval_number: int = None,
     ) -> str:
         """Plot the data profile of a problem.
 
@@ -436,19 +452,21 @@ class Report(object):
         """
         path = destination_dir / FileName.DATA_PROFILE.value
         problem.compute_data_profile(
-            algorithms_configurations, self.__histories_paths, file_path=path,
+            algorithms_configurations,
+            self.__histories_paths,
+            file_path=path,
             infeasibility_tolerance=infeasibility_tolerance,
-            max_eval_number=max_eval_number
+            max_eval_number=max_eval_number,
         )
         return path.relative_to(self.__root_directory).as_posix()
 
     def __plot_problem_histories(
-            self,
-            problem: Problem,
-            algorithms_configurations: AlgorithmsConfigurations,
-            destination_dir: Path,
-            infeasibility_tolerance: float = 0.0,
-            max_eval_number: int = None
+        self,
+        problem: Problem,
+        algorithms_configurations: AlgorithmsConfigurations,
+        destination_dir: Path,
+        infeasibility_tolerance: float = 0.0,
+        max_eval_number: int = None,
     ) -> str:
         """Plot the performance histories of a problem.
 
@@ -465,9 +483,12 @@ class Report(object):
         """
         path = destination_dir / FileName.HISTORIES.value
         problem.plot_histories(
-            algorithms_configurations, self.__histories_paths, show=False,
-            file_path=path, plot_all_histories=True,
+            algorithms_configurations,
+            self.__histories_paths,
+            show=False,
+            file_path=path,
+            plot_all_histories=True,
             infeasibility_tolerance=infeasibility_tolerance,
-            max_eval_number=max_eval_number
+            max_eval_number=max_eval_number,
         )
         return path.relative_to(self.__root_directory).as_posix()
