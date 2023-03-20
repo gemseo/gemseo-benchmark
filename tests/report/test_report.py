@@ -52,11 +52,14 @@ def test_init_missing_algorithms(
         Report(tmp_path, unknown_algorithms_configurations, problems_groups, results)
 
 
-def test_generate_report_sources(
-    tmp_path, algorithms_configurations, problems_groups, results
-):
+@pytest.fixture(scope="function")
+def report(tmp_path, algorithms_configurations, problems_groups, results) -> Report:
+    """A benchmarking report."""
+    return Report(tmp_path, algorithms_configurations, problems_groups, results)
+
+
+def test_generate_report_sources(tmp_path, report):
     """Check the generation of the report sources."""
-    report = Report(tmp_path, algorithms_configurations, problems_groups, results)
     report.generate(to_pdf=True)
     assert (tmp_path / "index.rst").is_file()
     assert (tmp_path / "algorithms.rst").is_file()
@@ -89,25 +92,20 @@ def test_retrieve_description(
     report.generate()
     with open(tmp_path / "algorithms.rst") as file:
         contents = file.readlines()
+
     assert contents == ref_contents
 
 
-def test_problems_descriptions_files(
-    tmp_path, algorithms_configurations, problem_a, problem_b, problems_groups, results
-):
+def test_problems_descriptions_files(tmp_path, report, problem_a, problem_b):
     """Check the generation of the files describing the problems."""
-    report = Report(tmp_path, algorithms_configurations, problems_groups, results)
     report.generate(to_html=False)
     assert (tmp_path / "problems_list.rst").is_file()
     assert (tmp_path / "problems" / f"{problem_a.name}.rst").is_file()
     assert (tmp_path / "problems" / f"{problem_b.name}.rst").is_file()
 
 
-def test_figures(
-    tmp_path, algorithms_configurations, problem_a, problem_b, problems_groups, results
-):
+def test_figures(tmp_path, report, problems_groups, problem_a, problem_b):
     """Check the generation of the figures."""
-    report = Report(tmp_path, algorithms_configurations, problems_groups, results)
     report.generate(to_html=False)
     group_dir = tmp_path / "images" / problems_groups[0].name.replace(" ", "_")
     assert (group_dir / "data_profile.png").is_file()
