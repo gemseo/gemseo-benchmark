@@ -66,6 +66,14 @@ def test_generate_report_sources(tmp_path, report):
     assert (tmp_path / "problems_groups.rst").is_file()
     assert (tmp_path / "groups" / "A_group.rst").is_file()
     assert (tmp_path / "_build" / "html" / "index.html").is_file()
+
+
+@pytest.mark.skip(
+    reason="The CI runner cannot execute the command `sphinx-build -M latexpdf`.",
+)
+def test_generate_pdf(tmp_path, report):
+    """Check the generation of the report in PDF."""
+    report.generate(to_pdf=True)
     assert (tmp_path / "_build" / "latex" / "benchmarking_report.pdf").is_file()
 
 
