@@ -35,7 +35,7 @@ from typing import Union
 
 import numpy
 from gemseo import api
-from gemseo.algos.doe.doe_lib import DOELibraryOptionType
+from gemseo.algos.doe.doe_library import DOELibraryOptionType
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.api import compute_doe
