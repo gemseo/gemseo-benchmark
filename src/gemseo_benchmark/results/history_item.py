@@ -12,7 +12,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
@@ -22,16 +21,16 @@
 from __future__ import annotations
 
 
-class HistoryItem(object):
+class HistoryItem:
     """A performance history item."""
 
     def __init__(
-            self,
-            objective_value: float,
-            infeasibility_measure: float,
-            n_unsatisfied_constraints: int = None,
+        self,
+        objective_value: float,
+        infeasibility_measure: float,
+        n_unsatisfied_constraints: int = None,
     ) -> None:
-        """
+        """# noqa: D205, D212, D415
         Args:
             objective_value: The objective function value of the item.
             infeasibility_measure: The infeasibility measure of the item.
@@ -41,15 +40,16 @@ class HistoryItem(object):
                 and if the infeasibility measure is positive it will be set to None.
         """
         self.__objective_value = objective_value
-        self.__infeas_measure, self.__n_unsatisfied_constraints = (
-            HistoryItem.__get_infeasibility(
-                infeasibility_measure, n_unsatisfied_constraints
-            )
+        (
+            self.__infeas_measure,
+            self.__n_unsatisfied_constraints,
+        ) = HistoryItem.__get_infeasibility(
+            infeasibility_measure, n_unsatisfied_constraints
         )
 
     @staticmethod
     def __get_infeasibility(
-            infeasibility_measure: float, n_unsatisfied_constraints: int | None
+        infeasibility_measure: float, n_unsatisfied_constraints: int | None
     ) -> tuple[float, int | None]:
         """Check the infeasibility measure and the number of unsatisfied constraints.
 
@@ -83,8 +83,10 @@ class HistoryItem(object):
                 f"{n_unsatisfied_constraints}."
             )
 
-        if infeasibility_measure == 0.0 and n_unsatisfied_constraints != 0 or (
-                infeasibility_measure > 0.0 and n_unsatisfied_constraints == 0
+        if (
+            infeasibility_measure == 0.0
+            and n_unsatisfied_constraints != 0
+            or (infeasibility_measure > 0.0 and n_unsatisfied_constraints == 0)
         ):
             raise ValueError(
                 f"The infeasibility measure ({infeasibility_measure}) and the number "
@@ -126,8 +128,8 @@ class HistoryItem(object):
             Whether the history item is equal to the other one.
         """
         return (
-                self.__infeas_measure == other.__infeas_measure
-                and self.objective_value == other.objective_value
+            self.__infeas_measure == other.__infeas_measure
+            and self.objective_value == other.objective_value
         )
 
     def __lt__(self, other: HistoryItem) -> bool:
@@ -140,8 +142,8 @@ class HistoryItem(object):
             Whether the history item is lower than the other one.
         """
         return self.__infeas_measure < other.__infeas_measure or (
-                self.__infeas_measure == other.__infeas_measure
-                and self.objective_value < other.objective_value
+            self.__infeas_measure == other.__infeas_measure
+            and self.objective_value < other.objective_value
         )
 
     def __le__(self, other: HistoryItem) -> bool:

@@ -12,7 +12,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
@@ -26,13 +25,12 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
-from numpy import array
-from numpy import ndarray
-
 from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.problems.analytical.rosenbrock import Rosenbrock
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.problems.problem import Problem
+from numpy import array
+from numpy import ndarray
 
 design_variables = array([0.0, 1.0])
 
@@ -85,7 +83,7 @@ def functions_values(
     return {
         objective.name: 2.0,
         inequality_constraint.name: array([1.0]),
-        equality_constraint.name: array([0.0])
+        equality_constraint.name: array([0.0]),
     }
 
 
@@ -109,8 +107,11 @@ def database(hashable_array, functions_values) -> mock.Mock:
 
 @pytest.fixture(scope="package")
 def problem(
-    design_space, objective, inequality_constraint, equality_constraint,
-    functions_values
+    design_space,
+    objective,
+    inequality_constraint,
+    equality_constraint,
+    functions_values,
 ) -> mock.Mock:
     """A solved optimization problem."""
     problem = mock.Mock(spec=OptimizationProblem)
@@ -129,8 +130,11 @@ def problem(
     problem.get_number_of_unsatisfied_constraints = mock.Mock(return_value=1)
     problem.get_optimum = mock.Mock(
         return_value=(
-            functions_values[objective.name], design_variables, True, functions_values,
-            None
+            functions_values[objective.name],
+            design_variables,
+            True,
+            functions_values,
+            None,
         )
     )
     problem.minimize_objective = True
@@ -138,9 +142,15 @@ def problem(
 
 
 def side_effect(
-    algos_configurations, results, show=False, file_path=None,
-    plot_all_histories=False, infeasibility_tolerance=0.0, max_eval_number=None
+    algos_configurations,
+    results,
+    show=False,
+    file_path=None,
+    plot_all_histories=False,
+    infeasibility_tolerance=0.0,
+    max_eval_number=None,
 ):
+    """Side effect for the computation of a data profile."""
     shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(file_path))
 
 
@@ -179,8 +189,12 @@ def group(problem_a, problem_b) -> mock.Mock:
     group.__iter__.return_value = [problem_a, problem_b]
 
     def side_effect(
-        algos_configurations, histories_paths, show=False, plot_path=None,
-        infeasibility_tolerance=0.0, max_eval_number=None
+        algos_configurations,
+        histories_paths,
+        show=False,
+        plot_path=None,
+        infeasibility_tolerance=0.0,
+        max_eval_number=None,
     ):
         shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(plot_path))
 
@@ -225,14 +239,16 @@ def unknown_algorithms_configurations(
     """The configurations of algorithms unknown to GEMSEO."""
     algos_configs = mock.MagicMock()
     algos_configs.names = [
-        algorithm_configuration.name, unknown_algorithm_configuration.name
+        algorithm_configuration.name,
+        unknown_algorithm_configuration.name,
     ]
     algos_configs.algorithms = [
         algorithm_configuration.algorithm_name,
-        unknown_algorithm_configuration.algorithm_name
+        unknown_algorithm_configuration.algorithm_name,
     ]
     algos_configs.__iter__.return_value = [
-        algorithm_configuration, unknown_algorithm_configuration
+        algorithm_configuration,
+        unknown_algorithm_configuration,
     ]
     return algos_configs
 
@@ -247,7 +263,8 @@ def results(
     """The results of the benchmarking."""
     results = mock.Mock()
     results.algorithms = [
-        algorithm_configuration.name, unknown_algorithm_configuration.name
+        algorithm_configuration.name,
+        unknown_algorithm_configuration.name,
     ]
     results.get_problems = mock.Mock(return_value=[problem_a.name, problem_b.name])
     paths = [Path(__file__).parent / "history.json"]
@@ -263,7 +280,7 @@ def rosenbrock() -> Problem:
         Rosenbrock,
         [array([0.0, 1.0]), array([1.0, 0.0])],
         TargetValues([1e-2, 1e-4, 1e-6, 0.0]),
-        optimum=0.0
+        optimum=0.0,
     )
 
 

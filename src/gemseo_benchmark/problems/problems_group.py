@@ -13,7 +13,6 @@
 # FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION
 # WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
@@ -23,17 +22,19 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Iterable, Iterator
+from typing import Iterable
+from typing import Iterator
 
-from gemseo_benchmark.algorithms.algorithms_configurations import \
-    AlgorithmsConfigurations
+from gemseo_benchmark.algorithms.algorithms_configurations import (
+    AlgorithmsConfigurations,
+)
 from gemseo_benchmark.data_profiles.data_profile import DataProfile
 from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 from gemseo_benchmark.results.results import Results
 
 
-class ProblemsGroup(object):
+class ProblemsGroup:
     """A group of reference problems for benchmarking.
 
     .. note::
@@ -46,12 +47,12 @@ class ProblemsGroup(object):
     """
 
     def __init__(
-            self,
-            name: str,
-            problems: Iterable[Problem],
-            description: str = None,
+        self,
+        name: str,
+        problems: Iterable[Problem],
+        description: str = None,
     ) -> None:
-        """
+        """# noqa: D205, D212, D415
         Args:
             name: The name of the group of problems.
             problems: The benchmarking problems of the group.
@@ -77,10 +78,10 @@ class ProblemsGroup(object):
         return all(problem.is_algorithm_suited(name) for problem in self.__problems)
 
     def compute_targets(
-            self,
-            targets_number: int,
-            ref_algos_configurations: AlgorithmsConfigurations,
-            only_feasible: bool = True,
+        self,
+        targets_number: int,
+        ref_algos_configurations: AlgorithmsConfigurations,
+        only_feasible: bool = True,
     ) -> None:
         """Generate targets for all the problems based on given reference algorithms.
 
@@ -95,13 +96,13 @@ class ProblemsGroup(object):
             )
 
     def compute_data_profile(
-            self,
-            algos_configurations: AlgorithmsConfigurations,
-            histories_paths: Results,
-            show: bool = True,
-            plot_path: str | Path = None,
-            infeasibility_tolerance: float = 0.0,
-            max_eval_number: int = None
+        self,
+        algos_configurations: AlgorithmsConfigurations,
+        histories_paths: Results,
+        show: bool = True,
+        plot_path: str | Path = None,
+        infeasibility_tolerance: float = 0.0,
+        max_eval_number: int = None,
     ) -> None:
         """Generate the data profiles of given algorithms relative to the problems.
 
@@ -125,15 +126,17 @@ class ProblemsGroup(object):
         for configuration_name in algos_configurations.names:
             for problem in self.__problems:
                 for history_path in histories_paths.get_paths(
-                        configuration_name, problem.name
+                    configuration_name, problem.name
                 ):
                     history = PerformanceHistory.from_file(history_path)
                     if max_eval_number is not None:
                         history = history.shorten(max_eval_number)
                     history.apply_infeasibility_tolerance(infeasibility_tolerance)
                     data_profile.add_history(
-                        problem.name, configuration_name, history.objective_values,
-                        history.infeasibility_measures
+                        problem.name,
+                        configuration_name,
+                        history.objective_values,
+                        history.infeasibility_measures,
                     )
 
         # Plot and/or save the data profile

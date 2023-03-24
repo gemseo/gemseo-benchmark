@@ -1,9 +1,24 @@
-.idea
+/build
+/dist
+/.tox
 *.pyc
-result_images/
+/src/gemseo_benchmark.egg-info
 
-examples/generate_report/
-examples/plot_histories/
+/.project
+/.pydevproject
+/.settings
+/.idea
+/.vim*
+/.vscode
+/tags
 
-.coverage
-htmlcov/
+/doc_src/build
+/doc
+
+/htmlcov
+
+/coverage.xml
+/.coverage*
+/.pytest_cache
+
+/result_images

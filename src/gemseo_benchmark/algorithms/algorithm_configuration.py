@@ -12,7 +12,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
@@ -20,8 +19,8 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Configuration of an algorithm defined by the values of its options.
 
-An algorithm depends on the values of its options.
-A value set defines a configuration of the algorithm.
+An algorithm depends on the values of its options. A value set defines a configuration of
+the algorithm.
 """
 from __future__ import annotations
 
@@ -32,17 +31,18 @@ from gemseo.utils.string_tools import pretty_repr
 
 class AlgorithmConfiguration:
     """The configuration of an algorithm."""
+
     __ALGORITHM_NAME = "algorithm_name"
     __ALGORITHM_OPTIONS = "algorithm_options"
     __CONFIGURATION_NAME = "configuration_name"
 
     def __init__(
-            self,
-            algorithm_name: str,
-            configuration_name: str = None,
-            **algorithm_options: Any
+        self,
+        algorithm_name: str,
+        configuration_name: str = None,
+        **algorithm_options: Any,
     ) -> None:
-        """
+        """# noqa: D205, D212, D415
         Args:
             algorithm_name: The name of the algorithm.
             configuration_name: The name of the configuration of the algorithm.
@@ -93,13 +93,13 @@ class AlgorithmConfiguration:
         return {
             self.__CONFIGURATION_NAME: self.__configuration_name,
             self.__ALGORITHM_NAME: self.__algorithm_name,
-            self.__ALGORITHM_OPTIONS: self.__algorithm_options
+            self.__ALGORITHM_OPTIONS: self.__algorithm_options,
         }
 
     @classmethod
     def from_dict(
-            cls, algorithm_configuration: dict[str, str | dict[str, Any]]
-    ) -> "AlgorithmConfiguration":
+        cls, algorithm_configuration: dict[str, str | dict[str, Any]]
+    ) -> AlgorithmConfiguration:
         """Load an algorithm configuration from a dictionary.
 
         Args:
@@ -111,5 +111,5 @@ class AlgorithmConfiguration:
         return AlgorithmConfiguration(
             algorithm_configuration[cls.__ALGORITHM_NAME],
             algorithm_configuration[cls.__CONFIGURATION_NAME],
-            **algorithm_configuration[cls.__ALGORITHM_OPTIONS]
+            **algorithm_configuration[cls.__ALGORITHM_OPTIONS],
         )

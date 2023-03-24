@@ -12,26 +12,27 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the problems group."""
-from matplotlib import pyplot
-from matplotlib.testing.decorators import image_comparison
-from numpy import zeros
-from pytest import raises
+from __future__ import annotations
 
 from gemseo.problems.analytical.power_2 import Power2
 from gemseo.problems.analytical.rosenbrock import Rosenbrock
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
-from gemseo_benchmark.algorithms.algorithms_configurations import \
-    AlgorithmsConfigurations
+from gemseo_benchmark.algorithms.algorithms_configurations import (
+    AlgorithmsConfigurations,
+)
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
+from matplotlib import pyplot
+from matplotlib.testing.decorators import image_comparison
+from numpy import zeros
+from pytest import raises
 
 algorithms_configurations = AlgorithmsConfigurations(AlgorithmConfiguration("L-BFGS-B"))
 
@@ -58,7 +59,7 @@ def test_compute_targets():
 
 
 @image_comparison(
-    baseline_images=["data_profile"], remove_text=True, extensions=['png']
+    baseline_images=["data_profile"], remove_text=True, extensions=["png"]
 )
 def test_compute_data_profile(problem_a, problem_b, results):
     """Check the computation of data profiles."""

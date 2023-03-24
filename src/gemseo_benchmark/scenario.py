@@ -7,8 +7,10 @@ from pathlib import Path
 from typing import Iterable
 
 from gemseo.algos.opt.opt_factory import OptimizersFactory
-from gemseo_benchmark.algorithms.algorithms_configurations import \
-    AlgorithmsConfigurations
+
+from gemseo_benchmark.algorithms.algorithms_configurations import (
+    AlgorithmsConfigurations,
+)
 from gemseo_benchmark.benchmarker import Benchmarker
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.report.report import Report
@@ -17,8 +19,9 @@ from gemseo_benchmark.results.results import Results
 LOGGER = logging.getLogger(__name__)
 
 
-class Scenario(object):
+class Scenario:
     """A benchmarking scenario, including running of solvers and reporting."""
+
     __DATABASES_DIRNAME = "databases"
     __HISTORIES_DIRNAME = "histories"
     __PSEVEN_LOGS_DIRNAME = "pseven_logs"
@@ -28,7 +31,7 @@ class Scenario(object):
     def __init__(
         self, algorithms: AlgorithmsConfigurations, outputs_path: str | Path
     ) -> None:
-        """
+        """# noqa: D205, D212, D415
         Args:
             algorithms: The algorithms configurations to be benchmarked.
             outputs_path: The path to the directory where to save the output files
@@ -57,7 +60,7 @@ class Scenario(object):
         generate_pdf_report: bool = False,
         infeasibility_tolerance: float = 0.0,
         save_databases: bool = False,
-        save_pseven_logs: bool = False
+        save_pseven_logs: bool = False,
     ) -> None:
         """Execute the benchmarking scenario.
 
@@ -84,7 +87,7 @@ class Scenario(object):
                 problems_groups,
                 generate_html_report,
                 generate_pdf_report,
-                infeasibility_tolerance
+                infeasibility_tolerance,
             )
 
     def _run_solvers(
@@ -92,7 +95,7 @@ class Scenario(object):
         problems_groups: Iterable[ProblemsGroup],
         overwrite_histories: bool,
         save_databases: bool,
-        save_pseven_logs: bool
+        save_pseven_logs: bool,
     ) -> None:
         """Run the solvers on the benchmarking problems.
 
@@ -107,6 +110,7 @@ class Scenario(object):
             save_pseven_logs = False
         else:
             from gemseo.algos.opt.lib_pseven import PSevenOpt
+
             save_pseven_logs = any(
                 [
                     algorithm.algorithm_name in PSevenOpt().descriptions
@@ -118,7 +122,9 @@ class Scenario(object):
             self._histories_path,
             self._results_path,
             self._get_dir_path(self.__DATABASES_DIRNAME) if save_databases else None,
-            self._get_dir_path(self.__PSEVEN_LOGS_DIRNAME) if save_pseven_logs else None
+            self._get_dir_path(self.__PSEVEN_LOGS_DIRNAME)
+            if save_pseven_logs
+            else None,
         )
         benchmarker.execute(
             {problem for group in problems_groups for problem in group},
@@ -148,7 +154,7 @@ class Scenario(object):
         problems_groups: Iterable[ProblemsGroup],
         generate_to_html: bool,
         generate_to_pdf: bool,
-        infeasibility_tolerance: float
+        infeasibility_tolerance: float,
     ) -> None:
         """Generate the benchmarking report.
 
@@ -162,7 +168,7 @@ class Scenario(object):
             self.__get_report_path(),
             self._algorithms,
             problems_groups,
-            Results(self._results_path)
+            Results(self._results_path),
         )
         report.generate(generate_to_html, generate_to_pdf, infeasibility_tolerance)
 

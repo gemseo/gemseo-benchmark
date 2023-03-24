@@ -12,20 +12,20 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the performance history."""
+from __future__ import annotations
+
 import re
 from pathlib import Path
 from unittest import mock
 
 import numpy
 import pytest
-
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
@@ -34,21 +34,21 @@ from gemseo_benchmark.results.performance_history import PerformanceHistory
 def test_invalid_init_lengths():
     """Check the initialization of a history with lists of inconsistent lengths."""
     with pytest.raises(
-            ValueError,
-            match="The objective history and the infeasibility history must have same"
-                  " length."
+        ValueError,
+        match="The objective history and the infeasibility history must have same"
+        " length.",
     ):
         PerformanceHistory([3.0, 2.0], [1.0])
     with pytest.raises(
-            ValueError,
-            match="The objective history and the feasibility history must have same"
-                  " length."
+        ValueError,
+        match="The objective history and the feasibility history must have same"
+        " length.",
     ):
         PerformanceHistory([3.0, 2.0], feasibility_statuses=[False])
     with pytest.raises(
-            ValueError,
-            match="The unsatisfied constraints history and the feasibility history"
-                  " must have same length."
+        ValueError,
+        match="The unsatisfied constraints history and the feasibility history"
+        " must have same length.",
     ):
         PerformanceHistory([3.0, 2.0], [1.0, 0.0], n_unsatisfied_constraints=[1])
 
@@ -60,7 +60,7 @@ def test_negative_infeasibility_measures():
 
 
 def test_length():
-    """Check the length of a performance history"""
+    """Check the length of a performance history."""
     history_1 = PerformanceHistory([3.0, 2.0])
     assert len(history_1) == 2
     history_2 = PerformanceHistory([3.0, 2.0], [1.0, 0.0])
@@ -70,7 +70,7 @@ def test_length():
 
 
 def test_iter():
-    """Check the iteration over a performance history"""
+    """Check the iteration over a performance history."""
     history = PerformanceHistory([3.0, 2.0], [1.0, 0.0])
     assert list(iter(history)) == [HistoryItem(3.0, 1.0), HistoryItem(2.0, 0.0)]
     history = PerformanceHistory([3.0, 2.0], feasibility_statuses=[False, True])
@@ -78,10 +78,9 @@ def test_iter():
 
 
 def test_compute_cumulated_minimum():
-    """Check the computation of the cumulated minimum of a performance history"""
+    """Check the computation of the cumulated minimum of a performance history."""
     history = PerformanceHistory(
-        [0.0, -3.0, -1.0, 0.0, 1.0, -1.0],
-        [2.0, 3.0, 1.0, 0.0, 0.0, 0.0]
+        [0.0, -3.0, -1.0, 0.0, 1.0, -1.0], [2.0, 3.0, 1.0, 0.0, 0.0, 0.0]
     )
     reference = PerformanceHistory(
         [0.0, 0.0, -1.0, 0.0, 0.0, -1.0], [2.0, 2.0, 1.0, 0.0, 0.0, 0.0]
@@ -134,9 +133,13 @@ def test_to_file(tmp_path):
     """Check the writing of a performance history into a file."""
     algorithm_configuration = AlgorithmConfiguration("algorithm")
     history = PerformanceHistory(
-        [-2.0, -3.0], [1.0, 0.0], n_unsatisfied_constraints=[1, 0],
-        problem_name="problem", doe_size=7, total_time=123.45,
-        algorithm_configuration=algorithm_configuration
+        [-2.0, -3.0],
+        [1.0, 0.0],
+        n_unsatisfied_constraints=[1, 0],
+        problem_name="problem",
+        doe_size=7,
+        total_time=123.45,
+        algorithm_configuration=algorithm_configuration,
     )
     file_path = tmp_path / "history.json"
     history.to_file(str(file_path))
@@ -145,7 +148,7 @@ def test_to_file(tmp_path):
     reference_path = Path(__file__).parent / "reference_history.json"
     with reference_path.open("r") as reference_file:
         reference = reference_file.read()
-    assert contents == reference
+    assert contents == reference[:-1]  # disregard last line break
 
 
 def test_from_file():
@@ -194,7 +197,7 @@ def incomplete_database(objective, equality_constraint, hashable_array) -> mock.
     database = mock.Mock()
     functions_values = {
         objective.name: 2.0,
-        equality_constraint.name: numpy.array([0.0])
+        equality_constraint.name: numpy.array([0.0]),
     }
     database.items = mock.Mock(return_value=[(hashable_array, functions_values)])
     # database.get = mock.Mock(return_value=functions_values)  # FIXME
@@ -223,10 +226,8 @@ def test_extend_smaller():
     """Check the extension of a performance history to a smaller size."""
     history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
     with pytest.raises(
-            ValueError,
-            match=re.escape(
-                "The expected size (1) is smaller than the history size (2)."
-            )
+        ValueError,
+        match=re.escape("The expected size (1) is smaller than the history size (2)."),
     ):
         history.extend(1)
 

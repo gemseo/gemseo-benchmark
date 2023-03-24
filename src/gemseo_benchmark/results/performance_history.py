@@ -12,7 +12,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
@@ -38,14 +37,17 @@ from __future__ import annotations
 import json
 import statistics
 from functools import reduce
-from itertools import chain, repeat
+from itertools import chain
+from itertools import repeat
 from pathlib import Path
-from typing import Callable, Iterable, Sequence
+from typing import Callable
+from typing import Iterable
+from typing import Sequence
 
+from gemseo.algos.opt_problem import OptimizationProblem
 from matplotlib.axes import Axes
 from numpy import inf
 
-from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.results.history_item import HistoryItem
 
@@ -59,6 +61,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
         problem_name (str): The name of the problem.
         total_time (float): The run time of the algorithm.
     """
+
     __ALGORITHM_CONFIGURATION = "algorithm_configuration"
     __DOE_SIZE = "DOE_size"
     __EXECUTION_TIME = "execution_time"
@@ -69,19 +72,19 @@ class PerformanceHistory(Sequence[HistoryItem]):
     __PROBLEM = "problem"
 
     def __init__(
-            self,
-            objective_values: Sequence[float] = None,
-            infeasibility_measures: Sequence[float] = None,
-            feasibility_statuses: Sequence[bool] = None,
-            n_unsatisfied_constraints: Sequence[int] = None,
-            problem_name: str = None,
-            objective_name: str = None,
-            constraints_names: Sequence[str] = None,
-            doe_size: int = None,
-            total_time: float = None,
-            algorithm_configuration: AlgorithmConfiguration = None,
+        self,
+        objective_values: Sequence[float] = None,
+        infeasibility_measures: Sequence[float] = None,
+        feasibility_statuses: Sequence[bool] = None,
+        n_unsatisfied_constraints: Sequence[int] = None,
+        problem_name: str = None,
+        objective_name: str = None,
+        constraints_names: Sequence[str] = None,
+        doe_size: int = None,
+        total_time: float = None,
+        algorithm_configuration: AlgorithmConfiguration = None,
     ) -> None:
-        """
+        """# noqa: D205, D212, D415
         Args:
             objective_values: The history of the quantity to be minimized.
                 If ``None``, will be considered empty.
@@ -130,7 +133,9 @@ class PerformanceHistory(Sequence[HistoryItem]):
         self.algorithm_configuration = algorithm_configuration
         self.doe_size = doe_size
         self.items = self.__get_history_items(
-            objective_values, infeasibility_measures, feasibility_statuses,
+            objective_values,
+            infeasibility_measures,
+            feasibility_statuses,
             n_unsatisfied_constraints,
         )
         self.problem_name = problem_name
@@ -161,7 +166,10 @@ class PerformanceHistory(Sequence[HistoryItem]):
         return self.__items
 
     @items.setter
-    def items(self, history_items: Iterable[HistoryItem], ) -> None:
+    def items(
+        self,
+        history_items: Iterable[HistoryItem],
+    ) -> None:
         for item in history_items:
             if not isinstance(item, HistoryItem):
                 raise TypeError(
@@ -173,10 +181,10 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
     @staticmethod
     def __get_history_items(
-            objective_values: Sequence[float] = None,
-            infeasibility_measures: Sequence[float] = None,
-            feasibility_statuses: Sequence[bool] = None,
-            n_unsatisfied_constraints: Sequence[int] = None,
+        objective_values: Sequence[float] = None,
+        infeasibility_measures: Sequence[float] = None,
+        feasibility_statuses: Sequence[bool] = None,
+        n_unsatisfied_constraints: Sequence[int] = None,
     ) -> list[HistoryItem]:
         """Return history items based on values histories.
 
@@ -237,14 +245,19 @@ class PerformanceHistory(Sequence[HistoryItem]):
             )
 
         return [
-            HistoryItem(value, measure, n_unsatisfied) for value, measure, n_unsatisfied
-            in zip(objective_values, infeasibility_measures, n_unsatisfied_constraints)
+            HistoryItem(value, measure, n_unsatisfied)
+            for value, measure, n_unsatisfied in zip(
+                objective_values, infeasibility_measures, n_unsatisfied_constraints
+            )
         ]
 
     def __len__(self) -> int:
         return len(self.__items)
 
-    def __getitem__(self, i: int, ) -> HistoryItem:
+    def __getitem__(
+        self,
+        i: int,
+    ) -> HistoryItem:
         return self.__items[i]
 
     def __repr__(self) -> str:
@@ -256,14 +269,14 @@ class PerformanceHistory(Sequence[HistoryItem]):
         Returns:
             The history of the cumulated minimum.
         """
-        minima = [reduce(min, self.__items[:i + 1]) for i in range(len(self))]
+        minima = [reduce(min, self.__items[: i + 1]) for i in range(len(self))]
         minimum_history = PerformanceHistory()
         minimum_history.items = minima
         return minimum_history
 
     @staticmethod
     def compute_minimum_history(
-            histories: Iterable[PerformanceHistory],
+        histories: Iterable[PerformanceHistory],
     ) -> PerformanceHistory:
         """Return the minimum of several performance histories.
 
@@ -277,7 +290,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
     @staticmethod
     def compute_maximum_history(
-            histories: Iterable[PerformanceHistory],
+        histories: Iterable[PerformanceHistory],
     ) -> PerformanceHistory:
         """Return the maximum of several performance histories.
 
@@ -291,7 +304,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
     @staticmethod
     def compute_median_history(
-            histories: Iterable[PerformanceHistory],
+        histories: Iterable[PerformanceHistory],
     ) -> PerformanceHistory:
         """Return the median of several performance histories.
 
@@ -305,8 +318,8 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
     @staticmethod
     def __compute_statistic(
-            histories: Iterable[PerformanceHistory],
-            statistic: Callable[[tuple[HistoryItem]], HistoryItem]
+        histories: Iterable[PerformanceHistory],
+        statistic: Callable[[tuple[HistoryItem]], HistoryItem],
     ) -> PerformanceHistory:
         """Return the history of a statistic of several performance histories.
 
@@ -326,9 +339,8 @@ class PerformanceHistory(Sequence[HistoryItem]):
         # Create the performance history
         history = PerformanceHistory()
         history.items = [
-            statistic(items) for items in zip(
-                *[history.items for history in extended_histories]
-            )
+            statistic(items)
+            for items in zip(*[history.items for history in extended_histories])
         ]
         return history
 
@@ -350,7 +362,10 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
         return truncated_history
 
-    def to_file(self, path: str | Path, ) -> None:
+    def to_file(
+        self,
+        path: str | Path,
+    ) -> None:
         """Save the performance history in a file.
 
         Args:
@@ -388,7 +403,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
         data[self.__HISTORY_ITEMS] = items_data
         with Path(path).open("w") as file:
-            json.dump(data, file, indent=4, separators=(',', ': '))
+            json.dump(data, file, indent=4, separators=(",", ": "))
 
     @classmethod
     def from_file(cls, path: str | Path) -> PerformanceHistory:
@@ -405,15 +420,12 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
         # Cover deprecated performance history files
         if isinstance(data, list):
-            print(
-                "Performance histories without algorithm configuration are deprecated."
-            )
             history = cls()
             history.items = [
                 HistoryItem(
                     item_data[PerformanceHistory.__PERFORMANCE],
                     item_data[PerformanceHistory.__INFEASIBILITY],
-                    item_data.get(PerformanceHistory.__N_UNSATISFIED_CONSTRAINTS)
+                    item_data.get(PerformanceHistory.__N_UNSATISFIED_CONSTRAINTS),
                 )
                 for item_data in data
             ]
@@ -432,7 +444,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
             HistoryItem(
                 item_data[PerformanceHistory.__PERFORMANCE],
                 item_data[PerformanceHistory.__INFEASIBILITY],
-                item_data.get(PerformanceHistory.__N_UNSATISFIED_CONSTRAINTS)
+                item_data.get(PerformanceHistory.__N_UNSATISFIED_CONSTRAINTS),
             )
             for item_data in data[cls.__HISTORY_ITEMS]
         ]
@@ -440,7 +452,9 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
     @classmethod
     def from_problem(
-            cls, problem: OptimizationProblem, problem_name: str = None,
+        cls,
+        problem: OptimizationProblem,
+        problem_name: str = None,
     ) -> PerformanceHistory:
         """Create a performance history from a solved optimization problem.
 
@@ -474,12 +488,17 @@ class PerformanceHistory(Sequence[HistoryItem]):
             n_unsatisfied_constraints.append(number_of_unsatisfied_constraints)
 
         return cls(
-            obj_values, infeas_measures, feas_statuses, n_unsatisfied_constraints,
-            problem_name, problem.objective.name, problem.get_scalar_constraints_names()
+            obj_values,
+            infeas_measures,
+            feas_statuses,
+            n_unsatisfied_constraints,
+            problem_name,
+            problem.objective.name,
+            problem.get_scalar_constraints_names(),
         )
 
     def get_plot_data(
-            self, feasible: bool = False, minimum_history: bool = False
+        self, feasible: bool = False, minimum_history: bool = False
     ) -> tuple[list[int], list[HistoryItem]]:
         """Return the data to plot the performance history.
 
@@ -508,7 +527,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
         return (
             list(range(first_feasible_index + 1, len(history) + 1)),
-            history[first_feasible_index:]
+            history[first_feasible_index:],
         )
 
     def extend(self, size: int) -> PerformanceHistory:
@@ -535,7 +554,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
         history.items = list(chain(self, repeat(self[-1], (size - len(self)))))
         return history
 
-    def shorten(self, size: int) -> "PerformanceHistory":
+    def shorten(self, size: int) -> PerformanceHistory:
         """Shorten the performance history to a given size.
 
         If the history is shorter than the expected size then it will not be altered.
@@ -550,9 +569,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
         history.items = self.items[:size]
         return history
 
-    def plot(
-            self, axes: Axes, only_feasible: bool, **kwargs: str | float
-    ) -> None:
+    def plot(self, axes: Axes, only_feasible: bool, **kwargs: str | float) -> None:
         """Plot the performance history.
 
         Args:

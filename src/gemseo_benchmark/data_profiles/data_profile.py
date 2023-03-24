@@ -12,7 +12,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
@@ -39,20 +38,27 @@ from __future__ import annotations
 
 from numbers import Number
 from pathlib import Path
-from typing import Iterable, Mapping, Sequence
+from typing import Iterable
+from typing import Mapping
+from typing import Sequence
 
 import matplotlib
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
-from numpy import array, linspace, ndarray, zeros
-
 from gemseo.utils.matplotlib_figure import save_show_figure
-from gemseo_benchmark import COLORS_CYCLE, get_markers_cycle, MarkeveryType
+from matplotlib.figure import Figure
+from numpy import array
+from numpy import linspace
+from numpy import ndarray
+from numpy import zeros
+
+from gemseo_benchmark import COLORS_CYCLE
+from gemseo_benchmark import get_markers_cycle
+from gemseo_benchmark import MarkeveryType
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 
-class DataProfile(object):
+class DataProfile:
     """Data profile that compares iterative algorithms on reference problems.
 
     A data profile is an empirical cumulative distribution function of the number of
@@ -61,7 +67,7 @@ class DataProfile(object):
     """
 
     def __init__(self, target_values: Mapping[str, TargetValues]) -> None:
-        """
+        """# noqa: D205, D212, D415
         Args:
             target_values: The target values of each of the reference problems.
         """
@@ -90,7 +96,7 @@ class DataProfile(object):
         if not isinstance(target_values, Mapping):
             raise TypeError("The target values be must passed as a mapping")
 
-        targets_numbers = set(len(pb_targets) for pb_targets in target_values.values())
+        targets_numbers = {len(pb_targets) for pb_targets in target_values.values()}
         if len(targets_numbers) != 1:
             raise ValueError(
                 "The reference problems must have the same number of target values."
@@ -100,12 +106,12 @@ class DataProfile(object):
         self.__targets_number = targets_numbers.pop()
 
     def add_history(
-            self,
-            problem_name: str,
-            algorithm_configuration_name: str,
-            objective_values: Sequence[float],
-            infeasibility_measures: Sequence[float] = None,
-            feasibility_statuses: Sequence[bool] = None,
+        self,
+        problem_name: str,
+        algorithm_configuration_name: str,
+        objective_values: Sequence[float],
+        infeasibility_measures: Sequence[float] = None,
+        feasibility_statuses: Sequence[bool] = None,
     ) -> None:
         """Add a history of performance values.
 
@@ -138,11 +144,11 @@ class DataProfile(object):
         )
 
     def plot(
-            self,
-            algo_names: Iterable[str] = None,
-            show: bool = True,
-            file_path: str | Path = None,
-            markevery: MarkeveryType = 0.1
+        self,
+        algo_names: Iterable[str] = None,
+        show: bool = True,
+        file_path: str | Path = None,
+        markevery: MarkeveryType = 0.1,
     ) -> None:
         """Plot the data profiles of the required algorithms.
 
@@ -237,9 +243,9 @@ class DataProfile(object):
             ValueError: If the algorithm does not have the same number of histories
                 for each problem.
         """
-        histories_numbers = set(
+        histories_numbers = {
             len(histories) for histories in self.__values_histories[algo_name].values()
-        )
+        }
         if len(histories_numbers) != 1:
             raise ValueError(
                 f"Reference problems unequally represented for algorithm {algo_name!r}."
@@ -248,8 +254,7 @@ class DataProfile(object):
 
     @staticmethod
     def _plot_data_profiles(
-            data_profiles: Mapping[str, Sequence[Number]],
-            markevery: MarkeveryType = 0.1
+        data_profiles: Mapping[str, Sequence[Number]], markevery: MarkeveryType = 0.1
     ) -> Figure:
         """Plot the data profiles.
 
@@ -280,13 +285,17 @@ class DataProfile(object):
 
         # Plot the data profiles
         for color, marker, (name, profile) in zip(
-                COLORS_CYCLE, get_markers_cycle(), data_profiles.items()
+            COLORS_CYCLE, get_markers_cycle(), data_profiles.items()
         ):
             # Plot the data profile
             profile_size = len(profile)
             axes.plot(
-                range(1, profile_size + 1), profile, color=color, label=name,
-                marker=marker, markevery=markevery
+                range(1, profile_size + 1),
+                profile,
+                color=color,
+                label=name,
+                marker=marker,
+                markevery=markevery,
             )
 
             # Extend the profile with an horizontal line if necessary
@@ -295,8 +304,9 @@ class DataProfile(object):
                 last_value = profile[-1]
                 axes.plot(
                     range(profile_size, profile_size + tail_size),
-                    [last_value] * tail_size, color=color,
-                    linestyle="dotted"
+                    [last_value] * tail_size,
+                    color=color,
+                    linestyle="dotted",
                 )
                 # Mark the last entry of the data profile
                 axes.plot(profile_size, last_value, marker="*", color=color)

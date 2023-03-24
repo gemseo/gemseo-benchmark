@@ -12,7 +12,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
@@ -25,7 +24,6 @@ import json
 from pathlib import Path
 
 import pytest
-
 from gemseo_benchmark.results.results import Results
 
 algorithm_name = "algorithm"
@@ -66,8 +64,8 @@ def test_add_invalid_path():
     """Check the addition of a nonexistent path to a collection."""
     results = Results()
     with pytest.raises(
-            FileNotFoundError,
-            match="The path to the history does not exist: not_a_file.json."
+        FileNotFoundError,
+        match="The path to the history does not exist: not_a_file.json.",
     ):
         results.add_path(algorithm_name, problem_name, "not_a_file.json")
 
@@ -92,8 +90,8 @@ def test_from_invalid_file():
     """Check the loading of a collection to an invalid path."""
     results = Results()
     with pytest.raises(
-            FileNotFoundError,
-            match="The path to the JSON file does not exist: not_a_path.json."
+        FileNotFoundError,
+        match="The path to the JSON file does not exist: not_a_path.json.",
     ):
         results.from_file("not_a_path.json")
 
@@ -110,10 +108,7 @@ def test_get_problems(results):
 
 def test_get_problems_unknown_algorithm(results):
     """Check the accessor to the problems names for an unknown algorithm."""
-    with pytest.raises(
-            ValueError,
-            match="Unknown algorithm name: unknown."
-    ):
+    with pytest.raises(ValueError, match="Unknown algorithm name: unknown."):
         results.get_problems("unknown")
 
 
@@ -140,8 +135,8 @@ def test_get_paths_unknown_problem(results):
         ("unknown", problem_name, history_path, False),
         (algorithm_name, "unknown", history_path, False),
         (algorithm_name, problem_name, Path(__file__).parent / "unknown", False),
-        (algorithm_name, problem_name, history_path, True)
-    ]
+        (algorithm_name, problem_name, history_path, True),
+    ],
 )
 def test_contains(results, algorithm, problem, path, contained):
     """Check the membership assessment of a history path to the results."""

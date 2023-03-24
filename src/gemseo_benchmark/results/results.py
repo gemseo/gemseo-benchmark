@@ -12,7 +12,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
 #                           documentation
@@ -25,11 +24,11 @@ import json
 from pathlib import Path
 
 
-class Results(object):
+class Results:
     """A collection of paths to performance histories."""
 
     def __init__(self, path: str | Path = None) -> None:
-        """
+        """# noqa: D205, D212, D415
         Args:
             path: The path to the JSON file from which to load the paths.
                 If ``None``, the collection is initially empty.
@@ -39,10 +38,7 @@ class Results(object):
             self.from_file(path)
 
     def add_path(
-            self,
-            algorithm_configuration_name: str,
-            problem_name: str,
-            path: str | Path
+        self, algorithm_configuration_name: str, problem_name: str, path: str | Path
     ) -> None:
         """Add a path to a performance history.
 
@@ -161,6 +157,7 @@ class Results(object):
             Whether the result is stored.
         """
         return (
-                algo_name in self.__dict and problem_name in self.__dict[algo_name]
-                and path in self.__dict[algo_name][problem_name]
+            algo_name in self.__dict
+            and problem_name in self.__dict[algo_name]
+            and path in self.__dict[algo_name][problem_name]
         )
