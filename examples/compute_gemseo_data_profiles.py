@@ -4,6 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 from shutil import rmtree
 
+from gemseo.api import configure
 from gemseo.api import execute_algo
 from gemseo.problems.analytical.rosenbrock import Rosenbrock
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -14,6 +15,13 @@ from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 from gemseo_benchmark.results.results import Results
+
+# Deactivate functions counters, progress bars and bounds check to accelerate the script
+configure(
+    activate_function_counters=False,
+    activate_progress_bar=False,
+    check_desvars_bounds=False,
+)
 
 # Set the reference problem
 problem = Problem("Rosenbrock", Rosenbrock, doe_algo_name="DiagonalDOE", doe_size=10)
@@ -49,7 +57,12 @@ reference_algorithm_configurations = AlgorithmsConfigurations(
     AlgorithmConfiguration("DIFFERENTIAL_EVOLUTION")
 )
 problem_group.compute_targets(3, algorithms_configurations)
-problem_group.compute_data_profile(algorithms_configurations, results, show=True)
+problem_group.compute_data_profile(
+    algorithms_configurations,
+    results,
+    show=False,
+    plot_path="data_profile.png",
+)
 
 # Clean up the histories files
 rmtree(histories_dir)

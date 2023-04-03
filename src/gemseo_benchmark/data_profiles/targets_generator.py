@@ -314,7 +314,9 @@ class TargetsGenerator:
         for history in self.__histories:
             budgets, items = history.get_plot_data(feasible=True, minimum_history=True)
             # Update the minimum budget
-            minimum_budget = min(budgets[0], minimum_budget)
+            if budgets:  # empty if there is no feasible points
+                minimum_budget = min(budgets[0], minimum_budget)
+
             axes.plot(
                 budgets,
                 [item.objective_value for item in items],

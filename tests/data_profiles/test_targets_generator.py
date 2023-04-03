@@ -156,13 +156,19 @@ def test_best_target_not_reached():
         generator.compute_target_values(2, show=False, best_target_objective=0.0)
 
 
-@image_comparison(
-    baseline_images=["plot_histories"], remove_text=True, extensions=["png"]
+@pytest.mark.parametrize(
+    ["feasibility_statuses", "baseline_images"],
+    [
+        [[True, True], ["plot_histories"]],
+        [[False, True], ["plot_partially_infeasible_history"]],
+        [[False, False], ["plot_infeasible_history"]],
+    ],
 )
-def test_plot_histories():
+@image_comparison(baseline_images=None, remove_text=True, extensions=["png"])
+def test_plot_histories(feasibility_statuses, baseline_images):
     """Check the plotting of histories."""
     generator = TargetsGenerator()
     generator.add_history([2.0, 1.0])
-    generator.add_history([3.0, 0.0])
+    generator.add_history([3.0, 0.0], feasibility_statuses=feasibility_statuses)
     pyplot.close("all")
     generator.plot_histories(best_target_value=0.0, show=False)
