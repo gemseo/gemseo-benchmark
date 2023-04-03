@@ -64,9 +64,7 @@ for ref_algo, start_point in product(reference_algos, STARTING_POINTS):
 
 # Compute the scale of target values
 targets_number = 20
-targets_values = {
-    "Rosenbrock": targets_generator.compute_target_values(targets_number, show=True)
-}
+targets_values = {"Rosenbrock": targets_generator.compute_target_values(targets_number)}
 
 # Set the algorithms to be compared
 methods = [
@@ -86,4 +84,5 @@ data_profiles = DataProfile(targets_values)
 for method_name, start_point in product(methods, STARTING_POINTS):
     history = generate_values_history(objective, method_name, start_point)
     data_profiles.add_history("Rosenbrock", method_name, history)
-data_profiles.plot()
+
+data_profiles.plot(show=False, file_path="data_profiles.jpg")
