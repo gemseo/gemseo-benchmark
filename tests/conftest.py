@@ -216,6 +216,7 @@ def algorithm_configuration() -> mock.Mock():
 def algorithms_configurations(algorithm_configuration) -> mock.Mock():
     """The configurations of algorithms."""
     algos_configs = mock.MagicMock()
+    algos_configs.name = "algorithms configurations"
     algos_configs.names = [algorithm_configuration.name]
     algos_configs.algorithms = [algorithm_configuration.algorithm]
     algos_configs.__iter__.return_value = [algorithm_configuration]
@@ -238,6 +239,7 @@ def unknown_algorithms_configurations(
 ) -> mock.Mock():
     """The configurations of algorithms unknown to GEMSEO."""
     algos_configs = mock.MagicMock()
+    algos_configs.name = "unknown algorithms configurations"
     algos_configs.names = [
         algorithm_configuration.name,
         unknown_algorithm_configuration.name,

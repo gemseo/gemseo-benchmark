@@ -21,6 +21,7 @@
 """Tests for the generation of a benchmarking report."""
 from __future__ import annotations
 
+from pathlib import Path
 from unittest import mock
 
 import pytest
@@ -49,22 +50,29 @@ def test_init_missing_algorithms(
         f"'{unknown_algorithm_configuration.name}', "
         f"'{algorithm_configuration.name}'.",
     ):
-        Report(tmp_path, unknown_algorithms_configurations, problems_groups, results)
+        Report(tmp_path, [unknown_algorithms_configurations], problems_groups, results)
 
 
 @pytest.fixture(scope="function")
 def report(tmp_path, algorithms_configurations, problems_groups, results) -> Report:
     """A benchmarking report."""
-    return Report(tmp_path, algorithms_configurations, problems_groups, results)
+    return Report(tmp_path, [algorithms_configurations], problems_groups, results)
 
 
-def test_generate_report_sources(tmp_path, report):
+def test_generate_report_sources(tmp_path, report, algorithms_configurations, group):
     """Check the generation of the report sources."""
     report.generate(to_pdf=True)
     assert (tmp_path / "index.rst").is_file()
     assert (tmp_path / "algorithms.rst").is_file()
-    assert (tmp_path / "problems_groups.rst").is_file()
-    assert (tmp_path / "groups" / "A_group.rst").is_file()
+    assert (tmp_path / "results.rst").is_file()
+    results_dir = tmp_path / "results"
+    algorithms_configurations_name = algorithms_configurations.name.replace(" ", "_")
+    assert (results_dir / f"{algorithms_configurations_name}.rst").is_file()
+    assert (
+        results_dir
+        / algorithms_configurations_name
+        / f"{group.name.replace(' ', '_')}.rst"
+    ).is_file()
     assert (tmp_path / "_build" / "html" / "index.html").is_file()
 
 
@@ -82,7 +90,7 @@ def test_retrieve_description(
 ):
     """Check the retrieval of a GEMSEO algorithm description."""
     report = Report(
-        tmp_path, unknown_algorithms_configurations, problems_groups, results
+        tmp_path, [unknown_algorithms_configurations], problems_groups, results
     )
     ref_contents = [
         "Algorithms\n",
@@ -90,12 +98,12 @@ def test_retrieve_description(
         "\n",
         "The following algorithms are considered in this benchmarking report.\n",
         "\n",
+        "Algorithm\n",
+        "   N/A\n",
+        "\n",
         "SLSQP\n",
         "   Sequential Least-Squares Quadratic Programming (SLSQP) implemented in the "
         "SciPy library\n",
-        "\n",
-        "Algorithm\n",
-        "   N/A\n",
     ]
     report.generate()
     with open(tmp_path / "algorithms.rst") as file:
@@ -112,10 +120,17 @@ def test_problems_descriptions_files(tmp_path, report, problem_a, problem_b):
     assert (tmp_path / "problems" / f"{problem_b.name}.rst").is_file()
 
 
-def test_figures(tmp_path, report, problems_groups, problem_a, problem_b):
+def test_figures(
+    tmp_path, report, algorithms_configurations, problems_groups, problem_a, problem_b
+):
     """Check the generation of the figures."""
     report.generate(to_html=False)
-    group_dir = tmp_path / "images" / problems_groups[0].name.replace(" ", "_")
+    group_dir = (
+        tmp_path
+        / "images"
+        / algorithms_configurations.name.replace(" ", "_")
+        / problems_groups[0].name.replace(" ", "_")
+    )
     assert (group_dir / "data_profile.png").is_file()
     problem_dir = group_dir / problem_a.name.replace(" ", "_")
     assert (problem_dir / "data_profile.png").is_file()
@@ -146,6 +161,42 @@ def test_problem_without_optimum(
 ):
     """Check the handling of a benchmarking problem without an optimum."""
     groups = [incomplete_group]
-    report = Report(tmp_path, algorithms_configurations, groups, results)
+    report = Report(tmp_path, [algorithms_configurations], groups, results)
     with pytest.raises(AttributeError, match="The optimum of the problem is not set."):
         report.generate()
+
+
+@pytest.fixture(scope="function")
+def incomplete_results(
+    algorithm_configuration, unknown_algorithm_configuration, problem_a, problem_b
+) -> mock.Mock:
+    """The results of the benchmarking."""
+    results = mock.Mock()
+    results.algorithms = [
+        algorithm_configuration.name,
+        unknown_algorithm_configuration.name,
+    ]
+    results.get_problems = mock.Mock(return_value=[problem_a.name])
+    paths = [Path(__file__).parent / "history.json"]
+    results.get_paths = mock.Mock(return_value=paths)
+    return results
+
+
+def test_incomplete_results(
+    tmp_path, algorithms_configurations, problems_groups, group, incomplete_results
+):
+    """Check the generation of a report with incomplete results."""
+    Report(
+        tmp_path, [algorithms_configurations], problems_groups, incomplete_results
+    ).generate()
+    algorithms_configurations_name = algorithms_configurations.name.replace(" ", "_")
+    group_name = group.name.replace(" ", "_")
+    assert not (
+        tmp_path / "images" / algorithms_configurations_name / group_name
+    ).is_dir()
+    assert not (
+        tmp_path
+        / "results"
+        / algorithms_configurations.name.replace(" ", "_")
+        / f"{group_name}.rst"
+    ).is_file()

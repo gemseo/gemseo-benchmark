@@ -46,13 +46,13 @@ from gemseo_benchmark.results.results import Results
 class FileName(enum.Enum):
     """The name of a report file."""
 
-    CONF = "conf.py"
     INDEX = "index.rst"
     PROBLEM = "problem.rst"
     PROBLEMS_LIST = "problems_list.rst"
-    GROUP = "group.rst"
-    GROUPS_LIST = "problems_groups.rst"
+    SUB_RESULTS = "sub_results.rst"
+    RESULTS = "results.rst"
     ALGORITHMS = "algorithms.rst"
+    ALGORITHMS_CONFIGURATIONS_GROUP = "algorithms_configurations_group.rst"
     DATA_PROFILE = "data_profile.png"
     HISTORIES = "histories.png"
 
@@ -61,7 +61,7 @@ class DirectoryName(enum.Enum):
     """The name of a report directory."""
 
     PROBLEMS = "problems"
-    GROUPS = "groups"
+    RESULTS = "results"
     IMAGES = "images"
     BUILD = "_build"
 
@@ -76,7 +76,7 @@ class Report:
     def __init__(
         self,
         root_directory_path: str | Path,
-        algos_configurations: AlgorithmsConfigurations,
+        algos_configurations_groups: Iterable[AlgorithmsConfigurations],
         problems_groups: Iterable[ProblemsGroup],
         histories_paths: Results,
         custom_algos_descriptions: Mapping[str, str] = None,
@@ -85,7 +85,7 @@ class Report:
         """# noqa: D205, D212, D415
         Args:
             root_directory_path: The path to the root directory of the report.
-            algos_configurations: The algorithms configurations.
+            algos_configurations_groups: The groups of algorithms configurations.
             problems_groups: The groups of reference problems.
             histories_paths: The paths to the reference histories for each algorithm
                 and reference problem.
@@ -102,14 +102,16 @@ class Report:
             ValueError: If an algorithm has no associated histories.
         """
         self.__root_directory = Path(root_directory_path)
-        self.__algos_configs = algos_configurations
+        self.__algorithms_configurations_groups = algos_configurations_groups
         self.__problems_groups = problems_groups
         self.__histories_paths = histories_paths
         if custom_algos_descriptions is None:
             custom_algos_descriptions = dict()
 
         self.__custom_algos_descriptions = custom_algos_descriptions
-        algos_diff = set(algos_configurations.names) - set(histories_paths.algorithms)
+        algos_diff = set().union(
+            *[group.names for group in algos_configurations_groups]
+        ) - set(histories_paths.algorithms)
         if algos_diff:
             raise ValueError(
                 f"Missing histories for algorithm{'s' if len(algos_diff) > 1 else ''} "
@@ -136,7 +138,7 @@ class Report:
         self.__create_root_directory()
         self.__create_algos_file()
         self.__create_problems_files()
-        self.__create_groups_files(infeasibility_tolerance)
+        self.__create_results_files(infeasibility_tolerance)
         self.__create_index()
         self.__build_report(to_html, to_pdf)
 
@@ -145,7 +147,7 @@ class Report:
         self.__root_directory.mkdir(exist_ok=True)
         # Create the subdirectories
         (self.__root_directory / "_static").mkdir(exist_ok=True)
-        for directory in [DirectoryName.GROUPS.value, DirectoryName.IMAGES.value]:
+        for directory in [DirectoryName.RESULTS.value, DirectoryName.IMAGES.value]:
             (self.__root_directory / directory).mkdir(exist_ok=True)
         # Create the configuration file
         copy(str(self.__CONF_PATH), str(self.__root_directory / self.__CONF_PATH.name))
@@ -154,7 +156,12 @@ class Report:
         """Create the file describing the algorithms."""
         # Get the descriptions of the algorithms
         algos_descriptions = dict(self.__custom_algos_descriptions)
-        for algo_name in self.__algos_configs.algorithms:
+        for algo_name in set().union(
+            *[
+                algos_configs_group.algorithms
+                for algos_configs_group in self.__algorithms_configurations_groups
+            ]
+        ):
             if algo_name not in algos_descriptions:
                 try:
                     library = OptimizersFactory().create(algo_name)
@@ -167,9 +174,10 @@ class Report:
                     ].description
 
         # Create the file
-        file_path = self.__root_directory / FileName.ALGORITHMS.value
         self.__fill_template(
-            file_path, FileName.ALGORITHMS.value, algorithms=algos_descriptions
+            self.__root_directory / FileName.ALGORITHMS.value,
+            FileName.ALGORITHMS.value,
+            algorithms=dict(sorted(algos_descriptions.items())),
         )
 
     def __create_problems_files(self) -> None:
@@ -227,73 +235,97 @@ class Report:
             self.__root_directory / DirectoryName.PROBLEMS.value / f"{problem.name}.rst"
         )
 
-    def __create_groups_files(self, infeasibility_tolerance: float = 0.0) -> None:
-        """Create the files corresponding to the problems groups.
+    def __create_results_files(self, infeasibility_tolerance: float = 0.0) -> None:
+        """Create the files corresponding to the benchmarking results.
 
         Args:
             infeasibility_tolerance: The tolerance on the infeasibility measure.
         """
-        groups_paths = list()
-        for problems_group in self.__problems_groups:
+        results_root = self.__root_directory / DirectoryName.RESULTS.value
+        algos_configs_groups_paths = list()
+        for algorithms_configurations_group in self.__algorithms_configurations_groups:
+            results_paths = list()
+            for problems_group in self.__problems_groups:
 
-            # Get the algorithms with results for all the problems of the group
-            problems_names = {problem.name for problem in problems_group}
-            algorithms_configurations = AlgorithmsConfigurations(
-                *[
-                    algo_config
-                    for algo_config in self.__algos_configs
-                    if set(self.__histories_paths.get_problems(algo_config.name))
-                    >= problems_names
-                ]
-            )
-            if not algorithms_configurations:
-                # There is no algorithm to display for the group
-                continue
+                # Get the algorithms with results for all the problems of the group
+                algorithms_configurations = AlgorithmsConfigurations(
+                    *[
+                        algo_config
+                        for algo_config in algorithms_configurations_group
+                        if set(self.__histories_paths.get_problems(algo_config.name))
+                        >= {problem.name for problem in problems_group}
+                    ]
+                )
+                if not algorithms_configurations:
+                    # There is no algorithm to display for the group
+                    continue
 
-            # Create the directory dedicated to the group
-            group_dir = (
-                self.__root_directory
-                / DirectoryName.IMAGES.value
-                / join_substrings(problems_group.name)
-            )
-            group_dir.mkdir(exist_ok=False)
+                # Create the directory dedicated to the results of the group of
+                # algorithms configurations on the group of problems
+                results_dir = (
+                    self.__root_directory
+                    / DirectoryName.IMAGES.value
+                    / join_substrings(algorithms_configurations_group.name)
+                    / join_substrings(problems_group.name)
+                )
+                results_dir.mkdir(parents=True, exist_ok=False)
 
-            # Generate the figures
-            group_profile = self.__compute_group_data_profile(
-                problems_group,
-                algorithms_configurations,
-                group_dir,
-                infeasibility_tolerance,
-            )
-            problems_figures = self.__plot_problems_figures(
-                problems_group,
-                algorithms_configurations,
-                group_dir,
-                infeasibility_tolerance,
-            )
+                # Generate the figures
+                data_profile = self.__compute_data_profile(
+                    problems_group,
+                    algorithms_configurations,
+                    results_dir,
+                    infeasibility_tolerance,
+                )
+                problems_figures = self.__plot_problems_figures(
+                    problems_group,
+                    algorithms_configurations,
+                    results_dir,
+                    infeasibility_tolerance,
+                )
 
-            # Create the file
-            group_path = (
-                self.__root_directory
-                / DirectoryName.GROUPS.value
-                / f"{join_substrings(problems_group.name)}.rst"
-            )
-            groups_paths.append(
-                group_path.relative_to(self.__root_directory).as_posix()
+                # Create the file
+                results_path = (
+                    results_root
+                    / join_substrings(algorithms_configurations_group.name)
+                    / f"{join_substrings(problems_group.name)}.rst"
+                )
+                results_path.parent.mkdir(exist_ok=True)
+                results_paths.append(results_path.relative_to(results_root).as_posix())
+                self.__fill_template(
+                    results_path,
+                    FileName.SUB_RESULTS.value,
+                    algorithms_group_name=algorithms_configurations_group.name,
+                    algorithms_configurations_names=[
+                        algo_config.name
+                        for algo_config in algorithms_configurations_group.configurations
+                    ],
+                    problems_group_name=problems_group.name,
+                    problems_group_description=problems_group.description,
+                    data_profile=data_profile,
+                    problems_figures=problems_figures,
+                )
+
+            # Create the file of the group of algorithms configurations
+            algos_configs_group_path = (
+                results_root
+                / f"{join_substrings(algorithms_configurations_group.name)}.rst"
             )
             self.__fill_template(
-                group_path,
-                FileName.GROUP.value,
-                name=problems_group.name,
-                description=problems_group.description,
-                problems_figures=problems_figures,
-                data_profile=group_profile,
+                algos_configs_group_path,
+                FileName.ALGORITHMS_CONFIGURATIONS_GROUP.value,
+                name=algorithms_configurations_group.name,
+                documents=results_paths,
+            )
+            algos_configs_groups_paths.append(
+                algos_configs_group_path.relative_to(self.__root_directory).as_posix()
             )
 
         # Create the file listing the problems groups
-        groups_list_path = self.__root_directory / FileName.GROUPS_LIST.value
         self.__fill_template(
-            groups_list_path, FileName.GROUPS_LIST.value, documents=groups_paths
+            self.__root_directory / FileName.RESULTS.value,
+            FileName.RESULTS.value,
+            documents=algos_configs_groups_paths,
         )
 
     def __create_index(self) -> None:
@@ -302,7 +334,7 @@ class Report:
         toctree_contents = [
             FileName.ALGORITHMS.value,
             FileName.PROBLEMS_LIST.value,
-            FileName.GROUPS_LIST.value,
+            FileName.RESULTS.value,
         ]
 
         # Create the file
@@ -353,7 +385,7 @@ class Report:
         finally:
             os.chdir(initial_dir)
 
-    def __compute_group_data_profile(
+    def __compute_data_profile(
         self,
         group: ProblemsGroup,
         algorithms_configurations: AlgorithmsConfigurations,

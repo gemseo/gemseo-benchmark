@@ -111,3 +111,28 @@ def test_discard(configuration_b, configuration_c, configuration_a):
         configuration_b,
         configuration_c,
     ]
+
+
+def test_name(configuration_b, configuration_c, configuration_a):
+    """Check the accessor to the name of a collection of algorithms configurations."""
+    name = "name of the collection"
+    algorithms_configurations = AlgorithmsConfigurations(
+        configuration_b,
+        configuration_c,
+        configuration_a,
+        name=name,
+    )
+    assert algorithms_configurations.name == name
+
+
+def test_unnamed_collection(configuration_b, configuration_c, configuration_a):
+    """Check the accessor to the name of an unnamed collection of configurations."""
+    algorithms_configurations = AlgorithmsConfigurations(
+        configuration_b,
+        configuration_c,
+        configuration_a,
+    )
+    with pytest.raises(
+        ValueError, match="The collection of algorithms configurations has no name."
+    ):
+        algorithms_configurations.name

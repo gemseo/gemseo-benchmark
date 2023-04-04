@@ -29,11 +29,14 @@ class Scenario:
     __RESULTS_FILENAME = "results.json"
 
     def __init__(
-        self, algorithms: AlgorithmsConfigurations, outputs_path: str | Path
+        self,
+        algorithms_configurations_groups: Iterable[AlgorithmsConfigurations],
+        outputs_path: str | Path,
     ) -> None:
         """# noqa: D205, D212, D415
         Args:
-            algorithms: The algorithms configurations to be benchmarked.
+            algorithms_configurations_groups: The groups of algorithms configurations
+                to be benchmarked.
             outputs_path: The path to the directory where to save the output files
                 (histories and report).
 
@@ -45,7 +48,7 @@ class Scenario:
                 f"The path to the outputs directory does not exist: {outputs_path}."
             )
 
-        self._algorithms = algorithms
+        self._algorithms_configurations_groups = algorithms_configurations_groups
         self._outputs_path = Path(outputs_path).resolve()
         self._histories_path = self._get_dir_path(self.__HISTORIES_DIRNAME)
         self._results_path = self._outputs_path / self.__RESULTS_FILENAME
@@ -113,8 +116,9 @@ class Scenario:
 
             save_pseven_logs = any(
                 [
-                    algorithm.algorithm_name in PSevenOpt().descriptions
-                    for algorithm in self._algorithms
+                    algorithm_configuration.algorithm_name in PSevenOpt().descriptions
+                    for algorithms_configurations in self._algorithms_configurations_groups
+                    for algorithm_configuration in algorithms_configurations
                 ]
             )
 
@@ -128,7 +132,13 @@ class Scenario:
         )
         benchmarker.execute(
             {problem for group in problems_groups for problem in group},
-            self._algorithms,
+            AlgorithmsConfigurations(
+                *[
+                    algo_config
+                    for algos_configs_group in self._algorithms_configurations_groups
+                    for algo_config in algos_configs_group
+                ]
+            ),
             overwrite_histories,
         )
 
@@ -166,7 +176,7 @@ class Scenario:
         """
         report = Report(
             self.__get_report_path(),
-            self._algorithms,
+            self._algorithms_configurations_groups,
             problems_groups,
             Results(self._results_path),
         )

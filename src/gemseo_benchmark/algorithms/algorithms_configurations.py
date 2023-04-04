@@ -30,13 +30,16 @@ from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfigu
 class AlgorithmsConfigurations(MutableSet[AlgorithmConfiguration]):
     """A collection of algorithms configurations."""
 
-    def __init__(self, *algorithms_configurations: AlgorithmConfiguration) -> None:
+    def __init__(
+        self, *algorithms_configurations: AlgorithmConfiguration, name: str = ""
+    ) -> None:
         """# noqa: D205, D212, D415
         Args:
             *algorithms_configurations: The algorithms configurations.
         """
         self.__algorithms = list()
         self.__configurations = list()
+        self.__name = name
         self.__names = list()
         for configuration in algorithms_configurations:
             self.add(configuration)
@@ -98,3 +101,15 @@ class AlgorithmsConfigurations(MutableSet[AlgorithmConfiguration]):
     def configurations(self) -> list[AlgorithmConfiguration]:
         """The algorithms configurations."""
         return list(self.__configurations)
+
+    @property
+    def name(self) -> str:
+        """The name of the collection of algorithms configurations.
+
+        Raises:
+            ValueError: If the collection of algorithms configurations has no name.
+        """
+        if not self.__name:
+            raise ValueError("The collection of algorithms configurations has no name.")
+
+        return self.__name
