@@ -18,7 +18,7 @@ def test_inexistent_outputs_path(algorithms_configurations):
         NotADirectoryError,
         match=f"The path to the outputs directory does not exist: {outputs_path}.",
     ):
-        Scenario(algorithms_configurations, outputs_path)
+        Scenario([algorithms_configurations], outputs_path)
 
 
 @pytest.mark.parametrize("save_databases", [False, True])
@@ -27,7 +27,7 @@ def test_execute(
     algorithms_configurations, tmp_path, rosenbrock, save_databases, save_pseven_logs
 ):
     """Check the execution of a benchmarking scenario."""
-    Scenario(algorithms_configurations, tmp_path).execute(
+    Scenario([algorithms_configurations], tmp_path).execute(
         [ProblemsGroup("Rosenbrock", [rosenbrock])],
         save_databases=save_databases,
         save_pseven_logs=save_pseven_logs,
@@ -48,7 +48,7 @@ def test_execute_pseven(
 ):
     """Check the execution of a benchmarking scenario including pSeven."""
     Scenario(
-        AlgorithmsConfigurations(AlgorithmConfiguration("PSEVEN")), tmp_path
+        [AlgorithmsConfigurations(AlgorithmConfiguration("PSEVEN"))], tmp_path
     ).execute(
         [ProblemsGroup("Rosenbrock", [rosenbrock])], save_pseven_logs=save_pseven_logs
     )
