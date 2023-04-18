@@ -26,17 +26,19 @@ from typing import Iterable
 
 from gemseo.algos.database import Database
 from gemseo.algos.opt.opt_factory import OptimizersFactory
-from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.api import configure_logger
-from gemseo.api import execute_algo
+from gemseo.core.parallel_execution.callable_parallel_execution import (
+    CallableParallelExecution,
+)
 from gemseo.utils.string_tools import pretty_str
-from gemseo.utils.timer import Timer
 
 from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
+from gemseo_benchmark.benchmarker.worker import Worker
+from gemseo_benchmark.benchmarker.worker import WorkerOutputs
 from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 from gemseo_benchmark.results.results import Results
@@ -56,7 +58,7 @@ class Benchmarker:
         databases_path: Path = None,
         pseven_logs_path: Path = None,
     ) -> None:
-        """# noqa: D205, D212, D415
+        """
         Args:
             histories_path: The path to the directory where to save the performance
                 histories.
@@ -68,10 +70,11 @@ class Benchmarker:
             pseven_logs_path: The path to the destination directory for the pSeven
                 log files.
                 If ``None``, the pSeven log files will not be saved.
-        """
+        """  # noqa: D205, D212, D415
         self._databases_path = databases_path
         self.__histories_path = histories_path
-        self.__is_algorithm_available = OptimizersFactory().is_available
+        self.__optimizers_factory = OptimizersFactory()
+        self.__is_algorithm_available = self.__optimizers_factory.is_available
         self.__pseven_logs_path = pseven_logs_path
         self.__results_path = results_path
         if results_path is not None and results_path.is_file():
@@ -84,6 +87,8 @@ class Benchmarker:
         problems: Iterable[Problem],
         algorithms: AlgorithmsConfigurations,
         overwrite_histories: bool = False,
+        number_of_processes: int = 1,
+        use_threading: bool = False,
     ) -> Results:
         """Run optimization algorithms on reference problems.
 
@@ -92,6 +97,10 @@ class Benchmarker:
             algorithms: The algorithms configurations.
             overwrite_histories: Whether to overwrite the existing performance
                 histories.
+            number_of_processes: The maximum simultaneous number of threads or
+                processes used to parallelize the execution.
+            use_threading: Whether to use threads instead of processes
+                to parallelize the execution.
 
         Returns:
             The results of the optimization.
@@ -99,22 +108,51 @@ class Benchmarker:
         Raises:
             ValueError: If the algorithm is not available.
         """
+        # Prepare the inputs of the benchmarking workers
+        inputs = list()
         for algorithm_configuration in algorithms:
 
             algorithm_name = algorithm_configuration.algorithm_name
             if not self.__is_algorithm_available(algorithm_name):
                 raise ValueError(f"The algorithm is not available: {algorithm_name}.")
 
-            # Run the algorithm
             algorithm_configuration = self.__disable_stopping_criteria(
                 algorithm_configuration
             )
-            for problem in problems:
-                self._solve_problem(
-                    problem,
-                    algorithm_configuration,
-                    overwrite_histories=overwrite_histories,
-                )
+            inputs.extend(
+                [
+                    (
+                        (
+                            self.__set_pseven_log_file(
+                                algorithm_configuration, problem, problem_instance_index
+                            ),
+                            problem,
+                            problem_instance,
+                            problem_instance_index,
+                        )
+                    )
+                    for problem in problems
+                    for problem_instance_index, problem_instance in enumerate(problem)
+                    if not self.__skip_instance(
+                        algorithm_configuration,
+                        problem,
+                        problem_instance_index,
+                        overwrite_histories,
+                    )
+                ]
+            )
+
+        if inputs:
+            worker = Worker(self.__optimizers_factory, self._HISTORY_CLASS)
+            if number_of_processes == 1:
+                for worker_inputs in inputs:
+                    self.__worker_callback(0, worker(worker_inputs))
+            else:
+                CallableParallelExecution(
+                    [worker],
+                    number_of_processes,
+                    use_threading,
+                ).execute(inputs, self.__worker_callback)
 
         return self._results
 
@@ -143,53 +181,6 @@ class Benchmarker:
             algorithm_configuration.name,
             **options,
         )
-
-    def _solve_problem(
-        self,
-        problem: Problem,
-        algorithm_configuration: AlgorithmConfiguration,
-        overwrite_histories: bool,
-    ) -> None:
-        """Solve a benchmarking problem for all its starting points.
-
-        Args:
-            problem: The benchmarking problem.
-            algorithm_configuration: The algorithm configuration.
-            overwrite_histories: Whether to overwrite existing performance histories.
-        """
-        # Run an optimization from each starting point
-        for problem_instance_index, problem_instance in enumerate(problem):
-
-            if self.__skip_instance(
-                algorithm_configuration,
-                problem,
-                problem_instance_index,
-                overwrite_histories,
-            ):
-                continue
-
-            algorithm_configuration_copy = self.__set_pseven_log_file(
-                algorithm_configuration, problem, problem_instance_index
-            )
-            database, history = self._run_algorithm(
-                problem_instance,
-                algorithm_configuration_copy,
-                problem.name,
-                problem_instance_index,
-            )
-
-            self._save_history(history, problem_instance_index)
-
-            if self._databases_path is not None:
-                self.__save_database(
-                    database,
-                    algorithm_configuration,
-                    problem.name,
-                    problem_instance_index,
-                )
-
-            if self.__results_path:
-                self._results.to_file(self.__results_path, indent=4)
 
     def __skip_instance(
         self,
@@ -266,42 +257,25 @@ class Benchmarker:
             ),
         )
 
-    def _run_algorithm(
-        self,
-        problem: OptimizationProblem,
-        algorithm_configuration: AlgorithmConfiguration,
-        problem_name: str,
-        index: int,
-    ) -> tuple[Database, PerformanceHistory]:
-        """Run an algorithm on a benchmarking problem for a particular starting point.
+    def __worker_callback(self, _: int, outputs: WorkerOutputs) -> None:
+        """Save the history and database of a benchmarking worker.
 
         Args:
-            problem: The instance of the benchmarking problem.
-            algorithm_configuration: The algorithm configuration.
-            problem_name: The name of the benchmarking problem.
-            index: The index of the problem instance.
-
-        Returns:
-            The runtime of the solver.
+            _: The index of the worker.
+            outputs: The outputs of the worker.
         """
-        algo_name = algorithm_configuration.algorithm_name
-        algo_options = algorithm_configuration.algorithm_options
+        problem, problem_instance_index, database, history = outputs
+        self._save_history(history, problem_instance_index)
+        if self._databases_path is not None:
+            self.__save_database(
+                database,
+                history.algorithm_configuration,
+                problem.name,
+                problem_instance_index,
+            )
 
-        with Timer() as timer:
-            execute_algo(problem, algo_name, **algo_options)
-
-        history = self._HISTORY_CLASS.from_problem(problem, problem_name)
-        history.algorithm_configuration = algorithm_configuration
-
-        history.doe_size = 1
-        if self.__is_algorithm_available("PSEVEN"):
-            from gemseo.algos.opt.lib_pseven import PSevenOpt
-
-            if algo_name in PSevenOpt().descriptions:
-                history.doe_size = len(algo_options.get("sample_x", [None]))
-
-        history.total_time = timer.elapsed_time
-        return problem.database, history
+        if self.__results_path:
+            self._results.to_file(self.__results_path, indent=4)
 
     def _save_history(self, history: PerformanceHistory, index: int) -> None:
         """Save a performance history into a history file.

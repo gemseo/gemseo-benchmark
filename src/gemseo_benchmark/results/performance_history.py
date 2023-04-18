@@ -84,7 +84,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
         total_time: float = None,
         algorithm_configuration: AlgorithmConfiguration = None,
     ) -> None:
-        """# noqa: D205, D212, D415
+        """
         Args:
             objective_values: The history of the quantity to be minimized.
                 If ``None``, will be considered empty.
@@ -123,7 +123,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
         Raises:
             ValueError: If the lengths of the histories do not match.
-        """
+        """  # noqa: D205, D212, D415
         if constraints_names is None:
             self._constraints_names = []
         else:

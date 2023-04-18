@@ -27,7 +27,7 @@ from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfigu
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
-from gemseo_benchmark.benchmarker import Benchmarker
+from gemseo_benchmark.benchmarker.benchmarker import Benchmarker
 from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.results.results import Results
 from numpy import array
@@ -128,3 +128,23 @@ def test___set_pseven_log_file(tmp_path, rosenbrock):
     algo_pb_dir = tmp_path / algo_config.name / rosenbrock.name
     assert (algo_pb_dir / f"{algo_config.name}.1.txt").is_file()
     assert (algo_pb_dir / f"{algo_config.name}.2.txt").is_file()
+
+
+@pytest.mark.parametrize(
+    ["number_of_processes", "use_threading"], [(1, False), (2, False), (2, True)]
+)
+def test_execution(results_root, rosenbrock, number_of_processes, use_threading):
+    """Check the execution of the benchmarker."""
+    results = Benchmarker(results_root).execute(
+        [rosenbrock],
+        AlgorithmsConfigurations(lbfgsb_configuration),
+        number_of_processes=number_of_processes,
+        use_threading=use_threading,
+    )
+    algo_pb_dir = results_root / lbfgsb_configuration.name / rosenbrock.name
+    path = algo_pb_dir / f"{lbfgsb_configuration.name}.1.json"
+    assert path.is_file()
+    assert results.contains(lbfgsb_configuration.algorithm_name, rosenbrock.name, path)
+    path = algo_pb_dir / f"{lbfgsb_configuration.name}.1.json"
+    assert path.is_file()
+    assert results.contains(lbfgsb_configuration.algorithm_name, rosenbrock.name, path)

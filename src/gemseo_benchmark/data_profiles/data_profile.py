@@ -67,10 +67,10 @@ class DataProfile:
     """
 
     def __init__(self, target_values: Mapping[str, TargetValues]) -> None:
-        """# noqa: D205, D212, D415
+        """
         Args:
             target_values: The target values of each of the reference problems.
-        """
+        """  # noqa: D205, D212, D415
         self.__targets_number = 0
         self.target_values = target_values
         self.__values_histories = dict()

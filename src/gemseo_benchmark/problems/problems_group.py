@@ -52,12 +52,12 @@ class ProblemsGroup:
         problems: Iterable[Problem],
         description: str = "",
     ) -> None:
-        """# noqa: D205, D212, D415
+        """
         Args:
             name: The name of the group of problems.
             problems: The benchmarking problems of the group.
             description: The description of the group of problems.
-        """
+        """  # noqa: D205, D212, D415
         self.name = name
         self.__problems = problems
         self.description = description

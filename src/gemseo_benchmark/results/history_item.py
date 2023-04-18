@@ -30,7 +30,7 @@ class HistoryItem:
         infeasibility_measure: float,
         n_unsatisfied_constraints: int = None,
     ) -> None:
-        """# noqa: D205, D212, D415
+        """
         Args:
             objective_value: The objective function value of the item.
             infeasibility_measure: The infeasibility measure of the item.
@@ -38,7 +38,7 @@ class HistoryItem:
                 item.
                 If ``None``, it will be set to 0 if the infeasibility measure is zero,
                 and if the infeasibility measure is positive it will be set to None.
-        """
+        """  # noqa: D205, D212, D415
         self.__objective_value = objective_value
         (
             self.__infeas_measure,

@@ -97,7 +97,7 @@ class Problem:
         target_values_number: int = None,
         optimum: float = None,
     ) -> None:
-        """# noqa: D205, D212, D415
+        """
         Args:
             name: The name of the benchmarking problem.
             optimization_problem_creator: A callable object that returns an instance
@@ -135,7 +135,7 @@ class Problem:
                 or if a starting point is not of type ndarray.
             ValueError: If neither starting points nor DOE configurations are passed,
                or if a starting point is of inappropriate shape.
-        """
+        """  # noqa: D205, D212, D415
         self.name = name
         self.__description = description
         self.creator = optimization_problem_creator
