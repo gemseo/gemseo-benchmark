@@ -28,11 +28,11 @@ class Results:
     """A collection of paths to performance histories."""
 
     def __init__(self, path: str | Path = None) -> None:
-        """# noqa: D205, D212, D415
+        """
         Args:
             path: The path to the JSON file from which to load the paths.
                 If ``None``, the collection is initially empty.
-        """
+        """  # noqa: D205, D212, D415
         self.__dict = dict()
         if path is not None:
             self.from_file(path)

@@ -11,7 +11,7 @@ from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
-from gemseo_benchmark.benchmarker import Benchmarker
+from gemseo_benchmark.benchmarker.benchmarker import Benchmarker
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.report.report import Report
 from gemseo_benchmark.results.results import Results
@@ -33,7 +33,7 @@ class Scenario:
         algorithms_configurations_groups: Iterable[AlgorithmsConfigurations],
         outputs_path: str | Path,
     ) -> None:
-        """# noqa: D205, D212, D415
+        """
         Args:
             algorithms_configurations_groups: The groups of algorithms configurations
                 to be benchmarked.
@@ -42,7 +42,7 @@ class Scenario:
 
         Raises:
             ValueError: If the path to outputs directory does not exist.
-        """
+        """  # noqa: D205, D212, D415
         if not Path(outputs_path).is_dir():
             raise NotADirectoryError(
                 f"The path to the outputs directory does not exist: {outputs_path}."

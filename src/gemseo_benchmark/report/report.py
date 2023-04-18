@@ -82,7 +82,7 @@ class Report:
         custom_algos_descriptions: Mapping[str, str] = None,
         max_eval_number_per_group: dict[str, int] = None,
     ) -> None:
-        """# noqa: D205, D212, D415
+        """
         Args:
             root_directory_path: The path to the root directory of the report.
             algos_configurations_groups: The groups of algorithms configurations.
@@ -100,7 +100,7 @@ class Report:
 
         Raises:
             ValueError: If an algorithm has no associated histories.
-        """
+        """  # noqa: D205, D212, D415
         self.__root_directory = Path(root_directory_path)
         self.__algorithms_configurations_groups = algos_configurations_groups
         self.__problems_groups = problems_groups

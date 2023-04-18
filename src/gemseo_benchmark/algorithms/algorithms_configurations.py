@@ -33,10 +33,10 @@ class AlgorithmsConfigurations(MutableSet[AlgorithmConfiguration]):
     def __init__(
         self, *algorithms_configurations: AlgorithmConfiguration, name: str = ""
     ) -> None:
-        """# noqa: D205, D212, D415
+        """
         Args:
             *algorithms_configurations: The algorithms configurations.
-        """
+        """  # noqa: D205, D212, D415
         self.__algorithms = list()
         self.__configurations = list()
         self.__name = name

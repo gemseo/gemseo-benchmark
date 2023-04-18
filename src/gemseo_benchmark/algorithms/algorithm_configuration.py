@@ -42,7 +42,7 @@ class AlgorithmConfiguration:
         configuration_name: str = None,
         **algorithm_options: Any,
     ) -> None:
-        """# noqa: D205, D212, D415
+        """
         Args:
             algorithm_name: The name of the algorithm.
             configuration_name: The name of the configuration of the algorithm.
@@ -50,7 +50,7 @@ class AlgorithmConfiguration:
                 its options, based on the pattern
                 ``"algorithm_name[option_name=option_value, ...]"``.
             **algorithm_options: The options of the algorithm.
-        """
+        """  # noqa: D205, D212, D415
         self.__algorithm_name = algorithm_name
         self.__algorithm_options = algorithm_options
         self.__configuration_name = configuration_name or self.__get_configuration_name(
