@@ -471,7 +471,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
         infeas_measures = list()
         feas_statuses = list()
         n_unsatisfied_constraints = list()
-        functions_names = set([obj_name] + problem.get_constraints_names())
+        functions_names = set([obj_name] + problem.get_constraint_names())
         for design_values, output_values in problem.database.items():
             # Only consider points with all functions values
             if not functions_names <= set(output_values.keys()):
@@ -494,7 +494,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
             n_unsatisfied_constraints,
             problem_name,
             problem.objective.name,
-            problem.get_scalar_constraints_names(),
+            problem.get_scalar_constraint_names(),
         )
 
     def get_plot_data(

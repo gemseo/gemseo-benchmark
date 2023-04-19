@@ -3,10 +3,10 @@ from __future__ import annotations
 
 from typing import Tuple
 
+from gemseo import execute_algo
 from gemseo.algos.database import Database
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
-from gemseo.api import execute_algo
 from gemseo.utils.timer import Timer
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration

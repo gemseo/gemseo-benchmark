@@ -24,9 +24,9 @@ import sys
 from pathlib import Path
 from typing import Iterable
 
+from gemseo import configure_logger
 from gemseo.algos.database import Database
 from gemseo.algos.opt.opt_factory import OptimizersFactory
-from gemseo.api import configure_logger
 from gemseo.core.parallel_execution.callable_parallel_execution import (
     CallableParallelExecution,
 )
@@ -401,7 +401,7 @@ class Benchmarker:
             problem_name: The name of the problem.
             index: The index of the problem instance.
         """
-        database.export_hdf(
+        database.to_hdf(
             self._get_path(
                 self._databases_path,
                 algorithm_configuration,

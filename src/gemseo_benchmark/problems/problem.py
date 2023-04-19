@@ -34,11 +34,11 @@ from typing import Sequence
 from typing import Union
 
 import numpy
-from gemseo import api
+from gemseo import compute_doe
+from gemseo import execute_algo
 from gemseo.algos.doe.doe_library import DOELibraryOptionType
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
-from gemseo.api import compute_doe
 from gemseo.utils.matplotlib_figure import save_show_figure
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
@@ -333,7 +333,7 @@ class Problem:
     @property
     def constraints_names(self) -> list[str]:
         """The names of the scalar constraints."""
-        return self._problem.get_scalar_constraints_names()
+        return self._problem.get_scalar_constraint_names()
 
     def is_algorithm_suited(self, name: str) -> bool:
         """Check whether an algorithm is suited to the problem.
@@ -388,7 +388,7 @@ class Problem:
                 options["ftol_abs"] = 0.0
 
             for instance in self:
-                api.execute_algo(instance, configuration.algorithm_name, **options)
+                execute_algo(instance, configuration.algorithm_name, **options)
                 history = PerformanceHistory.from_problem(instance)
                 self.__targets_generator.add_history(history=history)
 
