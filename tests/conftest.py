@@ -40,8 +40,8 @@ def design_space() -> mock.Mock:
     """A design space."""
     design_space = mock.Mock()
     design_space.dimension = 2
-    design_space.variables_names = ["x"]
-    design_space.variables_sizes = {"x": 2}
+    design_space.variable_names = ["x"]
+    design_space.variable_sizes = {"x": 2}
     design_space.get_current_value = mock.Mock(return_value=design_variables)
     design_space.set_current_value = mock.Mock()
     design_space.unnormalize_vect = lambda _: _
@@ -122,9 +122,10 @@ def problem(
     problem.objective = objective
     problem.nonproc_objective = None
     problem.constraints = [inequality_constraint, equality_constraint]
-    problem.get_constraints_names = mock.Mock(
+    problem.get_constraint_names = mock.Mock(
         return_value=[inequality_constraint.name, equality_constraint.name]
     )
+    problem.get_scalar_constraint_names = problem.get_constraint_names
     problem.evaluate_functions = mock.Mock(return_value=(functions_values, None))
     problem.get_violation_criteria = mock.Mock(return_value=(False, 1.0))
     problem.get_number_of_unsatisfied_constraints = mock.Mock(return_value=1)

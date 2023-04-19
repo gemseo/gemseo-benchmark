@@ -375,7 +375,7 @@ def test_start_points_wrong_dimension(benchmarking_problem):
 
 
 def test_get_start_points(creator):
-    """Check the computation of th starting points."""
+    """Check the computation of the starting points."""
     bench_problem = Problem("Problem", creator, doe_algo_name="DiagonalDOE")
     assert len(bench_problem.start_points) == 2
 
@@ -420,7 +420,7 @@ def test_constraints_names(benchmarking_problem, creator):
     """Check the accessor to the constraints names."""
     assert (
         benchmarking_problem.constraints_names
-        == creator().get_scalar_constraints_names()
+        == creator().get_scalar_constraint_names()
     )
 
 
