@@ -64,7 +64,7 @@ class Scenario:
         infeasibility_tolerance: float = 0.0,
         save_databases: bool = False,
         save_pseven_logs: bool = False,
-    ) -> None:
+    ) -> Results:
         """Execute the benchmarking scenario.
 
         Args:
@@ -77,6 +77,9 @@ class Scenario:
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             save_databases: Whether to save the databases of the optimizations.
             save_pseven_logs: Whether to save the logs of pSeven.
+
+        Returns:
+            The performance histories.
         """
         if not skip_solvers:
             LOGGER.info("Run the solvers on the benchmarking problems")
@@ -92,6 +95,8 @@ class Scenario:
                 generate_pdf_report,
                 infeasibility_tolerance,
             )
+
+        return Results(self._results_path)
 
     def _run_solvers(
         self,

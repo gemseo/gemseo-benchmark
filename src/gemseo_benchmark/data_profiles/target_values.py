@@ -24,7 +24,7 @@ or a root-finding problem. Targets are values, i.e. values of the objective func
 values of the residual norm, ranging from a first acceptable value to the best known
 value for the problem. Targets are used to estimate the efficiency (relative to the
 number of problem functions evaluations) of an algorithm to solve a problem (or several)
-and computes its data profile (see :mod:`data_profile`).
+and computes its data profile (see :mod:`.data_profiles.data_profile`).
 """
 from __future__ import annotations
 

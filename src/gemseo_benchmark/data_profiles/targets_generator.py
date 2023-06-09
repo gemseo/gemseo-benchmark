@@ -32,6 +32,7 @@ from typing import Sequence
 import matplotlib.pyplot as plt
 from gemseo.utils.matplotlib_figure import save_show_figure
 from matplotlib.figure import Figure
+from matplotlib.ticker import MaxNLocator
 from numpy import linspace
 from numpy import ndarray
 
@@ -325,8 +326,6 @@ class TargetsGenerator:
             )
 
         plt.xlim(left=minimum_budget - 1, right=maximum_budget + 1)
-        plt.xticks(linspace(minimum_budget, maximum_budget, dtype=int))
-
+        axes.xaxis.set_major_locator(MaxNLocator(integer=True))
         save_show_figure(figure, show, file_path)
-
         return figure

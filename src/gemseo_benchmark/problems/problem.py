@@ -22,7 +22,8 @@
 A benchmarking problem is a problem class to be solved by iterative algorithms for
 comparison purposes. A benchmarking problem is characterized by its functions (e.g.
 objective and constraints for an optimization problem), its starting points (each
-defining an instance of the problem) and its targets (refer to :mod:`target_values`).
+defining an instance of the problem) and its targets (refer to
+:mod:`.data_profiles.target_values`).
 """
 from __future__ import annotations
 
@@ -103,7 +104,11 @@ class Problem:
             optimization_problem_creator: A callable object that returns an instance
                 of the problem.
             start_points: The starting points of the benchmarking problem.
-                If ``None``, the start points will generated as a DOE.
+                If ``None``:
+                if ``doe_algo_name``, ``doe_size``, and ``doe_options`` are not ``None``
+                then the starting points will be generated as a DOE;
+                otherwise the current value of the optimization problem
+                will set as the single starting point.
             target_values: The target values of the benchmarking problem.
                 If ``None``, the target values will have to be generated later with the
                 `generate_targets` method.
@@ -131,7 +136,7 @@ class Problem:
 
         Raises:
             TypeError: If the return type of the creator is not
-                :class:`.OptimizationProblem`,
+                :class:`gemseo.algos.opt_problem.OptimizationProblem`,
                 or if a starting point is not of type ndarray.
             ValueError: If neither starting points nor DOE configurations are passed,
                or if a starting point is of inappropriate shape.
@@ -557,7 +562,7 @@ class Problem:
         file_path: Path = None,
         plot_all_histories: bool = False,
         alpha: float = 0.3,
-        markevery: MarkeveryType = 0.1,
+        markevery: MarkeveryType = None,
         infeasibility_tolerance: float = 0.0,
         max_eval_number: int = None,
     ) -> None:
