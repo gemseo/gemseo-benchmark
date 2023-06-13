@@ -64,6 +64,8 @@ class Scenario:
         infeasibility_tolerance: float = 0.0,
         save_databases: bool = False,
         save_pseven_logs: bool = False,
+        number_of_processes: int = 1,
+        use_threading: bool = False,
     ) -> Results:
         """Execute the benchmarking scenario.
 
@@ -77,6 +79,10 @@ class Scenario:
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             save_databases: Whether to save the databases of the optimizations.
             save_pseven_logs: Whether to save the logs of pSeven.
+            number_of_processes: The maximum number of simultaneous threads or
+                processes used to parallelize the execution.
+            use_threading: Whether to use threads instead of processes
+                to parallelize the execution.
 
         Returns:
             The performance histories.
@@ -84,7 +90,12 @@ class Scenario:
         if not skip_solvers:
             LOGGER.info("Run the solvers on the benchmarking problems")
             self._run_solvers(
-                problems_groups, overwrite_histories, save_databases, save_pseven_logs
+                problems_groups,
+                overwrite_histories,
+                save_databases,
+                save_pseven_logs,
+                number_of_processes,
+                use_threading,
             )
 
         if not skip_report:
@@ -104,6 +115,8 @@ class Scenario:
         overwrite_histories: bool,
         save_databases: bool,
         save_pseven_logs: bool,
+        number_of_processes: int,
+        use_threading: bool,
     ) -> None:
         """Run the solvers on the benchmarking problems.
 
@@ -112,6 +125,10 @@ class Scenario:
             overwrite_histories: Whether to overwrite the performance histories.
             save_databases: Whether to save the databases of the optimizations.
             save_pseven_logs: Whether to save the logs of pSeven.
+            number_of_processes: The maximum number of simultaneous threads or
+                processes used to parallelize the execution.
+            use_threading: Whether to use threads instead of processes
+                to parallelize the execution.
         """
         # Avoid creating a useless directory for the pSeven logs
         if not save_pseven_logs or not OptimizersFactory().is_available("PSEVEN"):
@@ -145,6 +162,8 @@ class Scenario:
                 ]
             ),
             overwrite_histories,
+            number_of_processes,
+            use_threading,
         )
 
     def _get_dir_path(self, name: str, overwrite: bool = False) -> Path:
