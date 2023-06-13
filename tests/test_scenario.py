@@ -21,16 +21,26 @@ def test_inexistent_outputs_path(algorithms_configurations):
         Scenario([algorithms_configurations], outputs_path)
 
 
+@pytest.mark.parametrize("number_of_processes", [1, 2])
+@pytest.mark.parametrize("use_threading", [False, True])
 @pytest.mark.parametrize("save_databases", [False, True])
 @pytest.mark.parametrize("save_pseven_logs", [False, True])
 def test_execute(
-    algorithms_configurations, tmp_path, rosenbrock, save_databases, save_pseven_logs
+    algorithms_configurations,
+    tmp_path,
+    rosenbrock,
+    save_databases,
+    save_pseven_logs,
+    number_of_processes,
+    use_threading,
 ):
     """Check the execution of a benchmarking scenario."""
     Scenario([algorithms_configurations], tmp_path).execute(
         [ProblemsGroup("Rosenbrock", [rosenbrock])],
         save_databases=save_databases,
         save_pseven_logs=save_pseven_logs,
+        number_of_processes=number_of_processes,
+        use_threading=use_threading,
     )
     assert (tmp_path / "histories").is_dir()
     assert (tmp_path / "results.json").is_file()
