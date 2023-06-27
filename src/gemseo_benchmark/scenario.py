@@ -1,0 +1,225 @@
+# Copyright 2021 IRT Saint Exupéry, https://www.irt-saintexupery.com
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License version 3 as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+"""A class to implement a benchmarking scenario (solving and reporting)."""
+from __future__ import annotations
+
+import logging
+import shutil
+from pathlib import Path
+from typing import Iterable
+
+from gemseo.algos.opt.opt_factory import OptimizersFactory
+
+from gemseo_benchmark.algorithms.algorithms_configurations import (
+    AlgorithmsConfigurations,
+)
+from gemseo_benchmark.benchmarker.benchmarker import Benchmarker
+from gemseo_benchmark.problems.problems_group import ProblemsGroup
+from gemseo_benchmark.report.report import Report
+from gemseo_benchmark.results.results import Results
+
+LOGGER = logging.getLogger(__name__)
+
+
+class Scenario:
+    """A benchmarking scenario, including running of solvers and reporting."""
+
+    __DATABASES_DIRNAME = "databases"
+    __HISTORIES_DIRNAME = "histories"
+    __PSEVEN_LOGS_DIRNAME = "pseven_logs"
+    __REPORT_DIRNAME = "report"
+    __RESULTS_FILENAME = "results.json"
+
+    def __init__(
+        self,
+        algorithms_configurations_groups: Iterable[AlgorithmsConfigurations],
+        outputs_path: str | Path,
+    ) -> None:
+        """
+        Args:
+            algorithms_configurations_groups: The groups of algorithms configurations
+                to be benchmarked.
+            outputs_path: The path to the directory where to save the output files
+                (histories and report).
+
+        Raises:
+            ValueError: If the path to outputs directory does not exist.
+        """  # noqa: D205, D212, D415
+        if not Path(outputs_path).is_dir():
+            raise NotADirectoryError(
+                f"The path to the outputs directory does not exist: {outputs_path}."
+            )
+
+        self._algorithms_configurations_groups = algorithms_configurations_groups
+        self._outputs_path = Path(outputs_path).resolve()
+        self._histories_path = self._get_dir_path(self.__HISTORIES_DIRNAME)
+        self._results_path = self._outputs_path / self.__RESULTS_FILENAME
+
+    def execute(
+        self,
+        problems_groups: Iterable[ProblemsGroup],
+        overwrite_histories: bool = False,
+        skip_solvers: bool = False,
+        skip_report: bool = False,
+        generate_html_report: bool = True,
+        generate_pdf_report: bool = False,
+        infeasibility_tolerance: float = 0.0,
+        save_databases: bool = False,
+        save_pseven_logs: bool = False,
+        number_of_processes: int = 1,
+        use_threading: bool = False,
+    ) -> Results:
+        """Execute the benchmarking scenario.
+
+        Args:
+            problems_groups: The groups of benchmarking problems.
+            overwrite_histories: Whether to overwrite the performance histories.
+            skip_solvers: Whether to skip the running of solvers.
+            skip_report: Whether to skip the generation of the report.
+            generate_html_report: Whether to generate the report in HTML format.
+            generate_pdf_report: Whether to generate the report in PDF format.
+            infeasibility_tolerance: The tolerance on the infeasibility measure.
+            save_databases: Whether to save the databases of the optimizations.
+            save_pseven_logs: Whether to save the logs of pSeven.
+            number_of_processes: The maximum number of simultaneous threads or
+                processes used to parallelize the execution.
+            use_threading: Whether to use threads instead of processes
+                to parallelize the execution.
+
+        Returns:
+            The performance histories.
+        """
+        if not skip_solvers:
+            LOGGER.info("Run the solvers on the benchmarking problems")
+            self._run_solvers(
+                problems_groups,
+                overwrite_histories,
+                save_databases,
+                save_pseven_logs,
+                number_of_processes,
+                use_threading,
+            )
+
+        if not skip_report:
+            LOGGER.info("Generate the benchmarking report")
+            self.__generate_report(
+                problems_groups,
+                generate_html_report,
+                generate_pdf_report,
+                infeasibility_tolerance,
+            )
+
+        return Results(self._results_path)
+
+    def _run_solvers(
+        self,
+        problems_groups: Iterable[ProblemsGroup],
+        overwrite_histories: bool,
+        save_databases: bool,
+        save_pseven_logs: bool,
+        number_of_processes: int,
+        use_threading: bool,
+    ) -> None:
+        """Run the solvers on the benchmarking problems.
+
+        Args:
+            problems_groups: The groups of benchmarking problems.
+            overwrite_histories: Whether to overwrite the performance histories.
+            save_databases: Whether to save the databases of the optimizations.
+            save_pseven_logs: Whether to save the logs of pSeven.
+            number_of_processes: The maximum number of simultaneous threads or
+                processes used to parallelize the execution.
+            use_threading: Whether to use threads instead of processes
+                to parallelize the execution.
+        """
+        # Avoid creating a useless directory for the pSeven logs
+        if not save_pseven_logs or not OptimizersFactory().is_available("PSEVEN"):
+            save_pseven_logs = False
+        else:
+            from gemseo.algos.opt.lib_pseven import PSevenOpt
+
+            save_pseven_logs = any(
+                [
+                    algorithm_configuration.algorithm_name in PSevenOpt().descriptions
+                    for algorithms_configurations in self._algorithms_configurations_groups
+                    for algorithm_configuration in algorithms_configurations
+                ]
+            )
+
+        benchmarker = Benchmarker(
+            self._histories_path,
+            self._results_path,
+            self._get_dir_path(self.__DATABASES_DIRNAME) if save_databases else None,
+            self._get_dir_path(self.__PSEVEN_LOGS_DIRNAME)
+            if save_pseven_logs
+            else None,
+        )
+        benchmarker.execute(
+            {problem for group in problems_groups for problem in group},
+            AlgorithmsConfigurations(
+                *[
+                    algo_config
+                    for algos_configs_group in self._algorithms_configurations_groups
+                    for algo_config in algos_configs_group
+                ]
+            ),
+            overwrite_histories,
+            number_of_processes,
+            use_threading,
+        )
+
+    def _get_dir_path(self, name: str, overwrite: bool = False) -> Path:
+        """Return the path to a directory.
+
+        Args:
+            name: The name of the directory.
+            overwrite: Whether to remove and remake the directory if it already exists.
+
+        Returns:
+            The path to the directory.
+        """
+        path = self._outputs_path / name
+        if path.is_dir() and overwrite:
+            shutil.rmtree(path)
+
+        path.mkdir(exist_ok=not overwrite)
+        return path
+
+    def __generate_report(
+        self,
+        problems_groups: Iterable[ProblemsGroup],
+        generate_to_html: bool,
+        generate_to_pdf: bool,
+        infeasibility_tolerance: float,
+    ) -> None:
+        """Generate the benchmarking report.
+
+        Args:
+            problems_groups: The groups of benchmarking problems.
+            generate_to_html: Whether to generate the report in HTML format.
+            generate_to_pdf: Whether to generate the report in PDF format.
+            infeasibility_tolerance: The tolerance on the infeasibility measure.
+        """
+        report = Report(
+            self.__get_report_path(),
+            self._algorithms_configurations_groups,
+            problems_groups,
+            Results(self._results_path),
+        )
+        report.generate(generate_to_html, generate_to_pdf, infeasibility_tolerance)
+
+    def __get_report_path(self) -> Path:
+        """Return the path to the report root directory."""
+        return self._get_dir_path(self.__REPORT_DIRNAME, overwrite=True)

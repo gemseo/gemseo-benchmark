@@ -1,0 +1,12 @@
+[
+        {
+            "performance": -2.0,
+            "infeasibility": 1.0,
+            "n_unsatisfied_constraints": 1
+        },
+        {
+            "performance": -3.0,
+            "infeasibility": 0.0,
+            "n_unsatisfied_constraints": 0
+        }
+    ]

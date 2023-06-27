@@ -1,0 +1,26 @@
+[
+    {
+        "performance": 1.0,
+        "infeasibility": 1.0
+    },
+    {
+        "performance": 0.5,
+        "infeasibility": 1.0
+    },
+    {
+        "performance": 2.0,
+        "infeasibility": 0.0
+    },
+    {
+        "performance": 1.0,
+        "infeasibility": 0.0
+    },
+    {
+        "performance": 0.3,
+        "infeasibility": 0.0
+    },
+    {
+        "performance": 0.0,
+        "infeasibility": 0.0
+    }
+]
