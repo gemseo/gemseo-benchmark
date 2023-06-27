@@ -1,4 +1,4 @@
-# Copyright 2022 IRT Saint Exupéry, https://www.irt-saintexupery.com
+# Copyright 2021 IRT Saint Exupéry, https://www.irt-saintexupery.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -19,8 +19,8 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Configuration of an algorithm defined by the values of its options.
 
-An algorithm depends on the values of its options. A value set defines a configuration of
-the algorithm.
+An algorithm depends on the values of its options. A value set defines a configuration
+of the algorithm.
 """
 from __future__ import annotations
 

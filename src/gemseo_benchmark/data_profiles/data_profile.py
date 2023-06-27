@@ -1,4 +1,4 @@
-# Copyright 2022 IRT Saint Exupéry, https://www.irt-saintexupery.com
+# Copyright 2021 IRT Saint Exupéry, https://www.irt-saintexupery.com
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -19,17 +19,16 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Class to compute data profiles for algorithms comparison.
 
-A data profile is a graphical tool to compare iterative algorithms,
-e.g. optimization algorithms or root-finding algorithms,
-on reference problems.
+A data profile is a graphical tool to compare iterative algorithms, e.g. optimization
+algorithms or root-finding algorithms, on reference problems.
 
-Each of the reference problems must be assigned targets,
-i.e. values of the objective function or values of the residual norm,
-ranging from a first acceptable value to the best known value for the problem.
+Each of the reference problems must be assigned targets, i.e. values of the objective
+function or values of the residual norm, ranging from a first acceptable value to the
+best known value for the problem.
 
-The algorithms will be compared based on the number of targets they reach,
-cumulated over all the reference problems,
-relative to the number of problems functions evaluations they make.
+The algorithms will be compared based on the number of targets they reach, cumulated
+over all the reference problems, relative to the number of problems functions
+evaluations they make.
 
 The data profile is the empirical cumulated distribution function of the number of
 functions evaluations made by an algorithm to reach a problem target.

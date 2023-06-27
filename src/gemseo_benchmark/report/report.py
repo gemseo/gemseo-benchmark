@@ -1,17 +1,17 @@
-# Copyright 2022 IRT Saint Exupéry, https://www.irt-saintexupery.com
+# Copyright 2021 IRT Saint Exupéry, https://www.irt-saintexupery.com
 #
-# This work is licensed under a BSD 0-Clause License.
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License version 3 as published by the Free Software Foundation.
 #
-# Permission to use, copy, modify, and/or distribute this software
-# for any purpose with or without fee is hereby granted.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
-# WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL
-# THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT,
-# OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING
-# FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
-# NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 # WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 # Contributors:
 #    INITIAL AUTHORS - initial API and implementation and/or initial
@@ -246,7 +246,6 @@ class Report:
         for algorithms_configurations_group in self.__algorithms_configurations_groups:
             results_paths = list()
             for problems_group in self.__problems_groups:
-
                 # Get the algorithms with results for all the problems of the group
                 algorithms_configurations = AlgorithmsConfigurations(
                     *[
