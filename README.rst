@@ -23,18 +23,18 @@ to submit bugs or questions.
 License
 -------
 
-The GEMSEO-UMDO source code is distributed under the GNU LGPL v3.0 license.
+The GEMSEO-BENCHMARK source code is distributed under the GNU LGPL v3.0 license.
 A copy of it can be found in the LICENSE.txt file.
 The GNU LGPL v3.0 license is an exception to the GNU GPL v3.0 license.
 A copy of the GNU GPL v3.0 license can be found in the LICENSES folder.
 
-The GEMSEO-UMDO examples are distributed under the BSD 0-Clause, a permissive
+The GEMSEO-BENCHMARK examples are distributed under the BSD 0-Clause, a permissive
 license that allows to copy paste the code of examples without preserving the
 copyright mentions.
 
-The GEMSEO-UMDO documentation is distributed under the CC BY-SA 4.0 license.
+The GEMSEO-BENCHMARK documentation is distributed under the CC BY-SA 4.0 license.
 
-The GEMSEO-UMDO product depends on other software which have various licenses.
+The GEMSEO-BENCHMARK product depends on other software which have various licenses.
 The list of dependencies with their licenses is given in the CREDITS.rst file.
 
 Contributors
