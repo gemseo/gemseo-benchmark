@@ -39,7 +39,7 @@ class AlgorithmConfiguration:
     def __init__(
         self,
         algorithm_name: str,
-        configuration_name: str = None,
+        configuration_name: str | None = None,
         **algorithm_options: Any,
     ) -> None:
         """

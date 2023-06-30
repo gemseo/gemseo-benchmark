@@ -72,16 +72,16 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
     def __init__(
         self,
-        objective_values: Sequence[float] = None,
-        infeasibility_measures: Sequence[float] = None,
-        feasibility_statuses: Sequence[bool] = None,
-        n_unsatisfied_constraints: Sequence[int] = None,
-        problem_name: str = None,
-        objective_name: str = None,
-        constraints_names: Sequence[str] = None,
-        doe_size: int = None,
-        total_time: float = None,
-        algorithm_configuration: AlgorithmConfiguration = None,
+        objective_values: Sequence[float] | None = None,
+        infeasibility_measures: Sequence[float] | None = None,
+        feasibility_statuses: Sequence[bool] | None = None,
+        n_unsatisfied_constraints: Sequence[int] | None = None,
+        problem_name: str | None = None,
+        objective_name: str | None = None,
+        constraints_names: Sequence[str] | None = None,
+        doe_size: int | None = None,
+        total_time: float | None = None,
+        algorithm_configuration: AlgorithmConfiguration | None = None,
     ) -> None:
         """
         Args:
@@ -180,10 +180,10 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
     @staticmethod
     def __get_history_items(
-        objective_values: Sequence[float] = None,
-        infeasibility_measures: Sequence[float] = None,
-        feasibility_statuses: Sequence[bool] = None,
-        n_unsatisfied_constraints: Sequence[int] = None,
+        objective_values: Sequence[float] | None = None,
+        infeasibility_measures: Sequence[float] | None = None,
+        feasibility_statuses: Sequence[bool] | None = None,
+        n_unsatisfied_constraints: Sequence[int] | None = None,
     ) -> list[HistoryItem]:
         """Return history items based on values histories.
 
@@ -453,7 +453,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
     def from_problem(
         cls,
         problem: OptimizationProblem,
-        problem_name: str = None,
+        problem_name: str | None = None,
     ) -> PerformanceHistory:
         """Create a performance history from a solved optimization problem.
 

@@ -79,8 +79,8 @@ class Report:
         algos_configurations_groups: Iterable[AlgorithmsConfigurations],
         problems_groups: Iterable[ProblemsGroup],
         histories_paths: Results,
-        custom_algos_descriptions: Mapping[str, str] = None,
-        max_eval_number_per_group: dict[str, int] = None,
+        custom_algos_descriptions: Mapping[str, str] | None = None,
+        max_eval_number_per_group: dict[str, int] | None = None,
     ) -> None:
         """
         Args:
@@ -89,7 +89,8 @@ class Report:
             problems_groups: The groups of reference problems.
             histories_paths: The paths to the reference histories for each algorithm
                 and reference problem.
-            custom_algos_descriptions: The descriptions of the MINAMO algorithms.
+            custom_algos_descriptions: Custom descriptions of the algorithms,
+                to be printed in the report instead of the default ones coded in GEMSEO.
             max_eval_number_per_group: The maximum evaluations numbers to be displayed
                 on the graphs of each group.
                 The keys are the groups names and the values are the maximum
@@ -127,6 +128,7 @@ class Report:
         to_html: bool = True,
         to_pdf: bool = False,
         infeasibility_tolerance: float = 0.0,
+        plot_all_histories: bool = True,
     ) -> None:
         """Generate the benchmarking report.
 
@@ -134,11 +136,12 @@ class Report:
             to_html: Whether to generate the report in HTML format.
             to_pdf: Whether to generate the report in PDF format.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
+            plot_all_histories: Whether to plot all the performance histories.
         """
         self.__create_root_directory()
         self.__create_algos_file()
         self.__create_problems_files()
-        self.__create_results_files(infeasibility_tolerance)
+        self.__create_results_files(infeasibility_tolerance, plot_all_histories)
         self.__create_index()
         self.__build_report(to_html, to_pdf)
 
@@ -235,11 +238,16 @@ class Report:
             self.__root_directory / DirectoryName.PROBLEMS.value / f"{problem.name}.rst"
         )
 
-    def __create_results_files(self, infeasibility_tolerance: float = 0.0) -> None:
+    def __create_results_files(
+        self,
+        infeasibility_tolerance: float = 0.0,
+        plot_all_histories: bool = True,
+    ) -> None:
         """Create the files corresponding to the benchmarking results.
 
         Args:
             infeasibility_tolerance: The tolerance on the infeasibility measure.
+            plot_all_histories: Whether to plot all the performance histories.
         """
         results_root = self.__root_directory / DirectoryName.RESULTS.value
         algos_configs_groups_paths = list()
@@ -281,6 +289,7 @@ class Report:
                     algorithms_configurations,
                     results_dir,
                     infeasibility_tolerance,
+                    plot_all_histories,
                 )
 
                 # Create the file
@@ -419,6 +428,7 @@ class Report:
         algorithms_configurations: AlgorithmsConfigurations,
         group_dir: Path,
         infeasibility_tolerance: float = 0.0,
+        plot_all_histories: bool = True,
     ) -> dict[str, dict[str, str]]:
         """Plot the results figures for each problem of a group.
 
@@ -427,6 +437,7 @@ class Report:
             algorithms_configurations: The algorithms configurations.
             group_dir: The path to the directory where to save the figures.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
+            plot_all_histories: Whether to plot all the performance histories.
 
         Returns:
             The paths to the figures.
@@ -453,6 +464,7 @@ class Report:
                     problem_dir,
                     infeasibility_tolerance,
                     max_eval_number,
+                    plot_all_histories,
                 ),
             }
 
@@ -466,7 +478,7 @@ class Report:
         algorithms_configurations: AlgorithmsConfigurations,
         destination_dir: Path,
         infeasibility_tolerance: float = 0.0,
-        max_eval_number: int = None,
+        max_eval_number: int | None = None,
     ) -> str:
         """Plot the data profile of a problem.
 
@@ -497,7 +509,8 @@ class Report:
         algorithms_configurations: AlgorithmsConfigurations,
         destination_dir: Path,
         infeasibility_tolerance: float = 0.0,
-        max_eval_number: int = None,
+        max_eval_number: int | None = None,
+        plot_all_histories: bool = True,
     ) -> str:
         """Plot the performance histories of a problem.
 
@@ -508,6 +521,7 @@ class Report:
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             max_eval_number: The maximum evaluations number to be displayed on the
                 graph.
+            plot_all_histories: Whether to plot all the performance histories.
 
         Returns:
             The path to the figure, relative to the root of the report.
@@ -518,7 +532,7 @@ class Report:
             self.__histories_paths,
             show=False,
             file_path=path,
-            plot_all_histories=True,
+            plot_all_histories=plot_all_histories,
             infeasibility_tolerance=infeasibility_tolerance,
             max_eval_number=max_eval_number,
         )

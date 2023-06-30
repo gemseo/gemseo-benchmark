@@ -25,6 +25,16 @@ The format is based on
 and this project adheres to
 `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
+Develop
+*******
+
+Added
+-----
+
+Scenario
+~~~~~~~~
+
+- The options ``custom_algos_descriptions`` and ``max_eval_number_per_group`` of :class:`Report` can be passed through :class:`Scenario`.
 
 Version 1.0.0 (June 2023)
 *************************
