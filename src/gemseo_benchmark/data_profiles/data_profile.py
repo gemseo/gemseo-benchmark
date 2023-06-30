@@ -109,8 +109,8 @@ class DataProfile:
         problem_name: str,
         algorithm_configuration_name: str,
         objective_values: Sequence[float],
-        infeasibility_measures: Sequence[float] = None,
-        feasibility_statuses: Sequence[bool] = None,
+        infeasibility_measures: Sequence[float] | None = None,
+        feasibility_statuses: Sequence[bool] | None = None,
     ) -> None:
         """Add a history of performance values.
 
@@ -144,9 +144,9 @@ class DataProfile:
 
     def plot(
         self,
-        algo_names: Iterable[str] = None,
+        algo_names: Iterable[str] | None = None,
         show: bool = True,
-        file_path: str | Path = None,
+        file_path: str | Path | None = None,
         markevery: MarkeveryType = 0.1,
     ) -> None:
         """Plot the data profiles of the required algorithms.

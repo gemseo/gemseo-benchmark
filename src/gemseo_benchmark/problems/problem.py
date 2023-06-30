@@ -88,15 +88,15 @@ class Problem:
         self,
         name: str,
         optimization_problem_creator: Callable[[], OptimizationProblem],
-        start_points: InputStartPoints = None,
-        target_values: TargetValues = None,
-        doe_algo_name: str = None,
-        doe_size: int = None,
-        doe_options: Mapping[str, DOELibraryOptionType] = None,
-        description: str = None,
-        target_values_algorithms_configurations: AlgorithmsConfigurations = None,
-        target_values_number: int = None,
-        optimum: float = None,
+        start_points: InputStartPoints | None = None,
+        target_values: TargetValues | None = None,
+        doe_algo_name: str | None = None,
+        doe_size: int | None = None,
+        doe_options: Mapping[str, DOELibraryOptionType] | None = None,
+        description: str | None = None,
+        target_values_algorithms_configurations: AlgorithmsConfigurations | None = None,
+        target_values_number: int | None = None,
+        optimum: float | None = None,
     ) -> None:
         """
         Args:
@@ -264,8 +264,8 @@ class Problem:
     def __get_start_points(
         self,
         doe_algo_name: str,
-        doe_size: int = None,
-        doe_options: Mapping[str, DOELibraryOptionType] = None,
+        doe_size: int | None = None,
+        doe_options: Mapping[str, DOELibraryOptionType] | None = None,
     ) -> ndarray:
         """Return the starting points of the benchmarking problem.
 
@@ -359,7 +359,7 @@ class Problem:
         only_feasible: bool = True,
         budget_min: int = 1,
         show: bool = False,
-        file_path: str = None,
+        file_path: str | None = None,
         best_target_tolerance: float = 0.0,
         disable_stopping: bool = True,
     ) -> TargetValues:
@@ -517,9 +517,9 @@ class Problem:
         algos_configurations: AlgorithmsConfigurations,
         results: Results,
         show: bool = False,
-        file_path: str | Path = None,
+        file_path: str | Path | None = None,
         infeasibility_tolerance: float = 0.0,
-        max_eval_number: int = None,
+        max_eval_number: int | None = None,
     ) -> None:
         """Generate the data profiles of given algorithms.
 
@@ -559,12 +559,12 @@ class Problem:
         algos_configurations: AlgorithmsConfigurations,
         results: Results,
         show: bool = False,
-        file_path: Path = None,
+        file_path: Path | None = None,
         plot_all_histories: bool = False,
         alpha: float = 0.3,
-        markevery: MarkeveryType = None,
+        markevery: MarkeveryType | None = None,
         infeasibility_tolerance: float = 0.0,
-        max_eval_number: int = None,
+        max_eval_number: int | None = None,
     ) -> None:
         """Plot the histories of a problem.
 
@@ -658,7 +658,7 @@ class Problem:
         algos_configurations: AlgorithmsConfigurations,
         results: Results,
         infeasibility_tolerance: float = 0.0,
-        max_eval_number: int = None,
+        max_eval_number: int | None = None,
     ) -> tuple[dict[str, list[PerformanceHistory]], float | None]:
         """Return the histories of the cumulated minimum.
 

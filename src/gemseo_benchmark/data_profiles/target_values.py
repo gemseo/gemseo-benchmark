@@ -60,7 +60,7 @@ class TargetValues(PerformanceHistory):
             for minimum in minimum_history
         ]
 
-    def plot(self, show: bool = True, file_path: str | Path = None) -> Figure:
+    def plot(self, show: bool = True, file_path: str | Path | None = None) -> Figure:
         """Plot the target values.
 
         Args:

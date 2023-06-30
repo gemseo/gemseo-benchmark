@@ -54,9 +54,9 @@ class Benchmarker:
     def __init__(
         self,
         histories_path: Path,
-        results_path: Path = None,
-        databases_path: Path = None,
-        pseven_logs_path: Path = None,
+        results_path: Path | None = None,
+        databases_path: Path | None = None,
+        pseven_logs_path: Path | None = None,
     ) -> None:
         """
         Args:

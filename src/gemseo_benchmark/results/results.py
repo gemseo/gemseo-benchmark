@@ -27,7 +27,7 @@ from pathlib import Path
 class Results:
     """A collection of paths to performance histories."""
 
-    def __init__(self, path: str | Path = None) -> None:
+    def __init__(self, path: str | Path | None = None) -> None:
         """
         Args:
             path: The path to the JSON file from which to load the paths.
@@ -63,7 +63,7 @@ class Results:
 
         self.__dict[algorithm_configuration_name][problem_name].append(absolute_path)
 
-    def to_file(self, path: str | Path, indent: int = None) -> None:
+    def to_file(self, path: str | Path, indent: int | None = None) -> None:
         """Save the histories paths to a JSON file.
 
         Args:
