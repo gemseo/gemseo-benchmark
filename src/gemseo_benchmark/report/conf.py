@@ -72,7 +72,15 @@ latex_documents = [
         master_doc,
         "benchmarking_report.tex",
         "Benchmarking Report",
-        "IRT Saint Exup'{e}ry",
-        "manual",
+        r"IRT Saint Exup\'{e}ry",
+        "report",
     )
 ]
+
+latex_elements = {
+    "preamble": r"""
+    \renewcommand{\thesection}{\arabic{section}}
+    \setcounter{secnumdepth}{4}
+    """,
+    "figure_align": "H",
+}

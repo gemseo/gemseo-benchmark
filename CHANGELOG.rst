@@ -36,6 +36,15 @@ Scenario
 
 - The options ``custom_algos_descriptions`` and ``max_eval_number_per_group`` of :class:`Report` can be passed through :class:`Scenario`.
 
+Fixed
+-----
+
+Report
+~~~~~~
+
+- The sections of the PDF report are correctly numbered.
+- The graphs of the PDF report are anchored to their expected locations.
+
 Version 1.0.0 (June 2023)
 *************************
 
