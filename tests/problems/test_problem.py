@@ -335,6 +335,26 @@ def test_plot_histories_max_eval_number(
     )
 
 
+@image_comparison(
+    baseline_images=["logarithmic_histories"], remove_text=True, extensions=["png"]
+)
+def test_use_log_scale(
+    tmpdir, creator, target_values, algorithms_configurations, algorithm_configuration
+):
+    """Check the use of a logarithmic scale."""
+    history = PerformanceHistory([1000, 100, 10, 1])
+    path = tmpdir / "history.json"
+    history.to_file(path)
+    results = mock.Mock()
+    results.get_paths = mock.Mock(return_value=[path])
+    problem = Problem("problem", creator, target_values=TargetValues([100, 1]))
+    pyplot.close("all")
+    problem.plot_histories(
+        algorithms_configurations, results, show=False, use_log_scale=True
+    )
+    results.get_paths.assert_called_once_with(algorithm_configuration.name, "problem")
+
+
 message = (
     "The starting points shall be passed as (lines of) a 2-dimensional NumPy "
     "array, or as an iterable of 1-dimensional NumPy arrays."

@@ -84,6 +84,7 @@ class Scenario:
         custom_algos_descriptions: Mapping[str, str] | None = None,
         max_eval_number_per_group: dict[str, int] | None = None,
         plot_all_histories: bool = True,
+        use_log_scale: bool = False,
     ) -> Results:
         """Execute the benchmarking scenario.
 
@@ -111,6 +112,7 @@ class Scenario:
                 If the key of a group is missing, all the evaluations are displayed
                 for the group.
             plot_all_histories: Whether to plot all the performance histories.
+            use_log_scale: Whether to use a logarithmic scale on the value axis.
 
         Returns:
             The performance histories.
@@ -136,6 +138,7 @@ class Scenario:
                 custom_algos_descriptions,
                 max_eval_number_per_group,
                 plot_all_histories,
+                use_log_scale,
             )
 
         return Results(self._results_path)
@@ -223,6 +226,7 @@ class Scenario:
         custom_algos_descriptions: Mapping[str, str],
         max_eval_number_per_group: dict[str, int],
         plot_all_histories: bool = True,
+        use_log_scale: bool = False,
     ) -> None:
         """Generate the benchmarking report.
 
@@ -241,6 +245,7 @@ class Scenario:
                 If the key of a group is missing, all the evaluations are displayed
                 for the group.
             plot_all_histories: Whether to plot all the performance histories.
+            use_log_scale: Whether to use a logarithmic scale on the value axis.
         """
         report = Report(
             self.__get_report_path(),
@@ -255,6 +260,7 @@ class Scenario:
             generate_to_pdf,
             infeasibility_tolerance,
             plot_all_histories,
+            use_log_scale,
         )
 
     def __get_report_path(self) -> Path:
