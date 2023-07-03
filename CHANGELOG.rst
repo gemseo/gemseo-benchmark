@@ -31,6 +31,11 @@ Develop
 Added
 -----
 
+Report
+~~~~~~
+
+- The optimization histories can be displayed on a logarithmic scale.
+
 Scenario
 ~~~~~~~~
 

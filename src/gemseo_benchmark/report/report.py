@@ -129,6 +129,7 @@ class Report:
         to_pdf: bool = False,
         infeasibility_tolerance: float = 0.0,
         plot_all_histories: bool = True,
+        use_log_scale: bool = False,
     ) -> None:
         """Generate the benchmarking report.
 
@@ -137,11 +138,14 @@ class Report:
             to_pdf: Whether to generate the report in PDF format.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             plot_all_histories: Whether to plot all the performance histories.
+            use_log_scale: Whether to use a logarithmic scale on the value axis.
         """
         self.__create_root_directory()
         self.__create_algos_file()
         self.__create_problems_files()
-        self.__create_results_files(infeasibility_tolerance, plot_all_histories)
+        self.__create_results_files(
+            infeasibility_tolerance, plot_all_histories, use_log_scale
+        )
         self.__create_index()
         self.__build_report(to_html, to_pdf)
 
@@ -242,12 +246,14 @@ class Report:
         self,
         infeasibility_tolerance: float = 0.0,
         plot_all_histories: bool = True,
+        use_log_scale: bool = False,
     ) -> None:
         """Create the files corresponding to the benchmarking results.
 
         Args:
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             plot_all_histories: Whether to plot all the performance histories.
+            use_log_scale: Whether to use a logarithmic scale on the value axis.
         """
         results_root = self.__root_directory / DirectoryName.RESULTS.value
         algos_configs_groups_paths = list()
@@ -290,6 +296,7 @@ class Report:
                     results_dir,
                     infeasibility_tolerance,
                     plot_all_histories,
+                    use_log_scale,
                 )
 
                 # Create the file
@@ -429,6 +436,7 @@ class Report:
         group_dir: Path,
         infeasibility_tolerance: float = 0.0,
         plot_all_histories: bool = True,
+        use_log_scale: bool = False,
     ) -> dict[str, dict[str, str]]:
         """Plot the results figures for each problem of a group.
 
@@ -438,6 +446,7 @@ class Report:
             group_dir: The path to the directory where to save the figures.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             plot_all_histories: Whether to plot all the performance histories.
+            use_log_scale: Whether to use a logarithmic scale on the value axis.
 
         Returns:
             The paths to the figures.
@@ -465,6 +474,7 @@ class Report:
                     infeasibility_tolerance,
                     max_eval_number,
                     plot_all_histories,
+                    use_log_scale,
                 ),
             }
 
@@ -511,6 +521,7 @@ class Report:
         infeasibility_tolerance: float = 0.0,
         max_eval_number: int | None = None,
         plot_all_histories: bool = True,
+        use_log_scale: bool = False,
     ) -> str:
         """Plot the performance histories of a problem.
 
@@ -522,6 +533,7 @@ class Report:
             max_eval_number: The maximum evaluations number to be displayed on the
                 graph.
             plot_all_histories: Whether to plot all the performance histories.
+            use_log_scale: Whether to use a logarithmic scale on the value axis.
 
         Returns:
             The path to the figure, relative to the root of the report.
@@ -535,5 +547,6 @@ class Report:
             plot_all_histories=plot_all_histories,
             infeasibility_tolerance=infeasibility_tolerance,
             max_eval_number=max_eval_number,
+            use_log_scale=use_log_scale,
         )
         return path.relative_to(self.__root_directory).as_posix()

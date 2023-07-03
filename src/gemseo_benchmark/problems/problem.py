@@ -565,6 +565,7 @@ class Problem:
         markevery: MarkeveryType | None = None,
         infeasibility_tolerance: float = 0.0,
         max_eval_number: int | None = None,
+        use_log_scale: bool = False,
     ) -> None:
         """Plot the histories of a problem.
 
@@ -582,6 +583,7 @@ class Problem:
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             max_eval_number: The maximum evaluations number displayed.
                 If ``None``, this value is inferred from the longest history.
+            use_log_scale: Whether to use a logarithmic scale on the value axis.
         """
         figure = plt.figure()
         axes = figure.gca()
@@ -628,6 +630,9 @@ class Problem:
 
         # Ensure the x-axis ticks are integers
         axes.xaxis.set_major_locator(MaxNLocator(integer=True))
+        if use_log_scale:
+            axes.set_yscale("log")
+
         plt.margins(x=0.1)
         plt.xlabel("Number of functions evaluations")
         plt.xlim(1, max_eval_number)
@@ -649,6 +654,8 @@ class Problem:
         twin_axes.set_yticks(objective_targets)
         twin_axes.set_yticklabels([f"{value:.2g}" for value in objective_targets])
         twin_axes.set_ylabel("Target values", rotation=270)
+        if use_log_scale:
+            twin_axes.set_yscale("log")
 
         plt.title("Convergence histories")
         save_show_figure(figure, show, file_path)
