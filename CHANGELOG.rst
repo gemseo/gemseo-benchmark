@@ -31,6 +31,11 @@ Develop
 Added
 -----
 
+Results
+~~~~~~~
+
+- The names of functions and the number of variables are stored in the performance history files.
+
 Report
 ~~~~~~
 

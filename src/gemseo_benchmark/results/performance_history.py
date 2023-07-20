@@ -40,6 +40,7 @@ from itertools import chain
 from itertools import repeat
 from pathlib import Path
 from typing import Callable
+from typing import Final
 from typing import Iterable
 from typing import Sequence
 
@@ -60,15 +61,17 @@ class PerformanceHistory(Sequence[HistoryItem]):
         problem_name (str): The name of the problem.
         total_time (float): The run time of the algorithm.
     """
-
-    __ALGORITHM_CONFIGURATION = "algorithm_configuration"
-    __DOE_SIZE = "DOE_size"
-    __EXECUTION_TIME = "execution_time"
-    __HISTORY_ITEMS = "history_items"
-    __INFEASIBILITY = "infeasibility"
-    __N_UNSATISFIED_CONSTRAINTS = "n_unsatisfied_constraints"
-    __PERFORMANCE = "performance"
-    __PROBLEM = "problem"
+    __ALGORITHM_CONFIGURATION: Final[str] = "algorithm_configuration"
+    __CONSTRAINTS_NAMES: Final[str] = "constraints_names"
+    __DOE_SIZE: Final[str] = "DOE_size"
+    __EXECUTION_TIME: Final[str] = "execution_time"
+    __HISTORY_ITEMS: Final[str] = "history_items"
+    __INFEASIBILITY: Final[str] = "infeasibility"
+    __N_UNSATISFIED_CONSTRAINTS: Final[str] = "n_unsatisfied_constraints"
+    __NUMBER_OF_VARIABLES: Final[str] = "number_of_variables"
+    __OBJECTIVE_NAME: Final[str] = "objective_name"
+    __PERFORMANCE: Final[str] = "performance"
+    __PROBLEM: Final[str] = "problem"
 
     def __init__(
         self,
@@ -82,6 +85,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
         doe_size: int | None = None,
         total_time: float | None = None,
         algorithm_configuration: AlgorithmConfiguration | None = None,
+        number_of_variables: int | None = None,
     ) -> None:
         """
         Args:
@@ -119,6 +123,8 @@ class PerformanceHistory(Sequence[HistoryItem]):
             algorithm_configuration: The name of the algorithm which generated the
                 history.
                 If ``None``, it will not be set.
+            number_of_variables: The number of optimization variables.
+                If ``None``, it will not be set.
 
         Raises:
             ValueError: If the lengths of the histories do not match.
@@ -138,6 +144,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
             n_unsatisfied_constraints,
         )
         self.problem_name = problem_name
+        self._number_of_variables = number_of_variables
         self.total_time = total_time
 
     @property
@@ -389,6 +396,13 @@ class PerformanceHistory(Sequence[HistoryItem]):
         if self.problem_name is not None:
             data[self.__PROBLEM] = self.problem_name
 
+        if self._number_of_variables is not None:
+            data[self.__NUMBER_OF_VARIABLES] = self._number_of_variables
+
+        data[self.__OBJECTIVE_NAME] = self._objective_name
+        if self._constraints_names:
+            data[self.__CONSTRAINTS_NAMES] = self._constraints_names
+
         if self.algorithm_configuration is not None:
             data[
                 self.__ALGORITHM_CONFIGURATION
@@ -432,6 +446,9 @@ class PerformanceHistory(Sequence[HistoryItem]):
 
         history = cls()
         history.problem_name = data.get(cls.__PROBLEM)
+        history._number_of_variables = data.get(cls.__NUMBER_OF_VARIABLES)
+        history._objective_name = data[cls.__OBJECTIVE_NAME]
+        history._constraints_names = data.get(cls.__CONSTRAINTS_NAMES, [])
         if cls.__ALGORITHM_CONFIGURATION in data:
             history.algorithm_configuration = AlgorithmConfiguration.from_dict(
                 data[cls.__ALGORITHM_CONFIGURATION]
@@ -494,6 +511,7 @@ class PerformanceHistory(Sequence[HistoryItem]):
             problem_name,
             problem.objective.name,
             problem.get_scalar_constraint_names(),
+            number_of_variables=problem.dimension,
         )
 
     def get_plot_data(
