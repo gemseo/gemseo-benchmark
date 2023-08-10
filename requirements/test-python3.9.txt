@@ -38,7 +38,7 @@ fastjsonschema==2.16.3
     # via gemseo
 fonttools==4.42.0
     # via matplotlib
-gemseo @ git+https://gitlab.com/gemseo/dev/gemseo.git@develop
+gemseo[all] @ git+https://gitlab.com/gemseo/dev/gemseo.git@develop
     # via gemseo-benchmark (setup.py)
 genson==1.2.2
     # via gemseo
@@ -60,7 +60,7 @@ jinja2==3.1.2
     # via
     #   gemseo
     #   sphinx
-joblib==1.3.1
+joblib==1.3.2
     # via scikit-learn
 kiwisolver==1.4.4
     # via matplotlib
@@ -150,18 +150,24 @@ six==1.16.0
 snowballstemmer==2.2.0
     # via sphinx
 sphinx==7.1.2
-    # via gemseo-benchmark (setup.py)
-sphinxcontrib-applehelp==1.0.4
+    # via
+    #   gemseo-benchmark (setup.py)
+    #   sphinxcontrib-applehelp
+    #   sphinxcontrib-devhelp
+    #   sphinxcontrib-htmlhelp
+    #   sphinxcontrib-qthelp
+    #   sphinxcontrib-serializinghtml
+sphinxcontrib-applehelp==1.0.6
     # via sphinx
-sphinxcontrib-devhelp==1.0.2
+sphinxcontrib-devhelp==1.0.4
     # via sphinx
-sphinxcontrib-htmlhelp==2.0.1
+sphinxcontrib-htmlhelp==2.0.3
     # via sphinx
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
-sphinxcontrib-qthelp==1.0.3
+sphinxcontrib-qthelp==1.0.5
     # via sphinx
-sphinxcontrib-serializinghtml==1.1.5
+sphinxcontrib-serializinghtml==1.1.7
     # via sphinx
 strenum==0.4.10
     # via gemseo
