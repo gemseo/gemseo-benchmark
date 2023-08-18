@@ -119,7 +119,7 @@ six==1.16.0
     # via python-dateutil
 snowballstemmer==2.2.0
     # via sphinx
-sphinx==7.2.0
+sphinx==7.2.2
     # via
     #   gemseo-benchmark (setup.py)
     #   sphinxcontrib-applehelp
