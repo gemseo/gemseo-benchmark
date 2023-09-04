@@ -1,0 +1,13 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: 7efffc0
+_src_path: /home/ad/gemseo-copier
+author_email: contact@gemseo.org
+author_name: Benoit Pauwels
+gemseo_min_version: '5'
+package_is_a_gemseo_plugin: false
+project_is_open_source: true
+project_name: gemseo-benchmark
+project_name_suffix: benchmark
+project_slug: gemseo_benchmark
+short_description: A GEMSEO-based package to benchmark optimization algorithm.
+use_gemseo_develop: true

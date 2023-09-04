@@ -23,7 +23,7 @@ repos:
     - id: rst-inline-touching-normal
 
 - repo: https://github.com/PyCQA/autoflake
-  rev: v2.2.0
+  rev: v2.2.1
   hooks:
     - id: autoflake
       args: [
@@ -89,7 +89,7 @@ repos:
         - pep8-naming==0.13.3
 
 - repo: https://github.com/commitizen-tools/commitizen
-  rev: 3.6.0
+  rev: 3.7.0
   hooks:
     - id: commitizen
       stages: [commit-msg]
@@ -107,19 +107,25 @@ repos:
       args: [ "--py38-plus" ]
     - id: nbqa-autopep8
 
+- repo: https://github.com/igorshubovych/markdownlint-cli
+  rev: v0.35.0
+  hooks:
+  - id: markdownlint
+    args: ["--fix"]
+
 - repo: https://github.com/Lucas-C/pre-commit-hooks
   rev: v1.5.4
   hooks:
     - id: insert-license
       name: insert LGPL license
-      exclude: ^docs
+      exclude: ^doc_src
       files: \.py$
       args:
         - --license-filepath
         - LICENSES/headers/LGPL-3.0.txt
     - id: insert-license
       name: insert BSD license
-      files: ^docs/(examples|tutorials).*\.py$
+      files: ^doc_src/(examples|tutorials).*\.py$
       args:
         - --license-filepath
         - LICENSES/headers/BSD-0-Clause.txt
@@ -132,3 +138,11 @@ repos:
         - LICENSES/headers/CC-BY-SA-4.0.txt
         - --comment-style
         - ..|   |
+    - id: insert-license
+      name: insert CC BY-SA license for md files
+      files: \.md$
+      args:
+        - --license-filepath
+        - LICENSES/headers/CC-BY-SA-4.0.txt
+        - --comment-style
+        - <!--||-->
