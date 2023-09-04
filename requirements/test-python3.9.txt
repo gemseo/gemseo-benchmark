@@ -32,7 +32,7 @@ execnet==2.0.2
     # via pytest-xdist
 fastjsonschema==2.18.0
     # via gemseo
-fonttools==4.42.0
+fonttools==4.42.1
     # via matplotlib
 gemseo @ git+https://gitlab.com/gemseo/dev/gemseo.git@develop
     # via gemseo-benchmark (setup.py)
@@ -54,7 +54,7 @@ jinja2==3.1.2
     # via
     #   gemseo
     #   sphinx
-kiwisolver==1.4.4
+kiwisolver==1.4.5
     # via matplotlib
 markupsafe==2.1.3
     # via jinja2
@@ -84,7 +84,7 @@ pandas==2.0.3
     # via gemseo
 pillow==10.0.0
     # via matplotlib
-pluggy==1.2.0
+pluggy==1.3.0
     # via pytest
 pydantic==1.10.12
     # via gemseo
@@ -92,7 +92,7 @@ pygments==2.16.1
     # via sphinx
 pyparsing==3.0.9
     # via matplotlib
-pytest==7.4.0
+pytest==7.4.1
     # via
     #   gemseo-benchmark (setup.py)
     #   pytest-cov
@@ -119,7 +119,7 @@ six==1.16.0
     # via python-dateutil
 snowballstemmer==2.2.0
     # via sphinx
-sphinx==7.2.2
+sphinx==7.2.5
     # via
     #   gemseo-benchmark (setup.py)
     #   sphinxcontrib-applehelp
@@ -137,7 +137,7 @@ sphinxcontrib-jsmath==1.0.1
     # via sphinx
 sphinxcontrib-qthelp==1.0.6
     # via sphinx
-sphinxcontrib-serializinghtml==1.1.8
+sphinxcontrib-serializinghtml==1.1.9
     # via sphinx
 strenum==0.4.15
     # via gemseo
