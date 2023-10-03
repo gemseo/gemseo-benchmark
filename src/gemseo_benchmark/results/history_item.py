@@ -28,7 +28,7 @@ class HistoryItem:
         self,
         objective_value: float,
         infeasibility_measure: float,
-        n_unsatisfied_constraints: int = None,
+        n_unsatisfied_constraints: int | None = None,
     ) -> None:
         """
         Args:

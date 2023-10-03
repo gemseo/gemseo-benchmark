@@ -99,9 +99,9 @@ class ProblemsGroup:
         algos_configurations: AlgorithmsConfigurations,
         histories_paths: Results,
         show: bool = True,
-        plot_path: str | Path = None,
+        plot_path: str | Path | None = None,
         infeasibility_tolerance: float = 0.0,
-        max_eval_number: int = None,
+        max_eval_number: int | None = None,
     ) -> None:
         """Generate the data profiles of given algorithms relative to the problems.
 

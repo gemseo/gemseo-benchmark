@@ -137,17 +137,22 @@ def test_to_file(tmp_path):
         [1.0, 0.0],
         n_unsatisfied_constraints=[1, 0],
         problem_name="problem",
+        objective_name="f",
+        constraints_names=["g", "h"],
         doe_size=7,
         total_time=123.45,
         algorithm_configuration=algorithm_configuration,
+        number_of_variables=4,
     )
     file_path = tmp_path / "history.json"
     history.to_file(str(file_path))
     with file_path.open("r") as file:
         contents = file.read()
+
     reference_path = Path(__file__).parent / "reference_history.json"
     with reference_path.open("r") as reference_file:
         reference = reference_file.read()
+
     assert contents == reference[:-1]  # disregard last line break
 
 
@@ -156,6 +161,9 @@ def test_from_file():
     reference_path = Path(__file__).parent / "reference_history.json"
     history = PerformanceHistory.from_file(reference_path)
     assert history.problem_name == "problem"
+    assert history._number_of_variables == 4
+    assert history._objective_name == "f"
+    assert history._constraints_names == ["g", "h"]
     assert history.algorithm_configuration.algorithm_name == "algorithm"
     assert history.algorithm_configuration.name == "algorithm"
     assert history.algorithm_configuration.algorithm_options == {}

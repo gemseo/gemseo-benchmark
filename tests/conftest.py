@@ -150,6 +150,7 @@ def side_effect(
     plot_all_histories=False,
     infeasibility_tolerance=0.0,
     max_eval_number=None,
+    use_log_scale=False,
 ):
     """Side effect for the computation of a data profile."""
     shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(file_path))

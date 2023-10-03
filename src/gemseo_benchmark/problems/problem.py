@@ -31,10 +31,8 @@ from pathlib import Path
 from typing import Callable
 from typing import Iterable
 from typing import Mapping
-from typing import Sequence
 from typing import Union
 
-import numpy
 from gemseo import compute_doe
 from gemseo import execute_algo
 from gemseo.algos.doe.doe_library import DOELibraryOptionType
@@ -42,7 +40,6 @@ from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.utils.matplotlib_figure import save_show_figure
 from matplotlib import pyplot as plt
-from matplotlib.axes import Axes
 from matplotlib.ticker import MaxNLocator
 from numpy import array
 from numpy import atleast_2d
@@ -59,7 +56,7 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
 from gemseo_benchmark.data_profiles.data_profile import DataProfile
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
-from gemseo_benchmark.results.history_item import HistoryItem
+from gemseo_benchmark.results.performance_histories import PerformanceHistories
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 from gemseo_benchmark.results.results import Results
 
@@ -88,15 +85,15 @@ class Problem:
         self,
         name: str,
         optimization_problem_creator: Callable[[], OptimizationProblem],
-        start_points: InputStartPoints = None,
-        target_values: TargetValues = None,
-        doe_algo_name: str = None,
-        doe_size: int = None,
-        doe_options: Mapping[str, DOELibraryOptionType] = None,
-        description: str = None,
-        target_values_algorithms_configurations: AlgorithmsConfigurations = None,
-        target_values_number: int = None,
-        optimum: float = None,
+        start_points: InputStartPoints | None = None,
+        target_values: TargetValues | None = None,
+        doe_algo_name: str | None = None,
+        doe_size: int | None = None,
+        doe_options: Mapping[str, DOELibraryOptionType] | None = None,
+        description: str | None = None,
+        target_values_algorithms_configurations: AlgorithmsConfigurations | None = None,
+        target_values_number: int | None = None,
+        optimum: float | None = None,
     ) -> None:
         """
         Args:
@@ -264,8 +261,8 @@ class Problem:
     def __get_start_points(
         self,
         doe_algo_name: str,
-        doe_size: int = None,
-        doe_options: Mapping[str, DOELibraryOptionType] = None,
+        doe_size: int | None = None,
+        doe_options: Mapping[str, DOELibraryOptionType] | None = None,
     ) -> ndarray:
         """Return the starting points of the benchmarking problem.
 
@@ -359,7 +356,7 @@ class Problem:
         only_feasible: bool = True,
         budget_min: int = 1,
         show: bool = False,
-        file_path: str = None,
+        file_path: str | None = None,
         best_target_tolerance: float = 0.0,
         disable_stopping: bool = True,
     ) -> TargetValues:
@@ -517,9 +514,9 @@ class Problem:
         algos_configurations: AlgorithmsConfigurations,
         results: Results,
         show: bool = False,
-        file_path: str | Path = None,
+        file_path: str | Path | None = None,
         infeasibility_tolerance: float = 0.0,
-        max_eval_number: int = None,
+        max_eval_number: int | None = None,
     ) -> None:
         """Generate the data profiles of given algorithms.
 
@@ -559,12 +556,13 @@ class Problem:
         algos_configurations: AlgorithmsConfigurations,
         results: Results,
         show: bool = False,
-        file_path: Path = None,
+        file_path: Path | None = None,
         plot_all_histories: bool = False,
         alpha: float = 0.3,
-        markevery: MarkeveryType = None,
+        markevery: MarkeveryType | None = None,
         infeasibility_tolerance: float = 0.0,
-        max_eval_number: int = None,
+        max_eval_number: int | None = None,
+        use_log_scale: bool = False,
     ) -> None:
         """Plot the histories of a problem.
 
@@ -582,6 +580,7 @@ class Problem:
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             max_eval_number: The maximum evaluations number displayed.
                 If ``None``, this value is inferred from the longest history.
+            use_log_scale: Whether to use a logarithmic scale on the value axis.
         """
         figure = plt.figure()
         axes = figure.gca()
@@ -610,10 +609,9 @@ class Problem:
         for configuration_name, color, marker in zip(
             algos_configurations.names, COLORS_CYCLE, get_markers_cycle()
         ):
-            minimum_value = self.__plot_algorithm_histories(
+            minimum_value = minima[configuration_name].plot_algorithm_histories(
                 axes,
                 configuration_name,
-                minima[configuration_name],
                 max_feasible_objective,
                 plot_all_histories,
                 color=color,
@@ -628,6 +626,9 @@ class Problem:
 
         # Ensure the x-axis ticks are integers
         axes.xaxis.set_major_locator(MaxNLocator(integer=True))
+        if use_log_scale:
+            axes.set_yscale("log")
+
         plt.margins(x=0.1)
         plt.xlabel("Number of functions evaluations")
         plt.xlim(1, max_eval_number)
@@ -649,6 +650,8 @@ class Problem:
         twin_axes.set_yticks(objective_targets)
         twin_axes.set_yticklabels([f"{value:.2g}" for value in objective_targets])
         twin_axes.set_ylabel("Target values", rotation=270)
+        if use_log_scale:
+            twin_axes.set_yscale("log")
 
         plt.title("Convergence histories")
         save_show_figure(figure, show, file_path)
@@ -658,8 +661,8 @@ class Problem:
         algos_configurations: AlgorithmsConfigurations,
         results: Results,
         infeasibility_tolerance: float = 0.0,
-        max_eval_number: int = None,
-    ) -> tuple[dict[str, list[PerformanceHistory]], float | None]:
+        max_eval_number: int | None = None,
+    ) -> tuple[dict[str, PerformanceHistories], float | None]:
         """Return the histories of the cumulated minimum.
 
         Args:
@@ -675,7 +678,7 @@ class Problem:
         minima = dict()
         max_feasible_objective = None
         for configuration_name in algos_configurations.names:
-            minima[configuration_name] = list()
+            minima[configuration_name] = PerformanceHistories()
             for path in results.get_paths(configuration_name, self.name):
                 # Get the history of the cumulated minimum
                 history = PerformanceHistory.from_file(path)
@@ -726,100 +729,3 @@ class Problem:
         return max_feasible_objective + y_relative_margin * (
             max_feasible_objective - self.optimum
         )
-
-    @staticmethod
-    def __plot_algorithm_histories(
-        axes: Axes,
-        algorithm_name: str,
-        histories: Iterable[PerformanceHistory],
-        max_feasible_objective: float,
-        plot_all: bool,
-        color: str,
-        marker: str,
-        alpha: float,
-        markevery: MarkeveryType,
-    ) -> float | None:
-        """Plot the histories associated with an algorithm.
-
-        Args:
-            axes: The axes on which to plot the performance histories.
-            algorithm_name: The name of the algorithm.
-            histories: The histories associated with the algorithm.
-            max_feasible_objective: The ordinate for infeasible history items.
-            plot_all: Whether to plot all the performance histories.
-            color: The color of the plot.
-            marker: The marker type of the plot.
-            alpha: The opacity level for overlapping areas.
-                Refer to the Matplotlib documentation.
-            markevery: The sampling parameter for the markers of the plot.
-                Refer to the Matplotlib documentation.
-
-        Returns:
-            The minimum feasible objective value of the median history
-            or None if the median history has no feasible item.
-        """
-        # Plot all the performance histories
-        if plot_all:
-            for history in histories:
-                history.plot(axes, only_feasible=True, color=color, alpha=alpha)
-
-        # Get the minimum history, starting from its first feasible item
-        minimum = PerformanceHistory.compute_minimum_history(histories)
-        abscissas, minimum_items = minimum.get_plot_data(feasible=True)
-        minimum_ordinates = [item.objective_value for item in minimum_items]
-
-        # Get the maximum history for the same abscissas as the minimum history
-        maximum = PerformanceHistory.compute_maximum_history(histories)
-        maximum_items = maximum.items
-        # Replace the infeasible objective values with the maximum value
-        # N.B. Axes.fill_between requires finite values, that is why the infeasible
-        # objective values are replaced with a finite value rather than with infinity.
-        maximum_ordinates = Problem.__get_penalized_objective_values(
-            maximum_items, abscissas, max_feasible_objective
-        )
-
-        # Plot the area between the minimum and maximum histories.
-        axes.fill_between(abscissas, minimum_ordinates, maximum_ordinates, alpha=alpha)
-        axes.plot(abscissas, minimum_ordinates, color=color, alpha=alpha)
-        # Replace the infeasible objective values with infinity
-        maximum_ordinates = Problem.__get_penalized_objective_values(
-            maximum_items, abscissas, numpy.inf
-        )
-        axes.plot(abscissas, maximum_ordinates, color=color, alpha=alpha)
-
-        # Plot the median history
-        median = PerformanceHistory.compute_median_history(histories)
-        median.plot(
-            axes,
-            only_feasible=True,
-            label=algorithm_name,
-            color=color,
-            marker=marker,
-            markevery=markevery,
-        )
-
-        # Return the smallest objective value of the median
-        _, history_items = median.get_plot_data(feasible=True)
-        if history_items:
-            return min(history_items).objective_value
-
-    @staticmethod
-    def __get_penalized_objective_values(
-        history_items: Sequence[HistoryItem], indexes: Iterable[int], value: float
-    ) -> list[float]:
-        """Return the objectives of history items, replacing the infeasible ones.
-
-        Args:
-            history_items: The history items.
-            indexes: The 1-based indexes of the history items.
-            value: The replacement for infeasible objective values.
-
-        Returns:
-            The objective values.
-        """
-        return [
-            history_items[index - 1].objective_value
-            if history_items[index - 1].is_feasible
-            else value
-            for index in indexes
-        ]

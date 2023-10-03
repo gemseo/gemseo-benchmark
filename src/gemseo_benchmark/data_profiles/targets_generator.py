@@ -26,7 +26,6 @@ required size) of this median history is extracted.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Iterable
 from typing import Sequence
 
 import matplotlib.pyplot as plt
@@ -38,6 +37,7 @@ from numpy import ndarray
 
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.results.history_item import HistoryItem
+from gemseo_benchmark.results.performance_histories import PerformanceHistories
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 
@@ -46,15 +46,18 @@ class TargetsGenerator:
 
     __NO_HISTORIES_MESSAGE = "There are no histories to generate the targets from."
 
+    __histories: PerformanceHistories
+    """A collection of performance histories."""
+
     def __init__(self) -> None:  # noqa: D107
-        self.__histories = list()
+        self.__histories = PerformanceHistories()
 
     def add_history(
         self,
-        objective_values: Sequence[float] = None,
-        infeasibility_measures: Sequence[float] = None,
-        feasibility_statuses: Sequence[bool] = None,
-        history: PerformanceHistory = None,
+        objective_values: Sequence[float] | None = None,
+        infeasibility_measures: Sequence[float] | None = None,
+        feasibility_statuses: Sequence[bool] | None = None,
+        history: PerformanceHistory | None = None,
     ) -> None:
         """Add a history of objective values.
 
@@ -96,8 +99,8 @@ class TargetsGenerator:
         budget_min: int = 1,
         feasible: bool = True,
         show: bool = False,
-        file_path: str | Path = None,
-        best_target_objective: float = None,
+        file_path: str | Path | None = None,
+        best_target_objective: float | None = None,
         best_target_tolerance: float = 0.0,
     ) -> TargetValues:
         """Compute the target values for a function from the histories of its values.
@@ -132,7 +135,7 @@ class TargetsGenerator:
         )
 
         # Compute the median of the cumulated minimum histories
-        median_history = PerformanceHistory.compute_median_history(reference_histories)
+        median_history = PerformanceHistories(*reference_histories).compute_median()
         if feasible:
             median_history = median_history.remove_leading_infeasible()
 
@@ -221,11 +224,11 @@ class TargetsGenerator:
 
     @staticmethod
     def __get_reference_histories(
-        histories: Iterable[PerformanceHistory],
+        histories: PerformanceHistories,
         best_target_objective: float | None,
         best_target_tolerance: float,
         feasible: bool,
-    ) -> tuple[list[PerformanceHistory], HistoryItem]:
+    ) -> tuple[PerformanceHistories, HistoryItem]:
         """Return the performance histories of reference.
 
         1. Compute the histories of the cumulated minima.
@@ -248,9 +251,7 @@ class TargetsGenerator:
             raise RuntimeError(TargetsGenerator.__NO_HISTORIES_MESSAGE)
 
         # Get the histories of the cumulated minima
-        reference_histories = [
-            history.compute_cumulated_minimum() for history in histories
-        ]
+        reference_histories = histories.cumulate_minimum()
 
         # Get the best target value
         if best_target_objective is None:
@@ -269,9 +270,9 @@ class TargetsGenerator:
             raise RuntimeError("The best target value is not feasible.")
 
         # Get the performance histories that reach the best target value
-        reference_histories = [
-            history for history in reference_histories if history[-1] <= best_target
-        ]
+        reference_histories = PerformanceHistories(
+            *[history for history in reference_histories if history[-1] <= best_target]
+        )
         if not reference_histories:
             raise RuntimeError(
                 "There is no performance history that reaches the best target value."
@@ -281,9 +282,9 @@ class TargetsGenerator:
 
     def plot_histories(
         self,
-        best_target_value: float = None,
+        best_target_value: float | None = None,
         show: bool = False,
-        file_path: str | Path = None,
+        file_path: str | Path | None = None,
     ) -> Figure:
         """Plot the histories used as a basis to compute the target values.
 

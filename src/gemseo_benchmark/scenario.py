@@ -19,6 +19,7 @@ import logging
 import shutil
 from pathlib import Path
 from typing import Iterable
+from typing import Mapping
 
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 
@@ -80,6 +81,10 @@ class Scenario:
         save_pseven_logs: bool = False,
         number_of_processes: int = 1,
         use_threading: bool = False,
+        custom_algos_descriptions: Mapping[str, str] | None = None,
+        max_eval_number_per_group: dict[str, int] | None = None,
+        plot_all_histories: bool = True,
+        use_log_scale: bool = False,
     ) -> Results:
         """Execute the benchmarking scenario.
 
@@ -97,6 +102,17 @@ class Scenario:
                 processes used to parallelize the execution.
             use_threading: Whether to use threads instead of processes
                 to parallelize the execution.
+            custom_algos_descriptions: Custom descriptions of the algorithms,
+                to be printed in the report instead of the default ones coded in GEMSEO.
+            max_eval_number_per_group: The maximum evaluations numbers to be displayed
+                on the graphs of each group.
+                The keys are the groups names and the values are the maximum
+                evaluations numbers for the graphs of the group.
+                If ``None``, all the evaluations are displayed.
+                If the key of a group is missing, all the evaluations are displayed
+                for the group.
+            plot_all_histories: Whether to plot all the performance histories.
+            use_log_scale: Whether to use a logarithmic scale on the value axis.
 
         Returns:
             The performance histories.
@@ -119,6 +135,10 @@ class Scenario:
                 generate_html_report,
                 generate_pdf_report,
                 infeasibility_tolerance,
+                custom_algos_descriptions,
+                max_eval_number_per_group,
+                plot_all_histories,
+                use_log_scale,
             )
 
         return Results(self._results_path)
@@ -203,6 +223,10 @@ class Scenario:
         generate_to_html: bool,
         generate_to_pdf: bool,
         infeasibility_tolerance: float,
+        custom_algos_descriptions: Mapping[str, str],
+        max_eval_number_per_group: dict[str, int],
+        plot_all_histories: bool = True,
+        use_log_scale: bool = False,
     ) -> None:
         """Generate the benchmarking report.
 
@@ -211,14 +235,33 @@ class Scenario:
             generate_to_html: Whether to generate the report in HTML format.
             generate_to_pdf: Whether to generate the report in PDF format.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
+            custom_algos_descriptions: Custom descriptions of the algorithms,
+                to be printed in the report instead of the default ones coded in GEMSEO.
+            max_eval_number_per_group: The maximum evaluations numbers to be displayed
+                on the graphs of each group.
+                The keys are the groups names and the values are the maximum
+                evaluations numbers for the graphs of the group.
+                If ``None``, all the evaluations are displayed.
+                If the key of a group is missing, all the evaluations are displayed
+                for the group.
+            plot_all_histories: Whether to plot all the performance histories.
+            use_log_scale: Whether to use a logarithmic scale on the value axis.
         """
         report = Report(
             self.__get_report_path(),
             self._algorithms_configurations_groups,
             problems_groups,
             Results(self._results_path),
+            custom_algos_descriptions,
+            max_eval_number_per_group,
         )
-        report.generate(generate_to_html, generate_to_pdf, infeasibility_tolerance)
+        report.generate(
+            generate_to_html,
+            generate_to_pdf,
+            infeasibility_tolerance,
+            plot_all_histories,
+            use_log_scale,
+        )
 
     def __get_report_path(self) -> Path:
         """Return the path to the report root directory."""
