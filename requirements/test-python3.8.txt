@@ -12,7 +12,7 @@ babel==2.13.1
     # via sphinx
 certifi==2023.7.22
     # via requests
-charset-normalizer==3.3.1
+charset-normalizer==3.3.2
     # via requests
 contourpy==1.1.1
     # via matplotlib
@@ -40,7 +40,7 @@ fastjsonschema==2.18.1
     # via gemseo
 fonttools==4.43.1
     # via matplotlib
-gemseo[all]==5.1.2.dev95+gd5dd5e51
+gemseo[all]==5.1.2.dev99+g2ca9a995
     # via gemseo-benchmark (pyproject.toml)
 genson==1.2.2
     # via gemseo
