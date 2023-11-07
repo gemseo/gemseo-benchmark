@@ -40,7 +40,7 @@ fastjsonschema==2.18.1
     # via gemseo
 fonttools==4.44.0
     # via matplotlib
-gemseo[all]==5.1.2.dev120+gd9b61d6e
+gemseo[all]==5.1.2.dev128+g83f5c73d
     # via gemseo-benchmark (pyproject.toml)
 genson==1.2.2
     # via gemseo
@@ -54,7 +54,7 @@ imagesize==1.4.1
     # via sphinx
 importlib-metadata==6.8.0
     # via sphinx
-importlib-resources==6.1.0
+importlib-resources==6.1.1
     # via matplotlib
 iniconfig==2.0.0
     # via pytest
