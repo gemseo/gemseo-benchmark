@@ -157,7 +157,7 @@ def test_to_file(tmp_path):
 
 
 def test_from_file():
-    """Check the initialization of a perfomance history from a file."""
+    """Check the initialization of a performance history from a file."""
     reference_path = Path(__file__).parent / "reference_history.json"
     history = PerformanceHistory.from_file(reference_path)
     assert history.problem_name == "problem"

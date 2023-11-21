@@ -30,6 +30,11 @@ and this project adheres to
 
 ## Added
 
+### Algorithms
+
+- Algorithm options specific to problem instances (e.g. paths for output files)
+  can be passed to ``AlgorithmConfiguration`` in the new argument ``instance_algorithm_options``.
+
 ### Results
 
 - The names of functions and the number of variables are stored in the

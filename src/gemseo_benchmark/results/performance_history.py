@@ -384,9 +384,9 @@ class PerformanceHistory(collections.abc.Sequence):
             data[self.__CONSTRAINTS_NAMES] = self._constraints_names
 
         if self.algorithm_configuration is not None:
-            data[
-                self.__ALGORITHM_CONFIGURATION
-            ] = self.algorithm_configuration.to_dict()
+            data[self.__ALGORITHM_CONFIGURATION] = self.algorithm_configuration.to_dict(
+                True
+            )
 
         if self.doe_size is not None:
             data[self.__DOE_SIZE] = self.doe_size
