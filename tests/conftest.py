@@ -211,6 +211,8 @@ def algorithm_configuration() -> mock.Mock():
     algo_config.algorithm_name = "SLSQP"
     algo_config.algorithm_options = {"normalize_design_space": False, "max_iter": 3}
     algo_config.name = "SLSQP"
+    algo_config.instance_algorithm_options = {}
+    algo_config.copy = mock.Mock(return_value=algo_config)
     return algo_config
 
 
@@ -232,6 +234,8 @@ def unknown_algorithm_configuration():
     algo_config.algorithm_name = "Algorithm"
     algo_config.algorithm_options = dict()
     algo_config.name = "Configuration"
+    algo_config.instance_algorithm_options = {}
+    algo_config.copy = mock.Mock(return_value=algo_config)
     return algo_config
 
 

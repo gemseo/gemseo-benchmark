@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import Final
 from typing import Iterable
 
 from gemseo import configure_logger
@@ -49,8 +50,11 @@ LOGGER = configure_logger()
 class Benchmarker:
     """A benchmarker of optimization algorithms on reference problems."""
 
-    _HISTORY_CLASS = PerformanceHistory
+    _HISTORY_CLASS: Final = PerformanceHistory
 
+    # TODO: (API BREAK) The argument ``pseven_logs_path`` is very specific to the pSeven
+    #  library and should be deprecated: the user can customize the logging paths
+    #  themselves with an instance algorithm option.
     def __init__(
         self,
         histories_path: Path,
@@ -110,36 +114,38 @@ class Benchmarker:
         """
         # Prepare the inputs of the benchmarking workers
         inputs = list()
-        for algorithm_configuration in algorithms:
+        for algorithm_configuration in [config.copy() for config in algorithms]:
             algorithm_name = algorithm_configuration.algorithm_name
             if not self.__is_algorithm_available(algorithm_name):
                 raise ValueError(f"The algorithm is not available: {algorithm_name}.")
 
-            algorithm_configuration = self.__disable_stopping_criteria(
-                algorithm_configuration
-            )
-            inputs.extend(
-                [
-                    (
+            self.__disable_stopping_criteria(algorithm_configuration)
+            for problem in problems:
+                problem_algorithm_configuration = self.__set_pseven_log_file(
+                    algorithm_configuration, problem
+                )
+                inputs.extend(
+                    [
                         (
-                            self.__set_pseven_log_file(
-                                algorithm_configuration, problem, problem_instance_index
+                            self.__set_instance_algorithm_options(
+                                problem_algorithm_configuration,
+                                problem_instance_index,
                             ),
                             problem,
                             problem_instance,
                             problem_instance_index,
                         )
-                    )
-                    for problem in problems
-                    for problem_instance_index, problem_instance in enumerate(problem)
-                    if not self.__skip_instance(
-                        algorithm_configuration,
-                        problem,
-                        problem_instance_index,
-                        overwrite_histories,
-                    )
-                ]
-            )
+                        for problem_instance_index, problem_instance in enumerate(
+                            problem
+                        )
+                        if not self.__skip_instance(
+                            algorithm_configuration,
+                            problem,
+                            problem_instance_index,
+                            overwrite_histories,
+                        )
+                    ]
+                )
 
         if inputs:
             worker = Worker(self.__optimizers_factory, self._HISTORY_CLASS)
@@ -158,27 +164,20 @@ class Benchmarker:
     @staticmethod
     def __disable_stopping_criteria(
         algorithm_configuration: AlgorithmConfiguration,
-    ) -> AlgorithmConfiguration:
+    ) -> None:
         """Disable the stopping criteria.
 
         Args:
             algorithm_configuration: The algorithm configuration.
-
-        Returns:
-            A copy of the algorithm configuration with disabled stopping criteria.
         """
-        options = {
-            "xtol_rel": 0.0,
-            "xtol_abs": 0.0,
-            "ftol_rel": 0.0,
-            "ftol_abs": 0.0,
-            "stop_crit_n_x": sys.maxsize,
-        }
-        options.update(algorithm_configuration.algorithm_options)
-        return AlgorithmConfiguration(
-            algorithm_configuration.algorithm_name,
-            algorithm_configuration.name,
-            **options,
+        algorithm_configuration.algorithm_options.update(
+            {
+                "xtol_rel": 0.0,
+                "xtol_abs": 0.0,
+                "ftol_rel": 0.0,
+                "ftol_abs": 0.0,
+                "stop_crit_n_x": sys.maxsize,
+            }
         )
 
     def __skip_instance(
@@ -223,21 +222,44 @@ class Benchmarker:
         )
         return False
 
+    @staticmethod
+    def __set_instance_algorithm_options(
+        algorithm_configuration: AlgorithmConfiguration,
+        index: int,
+    ) -> AlgorithmConfiguration:
+        """Return the algorithm configuration of an instance of a problem.
+
+        Args:
+            algorithm_configuration: The algorithm configuration.
+            index: The 0-based index of the problem instance.
+
+        Returns:
+            The algorithm configuration of the problem instance.
+        """
+        algorithm_options = dict(algorithm_configuration.algorithm_options)
+        for name, value in algorithm_configuration.instance_algorithm_options.items():
+            algorithm_options[name] = value(index)
+
+        return AlgorithmConfiguration(
+            algorithm_configuration.algorithm_name,
+            algorithm_configuration.name,
+            {},
+            **algorithm_options,
+        )
+
     def __set_pseven_log_file(
         self,
         algorithm_configuration: AlgorithmConfiguration,
         problem: Problem,
-        index: int,
     ) -> AlgorithmConfiguration:
         """Copy an algorithm configuration by adding the path to the pSeven log file.
 
         Args:
             algorithm_configuration: The algorithm configuration.
             problem: The benchmarking problem.
-            index: The index of the problem instance.
 
         Returns:
-            A copy of the configuration including the path to the pSeven log file.
+            The configuration including the path to the pSeven log file.
         """
         if not self.__pseven_logs_path or not self.__is_algorithm_available("PSEVEN"):
             return algorithm_configuration
@@ -247,14 +269,15 @@ class Benchmarker:
         if algorithm_configuration.algorithm_name not in PSevenOpt().descriptions:
             return algorithm_configuration
 
-        return AlgorithmConfiguration(
-            algorithm_configuration.algorithm_name,
-            algorithm_configuration.name,
-            **algorithm_configuration.algorithm_options,
-            log_path=pretty_str(
-                self.__get_pseven_log_path(algorithm_configuration, problem.name, index)
-            ),
+        algorithm_configuration_copy = algorithm_configuration.copy()
+        algorithm_configuration_copy.instance_algorithm_options[
+            "log_path"
+        ] = lambda index: pretty_str(
+            self.__get_pseven_log_path(
+                algorithm_configuration_copy, problem.name, index
+            )
         )
+        return algorithm_configuration_copy
 
     def __worker_callback(self, _: int, outputs: WorkerOutputs) -> None:
         """Save the history and database of a benchmarking worker.

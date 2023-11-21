@@ -20,6 +20,8 @@
 """Tests for the benchmarker."""
 from __future__ import annotations
 
+import json
+
 import pytest
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.problems.analytical.rastrigin import Rastrigin
@@ -145,6 +147,40 @@ def test_execution(results_root, rosenbrock, number_of_processes, use_threading)
     path = algo_pb_dir / f"{lbfgsb_configuration.name}.1.json"
     assert path.is_file()
     assert results.contains(lbfgsb_configuration.algorithm_name, rosenbrock.name, path)
-    path = algo_pb_dir / f"{lbfgsb_configuration.name}.1.json"
+    path = algo_pb_dir / f"{lbfgsb_configuration.name}.2.json"
     assert path.is_file()
     assert results.contains(lbfgsb_configuration.algorithm_name, rosenbrock.name, path)
+
+
+def test_instance_specific_algorithm_options(results_root, rosenbrock):
+    """Check instance-specific algorithm options."""
+    Benchmarker(results_root).execute(
+        [rosenbrock],
+        AlgorithmsConfigurations(
+            AlgorithmConfiguration(
+                "L-BFGS-B",
+                instance_algorithm_options={"max_iter": lambda index: index + 2},
+            )
+        ),
+    )
+    path_base = (
+        results_root
+        / lbfgsb_configuration.name
+        / rosenbrock.name
+        / lbfgsb_configuration.name
+    )
+    with path_base.with_suffix(".1.json").open("r") as json_file_1:
+        assert (
+            json.load(json_file_1)["algorithm_configuration"]["algorithm_options"][
+                "max_iter"
+            ]
+            == 2
+        )
+
+    with path_base.with_suffix(".2.json").open("r") as json_file_2:
+        assert (
+            json.load(json_file_2)["algorithm_configuration"]["algorithm_options"][
+                "max_iter"
+            ]
+            == 3
+        )

@@ -27,6 +27,7 @@ from pathlib import Path
 from shutil import copy
 from subprocess import call
 from typing import Any
+from typing import Final
 from typing import Iterable
 from typing import Mapping
 
@@ -69,9 +70,9 @@ class DirectoryName(enum.Enum):
 class Report:
     """A benchmarking report."""
 
-    __FILE_DIRECTORY = Path(__file__).parent
-    __TEMPLATES_DIR_PATH = __FILE_DIRECTORY / "templates"
-    __CONF_PATH = __FILE_DIRECTORY / "conf.py"
+    __FILE_DIRECTORY: Final[Path] = Path(__file__).parent
+    __TEMPLATES_DIR_PATH: Final[Path] = __FILE_DIRECTORY / "templates"
+    __CONF_PATH: Final[Path] = __FILE_DIRECTORY / "conf.py"
 
     def __init__(
         self,

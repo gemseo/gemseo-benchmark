@@ -26,6 +26,7 @@ required size) of this median history is extracted.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Final
 from typing import Sequence
 
 import matplotlib.pyplot as plt
@@ -44,7 +45,9 @@ from gemseo_benchmark.results.performance_history import PerformanceHistory
 class TargetsGenerator:
     """Compute the target values for an objective to minimize."""
 
-    __NO_HISTORIES_MESSAGE = "There are no histories to generate the targets from."
+    __NO_HISTORIES_MESSAGE: Final[
+        str
+    ] = "There are no histories to generate the targets from."
 
     __histories: PerformanceHistories
     """A collection of performance histories."""

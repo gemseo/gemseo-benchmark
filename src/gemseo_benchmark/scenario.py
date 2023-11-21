@@ -18,6 +18,7 @@ from __future__ import annotations
 import logging
 import shutil
 from pathlib import Path
+from typing import Final
 from typing import Iterable
 from typing import Mapping
 
@@ -37,11 +38,11 @@ LOGGER = logging.getLogger(__name__)
 class Scenario:
     """A benchmarking scenario, including running of solvers and reporting."""
 
-    __DATABASES_DIRNAME = "databases"
-    __HISTORIES_DIRNAME = "histories"
-    __PSEVEN_LOGS_DIRNAME = "pseven_logs"
-    __REPORT_DIRNAME = "report"
-    __RESULTS_FILENAME = "results.json"
+    __DATABASES_DIRNAME: Final[str] = "databases"
+    __HISTORIES_DIRNAME: Final[str] = "histories"
+    __PSEVEN_LOGS_DIRNAME: Final[str] = "pseven_logs"
+    __REPORT_DIRNAME: Final[str] = "report"
+    __RESULTS_FILENAME: Final[str] = "results.json"
 
     def __init__(
         self,
