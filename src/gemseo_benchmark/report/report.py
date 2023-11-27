@@ -26,6 +26,7 @@ import os
 from pathlib import Path
 from shutil import copy
 from subprocess import call
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import Final
 from typing import Iterable
@@ -39,9 +40,11 @@ from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
-from gemseo_benchmark.problems.problem import Problem
-from gemseo_benchmark.problems.problems_group import ProblemsGroup
-from gemseo_benchmark.results.results import Results
+
+if TYPE_CHECKING:
+    from gemseo_benchmark.problems.problem import Problem
+    from gemseo_benchmark.problems.problems_group import ProblemsGroup
+    from gemseo_benchmark.results.results import Results
 
 
 class FileName(enum.Enum):
@@ -108,7 +111,7 @@ class Report:
         self.__problems_groups = problems_groups
         self.__histories_paths = histories_paths
         if custom_algos_descriptions is None:
-            custom_algos_descriptions = dict()
+            custom_algos_descriptions = {}
 
         self.__custom_algos_descriptions = custom_algos_descriptions
         algos_diff = set().union(
@@ -198,7 +201,7 @@ class Report:
         problems_dir.mkdir()
 
         # Create a file for each problem
-        problems_paths = list()
+        problems_paths = []
         problems = [problem for group in self.__problems_groups for problem in group]
         problems = sorted(problems, key=lambda pb: pb.name.lower())
         for problem in problems:
@@ -257,9 +260,9 @@ class Report:
             use_log_scale: Whether to use a logarithmic scale on the value axis.
         """
         results_root = self.__root_directory / DirectoryName.RESULTS.value
-        algos_configs_groups_paths = list()
+        algos_configs_groups_paths = []
         for algorithms_configurations_group in self.__algorithms_configurations_groups:
-            results_paths = list()
+            results_paths = []
             for problems_group in self.__problems_groups:
                 # Get the algorithms with results for all the problems of the group
                 algorithms_configurations = AlgorithmsConfigurations(
@@ -308,14 +311,15 @@ class Report:
                 )
                 results_path.parent.mkdir(exist_ok=True)
                 results_paths.append(results_path.relative_to(results_root).as_posix())
+                algorithms_configurations_names = [
+                    algo_config.name
+                    for algo_config in algorithms_configurations_group.configurations
+                ]
                 self.__fill_template(
                     results_path,
                     FileName.SUB_RESULTS.value,
                     algorithms_group_name=algorithms_configurations_group.name,
-                    algorithms_configurations_names=[
-                        algo_config.name
-                        for algo_config in algorithms_configurations_group.configurations
-                    ],
+                    algorithms_configurations_names=algorithms_configurations_names,
                     problems_group_name=problems_group.name,
                     problems_group_description=problems_group.description,
                     data_profile=data_profile,
@@ -384,9 +388,9 @@ class Report:
             to_html: Whether to generate the report in HTML format.
             to_pdf: Whether to generate the report in PDF format.
         """
-        initial_dir = os.getcwd()
+        initial_dir = Path.cwd()
         os.chdir(str(self.__root_directory))
-        builders = list()
+        builders = []
         if to_html:
             builders.append("html")
         if to_pdf:
@@ -456,7 +460,7 @@ class Report:
             figures.
         """
         max_eval_number = self.__max_eval_numbers.get(group.name)
-        figures = dict()
+        figures = {}
         for problem in group:
             problem_dir = group_dir / join_substrings(problem.name)
             problem_dir.mkdir()
@@ -480,8 +484,7 @@ class Report:
             }
 
         # Sort the keys of the dictionary
-        figures = {key: figures[key] for key in sorted(figures.keys(), key=str.lower)}
-        return figures
+        return {key: figures[key] for key in sorted(figures.keys(), key=str.lower)}
 
     def __plot_problem_data_profile(
         self,

@@ -28,16 +28,20 @@ and computes its data profile (see :mod:`.data_profiles.data_profile`).
 """
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 from gemseo.utils.matplotlib_figure import save_show_figure
-from matplotlib.figure import Figure
 from numpy import array
 from numpy import linspace
 from numpy import logical_not
 
 from gemseo_benchmark.results.performance_history import PerformanceHistory
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from matplotlib.figure import Figure
 
 
 class TargetValues(PerformanceHistory):

@@ -18,6 +18,7 @@ from __future__ import annotations
 import logging
 import shutil
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Final
 from typing import Iterable
 from typing import Mapping
@@ -28,9 +29,11 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
 from gemseo_benchmark.benchmarker.benchmarker import Benchmarker
-from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.report.report import Report
 from gemseo_benchmark.results.results import Results
+
+if TYPE_CHECKING:
+    from gemseo_benchmark.problems.problems_group import ProblemsGroup
 
 LOGGER = logging.getLogger(__name__)
 
@@ -172,11 +175,9 @@ class Scenario:
             from gemseo.algos.opt.lib_pseven import PSevenOpt
 
             save_pseven_logs = any(
-                [
-                    algorithm_configuration.algorithm_name in PSevenOpt().descriptions
-                    for algorithms_configurations in self._algorithms_configurations_groups
-                    for algorithm_configuration in algorithms_configurations
-                ]
+                algorithm_configuration.algorithm_name in PSevenOpt().descriptions
+                for algorithms_configurations in self._algorithms_configurations_groups
+                for algorithm_configuration in algorithms_configurations
             )
 
         benchmarker = Benchmarker(

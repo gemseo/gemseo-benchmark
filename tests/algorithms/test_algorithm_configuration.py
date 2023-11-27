@@ -21,11 +21,12 @@
 from __future__ import annotations
 
 import pytest
+
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 
 
 @pytest.mark.parametrize(
-    ["input_name", "output_name"],
+    ("input_name", "output_name"),
     [("SciPy SLSQP", "SciPy SLSQP"), (None, "SLSQP_max_iter=9")],
 )
 def test_name(input_name, output_name):
@@ -35,10 +36,10 @@ def test_name(input_name, output_name):
 
 
 @pytest.mark.parametrize(
-    ["input_name", "output_name"],
+    ("input_name", "output_name"),
     [("SciPy SLSQP", "SciPy SLSQP"), (None, "SLSQP_max_iter=9")],
 )
-@pytest.mark.parametrize("skip_instance_algorithm_options", (False, True))
+@pytest.mark.parametrize("skip_instance_algorithm_options", [False, True])
 def test_to_dict(input_name, output_name, skip_instance_algorithm_options):
     """Check the export of an algorithm configuration as a dictionary."""
     algorithm_configuration = AlgorithmConfiguration(

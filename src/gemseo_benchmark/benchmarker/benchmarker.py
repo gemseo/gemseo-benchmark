@@ -21,12 +21,11 @@
 from __future__ import annotations
 
 import sys
-from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Final
 from typing import Iterable
 
 from gemseo import configure_logger
-from gemseo.algos.database import Database
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.core.parallel_execution.callable_parallel_execution import (
     CallableParallelExecution,
@@ -35,14 +34,20 @@ from gemseo.utils.string_tools import pretty_str
 
 from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
-from gemseo_benchmark.algorithms.algorithms_configurations import (
-    AlgorithmsConfigurations,
-)
 from gemseo_benchmark.benchmarker.worker import Worker
 from gemseo_benchmark.benchmarker.worker import WorkerOutputs
-from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 from gemseo_benchmark.results.results import Results
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from gemseo.algos.database import Database
+
+    from gemseo_benchmark.algorithms.algorithms_configurations import (
+        AlgorithmsConfigurations,
+    )
+    from gemseo_benchmark.problems.problem import Problem
 
 LOGGER = configure_logger()
 
@@ -113,7 +118,7 @@ class Benchmarker:
             ValueError: If the algorithm is not available.
         """
         # Prepare the inputs of the benchmarking workers
-        inputs = list()
+        inputs = []
         for algorithm_configuration in [config.copy() for config in algorithms]:
             algorithm_name = algorithm_configuration.algorithm_name
             if not self.__is_algorithm_available(algorithm_name):
@@ -270,11 +275,11 @@ class Benchmarker:
             return algorithm_configuration
 
         algorithm_configuration_copy = algorithm_configuration.copy()
-        algorithm_configuration_copy.instance_algorithm_options[
-            "log_path"
-        ] = lambda index: pretty_str(
-            self.__get_pseven_log_path(
-                algorithm_configuration_copy, problem.name, index
+        algorithm_configuration_copy.instance_algorithm_options["log_path"] = (
+            lambda index: pretty_str(
+                self.__get_pseven_log_path(
+                    algorithm_configuration_copy, problem.name, index
+                )
             )
         )
         return algorithm_configuration_copy

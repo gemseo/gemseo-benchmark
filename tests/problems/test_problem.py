@@ -28,21 +28,21 @@ import numpy
 import pytest
 from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.problems.analytical.rosenbrock import Rosenbrock
-from gemseo_benchmark.data_profiles.target_values import TargetValues
-from gemseo_benchmark.problems.problem import Problem
-from gemseo_benchmark.results.performance_history import PerformanceHistory
 from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
 from numpy import ones
 from numpy import zeros
 from numpy.testing import assert_allclose
 from numpy.testing import assert_equal
-from pytest import raises
+
+from gemseo_benchmark.data_profiles.target_values import TargetValues
+from gemseo_benchmark.problems.problem import Problem
+from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 
 def test_invalid_creator():
     """Check initialization with an invalid problem creator."""
-    with raises(
+    with pytest.raises(
         TypeError,
         match="optimization_problem_creator must return an OptimizationProblem.",
     ):
@@ -70,7 +70,7 @@ def test_default_start_point(benchmarking_problem, problem):
 
 def test_wrong_start_points_type(creator):
     """Check initialization with starting points of the wrong type."""
-    with raises(
+    with pytest.raises(
         TypeError,
         match="A starting point must be a 1-dimensional NumPy array of size 2.",
     ):
@@ -79,7 +79,7 @@ def test_wrong_start_points_type(creator):
 
 def test_inconsistent_start_points(creator):
     """Check initialization with starting points of inadequate size."""
-    with raises(
+    with pytest.raises(
         ValueError,
         match="A starting point must be a 1-dimensional NumPy array of size 2.",
     ):
@@ -105,8 +105,10 @@ def test_start_points_iteration(creator):
 def test_undefined_targets(creator):
     """Check the access to undefined targets."""
     problem = Problem("problem", creator, [zeros(2)])
-    with raises(ValueError, match="The benchmarking problem has no target value."):
-        problem.target_values
+    with pytest.raises(
+        ValueError, match="The benchmarking problem has no target value."
+    ):
+        _ = problem.target_values
 
 
 def test_generate_start_points(creator):
@@ -121,12 +123,14 @@ def test_undefined_start_points(creator):  # TODO: use creator
     opt_problem.design_space = mock.Mock()
     opt_problem.design_space.has_current_value = mock.Mock(return_value=False)
     problem = Problem("problem", lambda: opt_problem)
-    with raises(ValueError, match="The benchmarking problem has no starting point."):
-        problem.start_points
+    with pytest.raises(
+        ValueError, match="The benchmarking problem has no starting point."
+    ):
+        _ = problem.start_points
 
 
 @pytest.mark.parametrize(
-    [
+    (
         "dimension",
         "nonlinear_objective",
         "linear_equality_constraints",
@@ -134,7 +138,7 @@ def test_undefined_start_points(creator):  # TODO: use creator
         "nonlinear_equality_constraints",
         "nonlinear_inequality_constraints",
         "description",
-    ],
+    ),
     [
         (
             1,
@@ -190,7 +194,7 @@ def results():
     return results
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def target_values():
     """Target values."""
     # N.B. passing the configuration is required for the setter.
@@ -255,7 +259,7 @@ def test_plot_3_histories(
         PerformanceHistory([1.2, 1.0, 0.5, 0.4, 0.2]),
         PerformanceHistory([1.1, 0.7, 0.5, 0.1, 0.0]),
     ]
-    paths = list()
+    paths = []
     for index, history in enumerate(histories):
         path = tmpdir / f"history_{index + 1}.json"
         history.to_file(path)
@@ -280,7 +284,7 @@ def test_plot_infeasible_histories(
         PerformanceHistory([1.0, 0.5, 0.1], [1.0, 0.0, 0.0]),
         PerformanceHistory([0.5, 0.2, 0.0], [1.0, 0.0, 0.0]),
     ]
-    paths = list()
+    paths = []
     for index, history in enumerate(histories):
         path = tmpdir / f"history_{index + 1}.json"
         history.to_file(path)
@@ -417,7 +421,7 @@ def test_target_values_wrong_type(benchmarking_problem):
 
 
 @pytest.mark.parametrize(
-    ["input_description", "description"],
+    ("input_description", "description"),
     [
         (None, "No description available."),
         ("A description of the problem.", "A description of the problem."),

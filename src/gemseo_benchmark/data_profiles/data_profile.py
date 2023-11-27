@@ -35,8 +35,7 @@ functions evaluations made by an algorithm to reach a problem target.
 """
 from __future__ import annotations
 
-from numbers import Number
-from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Iterable
 from typing import Mapping
 from typing import Sequence
@@ -44,17 +43,23 @@ from typing import Sequence
 import matplotlib
 import matplotlib.pyplot as plt
 from gemseo.utils.matplotlib_figure import save_show_figure
-from matplotlib.figure import Figure
 from numpy import array
 from numpy import linspace
 from numpy import ndarray
 from numpy import zeros
 
 from gemseo_benchmark import COLORS_CYCLE
-from gemseo_benchmark import get_markers_cycle
 from gemseo_benchmark import MarkeveryType
-from gemseo_benchmark.data_profiles.target_values import TargetValues
+from gemseo_benchmark import get_markers_cycle
 from gemseo_benchmark.results.performance_history import PerformanceHistory
+
+if TYPE_CHECKING:
+    from numbers import Number
+    from pathlib import Path
+
+    from matplotlib.figure import Figure
+
+    from gemseo_benchmark.data_profiles.target_values import TargetValues
 
 
 class DataProfile:
@@ -72,7 +77,7 @@ class DataProfile:
         """  # noqa: D205, D212, D415
         self.__targets_number = 0
         self.target_values = target_values
-        self.__values_histories = dict()
+        self.__values_histories = {}
 
     @property
     def target_values(self) -> dict[str, TargetValues]:
@@ -133,7 +138,7 @@ class DataProfile:
             raise ValueError(f"{problem_name!r} is not the name of a reference problem")
         if algorithm_configuration_name not in self.__values_histories:
             self.__values_histories[algorithm_configuration_name] = {
-                pb_name: list() for pb_name in self.__target_values.keys()
+                pb_name: [] for pb_name in self.__target_values
             }
         history = PerformanceHistory(
             objective_values, infeasibility_measures, feasibility_statuses
@@ -161,7 +166,7 @@ class DataProfile:
                 Refer to the Matplotlib documentation.
         """
         if algo_names is None:
-            algo_names = tuple()
+            algo_names = ()
 
         data_profiles = self.compute_data_profiles(*algo_names)
         figure = self._plot_data_profiles(data_profiles, markevery)
@@ -180,7 +185,7 @@ class DataProfile:
         Returns:
             The data profiles.
         """
-        data_profiles = dict()
+        data_profiles = {}
         if not algo_names:
             algo_names = self.__values_histories.keys()
 

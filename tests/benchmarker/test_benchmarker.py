@@ -21,18 +21,22 @@
 from __future__ import annotations
 
 import json
+from typing import TYPE_CHECKING
 
 import pytest
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.problems.analytical.rastrigin import Rastrigin
+from numpy import array
+
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
 from gemseo_benchmark.benchmarker.benchmarker import Benchmarker
 from gemseo_benchmark.problems.problem import Problem
-from gemseo_benchmark.results.results import Results
-from numpy import array
+
+if TYPE_CHECKING:
+    from gemseo_benchmark.results.results import Results
 
 
 @pytest.fixture(scope="module")
@@ -133,7 +137,7 @@ def test___set_pseven_log_file(tmp_path, rosenbrock):
 
 
 @pytest.mark.parametrize(
-    ["number_of_processes", "use_threading"], [(1, False), (2, False), (2, True)]
+    ("number_of_processes", "use_threading"), [(1, False), (2, False), (2, True)]
 )
 def test_execution(results_root, rosenbrock, number_of_processes, use_threading):
     """Check the execution of the benchmarker."""

@@ -21,10 +21,11 @@
 from __future__ import annotations
 
 import pytest
-from gemseo_benchmark.data_profiles.target_values import TargetValues
-from gemseo_benchmark.results.performance_history import PerformanceHistory
 from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
+
+from gemseo_benchmark.data_profiles.target_values import TargetValues
+from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 
 def test_count_targets_hist():

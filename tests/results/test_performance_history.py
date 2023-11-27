@@ -26,6 +26,7 @@ from unittest import mock
 
 import numpy
 import pytest
+
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_history import PerformanceHistory

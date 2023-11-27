@@ -37,10 +37,10 @@ class AlgorithmsConfigurations(MutableSet[AlgorithmConfiguration]):
         Args:
             *algorithms_configurations: The algorithms configurations.
         """  # noqa: D205, D212, D415
-        self.__algorithms = list()
-        self.__configurations = list()
+        self.__algorithms = []
+        self.__configurations = []
         self.__name = name
-        self.__names = list()
+        self.__names = []
         for configuration in algorithms_configurations:
             self.add(configuration)
 

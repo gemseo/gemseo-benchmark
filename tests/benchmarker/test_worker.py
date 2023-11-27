@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 from gemseo.algos.opt.opt_factory import OptimizersFactory
+
 from gemseo_benchmark.benchmarker.worker import Worker
 
 

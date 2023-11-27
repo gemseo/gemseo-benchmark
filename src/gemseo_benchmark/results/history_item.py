@@ -74,8 +74,7 @@ class HistoryItem:
         if n_unsatisfied_constraints is None:
             if infeasibility_measure == 0.0:
                 return infeasibility_measure, 0
-            else:
-                return infeasibility_measure, None
+            return infeasibility_measure, None
 
         if n_unsatisfied_constraints < 0:
             raise ValueError(
