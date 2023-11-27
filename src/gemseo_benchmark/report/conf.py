@@ -35,7 +35,7 @@
 from __future__ import annotations
 
 project = "Benchmarking Report"
-copyright = "2021, IRT Saint Exupéry"
+copyright = "2021, IRT Saint Exupéry"  # noqa: A001
 author = "IRT Saint Exupéry"
 
 # -- General configuration ---------------------------------------------------

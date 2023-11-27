@@ -23,6 +23,7 @@ from __future__ import annotations
 import re
 
 import pytest
+
 from gemseo_benchmark.results.history_item import HistoryItem
 
 
@@ -68,7 +69,7 @@ def test_unsatisfied_constraints_number():
         HistoryItem(1.0, 1.0, -1)
 
 
-@pytest.mark.parametrize(["measure", "number"], [(1.0, 0), (0.0, 1)])
+@pytest.mark.parametrize(("measure", "number"), [(1.0, 0), (0.0, 1)])
 def test_inconsistent_unsatisfied_constraints_number(measure, number):
     """Check the setting of an inconsistent number of unsatisfied constraints."""
     with pytest.raises(
@@ -81,7 +82,7 @@ def test_inconsistent_unsatisfied_constraints_number(measure, number):
         HistoryItem(1.0, measure, number)
 
 
-@pytest.mark.parametrize(["measure", "number"], [(1.0, None), (0.0, 0)])
+@pytest.mark.parametrize(("measure", "number"), [(1.0, None), (0.0, 0)])
 def test_default_unsatisfied_constraints_number(measure, number):
     """Check the default number of unsatisfied constraints."""
     assert HistoryItem(1.0, measure).n_unsatisfied_constraints == number

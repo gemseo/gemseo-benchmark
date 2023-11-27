@@ -20,8 +20,13 @@
 """Tests for the problems group."""
 from __future__ import annotations
 
+import pytest
 from gemseo.problems.analytical.power_2 import Power2
 from gemseo.problems.analytical.rosenbrock import Rosenbrock
+from matplotlib import pyplot
+from matplotlib.testing.decorators import image_comparison
+from numpy import zeros
+
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
@@ -29,10 +34,6 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
-from matplotlib import pyplot
-from matplotlib.testing.decorators import image_comparison
-from numpy import zeros
-from pytest import raises
 
 algorithms_configurations = AlgorithmsConfigurations(AlgorithmConfiguration("L-BFGS-B"))
 
@@ -52,8 +53,10 @@ def test_is_algorithm_suited():
 def test_compute_targets():
     """Check the computation of target values."""
     rosenbrock = Problem("Rosenbrock", Rosenbrock, [zeros(2)])
-    with raises(ValueError, match="The benchmarking problem has no target value."):
-        rosenbrock.target_values
+    with pytest.raises(
+        ValueError, match="The benchmarking problem has no target value."
+    ):
+        _ = rosenbrock.target_values
     ProblemsGroup("group", [rosenbrock]).compute_targets(2, algorithms_configurations)
     assert isinstance(rosenbrock.target_values, TargetValues)
 

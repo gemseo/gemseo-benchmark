@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 import pytest
+
 from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_histories import PerformanceHistories
 from gemseo_benchmark.results.performance_history import PerformanceHistory

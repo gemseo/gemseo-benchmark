@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import pytest
 from gemseo.algos.opt.opt_factory import OptimizersFactory
+
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,

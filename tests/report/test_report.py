@@ -25,6 +25,7 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
+
 from gemseo_benchmark.report.report import Report
 
 
@@ -53,7 +54,7 @@ def test_init_missing_algorithms(
         Report(tmp_path, [unknown_algorithms_configurations], problems_groups, results)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def report(tmp_path, algorithms_configurations, problems_groups, results) -> Report:
     """A benchmarking report."""
     return Report(tmp_path, [algorithms_configurations], problems_groups, results)
@@ -166,7 +167,7 @@ def test_problem_without_optimum(
         report.generate()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def incomplete_results(
     algorithm_configuration, unknown_algorithm_configuration, problem_a, problem_b
 ) -> mock.Mock:

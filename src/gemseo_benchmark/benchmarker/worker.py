@@ -15,17 +15,23 @@
 """A class to implement a benchmarking worker."""
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 from typing import Tuple
 
 from gemseo import execute_algo
 from gemseo.algos.database import Database
-from gemseo.algos.opt.opt_factory import OptimizersFactory
-from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.utils.timer import Timer
 
-from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
+
+if TYPE_CHECKING:
+    from gemseo.algos.opt.opt_factory import OptimizersFactory
+    from gemseo.algos.opt_problem import OptimizationProblem
+
+    from gemseo_benchmark.algorithms.algorithm_configuration import (
+        AlgorithmConfiguration,
+    )
 
 WorkerOutputs = Tuple[Problem, int, Database, PerformanceHistory]
 

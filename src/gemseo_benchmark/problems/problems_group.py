@@ -21,17 +21,21 @@
 """Grouping of reference problems for benchmarking."""
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Iterable
 from typing import Iterator
 
-from gemseo_benchmark.algorithms.algorithms_configurations import (
-    AlgorithmsConfigurations,
-)
 from gemseo_benchmark.data_profiles.data_profile import DataProfile
-from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
-from gemseo_benchmark.results.results import Results
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from gemseo_benchmark.algorithms.algorithms_configurations import (
+        AlgorithmsConfigurations,
+    )
+    from gemseo_benchmark.problems.problem import Problem
+    from gemseo_benchmark.results.results import Results
 
 
 class ProblemsGroup:

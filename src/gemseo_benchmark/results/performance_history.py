@@ -38,17 +38,21 @@ import json
 from functools import reduce
 from itertools import chain
 from itertools import repeat
+from itertools import starmap
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Final
 from typing import Iterable
 from typing import Sequence
 
-from gemseo.algos.opt_problem import OptimizationProblem
-from matplotlib.axes import Axes
 from numpy import inf
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.results.history_item import HistoryItem
+
+if TYPE_CHECKING:
+    from gemseo.algos.opt_problem import OptimizationProblem
+    from matplotlib.axes import Axes
 
 
 class PerformanceHistory(collections.abc.Sequence):
@@ -60,6 +64,7 @@ class PerformanceHistory(collections.abc.Sequence):
         problem_name (str): The name of the problem.
         total_time (float): The run time of the algorithm.
     """
+
     __ALGORITHM_CONFIGURATION: Final[str] = "algorithm_configuration"
     __CONSTRAINTS_NAMES: Final[str] = "constraints_names"
     __DOE_SIZE: Final[str] = "DOE_size"
@@ -249,12 +254,14 @@ class PerformanceHistory(collections.abc.Sequence):
                 " must have same length."
             )
 
-        return [
-            HistoryItem(value, measure, n_unsatisfied)
-            for value, measure, n_unsatisfied in zip(
-                objective_values, infeasibility_measures, n_unsatisfied_constraints
+        return list(
+            starmap(
+                HistoryItem,
+                zip(
+                    objective_values, infeasibility_measures, n_unsatisfied_constraints
+                ),
             )
-        ]
+        )
 
     def __len__(self) -> int:
         return len(self.__items)
@@ -266,7 +273,7 @@ class PerformanceHistory(collections.abc.Sequence):
         return self.__items[i]
 
     def __repr__(self) -> str:
-        return str([item for item in self])
+        return str(list(self))
 
     def compute_cumulated_minimum(self) -> PerformanceHistory:
         """Return the history of the cumulated minimum.
@@ -357,7 +364,7 @@ class PerformanceHistory(collections.abc.Sequence):
         Args:
             path: The path where to write the file.
         """
-        items_data = list()
+        items_data = []
         # Add each history item in dictionary format
         for item in self.items:
             data_item = {
@@ -372,7 +379,7 @@ class PerformanceHistory(collections.abc.Sequence):
 
             items_data.append(data_item)
 
-        data = dict()
+        data = {}
         if self.problem_name is not None:
             data[self.__PROBLEM] = self.problem_name
 
@@ -396,7 +403,7 @@ class PerformanceHistory(collections.abc.Sequence):
 
         data[self.__HISTORY_ITEMS] = items_data
         with Path(path).open("w") as file:
-            json.dump(data, file, indent=4, separators=(",", ": "))
+            json.dump(data, file, indent=2, separators=(",", ": "))
 
     @classmethod
     def from_file(cls, path: str | Path) -> PerformanceHistory:
@@ -463,11 +470,11 @@ class PerformanceHistory(collections.abc.Sequence):
             The performance history.
         """
         obj_name = problem.objective.name
-        obj_values = list()
-        infeas_measures = list()
-        feas_statuses = list()
-        n_unsatisfied_constraints = list()
-        functions_names = set([obj_name] + problem.get_constraint_names())
+        obj_values = []
+        infeas_measures = []
+        feas_statuses = []
+        n_unsatisfied_constraints = []
+        functions_names = {obj_name, *problem.get_constraint_names()}
         for design_values, output_values in problem.database.items():
             # Only consider points with all functions values
             if not functions_names <= set(output_values.keys()):
@@ -507,10 +514,7 @@ class PerformanceHistory(collections.abc.Sequence):
         Returns:
             The abscissas and the ordinates of the plot.
         """
-        if minimum_history:
-            history = self.compute_cumulated_minimum()
-        else:
-            history = self
+        history = self.compute_cumulated_minimum() if minimum_history else self
 
         # Find the index of the first feasible history item
         if feasible:

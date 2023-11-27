@@ -17,16 +17,20 @@ from __future__ import annotations
 
 import collections.abc
 import statistics
+from typing import TYPE_CHECKING
 from typing import Callable
 from typing import Iterable
 from typing import Sequence
 
 import numpy
-from matplotlib.axes import Axes
 
-from gemseo_benchmark import MarkeveryType
-from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
+
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
+
+    from gemseo_benchmark import MarkeveryType
+    from gemseo_benchmark.results.history_item import HistoryItem
 
 
 class PerformanceHistories(collections.abc.MutableSequence):
@@ -205,6 +209,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         _, history_items = median.get_plot_data(feasible=True)
         if history_items:
             return min(history_items).objective_value
+        return None
 
     @staticmethod
     def __get_penalized_objective_values(

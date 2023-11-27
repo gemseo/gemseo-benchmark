@@ -33,7 +33,7 @@ class Results:
             path: The path to the JSON file from which to load the paths.
                 If ``None``, the collection is initially empty.
         """  # noqa: D205, D212, D415
-        self.__dict = dict()
+        self.__dict = {}
         if path is not None:
             self.from_file(path)
 
@@ -54,12 +54,14 @@ class Results:
         try:
             absolute_path = Path(path).resolve(strict=True)
         except FileNotFoundError:
-            raise FileNotFoundError(f"The path to the history does not exist: {path}.")
+            raise FileNotFoundError(
+                f"The path to the history does not exist: {path}."
+            ) from None
         if algorithm_configuration_name not in self.__dict:
-            self.__dict[algorithm_configuration_name] = dict()
+            self.__dict[algorithm_configuration_name] = {}
 
         if problem_name not in self.__dict[algorithm_configuration_name]:
-            self.__dict[algorithm_configuration_name][problem_name] = list()
+            self.__dict[algorithm_configuration_name][problem_name] = []
 
         self.__dict[algorithm_configuration_name][problem_name].append(absolute_path)
 
@@ -71,9 +73,9 @@ class Results:
             indent: The indent level of the JSON serialization.
         """
         # Convert the paths to strings to be JSON serializable
-        serializable = dict()
+        serializable = {}
         for algo_name, problems in self.__dict.items():
-            serializable[algo_name] = dict()
+            serializable[algo_name] = {}
             for problem_name, paths in problems.items():
                 serializable[algo_name][problem_name] = [str(path) for path in paths]
         with Path(path).open("w") as file:
