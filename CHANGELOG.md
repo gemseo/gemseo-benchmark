@@ -26,7 +26,29 @@ The format is based on
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-# Version 1.1.0 (September 2023)
+# Develop
+
+## Changed
+
+### Benchmarker
+
+- The option to automatically save the logs of pSeven has been removed
+  from classes ``Scenario`` and ``Benchmarker``.
+  However, the user can still save these logs
+  by passing an instance-specific option to ``AlgorithmConfiguration``
+  (refer to the "Added" section of the present changelog).
+  For example:
+  ``instance_algorithm_options
+  ={"log_path": lambda index: f"my/log/files/{index}.log"}``.
+  N.B. the user is now responsible for the creation of the parent directories.
+- Class ``Worker`` no longer sets ``PerformanceHistory.doe_size``
+  to the length of the value of the pSeven option ``"sample_x"``.
+  Note that this does not affect the behavior of ``gemseo-benchmark``:
+  ``PerformanceHistory.doe_size`` is only used as convenience
+  when loading/saving a ``PerformanceHistory`` using a file.
+  In particular, the behavior of ``Report`` is not changed.
+  The user can still set the value of ``PerformanceHistory.doe_size``
+  by themselves since it is a public attribute.
 
 ## Added
 
@@ -34,6 +56,10 @@ and this project adheres to
 
 - Algorithm options specific to problem instances (e.g. paths for output files)
   can be passed to ``AlgorithmConfiguration`` in the new argument ``instance_algorithm_options``.
+
+# Version 1.1.0 (September 2023)
+
+## Added
 
 ### Results
 

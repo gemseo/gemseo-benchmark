@@ -27,7 +27,6 @@ from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
-    from gemseo.algos.opt.opt_factory import OptimizersFactory
     from gemseo.algos.opt_problem import OptimizationProblem
 
     from gemseo_benchmark.algorithms.algorithm_configuration import (
@@ -41,16 +40,12 @@ class Worker:
     """A benchmarking worker."""
 
     def __init__(
-        self,
-        factory: OptimizersFactory,
-        history_class: type[PerformanceHistory] = PerformanceHistory,
+        self, history_class: type[PerformanceHistory] = PerformanceHistory
     ) -> None:
         """
         Args:
-            factory: The factory for optimizers.
             history_class: The class of performance history.
         """  # noqa: D205, D212, D415
-        self.__factory = factory
         self.__history_class = history_class
 
     def __call__(
@@ -82,11 +77,5 @@ class Worker:
         history = self.__history_class.from_problem(problem_instance, problem.name)
         history.algorithm_configuration = algorithm_configuration
         history.doe_size = 1
-        if self.__factory.is_available("PSEVEN"):
-            from gemseo.algos.opt.lib_pseven import PSevenOpt
-
-            if algo_name in PSevenOpt().descriptions:
-                history.doe_size = len(algo_options.get("sample_x", [None]))
-
         history.total_time = timer.elapsed_time
         return problem, problem_instance_index, problem_instance.database, history
