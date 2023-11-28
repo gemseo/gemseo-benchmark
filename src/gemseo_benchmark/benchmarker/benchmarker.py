@@ -31,7 +31,6 @@ from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.core.parallel_execution.callable_parallel_execution import (
     CallableParallelExecution,
 )
-from gemseo.utils.string_tools import pretty_str
 
 from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -58,15 +57,11 @@ class Benchmarker:
 
     _HISTORY_CLASS: Final = PerformanceHistory
 
-    # TODO: (API BREAK) The argument ``pseven_logs_path`` is very specific to the pSeven
-    #  library and should be deprecated: the user can customize the logging paths
-    #  themselves with an instance algorithm option.
     def __init__(
         self,
         histories_path: Path,
         results_path: Path | None = None,
         databases_path: Path | None = None,
-        pseven_logs_path: Path | None = None,
     ) -> None:
         """
         Args:
@@ -77,15 +72,11 @@ class Benchmarker:
                 If exists, the file is updated with the new performance histories paths.
             databases_path: The path to the destination directory for the databases.
                 If ``None``, the databases will not be saved.
-            pseven_logs_path: The path to the destination directory for the pSeven
-                log files.
-                If ``None``, the pSeven log files will not be saved.
         """  # noqa: D205, D212, D415
         self._databases_path = databases_path
         self.__histories_path = histories_path
         self.__optimizers_factory = OptimizersFactory()
         self.__is_algorithm_available = self.__optimizers_factory.is_available
-        self.__pseven_logs_path = pseven_logs_path
         self.__results_path = results_path
         if results_path is not None and results_path.is_file():
             self._results = Results(results_path)
@@ -127,14 +118,11 @@ class Benchmarker:
 
             self.__disable_stopping_criteria(algorithm_configuration)
             for problem in problems:
-                problem_algorithm_configuration = self.__set_pseven_log_file(
-                    algorithm_configuration, problem
-                )
                 inputs.extend(
                     [
                         (
                             self.__set_instance_algorithm_options(
-                                problem_algorithm_configuration,
+                                algorithm_configuration,
                                 problem_instance_index,
                             ),
                             problem,
@@ -154,7 +142,7 @@ class Benchmarker:
                 )
 
         if inputs:
-            worker = Worker(self.__optimizers_factory, self._HISTORY_CLASS)
+            worker = Worker(self._HISTORY_CLASS)
             if number_of_processes == 1:
                 for worker_inputs in inputs:
                     self.__worker_callback(0, worker(worker_inputs))
@@ -253,38 +241,6 @@ class Benchmarker:
             **algorithm_options,
         )
 
-    def __set_pseven_log_file(
-        self,
-        algorithm_configuration: AlgorithmConfiguration,
-        problem: Problem,
-    ) -> AlgorithmConfiguration:
-        """Copy an algorithm configuration by adding the path to the pSeven log file.
-
-        Args:
-            algorithm_configuration: The algorithm configuration.
-            problem: The benchmarking problem.
-
-        Returns:
-            The configuration including the path to the pSeven log file.
-        """
-        if not self.__pseven_logs_path or not self.__is_algorithm_available("PSEVEN"):
-            return algorithm_configuration
-
-        from gemseo.algos.opt.lib_pseven import PSevenOpt
-
-        if algorithm_configuration.algorithm_name not in PSevenOpt().descriptions:
-            return algorithm_configuration
-
-        algorithm_configuration_copy = algorithm_configuration.copy()
-        algorithm_configuration_copy.instance_algorithm_options["log_path"] = (
-            lambda index: pretty_str(
-                self.__get_pseven_log_path(
-                    algorithm_configuration_copy, problem.name, index
-                )
-            )
-        )
-        return algorithm_configuration_copy
-
     def __worker_callback(self, _: int, outputs: WorkerOutputs) -> None:
         """Save the history and database of a benchmarking worker.
 
@@ -345,38 +301,6 @@ class Benchmarker:
             index,
             "json",
             make_parents=make_parents,
-        )
-
-    def __get_pseven_log_path(
-        self,
-        algorithm_configuration: AlgorithmConfiguration,
-        problem_name: str,
-        index: int,
-    ) -> Path:
-        """Return a path for a pSeven log file.
-
-        Args:
-            algorithm_configuration: The algorithm configuration.
-            problem_name: The name of the problem.
-            index: The index of the problem instance.
-
-        Returns:
-            The path for the pSeven log file.
-
-        Raises:
-            ValueError: If the path to the destination directory for the
-                pSeven files is not set.
-        """
-        if not self.__pseven_logs_path:
-            raise ValueError("The directory for the pSeven files is not set.")
-
-        return self._get_path(
-            self.__pseven_logs_path,
-            algorithm_configuration,
-            problem_name,
-            index,
-            "txt",
-            make_parents=True,
         )
 
     @staticmethod

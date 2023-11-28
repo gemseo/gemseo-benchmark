@@ -17,12 +17,7 @@
 from __future__ import annotations
 
 import pytest
-from gemseo.algos.opt.opt_factory import OptimizersFactory
 
-from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
-from gemseo_benchmark.algorithms.algorithms_configurations import (
-    AlgorithmsConfigurations,
-)
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.scenario import Scenario
 
@@ -40,13 +35,11 @@ def test_inexistent_outputs_path(algorithms_configurations):
 @pytest.mark.parametrize("number_of_processes", [1, 2])
 @pytest.mark.parametrize("use_threading", [False, True])
 @pytest.mark.parametrize("save_databases", [False, True])
-@pytest.mark.parametrize("save_pseven_logs", [False, True])
 def test_execute(
     algorithms_configurations,
     tmp_path,
     rosenbrock,
     save_databases,
-    save_pseven_logs,
     number_of_processes,
     use_threading,
 ):
@@ -54,7 +47,6 @@ def test_execute(
     Scenario([algorithms_configurations], tmp_path).execute(
         [ProblemsGroup("Rosenbrock", [rosenbrock])],
         save_databases=save_databases,
-        save_pseven_logs=save_pseven_logs,
         number_of_processes=number_of_processes,
         use_threading=use_threading,
     )
@@ -62,20 +54,3 @@ def test_execute(
     assert (tmp_path / "results.json").is_file()
     assert (tmp_path / "report").is_dir()
     assert (tmp_path / "databases").is_dir() == save_databases
-    assert not (tmp_path / "pseven_logs").is_dir()
-
-
-@pytest.mark.skipif(
-    not OptimizersFactory().is_available("PSEVEN"), reason="pSeven is not available."
-)
-@pytest.mark.parametrize("save_pseven_logs", [False, True])
-def test_execute_pseven(
-    algorithms_configurations, tmp_path, rosenbrock, save_pseven_logs
-):
-    """Check the execution of a benchmarking scenario including pSeven."""
-    Scenario(
-        [AlgorithmsConfigurations(AlgorithmConfiguration("PSEVEN"))], tmp_path
-    ).execute(
-        [ProblemsGroup("Rosenbrock", [rosenbrock])], save_pseven_logs=save_pseven_logs
-    )
-    assert (tmp_path / "pseven_logs").is_dir() == save_pseven_logs

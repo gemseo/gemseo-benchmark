@@ -24,8 +24,6 @@ from typing import Final
 from typing import Iterable
 from typing import Mapping
 
-from gemseo.algos.opt.opt_factory import OptimizersFactory
-
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
@@ -44,7 +42,6 @@ class Scenario:
 
     __DATABASES_DIRNAME: Final[str] = "databases"
     __HISTORIES_DIRNAME: Final[str] = "histories"
-    __PSEVEN_LOGS_DIRNAME: Final[str] = "pseven_logs"
     __REPORT_DIRNAME: Final[str] = "report"
     __RESULTS_FILENAME: Final[str] = "results.json"
 
@@ -83,7 +80,6 @@ class Scenario:
         generate_pdf_report: bool = False,
         infeasibility_tolerance: float = 0.0,
         save_databases: bool = False,
-        save_pseven_logs: bool = False,
         number_of_processes: int = 1,
         use_threading: bool = False,
         custom_algos_descriptions: Mapping[str, str] | None = None,
@@ -102,7 +98,6 @@ class Scenario:
             generate_pdf_report: Whether to generate the report in PDF format.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             save_databases: Whether to save the databases of the optimizations.
-            save_pseven_logs: Whether to save the logs of pSeven.
             number_of_processes: The maximum number of simultaneous threads or
                 processes used to parallelize the execution.
             use_threading: Whether to use threads instead of processes
@@ -128,7 +123,6 @@ class Scenario:
                 problems_groups,
                 overwrite_histories,
                 save_databases,
-                save_pseven_logs,
                 number_of_processes,
                 use_threading,
             )
@@ -153,7 +147,6 @@ class Scenario:
         problems_groups: Iterable[ProblemsGroup],
         overwrite_histories: bool,
         save_databases: bool,
-        save_pseven_logs: bool,
         number_of_processes: int,
         use_threading: bool,
     ) -> None:
@@ -163,33 +156,16 @@ class Scenario:
             problems_groups: The groups of benchmarking problems.
             overwrite_histories: Whether to overwrite the performance histories.
             save_databases: Whether to save the databases of the optimizations.
-            save_pseven_logs: Whether to save the logs of pSeven.
             number_of_processes: The maximum number of simultaneous threads or
                 processes used to parallelize the execution.
             use_threading: Whether to use threads instead of processes
                 to parallelize the execution.
         """
-        # Avoid creating a useless directory for the pSeven logs
-        if not save_pseven_logs or not OptimizersFactory().is_available("PSEVEN"):
-            save_pseven_logs = False
-        else:
-            from gemseo.algos.opt.lib_pseven import PSevenOpt
-
-            save_pseven_logs = any(
-                algorithm_configuration.algorithm_name in PSevenOpt().descriptions
-                for algorithms_configurations in self._algorithms_configurations_groups
-                for algorithm_configuration in algorithms_configurations
-            )
-
-        benchmarker = Benchmarker(
+        Benchmarker(
             self._histories_path,
             self._results_path,
             self._get_dir_path(self.__DATABASES_DIRNAME) if save_databases else None,
-            self._get_dir_path(self.__PSEVEN_LOGS_DIRNAME)
-            if save_pseven_logs
-            else None,
-        )
-        benchmarker.execute(
+        ).execute(
             {problem for group in problems_groups for problem in group},
             AlgorithmsConfigurations(
                 *[
