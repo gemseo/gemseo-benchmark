@@ -18,6 +18,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for benchmarking reference problems."""
+
 from __future__ import annotations
 
 import re

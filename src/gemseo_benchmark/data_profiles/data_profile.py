@@ -33,6 +33,7 @@ evaluations they make.
 The data profile is the empirical cumulated distribution function of the number of
 functions evaluations made by an algorithm to reach a problem target.
 """
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

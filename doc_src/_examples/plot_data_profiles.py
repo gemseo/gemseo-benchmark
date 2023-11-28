@@ -32,6 +32,7 @@
 Compute data profiles
 =====================
 """
+
 # %%
 # In this example,
 # we compute the **data profiles** of three algorithms configurations

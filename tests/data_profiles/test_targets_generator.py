@@ -18,6 +18,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the targets generator."""
+
 from __future__ import annotations
 
 import re

@@ -18,6 +18,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """A class to collect the paths to performance histories."""
+
 from __future__ import annotations
 
 import json

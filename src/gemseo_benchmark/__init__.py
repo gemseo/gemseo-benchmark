@@ -18,6 +18,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Benchmarking of algorithms."""
+
 from __future__ import annotations
 
 import itertools

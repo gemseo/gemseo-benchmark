@@ -18,4 +18,5 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """The configurations of the algorithms from their options."""
+
 from __future__ import annotations

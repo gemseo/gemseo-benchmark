@@ -32,6 +32,7 @@
 Generate a benchmarking report
 ==============================
 """
+
 # %%
 # In this example,
 # we generate a **benchmarking report**

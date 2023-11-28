@@ -26,6 +26,7 @@ value for the problem. Targets are used to estimate the efficiency (relative to 
 number of problem functions evaluations) of an algorithm to solve a problem (or several)
 and computes its data profile (see :mod:`.data_profiles.data_profile`).
 """
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

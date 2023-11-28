@@ -23,6 +23,7 @@ The targets are generated out of algorithms histories considered to be of refere
 median of the reference histories is computed and a uniformly distributed subset (of the
 required size) of this median history is extracted.
 """
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

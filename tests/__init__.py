@@ -18,4 +18,5 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the benchmarking of algorithms."""
+
 from __future__ import annotations

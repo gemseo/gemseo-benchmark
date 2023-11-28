@@ -22,6 +22,7 @@
 An algorithm depends on the values of its options. A value set defines a configuration
 of the algorithm.
 """
+
 from __future__ import annotations
 
 from types import MappingProxyType

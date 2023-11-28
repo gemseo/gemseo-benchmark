@@ -18,6 +18,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """A collection of algorithms configurations."""
+
 from __future__ import annotations
 
 import bisect

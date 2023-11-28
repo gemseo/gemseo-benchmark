@@ -31,6 +31,7 @@ boolean feasibility statuses.
 Performance histories can be used to generate target values for a problem, or to
 generate the data profile of an algorithm.
 """
+
 from __future__ import annotations
 
 import collections.abc

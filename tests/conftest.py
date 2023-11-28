@@ -18,6 +18,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Fixtures for the tests."""
+
 from __future__ import annotations
 
 import shutil
