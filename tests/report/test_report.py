@@ -19,6 +19,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the generation of a benchmarking report."""
+
 from __future__ import annotations
 
 from pathlib import Path

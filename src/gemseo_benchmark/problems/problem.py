@@ -25,6 +25,7 @@ objective and constraints for an optimization problem), its starting points (eac
 defining an instance of the problem) and its targets (refer to
 :mod:`.data_profiles.target_values`).
 """
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

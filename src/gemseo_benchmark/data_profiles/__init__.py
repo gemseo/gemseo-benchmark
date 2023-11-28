@@ -18,4 +18,5 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Computation of data profiles for algorithms comparison."""
+
 from __future__ import annotations

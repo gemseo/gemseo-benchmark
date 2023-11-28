@@ -19,4 +19,5 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Generation of a benchmarking report."""
+
 from __future__ import annotations

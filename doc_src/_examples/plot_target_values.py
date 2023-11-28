@@ -32,6 +32,7 @@
 Generate target values
 ======================
 """
+
 # %%
 # In this example,
 # we generate **target values** for a problem

@@ -18,6 +18,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the collection of paths to performance histories."""
+
 from __future__ import annotations
 
 import json

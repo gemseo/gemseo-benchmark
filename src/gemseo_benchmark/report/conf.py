@@ -32,6 +32,7 @@
 # sys.path.insert(0, os.path.abspath('.'))
 # -- Project information -----------------------------------------------------
 """Configuration of the benchmarking report."""
+
 from __future__ import annotations
 
 project = "Benchmarking Report"

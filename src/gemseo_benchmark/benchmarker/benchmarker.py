@@ -18,6 +18,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """A benchmarker of optimization algorithms on reference problems."""
+
 from __future__ import annotations
 
 import sys
