@@ -167,13 +167,11 @@ class Scenario:
             self._get_dir_path(self.__DATABASES_DIRNAME) if save_databases else None,
         ).execute(
             {problem for group in problems_groups for problem in group},
-            AlgorithmsConfigurations(
-                *[
-                    algo_config
-                    for algos_configs_group in self._algorithms_configurations_groups
-                    for algo_config in algos_configs_group
-                ]
-            ),
+            AlgorithmsConfigurations(*[
+                algo_config
+                for algos_configs_group in self._algorithms_configurations_groups
+                for algo_config in algos_configs_group
+            ]),
             overwrite_histories,
             number_of_processes,
             use_threading,

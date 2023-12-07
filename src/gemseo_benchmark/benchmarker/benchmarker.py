@@ -118,28 +118,24 @@ class Benchmarker:
 
             self.__disable_stopping_criteria(algorithm_configuration)
             for problem in problems:
-                inputs.extend(
-                    [
-                        (
-                            self.__set_instance_algorithm_options(
-                                algorithm_configuration,
-                                problem_instance_index,
-                            ),
-                            problem,
-                            problem_instance,
-                            problem_instance_index,
-                        )
-                        for problem_instance_index, problem_instance in enumerate(
-                            problem
-                        )
-                        if not self.__skip_instance(
+                inputs.extend([
+                    (
+                        self.__set_instance_algorithm_options(
                             algorithm_configuration,
-                            problem,
                             problem_instance_index,
-                            overwrite_histories,
-                        )
-                    ]
-                )
+                        ),
+                        problem,
+                        problem_instance,
+                        problem_instance_index,
+                    )
+                    for problem_instance_index, problem_instance in enumerate(problem)
+                    if not self.__skip_instance(
+                        algorithm_configuration,
+                        problem,
+                        problem_instance_index,
+                        overwrite_histories,
+                    )
+                ])
 
         if inputs:
             worker = Worker(self._HISTORY_CLASS)
@@ -164,15 +160,13 @@ class Benchmarker:
         Args:
             algorithm_configuration: The algorithm configuration.
         """
-        algorithm_configuration.algorithm_options.update(
-            {
-                "xtol_rel": 0.0,
-                "xtol_abs": 0.0,
-                "ftol_rel": 0.0,
-                "ftol_abs": 0.0,
-                "stop_crit_n_x": sys.maxsize,
-            }
-        )
+        algorithm_configuration.algorithm_options.update({
+            "xtol_rel": 0.0,
+            "xtol_abs": 0.0,
+            "ftol_rel": 0.0,
+            "ftol_abs": 0.0,
+            "stop_crit_n_x": sys.maxsize,
+        })
 
     def __skip_instance(
         self,

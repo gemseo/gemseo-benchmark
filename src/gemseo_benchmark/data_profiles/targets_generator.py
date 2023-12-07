@@ -278,9 +278,9 @@ class TargetsGenerator:
             raise RuntimeError("The best target value is not feasible.")
 
         # Get the performance histories that reach the best target value
-        reference_histories = PerformanceHistories(
-            *[history for history in reference_histories if history[-1] <= best_target]
-        )
+        reference_histories = PerformanceHistories(*[
+            history for history in reference_histories if history[-1] <= best_target
+        ])
         if not reference_histories:
             raise RuntimeError(
                 "There is no performance history that reaches the best target value."

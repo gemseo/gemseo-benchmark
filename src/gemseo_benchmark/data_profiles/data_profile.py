@@ -211,12 +211,10 @@ class DataProfile:
         algo_histories = self.__values_histories[algo_name]
 
         # Compute the maximal size of an optimization history
-        max_history_size = max(
-            [
-                max([len(pb_history) for pb_history in algo_history])
-                for algo_history in algo_histories.values()
-            ]
-        )
+        max_history_size = max([
+            max([len(pb_history) for pb_history in algo_history])
+            for algo_history in algo_histories.values()
+        ])
 
         # Compute the history of the number of target hits across all optimizations
         total_hits_history = zeros(max_history_size)

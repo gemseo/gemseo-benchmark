@@ -601,9 +601,9 @@ class Problem:
             algos_configurations, results, infeasibility_tolerance, max_eval_number
         )
         if max_eval_number is None:
-            max_eval_number = max(
-                [len(hist) for histories in minima.values() for hist in histories]
-            )
+            max_eval_number = max([
+                len(hist) for histories in minima.values() for hist in histories
+            ])
 
         y_relative_margin = 0.03
         max_feasible_objective = self.__get_infeasible_items_objective(
@@ -702,9 +702,10 @@ class Problem:
                 if max_feasible_objective is None:
                     max_feasible_objective = max(feasible_objectives, default=None)
                 else:
-                    max_feasible_objective = max(
-                        [*feasible_objectives, max_feasible_objective]
-                    )
+                    max_feasible_objective = max([
+                        *feasible_objectives,
+                        max_feasible_objective,
+                    ])
 
         return minima, max_feasible_objective
 

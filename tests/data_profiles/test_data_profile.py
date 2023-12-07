@@ -44,12 +44,10 @@ def test_consistent_target_values():
         ValueError,
         match="The reference problems must have the same number " "of target values",
     ):
-        DataProfile(
-            {
-                "problem_1": TargetValues([1.0, 0.0]),
-                "problem_2": TargetValues([2.0]),
-            }
-        )
+        DataProfile({
+            "problem_1": TargetValues([1.0, 0.0]),
+            "problem_2": TargetValues([2.0]),
+        })
 
 
 def test_add_history_unknown_problem():
@@ -116,12 +114,10 @@ def test_different_sizes_histories():
 
 def test_unevenly_represented_problems():
     """Check the handling of unevenly represented reference problems."""
-    data_profile = DataProfile(
-        {
-            "problem1": TargetValues([1.0, 0.0]),
-            "problem2": TargetValues([1.0, 0.0]),
-        }
-    )
+    data_profile = DataProfile({
+        "problem1": TargetValues([1.0, 0.0]),
+        "problem2": TargetValues([1.0, 0.0]),
+    })
     data_profile.add_history("problem1", "algo", [2.0, 2.0])
     data_profile.add_history("problem1", "algo", [2.0, 2.0])
     data_profile.add_history("problem2", "algo", [2.0, 2.0])
