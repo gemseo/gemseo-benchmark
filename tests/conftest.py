@@ -48,6 +48,7 @@ def design_space() -> mock.Mock:
     design_space.set_current_value = mock.Mock()
     design_space.unnormalize_vect = lambda _: _
     design_space.untransform_vect = lambda x, no_check: x
+    design_space.normalize = {"x": [True]}
     return design_space
 
 
