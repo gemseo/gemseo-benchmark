@@ -21,9 +21,12 @@ from gemseo_benchmark.benchmarker.worker import Worker
 
 def test_call(algorithm_configuration, rosenbrock):
     """Check the call to the benchmarking worker."""
-    _, problem_instance_index, database, history = Worker()(
-        (algorithm_configuration, rosenbrock, rosenbrock.creator(), 0)
-    )
+    _, problem_instance_index, database, history = Worker()((
+        algorithm_configuration,
+        rosenbrock,
+        rosenbrock.creator(),
+        0,
+    ))
     assert problem_instance_index == 0
     assert len(database) > 0
     assert len(history) > 0

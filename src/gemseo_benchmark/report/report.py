@@ -115,9 +115,9 @@ class Report:
             custom_algos_descriptions = {}
 
         self.__custom_algos_descriptions = custom_algos_descriptions
-        algos_diff = set().union(
-            *[group.names for group in algos_configurations_groups]
-        ) - set(histories_paths.algorithms)
+        algos_diff = set().union(*[
+            group.names for group in algos_configurations_groups
+        ]) - set(histories_paths.algorithms)
         if algos_diff:
             raise ValueError(
                 f"Missing histories for algorithm{'s' if len(algos_diff) > 1 else ''} "
@@ -168,12 +168,10 @@ class Report:
         """Create the file describing the algorithms."""
         # Get the descriptions of the algorithms
         algos_descriptions = dict(self.__custom_algos_descriptions)
-        for algo_name in set().union(
-            *[
-                algos_configs_group.algorithms
-                for algos_configs_group in self.__algorithms_configurations_groups
-            ]
-        ):
+        for algo_name in set().union(*[
+            algos_configs_group.algorithms
+            for algos_configs_group in self.__algorithms_configurations_groups
+        ]):
             if algo_name not in algos_descriptions:
                 try:
                     library = OptimizersFactory().create(algo_name)
@@ -266,14 +264,12 @@ class Report:
             results_paths = []
             for problems_group in self.__problems_groups:
                 # Get the algorithms with results for all the problems of the group
-                algorithms_configurations = AlgorithmsConfigurations(
-                    *[
-                        algo_config
-                        for algo_config in algorithms_configurations_group
-                        if set(self.__histories_paths.get_problems(algo_config.name))
-                        >= {problem.name for problem in problems_group}
-                    ]
-                )
+                algorithms_configurations = AlgorithmsConfigurations(*[
+                    algo_config
+                    for algo_config in algorithms_configurations_group
+                    if set(self.__histories_paths.get_problems(algo_config.name))
+                    >= {problem.name for problem in problems_group}
+                ])
                 if not algorithms_configurations:
                     # There is no algorithm to display for the group
                     continue

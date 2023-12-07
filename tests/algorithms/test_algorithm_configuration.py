@@ -69,14 +69,12 @@ def test_to_dict(input_name, output_name, skip_instance_algorithm_options):
 
 def test_from_dict():
     """Check the import of an algorithm configuration from a dictionary."""
-    algorithm_configuration = AlgorithmConfiguration.from_dict(
-        {
-            "configuration_name": "SciPy SLSQP",
-            "algorithm_name": "SLSQP",
-            "algorithm_options": {"max_iter": 9},
-            "instance_algorithm_options": {"seed": lambda index: index},
-        }
-    )
+    algorithm_configuration = AlgorithmConfiguration.from_dict({
+        "configuration_name": "SciPy SLSQP",
+        "algorithm_name": "SLSQP",
+        "algorithm_options": {"max_iter": 9},
+        "instance_algorithm_options": {"seed": lambda index: index},
+    })
     assert algorithm_configuration.name == "SciPy SLSQP"
     assert algorithm_configuration.algorithm_name == "SLSQP"
     assert algorithm_configuration.algorithm_options == {"max_iter": 9}

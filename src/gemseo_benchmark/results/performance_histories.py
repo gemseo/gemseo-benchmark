@@ -70,9 +70,9 @@ class PerformanceHistories(collections.abc.MutableSequence):
 
     def __get_equal_size_histories(self) -> PerformanceHistories:
         """Return the histories extended to the maximum size."""
-        return PerformanceHistories(
-            *[history.extend(self.__maximum_size) for history in self]
-        )
+        return PerformanceHistories(*[
+            history.extend(self.__maximum_size) for history in self
+        ])
 
     @property
     def __maximum_size(self) -> int:
@@ -127,17 +127,17 @@ class PerformanceHistories(collections.abc.MutableSequence):
         history = PerformanceHistory()
         history.items = [
             statistic_computer(items)
-            for items in zip(
-                *[history.items for history in self.__get_equal_size_histories()]
-            )
+            for items in zip(*[
+                history.items for history in self.__get_equal_size_histories()
+            ])
         ]
         return history
 
     def cumulate_minimum(self) -> PerformanceHistories:
         """Return the histories of the minimum."""
-        return PerformanceHistories(
-            *[history.compute_cumulated_minimum() for history in self]
-        )
+        return PerformanceHistories(*[
+            history.compute_cumulated_minimum() for history in self
+        ])
 
     def plot_algorithm_histories(
         self,

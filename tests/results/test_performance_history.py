@@ -99,27 +99,33 @@ history_3 = PerformanceHistory([3.0, -3.0, 3.0], [0.0, 0.0, 0.0])
 def test_compute_minimum_history():
     """Check the computation of the minimum history."""
     items = [HistoryItem(-2.0, 0.0), HistoryItem(-3.0, 0.0), HistoryItem(2.0, 0.0)]
-    minimum = PerformanceHistory.compute_minimum_history(
-        [history_1, history_2, history_3]
-    )
+    minimum = PerformanceHistory.compute_minimum_history([
+        history_1,
+        history_2,
+        history_3,
+    ])
     assert minimum.items == items
 
 
 def test_compute_maximum_history():
     """Check the computation of the maximum history."""
     items = [HistoryItem(1.0, 2.0), HistoryItem(-2.0, 3.0), HistoryItem(0.0, 3.0)]
-    maximum = PerformanceHistory.compute_maximum_history(
-        [history_1, history_2, history_3]
-    )
+    maximum = PerformanceHistory.compute_maximum_history([
+        history_1,
+        history_2,
+        history_3,
+    ])
     assert maximum.items == items
 
 
 def test_compute_median_history():
     """Check the computation of the median history."""
     items = [HistoryItem(3.0, 0.0), HistoryItem(-1.0, 0.0), HistoryItem(3.0, 0.0)]
-    median = PerformanceHistory.compute_median_history(
-        [history_1, history_2, history_3]
-    )
+    median = PerformanceHistory.compute_median_history([
+        history_1,
+        history_2,
+        history_3,
+    ])
     assert median.items == items
 
 
