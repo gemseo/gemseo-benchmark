@@ -396,8 +396,7 @@ class Report:
             for builder in builders:
                 call(
                     f"sphinx-build -M {builder} {self.__root_directory} "
-                    f"{DirectoryName.BUILD.value}",
-                    shell=True,
+                    f"{DirectoryName.BUILD.value}".split()
                 )
         finally:
             os.chdir(initial_dir)
