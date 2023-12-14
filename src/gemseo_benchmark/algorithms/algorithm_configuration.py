@@ -127,9 +127,9 @@ class AlgorithmConfiguration:
             self.__ALGORITHM_OPTIONS: self.__algorithm_options,
         }
         if not skip_instance_algorithm_options:
-            dictionary[
-                self.__INSTANCE_ALGORITHM_OPTIONS
-            ] = self.__instance_algorithm_options
+            dictionary[self.__INSTANCE_ALGORITHM_OPTIONS] = (
+                self.__instance_algorithm_options
+            )
 
         return dictionary
 
