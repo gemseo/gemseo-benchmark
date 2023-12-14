@@ -50,9 +50,9 @@ if TYPE_CHECKING:
 class TargetsGenerator:
     """Compute the target values for an objective to minimize."""
 
-    __NO_HISTORIES_MESSAGE: Final[
-        str
-    ] = "There are no histories to generate the targets from."
+    __NO_HISTORIES_MESSAGE: Final[str] = (
+        "There are no histories to generate the targets from."
+    )
 
     __histories: PerformanceHistories
     """A collection of performance histories."""
