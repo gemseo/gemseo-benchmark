@@ -52,10 +52,16 @@ and this project adheres to
 
 ## Added
 
+- Support for Python 3.11.
+
 ### Algorithms
 
 - Algorithm options specific to problem instances (e.g. paths for output files)
   can be passed to ``AlgorithmConfiguration`` in the new argument ``instance_algorithm_options``.
+
+## Removed
+
+- Support for Python 3.8.
 
 # Version 1.1.0 (September 2023)
 

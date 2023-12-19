@@ -43,8 +43,6 @@ from itertools import starmap
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Final
-from typing import Iterable
-from typing import Sequence
 
 from numpy import inf
 
@@ -52,6 +50,9 @@ from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfigu
 from gemseo_benchmark.results.history_item import HistoryItem
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from collections.abc import Sequence
+
     from gemseo.algos.opt_problem import OptimizationProblem
     from matplotlib.axes import Axes
 

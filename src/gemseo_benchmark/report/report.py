@@ -30,8 +30,6 @@ from subprocess import call
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Final
-from typing import Iterable
-from typing import Mapping
 
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from jinja2 import Environment
@@ -43,6 +41,9 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from collections.abc import Mapping
+
     from gemseo_benchmark.problems.problem import Problem
     from gemseo_benchmark.problems.problems_group import ProblemsGroup
     from gemseo_benchmark.results.results import Results

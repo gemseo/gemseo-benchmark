@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from typing import Tuple
 
 from gemseo import execute_algo
 from gemseo.algos.database import Database
@@ -33,7 +32,7 @@ if TYPE_CHECKING:
         AlgorithmConfiguration,
     )
 
-WorkerOutputs = Tuple[Problem, int, Database, PerformanceHistory]
+WorkerOutputs = tuple[Problem, int, Database, PerformanceHistory]
 
 
 class Worker:
