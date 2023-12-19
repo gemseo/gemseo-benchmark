@@ -23,13 +23,13 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from typing import Iterable
-from typing import Iterator
 
 from gemseo_benchmark.data_profiles.data_profile import DataProfile
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from collections.abc import Iterator
     from pathlib import Path
 
     from gemseo_benchmark.algorithms.algorithms_configurations import (

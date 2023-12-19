@@ -28,7 +28,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 from typing import Final
-from typing import Sequence
 
 import matplotlib.pyplot as plt
 from gemseo.utils.matplotlib_figure import save_show_figure
@@ -42,6 +41,7 @@ from gemseo_benchmark.results.performance_histories import PerformanceHistories
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
     from pathlib import Path
 
     from matplotlib.figure import Figure

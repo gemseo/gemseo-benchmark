@@ -20,14 +20,15 @@ import collections.abc
 import statistics
 from typing import TYPE_CHECKING
 from typing import Callable
-from typing import Iterable
-from typing import Sequence
 
 import numpy
 
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from collections.abc import Sequence
+
     from matplotlib.axes import Axes
 
     from gemseo_benchmark import MarkeveryType

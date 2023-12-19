@@ -28,10 +28,10 @@ defining an instance of the problem) and its targets (refer to
 
 from __future__ import annotations
 
+from collections.abc import Iterable
+from collections.abc import Mapping
 from typing import TYPE_CHECKING
 from typing import Callable
-from typing import Iterable
-from typing import Mapping
 from typing import Union
 
 from gemseo import compute_doe

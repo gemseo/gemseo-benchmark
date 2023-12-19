@@ -36,10 +36,10 @@ functions evaluations made by an algorithm to reach a problem target.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
+from collections.abc import Mapping
+from collections.abc import Sequence
 from typing import TYPE_CHECKING
-from typing import Iterable
-from typing import Mapping
-from typing import Sequence
 
 import matplotlib
 import matplotlib.pyplot as plt

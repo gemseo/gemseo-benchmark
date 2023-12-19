@@ -22,8 +22,8 @@
 from __future__ import annotations
 
 import bisect
-from typing import Iterator
-from typing import MutableSet
+from collections.abc import Iterator
+from collections.abc import MutableSet
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 

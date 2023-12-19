@@ -25,11 +25,11 @@ of the algorithm.
 
 from __future__ import annotations
 
+from collections.abc import MutableMapping
 from types import MappingProxyType
 from typing import Any
 from typing import Callable
 from typing import Final
-from typing import MutableMapping
 
 from gemseo.utils.string_tools import pretty_repr
 

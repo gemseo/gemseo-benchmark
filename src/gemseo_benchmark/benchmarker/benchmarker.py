@@ -24,7 +24,6 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 from typing import Final
-from typing import Iterable
 
 from gemseo import configure_logger
 from gemseo.algos.opt.opt_factory import OptimizersFactory
@@ -40,6 +39,7 @@ from gemseo_benchmark.results.performance_history import PerformanceHistory
 from gemseo_benchmark.results.results import Results
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from pathlib import Path
 
     from gemseo.algos.database import Database
