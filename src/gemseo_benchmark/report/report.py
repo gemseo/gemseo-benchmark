@@ -19,6 +19,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Generation of a benchmarking report."""
+
 from __future__ import annotations
 
 import enum
@@ -26,9 +27,9 @@ import os
 from pathlib import Path
 from shutil import copy
 from subprocess import call
+from typing import TYPE_CHECKING
 from typing import Any
-from typing import Iterable
-from typing import Mapping
+from typing import Final
 
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from jinja2 import Environment
@@ -38,9 +39,14 @@ from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
-from gemseo_benchmark.problems.problem import Problem
-from gemseo_benchmark.problems.problems_group import ProblemsGroup
-from gemseo_benchmark.results.results import Results
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from collections.abc import Mapping
+
+    from gemseo_benchmark.problems.problem import Problem
+    from gemseo_benchmark.problems.problems_group import ProblemsGroup
+    from gemseo_benchmark.results.results import Results
 
 
 class FileName(enum.Enum):
@@ -69,9 +75,9 @@ class DirectoryName(enum.Enum):
 class Report:
     """A benchmarking report."""
 
-    __FILE_DIRECTORY = Path(__file__).parent
-    __TEMPLATES_DIR_PATH = __FILE_DIRECTORY / "templates"
-    __CONF_PATH = __FILE_DIRECTORY / "conf.py"
+    __FILE_DIRECTORY: Final[Path] = Path(__file__).parent
+    __TEMPLATES_DIR_PATH: Final[Path] = __FILE_DIRECTORY / "templates"
+    __CONF_PATH: Final[Path] = __FILE_DIRECTORY / "conf.py"
 
     def __init__(
         self,
@@ -107,12 +113,12 @@ class Report:
         self.__problems_groups = problems_groups
         self.__histories_paths = histories_paths
         if custom_algos_descriptions is None:
-            custom_algos_descriptions = dict()
+            custom_algos_descriptions = {}
 
         self.__custom_algos_descriptions = custom_algos_descriptions
-        algos_diff = set().union(
-            *[group.names for group in algos_configurations_groups]
-        ) - set(histories_paths.algorithms)
+        algos_diff = set().union(*[
+            group.names for group in algos_configurations_groups
+        ]) - set(histories_paths.algorithms)
         if algos_diff:
             raise ValueError(
                 f"Missing histories for algorithm{'s' if len(algos_diff) > 1 else ''} "
@@ -163,12 +169,10 @@ class Report:
         """Create the file describing the algorithms."""
         # Get the descriptions of the algorithms
         algos_descriptions = dict(self.__custom_algos_descriptions)
-        for algo_name in set().union(
-            *[
-                algos_configs_group.algorithms
-                for algos_configs_group in self.__algorithms_configurations_groups
-            ]
-        ):
+        for algo_name in set().union(*[
+            algos_configs_group.algorithms
+            for algos_configs_group in self.__algorithms_configurations_groups
+        ]):
             if algo_name not in algos_descriptions:
                 try:
                     library = OptimizersFactory().create(algo_name)
@@ -176,9 +180,9 @@ class Report:
                     # The algorithm is unavailable
                     algos_descriptions[algo_name] = "N/A"
                 else:
-                    algos_descriptions[algo_name] = library.descriptions[
-                        algo_name
-                    ].description
+                    algos_descriptions[algo_name] = (
+                        library.descriptions[algo_name].description
+                    )
 
         # Create the file
         self.__fill_template(
@@ -197,7 +201,7 @@ class Report:
         problems_dir.mkdir()
 
         # Create a file for each problem
-        problems_paths = list()
+        problems_paths = []
         problems = [problem for group in self.__problems_groups for problem in group]
         problems = sorted(problems, key=lambda pb: pb.name.lower())
         for problem in problems:
@@ -256,19 +260,17 @@ class Report:
             use_log_scale: Whether to use a logarithmic scale on the value axis.
         """
         results_root = self.__root_directory / DirectoryName.RESULTS.value
-        algos_configs_groups_paths = list()
+        algos_configs_groups_paths = []
         for algorithms_configurations_group in self.__algorithms_configurations_groups:
-            results_paths = list()
+            results_paths = []
             for problems_group in self.__problems_groups:
                 # Get the algorithms with results for all the problems of the group
-                algorithms_configurations = AlgorithmsConfigurations(
-                    *[
-                        algo_config
-                        for algo_config in algorithms_configurations_group
-                        if set(self.__histories_paths.get_problems(algo_config.name))
-                        >= {problem.name for problem in problems_group}
-                    ]
-                )
+                algorithms_configurations = AlgorithmsConfigurations(*[
+                    algo_config
+                    for algo_config in algorithms_configurations_group
+                    if set(self.__histories_paths.get_problems(algo_config.name))
+                    >= {problem.name for problem in problems_group}
+                ])
                 if not algorithms_configurations:
                     # There is no algorithm to display for the group
                     continue
@@ -307,14 +309,15 @@ class Report:
                 )
                 results_path.parent.mkdir(exist_ok=True)
                 results_paths.append(results_path.relative_to(results_root).as_posix())
+                algorithms_configurations_names = [
+                    algo_config.name
+                    for algo_config in algorithms_configurations_group.configurations
+                ]
                 self.__fill_template(
                     results_path,
                     FileName.SUB_RESULTS.value,
                     algorithms_group_name=algorithms_configurations_group.name,
-                    algorithms_configurations_names=[
-                        algo_config.name
-                        for algo_config in algorithms_configurations_group.configurations
-                    ],
+                    algorithms_configurations_names=algorithms_configurations_names,
                     problems_group_name=problems_group.name,
                     problems_group_description=problems_group.description,
                     data_profile=data_profile,
@@ -383,9 +386,9 @@ class Report:
             to_html: Whether to generate the report in HTML format.
             to_pdf: Whether to generate the report in PDF format.
         """
-        initial_dir = os.getcwd()
+        initial_dir = Path.cwd()
         os.chdir(str(self.__root_directory))
-        builders = list()
+        builders = []
         if to_html:
             builders.append("html")
         if to_pdf:
@@ -394,8 +397,7 @@ class Report:
             for builder in builders:
                 call(
                     f"sphinx-build -M {builder} {self.__root_directory} "
-                    f"{DirectoryName.BUILD.value}",
-                    shell=True,
+                    f"{DirectoryName.BUILD.value}".split()
                 )
         finally:
             os.chdir(initial_dir)
@@ -455,7 +457,7 @@ class Report:
             figures.
         """
         max_eval_number = self.__max_eval_numbers.get(group.name)
-        figures = dict()
+        figures = {}
         for problem in group:
             problem_dir = group_dir / join_substrings(problem.name)
             problem_dir.mkdir()
@@ -479,8 +481,7 @@ class Report:
             }
 
         # Sort the keys of the dictionary
-        figures = {key: figures[key] for key in sorted(figures.keys(), key=str.lower)}
-        return figures
+        return {key: figures[key] for key in sorted(figures.keys(), key=str.lower)}
 
     def __plot_problem_data_profile(
         self,

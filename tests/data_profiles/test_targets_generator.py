@@ -18,16 +18,18 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the targets generator."""
+
 from __future__ import annotations
 
 import re
 from unittest import mock
 
 import pytest
-from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
-from gemseo_benchmark.results.history_item import HistoryItem
 from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
+
+from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
+from gemseo_benchmark.results.history_item import HistoryItem
 
 
 def test_add_inconsistent_histories():
@@ -40,7 +42,7 @@ def test_add_inconsistent_histories():
 
 
 @pytest.mark.parametrize(
-    ["objective_values", "history", "message"],
+    ("objective_values", "history", "message"),
     [
         (
             (3.0, 2.0),
@@ -157,11 +159,11 @@ def test_best_target_not_reached():
 
 
 @pytest.mark.parametrize(
-    ["feasibility_statuses", "baseline_images"],
+    ("feasibility_statuses", "baseline_images"),
     [
-        [[True, True], ["plot_histories"]],
-        [[False, True], ["plot_partially_infeasible_history"]],
-        [[False, False], ["plot_infeasible_history"]],
+        ([True, True], ["plot_histories"]),
+        ([False, True], ["plot_partially_infeasible_history"]),
+        ([False, False], ["plot_infeasible_history"]),
     ],
 )
 @image_comparison(baseline_images=None, remove_text=True, extensions=["png"])

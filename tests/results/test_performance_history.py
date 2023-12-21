@@ -18,6 +18,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the performance history."""
+
 from __future__ import annotations
 
 import re
@@ -26,6 +27,7 @@ from unittest import mock
 
 import numpy
 import pytest
+
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
@@ -97,27 +99,33 @@ history_3 = PerformanceHistory([3.0, -3.0, 3.0], [0.0, 0.0, 0.0])
 def test_compute_minimum_history():
     """Check the computation of the minimum history."""
     items = [HistoryItem(-2.0, 0.0), HistoryItem(-3.0, 0.0), HistoryItem(2.0, 0.0)]
-    minimum = PerformanceHistory.compute_minimum_history(
-        [history_1, history_2, history_3]
-    )
+    minimum = PerformanceHistory.compute_minimum_history([
+        history_1,
+        history_2,
+        history_3,
+    ])
     assert minimum.items == items
 
 
 def test_compute_maximum_history():
     """Check the computation of the maximum history."""
     items = [HistoryItem(1.0, 2.0), HistoryItem(-2.0, 3.0), HistoryItem(0.0, 3.0)]
-    maximum = PerformanceHistory.compute_maximum_history(
-        [history_1, history_2, history_3]
-    )
+    maximum = PerformanceHistory.compute_maximum_history([
+        history_1,
+        history_2,
+        history_3,
+    ])
     assert maximum.items == items
 
 
 def test_compute_median_history():
     """Check the computation of the median history."""
     items = [HistoryItem(3.0, 0.0), HistoryItem(-1.0, 0.0), HistoryItem(3.0, 0.0)]
-    median = PerformanceHistory.compute_median_history(
-        [history_1, history_2, history_3]
-    )
+    median = PerformanceHistory.compute_median_history([
+        history_1,
+        history_2,
+        history_3,
+    ])
     assert median.items == items
 
 
@@ -157,7 +165,7 @@ def test_to_file(tmp_path):
 
 
 def test_from_file():
-    """Check the initialization of a perfomance history from a file."""
+    """Check the initialization of a performance history from a file."""
     reference_path = Path(__file__).parent / "reference_history.json"
     history = PerformanceHistory.from_file(reference_path)
     assert history.problem_name == "problem"

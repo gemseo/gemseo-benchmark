@@ -23,14 +23,14 @@ The targets are generated out of algorithms histories considered to be of refere
 median of the reference histories is computed and a uniformly distributed subset (of the
 required size) of this median history is extracted.
 """
+
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Sequence
+from typing import TYPE_CHECKING
+from typing import Final
 
 import matplotlib.pyplot as plt
 from gemseo.utils.matplotlib_figure import save_show_figure
-from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
 from numpy import linspace
 from numpy import ndarray
@@ -40,11 +40,19 @@ from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_histories import PerformanceHistories
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from pathlib import Path
+
+    from matplotlib.figure import Figure
+
 
 class TargetsGenerator:
     """Compute the target values for an objective to minimize."""
 
-    __NO_HISTORIES_MESSAGE = "There are no histories to generate the targets from."
+    __NO_HISTORIES_MESSAGE: Final[str] = (
+        "There are no histories to generate the targets from."
+    )
 
     __histories: PerformanceHistories
     """A collection of performance histories."""
@@ -270,9 +278,9 @@ class TargetsGenerator:
             raise RuntimeError("The best target value is not feasible.")
 
         # Get the performance histories that reach the best target value
-        reference_histories = PerformanceHistories(
-            *[history for history in reference_histories if history[-1] <= best_target]
-        )
+        reference_histories = PerformanceHistories(*[
+            history for history in reference_histories if history[-1] <= best_target
+        ])
         if not reference_histories:
             raise RuntimeError(
                 "There is no performance history that reaches the best target value."

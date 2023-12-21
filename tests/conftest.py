@@ -18,6 +18,7 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Fixtures for the tests."""
+
 from __future__ import annotations
 
 import shutil
@@ -27,10 +28,11 @@ from unittest import mock
 import pytest
 from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.problems.analytical.rosenbrock import Rosenbrock
-from gemseo_benchmark.data_profiles.target_values import TargetValues
-from gemseo_benchmark.problems.problem import Problem
 from numpy import array
 from numpy import ndarray
+
+from gemseo_benchmark.data_profiles.target_values import TargetValues
+from gemseo_benchmark.problems.problem import Problem
 
 design_variables = array([0.0, 1.0])
 
@@ -46,6 +48,7 @@ def design_space() -> mock.Mock:
     design_space.set_current_value = mock.Mock()
     design_space.unnormalize_vect = lambda _: _
     design_space.untransform_vect = lambda x, no_check: x
+    design_space.normalize = {"x": [True]}
     return design_space
 
 
@@ -211,6 +214,8 @@ def algorithm_configuration() -> mock.Mock():
     algo_config.algorithm_name = "SLSQP"
     algo_config.algorithm_options = {"normalize_design_space": False, "max_iter": 3}
     algo_config.name = "SLSQP"
+    algo_config.instance_algorithm_options = {}
+    algo_config.copy = mock.Mock(return_value=algo_config)
     return algo_config
 
 
@@ -230,8 +235,10 @@ def unknown_algorithm_configuration():
     """The configuration of an algorithm unknown to GEMSEO."""
     algo_config = mock.Mock()
     algo_config.algorithm_name = "Algorithm"
-    algo_config.algorithm_options = dict()
+    algo_config.algorithm_options = {}
     algo_config.name = "Configuration"
+    algo_config.instance_algorithm_options = {}
+    algo_config.copy = mock.Mock(return_value=algo_config)
     return algo_config
 
 
@@ -260,7 +267,7 @@ def unknown_algorithms_configurations(
 ALGO_NAME = "SLSQP"
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def results(
     algorithm_configuration, unknown_algorithm_configuration, problem_a, problem_b
 ) -> mock.Mock:

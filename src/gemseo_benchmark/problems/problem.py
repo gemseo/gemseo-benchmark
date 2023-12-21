@@ -25,17 +25,17 @@ objective and constraints for an optimization problem), its starting points (eac
 defining an instance of the problem) and its targets (refer to
 :mod:`.data_profiles.target_values`).
 """
+
 from __future__ import annotations
 
-from pathlib import Path
+from collections.abc import Iterable
+from collections.abc import Mapping
+from typing import TYPE_CHECKING
 from typing import Callable
-from typing import Iterable
-from typing import Mapping
 from typing import Union
 
 from gemseo import compute_doe
 from gemseo import execute_algo
-from gemseo.algos.doe.doe_library import DOELibraryOptionType
 from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.utils.matplotlib_figure import save_show_figure
@@ -48,17 +48,23 @@ from numpy import ndarray
 from numpy import save
 
 from gemseo_benchmark import COLORS_CYCLE
-from gemseo_benchmark import get_markers_cycle
 from gemseo_benchmark import MarkeveryType
-from gemseo_benchmark.algorithms.algorithms_configurations import (
-    AlgorithmsConfigurations,
-)
+from gemseo_benchmark import get_markers_cycle
 from gemseo_benchmark.data_profiles.data_profile import DataProfile
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
 from gemseo_benchmark.results.performance_histories import PerformanceHistories
 from gemseo_benchmark.results.performance_history import PerformanceHistory
-from gemseo_benchmark.results.results import Results
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from gemseo.algos.doe.doe_library import DOELibraryOptionType
+
+    from gemseo_benchmark.algorithms.algorithms_configurations import (
+        AlgorithmsConfigurations,
+    )
+    from gemseo_benchmark.results.results import Results
 
 InputStartPoints = Union[ndarray, Iterable[ndarray]]
 
@@ -153,7 +159,7 @@ class Problem:
         self._problem = problem
 
         # Set the starting points
-        self.__start_points = list()
+        self.__start_points = []
         if start_points is not None:
             self.start_points = start_points
         elif doe_algo_name is not None:
@@ -206,7 +212,7 @@ class Problem:
             except TypeError:
                 raise TypeError(
                     f"{message} The following type was passed: {type(start_points)}."
-                )
+                ) from None
 
             self.__check_iterable_start_points(start_points)
             start_points_list = list(start_points)
@@ -226,7 +232,7 @@ class Problem:
                     f"({self._problem.dimension})."
                 )
 
-            start_points_list = [point for point in start_points]
+            start_points_list = list(start_points)
 
         # Check that the starting points are within the bounds of the design space
         for point in start_points_list:
@@ -280,7 +286,7 @@ class Problem:
             doe_size = min([self._problem.dimension, 10])
 
         if doe_options is None:
-            doe_options = dict()
+            doe_options = {}
 
         return compute_doe(
             self._problem.design_space, doe_algo_name, doe_size, **doe_options
@@ -423,9 +429,9 @@ class Problem:
             the history of feasibility statuses.
         """
         obj_name = problem.objective.name
-        obj_values = list()
-        infeas_measures = list()
-        feas_statuses = list()
+        obj_values = []
+        infeas_measures = []
+        feas_statuses = []
         for key, values in problem.database.items():
             obj_values.append(values[obj_name])
             feasibility, measure = problem.get_violation_criteria(key)
@@ -595,9 +601,9 @@ class Problem:
             algos_configurations, results, infeasibility_tolerance, max_eval_number
         )
         if max_eval_number is None:
-            max_eval_number = max(
-                [len(hist) for histories in minima.values() for hist in histories]
-            )
+            max_eval_number = max([
+                len(hist) for histories in minima.values() for hist in histories
+            ])
 
         y_relative_margin = 0.03
         max_feasible_objective = self.__get_infeasible_items_objective(
@@ -605,7 +611,7 @@ class Problem:
         )
 
         # Plot the histories
-        minimum_values = list()
+        minimum_values = []
         for configuration_name, color, marker in zip(
             algos_configurations.names, COLORS_CYCLE, get_markers_cycle()
         ):
@@ -675,7 +681,7 @@ class Problem:
         Returns:
             The histories of the cumulated minima and the maximum feasible value.
         """
-        minima = dict()
+        minima = {}
         max_feasible_objective = None
         for configuration_name in algos_configurations.names:
             minima[configuration_name] = PerformanceHistories()
@@ -696,9 +702,10 @@ class Problem:
                 if max_feasible_objective is None:
                     max_feasible_objective = max(feasible_objectives, default=None)
                 else:
-                    max_feasible_objective = max(
-                        feasible_objectives + [max_feasible_objective]
-                    )
+                    max_feasible_objective = max([
+                        *feasible_objectives,
+                        max_feasible_objective,
+                    ])
 
         return minima, max_feasible_objective
 

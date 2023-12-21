@@ -13,20 +13,26 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """A class to implement a collection of performance histories."""
+
 from __future__ import annotations
 
 import collections.abc
 import statistics
+from typing import TYPE_CHECKING
 from typing import Callable
-from typing import Iterable
-from typing import Sequence
 
 import numpy
-from matplotlib.axes import Axes
 
-from gemseo_benchmark import MarkeveryType
-from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from collections.abc import Sequence
+
+    from matplotlib.axes import Axes
+
+    from gemseo_benchmark import MarkeveryType
+    from gemseo_benchmark.results.history_item import HistoryItem
 
 
 class PerformanceHistories(collections.abc.MutableSequence):
@@ -65,9 +71,9 @@ class PerformanceHistories(collections.abc.MutableSequence):
 
     def __get_equal_size_histories(self) -> PerformanceHistories:
         """Return the histories extended to the maximum size."""
-        return PerformanceHistories(
-            *[history.extend(self.__maximum_size) for history in self]
-        )
+        return PerformanceHistories(*[
+            history.extend(self.__maximum_size) for history in self
+        ])
 
     @property
     def __maximum_size(self) -> int:
@@ -122,17 +128,17 @@ class PerformanceHistories(collections.abc.MutableSequence):
         history = PerformanceHistory()
         history.items = [
             statistic_computer(items)
-            for items in zip(
-                *[history.items for history in self.__get_equal_size_histories()]
-            )
+            for items in zip(*[
+                history.items for history in self.__get_equal_size_histories()
+            ])
         ]
         return history
 
     def cumulate_minimum(self) -> PerformanceHistories:
         """Return the histories of the minimum."""
-        return PerformanceHistories(
-            *[history.compute_cumulated_minimum() for history in self]
-        )
+        return PerformanceHistories(*[
+            history.compute_cumulated_minimum() for history in self
+        ])
 
     def plot_algorithm_histories(
         self,
@@ -205,6 +211,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         _, history_items = median.get_plot_data(feasible=True)
         if history_items:
             return min(history_items).objective_value
+        return None
 
     @staticmethod
     def __get_penalized_objective_values(

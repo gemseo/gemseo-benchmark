@@ -18,11 +18,12 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """A collection of algorithms configurations."""
+
 from __future__ import annotations
 
 import bisect
-from typing import Iterator
-from typing import MutableSet
+from collections.abc import Iterator
+from collections.abc import MutableSet
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 
@@ -37,10 +38,10 @@ class AlgorithmsConfigurations(MutableSet[AlgorithmConfiguration]):
         Args:
             *algorithms_configurations: The algorithms configurations.
         """  # noqa: D205, D212, D415
-        self.__algorithms = list()
-        self.__configurations = list()
+        self.__algorithms = []
+        self.__configurations = []
         self.__name = name
-        self.__names = list()
+        self.__names = []
         for configuration in algorithms_configurations:
             self.add(configuration)
 

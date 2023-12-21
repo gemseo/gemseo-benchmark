@@ -18,4 +18,5 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the algorithms configurations."""
+
 from __future__ import annotations

@@ -18,41 +18,44 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the data profile."""
+
 from __future__ import annotations
 
 import pytest
+from matplotlib import pyplot
+from matplotlib.testing.decorators import image_comparison
+
 from gemseo_benchmark.data_profiles.data_profile import DataProfile
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.results.history_item import HistoryItem
-from matplotlib import pyplot
-from matplotlib.testing.decorators import image_comparison
-from pytest import raises
 
 
 def test_target_values_as_mapping():
     """Check the setting of target values as a mapping."""
-    with raises(TypeError, match="The target values be must passed as a mapping"):
+    with pytest.raises(
+        TypeError, match="The target values be must passed as a mapping"
+    ):
         DataProfile([TargetValues([2.0, 1.0])])
 
 
 def test_consistent_target_values():
     """Check the setting of consistent target values."""
-    with raises(
+    with pytest.raises(
         ValueError,
         match="The reference problems must have the same number " "of target values",
     ):
-        DataProfile(
-            {
-                "problem_1": TargetValues([1.0, 0.0]),
-                "problem_2": TargetValues([2.0]),
-            }
-        )
+        DataProfile({
+            "problem_1": TargetValues([1.0, 0.0]),
+            "problem_2": TargetValues([2.0]),
+        })
 
 
 def test_add_history_unknown_problem():
     """Check the addition of a history for an unknown problem."""
     data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
-    with raises(ValueError, match="'toto' is not the name of a reference problem"):
+    with pytest.raises(
+        ValueError, match="'toto' is not the name of a reference problem"
+    ):
         data_profile.add_history("toto", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
 
 
@@ -111,16 +114,14 @@ def test_different_sizes_histories():
 
 def test_unevenly_represented_problems():
     """Check the handling of unevenly represented reference problems."""
-    data_profile = DataProfile(
-        {
-            "problem1": TargetValues([1.0, 0.0]),
-            "problem2": TargetValues([1.0, 0.0]),
-        }
-    )
+    data_profile = DataProfile({
+        "problem1": TargetValues([1.0, 0.0]),
+        "problem2": TargetValues([1.0, 0.0]),
+    })
     data_profile.add_history("problem1", "algo", [2.0, 2.0])
     data_profile.add_history("problem1", "algo", [2.0, 2.0])
     data_profile.add_history("problem2", "algo", [2.0, 2.0])
-    with raises(
+    with pytest.raises(
         ValueError,
         match="Reference problems unequally represented for algorithm 'algo'",
     ):

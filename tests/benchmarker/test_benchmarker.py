@@ -18,19 +18,25 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the benchmarker."""
+
 from __future__ import annotations
 
+import json
+from typing import TYPE_CHECKING
+
 import pytest
-from gemseo.algos.opt.opt_factory import OptimizersFactory
 from gemseo.problems.analytical.rastrigin import Rastrigin
+from numpy import array
+
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
 from gemseo_benchmark.benchmarker.benchmarker import Benchmarker
 from gemseo_benchmark.problems.problem import Problem
-from gemseo_benchmark.results.results import Results
-from numpy import array
+
+if TYPE_CHECKING:
+    from gemseo_benchmark.results.results import Results
 
 
 @pytest.fixture(scope="module")
@@ -115,23 +121,8 @@ def test___skip_instance(tmp_path, rosenbrock, rastrigin, caplog):
     )
 
 
-@pytest.mark.skipif(
-    not OptimizersFactory().is_available("PSEVEN"), reason="pSeven is not available."
-)
-def test___set_pseven_log_file(tmp_path, rosenbrock):
-    """Check the setting of the pSeven log file."""
-    results_path = tmp_path / "results.json"
-    algo_config = AlgorithmConfiguration("PSEVEN")
-    Benchmarker(tmp_path, results_path, pseven_logs_path=tmp_path).execute(
-        [rosenbrock], AlgorithmsConfigurations(algo_config)
-    )
-    algo_pb_dir = tmp_path / algo_config.name / rosenbrock.name
-    assert (algo_pb_dir / f"{algo_config.name}.1.txt").is_file()
-    assert (algo_pb_dir / f"{algo_config.name}.2.txt").is_file()
-
-
 @pytest.mark.parametrize(
-    ["number_of_processes", "use_threading"], [(1, False), (2, False), (2, True)]
+    ("number_of_processes", "use_threading"), [(1, False), (2, False), (2, True)]
 )
 def test_execution(results_root, rosenbrock, number_of_processes, use_threading):
     """Check the execution of the benchmarker."""
@@ -145,6 +136,40 @@ def test_execution(results_root, rosenbrock, number_of_processes, use_threading)
     path = algo_pb_dir / f"{lbfgsb_configuration.name}.1.json"
     assert path.is_file()
     assert results.contains(lbfgsb_configuration.algorithm_name, rosenbrock.name, path)
-    path = algo_pb_dir / f"{lbfgsb_configuration.name}.1.json"
+    path = algo_pb_dir / f"{lbfgsb_configuration.name}.2.json"
     assert path.is_file()
     assert results.contains(lbfgsb_configuration.algorithm_name, rosenbrock.name, path)
+
+
+def test_instance_specific_algorithm_options(results_root, rosenbrock):
+    """Check instance-specific algorithm options."""
+    Benchmarker(results_root).execute(
+        [rosenbrock],
+        AlgorithmsConfigurations(
+            AlgorithmConfiguration(
+                "L-BFGS-B",
+                instance_algorithm_options={"max_iter": lambda index: index + 2},
+            )
+        ),
+    )
+    path_base = (
+        results_root
+        / lbfgsb_configuration.name
+        / rosenbrock.name
+        / lbfgsb_configuration.name
+    )
+    with path_base.with_suffix(".1.json").open("r") as json_file_1:
+        assert (
+            json.load(json_file_1)["algorithm_configuration"]["algorithm_options"][
+                "max_iter"
+            ]
+            == 2
+        )
+
+    with path_base.with_suffix(".2.json").open("r") as json_file_2:
+        assert (
+            json.load(json_file_2)["algorithm_configuration"]["algorithm_options"][
+                "max_iter"
+            ]
+            == 3
+        )

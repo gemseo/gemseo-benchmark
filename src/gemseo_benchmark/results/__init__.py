@@ -18,4 +18,5 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Management of paths to performance histories."""
+
 from __future__ import annotations

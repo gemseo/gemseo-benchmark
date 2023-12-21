@@ -18,19 +18,21 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Benchmarking of algorithms."""
+
 from __future__ import annotations
 
 import itertools
 import re
-from typing import Iterator
-from typing import List
-from typing import Tuple
+from typing import TYPE_CHECKING
 from typing import Union
 
 import matplotlib
 
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
 MarkeveryType = Union[
-    None, int, Tuple[int, int], slice, List[int], float, Tuple[float, float], List[bool]
+    None, int, tuple[int, int], slice, list[int], float, tuple[float, float], list[bool]
 ]
 # The colors cycle for the plots
 COLORS_CYCLE = matplotlib.rcParams["axes.prop_cycle"].by_key()["color"]

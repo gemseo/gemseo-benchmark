@@ -1,28 +1,28 @@
 {
-    "problem": "problem",
-    "number_of_variables": 4,
-    "objective_name": "f",
-    "constraints_names": [
-        "g",
-        "h"
-    ],
-    "algorithm_configuration": {
-        "configuration_name": "algorithm",
-        "algorithm_name": "algorithm",
-        "algorithm_options": {}
+  "problem": "problem",
+  "number_of_variables": 4,
+  "objective_name": "f",
+  "constraints_names": [
+    "g",
+    "h"
+  ],
+  "algorithm_configuration": {
+    "configuration_name": "algorithm",
+    "algorithm_name": "algorithm",
+    "algorithm_options": {}
+  },
+  "DOE_size": 7,
+  "execution_time": 123.45,
+  "history_items": [
+    {
+      "performance": -2.0,
+      "infeasibility": 1.0,
+      "n_unsatisfied_constraints": 1
     },
-    "DOE_size": 7,
-    "execution_time": 123.45,
-    "history_items": [
-        {
-            "performance": -2.0,
-            "infeasibility": 1.0,
-            "n_unsatisfied_constraints": 1
-        },
-        {
-            "performance": -3.0,
-            "infeasibility": 0.0,
-            "n_unsatisfied_constraints": 0
-        }
-    ]
+    {
+      "performance": -3.0,
+      "infeasibility": 0.0,
+      "n_unsatisfied_constraints": 0
+    }
+  ]
 }

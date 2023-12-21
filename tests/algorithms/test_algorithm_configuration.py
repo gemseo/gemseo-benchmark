@@ -18,14 +18,16 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the algorithm configuration."""
+
 from __future__ import annotations
 
 import pytest
+
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 
 
 @pytest.mark.parametrize(
-    ["input_name", "output_name"],
+    ("input_name", "output_name"),
     [("SciPy SLSQP", "SciPy SLSQP"), (None, "SLSQP_max_iter=9")],
 )
 def test_name(input_name, output_name):
@@ -35,28 +37,54 @@ def test_name(input_name, output_name):
 
 
 @pytest.mark.parametrize(
-    ["input_name", "output_name"],
+    ("input_name", "output_name"),
     [("SciPy SLSQP", "SciPy SLSQP"), (None, "SLSQP_max_iter=9")],
 )
-def test_to_dict(input_name, output_name):
+@pytest.mark.parametrize("skip_instance_algorithm_options", [False, True])
+def test_to_dict(input_name, output_name, skip_instance_algorithm_options):
     """Check the export of an algorithm configuration as a dictionary."""
-    algorithm_configuration = AlgorithmConfiguration("SLSQP", input_name, max_iter=9)
-    assert algorithm_configuration.to_dict() == {
-        "configuration_name": output_name,
-        "algorithm_name": "SLSQP",
-        "algorithm_options": {"max_iter": 9},
-    }
+    algorithm_configuration = AlgorithmConfiguration(
+        "SLSQP", input_name, {"seed": lambda index: index}, max_iter=9
+    )
+    dictionary = algorithm_configuration.to_dict(skip_instance_algorithm_options)
+    assert dictionary["algorithm_name"] == "SLSQP"
+    assert dictionary["configuration_name"] == output_name
+    assert dictionary["algorithm_options"] == {"max_iter": 9}
+    if skip_instance_algorithm_options:
+        assert dictionary.keys() == {
+            "algorithm_name",
+            "configuration_name",
+            "algorithm_options",
+        }
+    else:
+        assert dictionary.keys() == {
+            "algorithm_name",
+            "configuration_name",
+            "algorithm_options",
+            "instance_algorithm_options",
+        }
+        assert dictionary["instance_algorithm_options"].keys() == {"seed"}
+        assert dictionary["instance_algorithm_options"]["seed"](7) == 7
 
 
 def test_from_dict():
     """Check the import of an algorithm configuration from a dictionary."""
-    algorithm_configuration = AlgorithmConfiguration.from_dict(
-        {
-            "configuration_name": "SciPy SLSQP",
-            "algorithm_name": "SLSQP",
-            "algorithm_options": {"max_iter": 9},
-        }
-    )
+    algorithm_configuration = AlgorithmConfiguration.from_dict({
+        "configuration_name": "SciPy SLSQP",
+        "algorithm_name": "SLSQP",
+        "algorithm_options": {"max_iter": 9},
+        "instance_algorithm_options": {"seed": lambda index: index},
+    })
     assert algorithm_configuration.name == "SciPy SLSQP"
     assert algorithm_configuration.algorithm_name == "SLSQP"
+    assert algorithm_configuration.algorithm_options == {"max_iter": 9}
+
+
+def test_copy(algorithm_configuration):
+    """Check the copy an algorithm configuration."""
+    algorithm_configuration = AlgorithmConfiguration(
+        "Algorithm", "Algorithm configuration", max_iter=9
+    ).copy()
+    assert algorithm_configuration.algorithm_name == "Algorithm"
+    assert algorithm_configuration.name == "Algorithm configuration"
     assert algorithm_configuration.algorithm_options == {"max_iter": 9}

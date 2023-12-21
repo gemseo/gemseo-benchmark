@@ -18,12 +18,14 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the collection of paths to performance histories."""
+
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
 import pytest
+
 from gemseo_benchmark.results.results import Results
 
 algorithm_name = "algorithm"
@@ -45,7 +47,7 @@ def results_contents() -> dict[str, dict[str, list[str]]]:
     return {algorithm_name: {problem_name: [str(history_path.resolve())]}}
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def results_file(tmp_path, results_contents) -> Path:
     """The path to the results file."""
     results_path = tmp_path / "results_reference.json"
@@ -130,7 +132,7 @@ def test_get_paths_unknown_problem(results):
 
 
 @pytest.mark.parametrize(
-    ["algorithm", "problem", "path", "contained"],
+    ("algorithm", "problem", "path", "contained"),
     [
         ("unknown", problem_name, history_path, False),
         (algorithm_name, "unknown", history_path, False),

@@ -13,23 +13,27 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """A class to implement a benchmarking scenario (solving and reporting)."""
+
 from __future__ import annotations
 
 import logging
 import shutil
 from pathlib import Path
-from typing import Iterable
-from typing import Mapping
-
-from gemseo.algos.opt.opt_factory import OptimizersFactory
+from typing import TYPE_CHECKING
+from typing import Final
 
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
 from gemseo_benchmark.benchmarker.benchmarker import Benchmarker
-from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.report.report import Report
 from gemseo_benchmark.results.results import Results
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from collections.abc import Mapping
+
+    from gemseo_benchmark.problems.problems_group import ProblemsGroup
 
 LOGGER = logging.getLogger(__name__)
 
@@ -37,11 +41,10 @@ LOGGER = logging.getLogger(__name__)
 class Scenario:
     """A benchmarking scenario, including running of solvers and reporting."""
 
-    __DATABASES_DIRNAME = "databases"
-    __HISTORIES_DIRNAME = "histories"
-    __PSEVEN_LOGS_DIRNAME = "pseven_logs"
-    __REPORT_DIRNAME = "report"
-    __RESULTS_FILENAME = "results.json"
+    __DATABASES_DIRNAME: Final[str] = "databases"
+    __HISTORIES_DIRNAME: Final[str] = "histories"
+    __REPORT_DIRNAME: Final[str] = "report"
+    __RESULTS_FILENAME: Final[str] = "results.json"
 
     def __init__(
         self,
@@ -78,7 +81,6 @@ class Scenario:
         generate_pdf_report: bool = False,
         infeasibility_tolerance: float = 0.0,
         save_databases: bool = False,
-        save_pseven_logs: bool = False,
         number_of_processes: int = 1,
         use_threading: bool = False,
         custom_algos_descriptions: Mapping[str, str] | None = None,
@@ -97,7 +99,6 @@ class Scenario:
             generate_pdf_report: Whether to generate the report in PDF format.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             save_databases: Whether to save the databases of the optimizations.
-            save_pseven_logs: Whether to save the logs of pSeven.
             number_of_processes: The maximum number of simultaneous threads or
                 processes used to parallelize the execution.
             use_threading: Whether to use threads instead of processes
@@ -123,7 +124,6 @@ class Scenario:
                 problems_groups,
                 overwrite_histories,
                 save_databases,
-                save_pseven_logs,
                 number_of_processes,
                 use_threading,
             )
@@ -148,7 +148,6 @@ class Scenario:
         problems_groups: Iterable[ProblemsGroup],
         overwrite_histories: bool,
         save_databases: bool,
-        save_pseven_logs: bool,
         number_of_processes: int,
         use_threading: bool,
     ) -> None:
@@ -158,43 +157,22 @@ class Scenario:
             problems_groups: The groups of benchmarking problems.
             overwrite_histories: Whether to overwrite the performance histories.
             save_databases: Whether to save the databases of the optimizations.
-            save_pseven_logs: Whether to save the logs of pSeven.
             number_of_processes: The maximum number of simultaneous threads or
                 processes used to parallelize the execution.
             use_threading: Whether to use threads instead of processes
                 to parallelize the execution.
         """
-        # Avoid creating a useless directory for the pSeven logs
-        if not save_pseven_logs or not OptimizersFactory().is_available("PSEVEN"):
-            save_pseven_logs = False
-        else:
-            from gemseo.algos.opt.lib_pseven import PSevenOpt
-
-            save_pseven_logs = any(
-                [
-                    algorithm_configuration.algorithm_name in PSevenOpt().descriptions
-                    for algorithms_configurations in self._algorithms_configurations_groups
-                    for algorithm_configuration in algorithms_configurations
-                ]
-            )
-
-        benchmarker = Benchmarker(
+        Benchmarker(
             self._histories_path,
             self._results_path,
             self._get_dir_path(self.__DATABASES_DIRNAME) if save_databases else None,
-            self._get_dir_path(self.__PSEVEN_LOGS_DIRNAME)
-            if save_pseven_logs
-            else None,
-        )
-        benchmarker.execute(
+        ).execute(
             {problem for group in problems_groups for problem in group},
-            AlgorithmsConfigurations(
-                *[
-                    algo_config
-                    for algos_configs_group in self._algorithms_configurations_groups
-                    for algo_config in algos_configs_group
-                ]
-            ),
+            AlgorithmsConfigurations(*[
+                algo_config
+                for algos_configs_group in self._algorithms_configurations_groups
+                for algo_config in algos_configs_group
+            ]),
             overwrite_histories,
             number_of_processes,
             use_threading,

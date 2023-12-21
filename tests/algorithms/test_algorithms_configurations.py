@@ -18,11 +18,13 @@
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """Tests for the algorithms configurations."""
+
 from __future__ import annotations
 
 from unittest import mock
 
 import pytest
+
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
@@ -135,4 +137,4 @@ def test_unnamed_collection(configuration_b, configuration_c, configuration_a):
     with pytest.raises(
         ValueError, match="The collection of algorithms configurations has no name."
     ):
-        algorithms_configurations.name
+        algorithms_configurations.name  # noqa: B018
