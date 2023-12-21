@@ -33,13 +33,7 @@ but not linked with the application,
 for documentation generation,
 training or example purposes.
 
-[black](https://black.readthedocs.io)
-:   MIT
-
 [commitizen](https://commitizen-tools.github.io/commitizen/)
-:   MIT
-
-[flake8](https://flake8.pycqa.org)
 :   MIT
 
 [pre-commit](https://pre-commit.com)
@@ -57,8 +51,8 @@ training or example purposes.
 [pytest-xdist](https://github.com/pytest-dev/pytest-xdist)
 :   MIT
 
-[reorder-python-imports](https://github.com/asottile/reorder_python_imports)
-:   MIT
+[ruff](https://docs.astral.sh/ruff/)
+: MIT
 
 [setuptools](https://setuptools.readthedocs.io/)
 :   MIT
