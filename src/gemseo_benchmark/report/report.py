@@ -180,9 +180,9 @@ class Report:
                     # The algorithm is unavailable
                     algos_descriptions[algo_name] = "N/A"
                 else:
-                    algos_descriptions[algo_name] = (
-                        library.descriptions[algo_name].description
-                    )
+                    algos_descriptions[algo_name] = library.descriptions[
+                        algo_name
+                    ].description
 
         # Create the file
         self.__fill_template(
