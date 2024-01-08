@@ -6,7 +6,7 @@
 #
 --extra-index-url https://gitlab.com/api/v4/projects/25527353/packages/pypi/simple
 
-alabaster==0.7.13
+alabaster==0.7.15
     # via sphinx
 annotated-types==0.6.0
     # via pydantic
