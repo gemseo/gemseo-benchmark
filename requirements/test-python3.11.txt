@@ -6,7 +6,7 @@
 #
 --extra-index-url https://gitlab.com/api/v4/projects/25527353/packages/pypi/simple
 
-alabaster==0.7.15
+alabaster==0.7.16
     # via sphinx
 annotated-types==0.6.0
     # via pydantic
@@ -40,7 +40,7 @@ fastjsonschema==2.19.0
     # via gemseo
 fonttools==4.47.0
     # via matplotlib
-gemseo[all]==5.2.1.dev29+g51277328
+gemseo[all]==5.2.1.dev31+gc02e7810
     # via
     #   gemseo
     #   gemseo-benchmark (pyproject.toml)
