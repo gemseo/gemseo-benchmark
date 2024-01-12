@@ -83,10 +83,8 @@ class HistoryItem:
                 f"{n_unsatisfied_constraints}."
             )
 
-        if (
-            infeasibility_measure == 0.0
-            and n_unsatisfied_constraints != 0
-            or (infeasibility_measure > 0.0 and n_unsatisfied_constraints == 0)
+        if (infeasibility_measure == 0.0 and n_unsatisfied_constraints != 0) or (
+            infeasibility_measure > 0.0 and n_unsatisfied_constraints == 0
         ):
             raise ValueError(
                 f"The infeasibility measure ({infeasibility_measure}) and the number "
