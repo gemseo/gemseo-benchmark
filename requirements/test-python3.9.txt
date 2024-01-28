@@ -26,7 +26,7 @@ coverage[toml]==7.4.1
     #   pytest-cov
 cycler==0.12.1
     # via matplotlib
-dill==0.3.7
+dill==0.3.8
     # via openturns
 docstring-inheritance==2.1.2
     # via gemseo
@@ -42,7 +42,7 @@ fastjsonschema==2.19.1
     # via gemseo
 fonttools==4.47.2
     # via matplotlib
-gemseo[all]==5.2.1.dev75+g3fa9b767
+gemseo[all]==5.2.1.dev77+g004a1d02
     # via
     #   gemseo
     #   gemseo-benchmark (pyproject.toml)
@@ -128,7 +128,7 @@ pygments==2.17.2
     # via sphinx
 pyparsing==3.1.1
     # via matplotlib
-pytest==8.0.0rc2
+pytest==8.0.0
     # via
     #   gemseo-benchmark (pyproject.toml)
     #   pytest-cov
