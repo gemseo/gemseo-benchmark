@@ -12,7 +12,7 @@ annotated-types==0.6.0
     # via pydantic
 babel==2.14.0
     # via sphinx
-certifi==2023.11.17
+certifi==2024.2.2
     # via requests
 charset-normalizer==3.3.2
     # via requests
@@ -42,7 +42,7 @@ fastjsonschema==2.19.1
     # via gemseo
 fonttools==4.47.2
     # via matplotlib
-gemseo[all]==5.2.1.dev87+g403a6b4b
+gemseo[all]==5.2.1.dev91+gcd1d6a74
     # via
     #   gemseo
     #   gemseo-benchmark (pyproject.toml)
@@ -141,7 +141,7 @@ python-dateutil==2.8.2
     # via
     #   matplotlib
     #   pandas
-pytz==2023.4
+pytz==2024.1
     # via pandas
 pyxdsm==2.3.0
     # via gemseo
