@@ -120,10 +120,11 @@ class Report:
             group.names for group in algos_configurations_groups
         ]) - set(histories_paths.algorithms)
         if algos_diff:
-            raise ValueError(
+            msg = (
                 f"Missing histories for algorithm{'s' if len(algos_diff) > 1 else ''} "
                 f"{', '.join([f'{name!r}' for name in sorted(algos_diff)])}."
             )
+            raise ValueError(msg)
 
         self.__max_eval_numbers = max_eval_number_per_group or {
             group.name: None for group in problems_groups
@@ -212,7 +213,8 @@ class Report:
                 continue
 
             if problem.optimum is None:
-                raise AttributeError("The optimum of the problem is not set.")
+                msg = "The optimum of the problem is not set."
+                raise AttributeError(msg)
 
             self.__fill_template(
                 path,

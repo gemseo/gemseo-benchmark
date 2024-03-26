@@ -184,10 +184,11 @@ class PerformanceHistory(collections.abc.Sequence):
     ) -> None:
         for item in history_items:
             if not isinstance(item, HistoryItem):
-                raise TypeError(
+                msg = (
                     "History items must be of type HistoryItem."
                     f" The following type was passed: {type(item)}."
                 )
+                raise TypeError(msg)
 
         self.__items = list(history_items)
 
@@ -230,16 +231,18 @@ class PerformanceHistory(collections.abc.Sequence):
 
         if infeasibility_measures is not None:
             if len(infeasibility_measures) != len(objective_values):
-                raise ValueError(
+                msg = (
                     "The objective history and the infeasibility history "
                     "must have same length."
                 )
+                raise ValueError(msg)
         elif feasibility_statuses is not None:
             if len(feasibility_statuses) != len(objective_values):
-                raise ValueError(
+                msg = (
                     "The objective history and the feasibility history "
                     "must have same length."
                 )
+                raise ValueError(msg)
             infeasibility_measures = [
                 0.0 if is_feas else inf for is_feas in feasibility_statuses
             ]
@@ -251,10 +254,11 @@ class PerformanceHistory(collections.abc.Sequence):
                 0 if entry == 0.0 else None for entry in infeasibility_measures
             ]
         elif len(n_unsatisfied_constraints) != len(infeasibility_measures):
-            raise ValueError(
+            msg = (
                 "The unsatisfied constraints history and the feasibility history"
                 " must have same length."
             )
+            raise ValueError(msg)
 
         return list(
             starmap(
@@ -548,10 +552,11 @@ class PerformanceHistory(collections.abc.Sequence):
             ValueError: If the expected size is smaller than the history size.
         """
         if size < len(self):
-            raise ValueError(
+            msg = (
                 f"The expected size ({size}) is smaller than "
                 f"the history size ({len(self)})."
             )
+            raise ValueError(msg)
 
         history = PerformanceHistory()
         history.items = list(chain(self, repeat(self[-1], (size - len(self)))))

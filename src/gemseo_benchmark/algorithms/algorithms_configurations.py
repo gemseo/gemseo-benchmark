@@ -65,10 +65,11 @@ class AlgorithmsConfigurations(MutableSet[AlgorithmConfiguration]):
                 with the same name.
         """
         if algorithm_configuration in self:
-            raise ValueError(
+            msg = (
                 "The collection already contains an algorithm configuration named "
                 f"{algorithm_configuration.name}."
             )
+            raise ValueError(msg)
 
         index = bisect.bisect(self.__names, algorithm_configuration.name)
         self.__configurations.insert(index, algorithm_configuration)
@@ -111,6 +112,7 @@ class AlgorithmsConfigurations(MutableSet[AlgorithmConfiguration]):
             ValueError: If the collection of algorithms configurations has no name.
         """
         if not self.__name:
-            raise ValueError("The collection of algorithms configurations has no name.")
+            msg = "The collection of algorithms configurations has no name."
+            raise ValueError(msg)
 
         return self.__name
