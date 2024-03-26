@@ -153,9 +153,8 @@ class Problem:
         # Set the dimension
         problem = optimization_problem_creator()
         if not isinstance(problem, OptimizationProblem):
-            raise TypeError(
-                "optimization_problem_creator must return an OptimizationProblem."
-            )
+            msg = "optimization_problem_creator must return an OptimizationProblem."
+            raise TypeError(msg)
         self._problem = problem
 
         # Set the starting points
@@ -194,7 +193,8 @@ class Problem:
                 shape.
         """
         if not self.__start_points:
-            raise ValueError("The benchmarking problem has no starting point.")
+            msg = "The benchmarking problem has no starting point."
+            raise ValueError(msg)
 
         return self.__start_points
 
@@ -210,9 +210,8 @@ class Problem:
                 # try to treat the starting points as an iterable
                 iter(start_points)
             except TypeError:
-                raise TypeError(
-                    f"{message} The following type was passed: {type(start_points)}."
-                ) from None
+                msg = f"{message} The following type was passed: {type(start_points)}."
+                raise TypeError(msg) from None
 
             self.__check_iterable_start_points(start_points)
             start_points_list = list(start_points)
@@ -220,17 +219,19 @@ class Problem:
         else:
             # the starting points are passed as a NumPy array
             if start_points.ndim != 2:
-                raise ValueError(
+                msg = (
                     f"{message} A {start_points.ndim}-dimensional NumPy array "
                     "was passed."
                 )
+                raise ValueError(msg)
 
             if start_points.shape[1] != self._problem.dimension:
-                raise ValueError(
+                msg = (
                     f"{message} The number of columns ({start_points.shape[1]}) "
                     f"is different from the problem dimension "
                     f"({self._problem.dimension})."
                 )
+                raise ValueError(msg)
 
             start_points_list = list(start_points)
 
@@ -305,17 +306,19 @@ class Problem:
             ValueError: If the benchmarking problem has no target value.
         """
         if self.__target_values is None:
-            raise ValueError("The benchmarking problem has no target value.")
+            msg = "The benchmarking problem has no target value."
+            raise ValueError(msg)
 
         return self.__target_values
 
     @target_values.setter
     def target_values(self, target_values: TargetValues) -> None:
         if not isinstance(target_values, TargetValues):
-            raise TypeError(
+            msg = (
                 f"Target values must be of type TargetValues. "
                 f"Type {type(target_values)} was passed."
             )
+            raise TypeError(msg)
 
         self.__target_values = target_values
 

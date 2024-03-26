@@ -114,7 +114,8 @@ class Benchmarker:
         for algorithm_configuration in [config.copy() for config in algorithms]:
             algorithm_name = algorithm_configuration.algorithm_name
             if not self.__is_algorithm_available(algorithm_name):
-                raise ValueError(f"The algorithm is not available: {algorithm_name}.")
+                msg = f"The algorithm is not available: {algorithm_name}."
+                raise ValueError(msg)
 
             self.__disable_stopping_criteria(algorithm_configuration)
             for problem in problems:

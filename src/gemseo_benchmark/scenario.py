@@ -62,9 +62,8 @@ class Scenario:
             ValueError: If the path to outputs directory does not exist.
         """  # noqa: D205, D212, D415
         if not Path(outputs_path).is_dir():
-            raise NotADirectoryError(
-                f"The path to the outputs directory does not exist: {outputs_path}."
-            )
+            msg = f"The path to the outputs directory does not exist: {outputs_path}."
+            raise NotADirectoryError(msg)
 
         self._algorithms_configurations_groups = algorithms_configurations_groups
         self._outputs_path = Path(outputs_path).resolve()
