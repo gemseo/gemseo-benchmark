@@ -148,7 +148,9 @@ def test_instance_specific_algorithm_options(results_root, rosenbrock):
         AlgorithmsConfigurations(
             AlgorithmConfiguration(
                 "L-BFGS-B",
-                instance_algorithm_options={"max_iter": lambda index: index + 2},
+                instance_algorithm_options={
+                    "max_iter": lambda problem, index: problem.dimension + index
+                },
             )
         ),
     )

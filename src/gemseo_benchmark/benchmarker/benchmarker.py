@@ -123,6 +123,7 @@ class Benchmarker:
                     (
                         self.__set_instance_algorithm_options(
                             algorithm_configuration,
+                            problem,
                             problem_instance_index,
                         ),
                         problem,
@@ -193,7 +194,7 @@ class Benchmarker:
         if not overwrite_histories and self._results.contains(
             algorithm_configuration.name,
             problem_name,
-            self.__get_history_path(algorithm_configuration, problem_name, index),
+            self.get_history_path(algorithm_configuration, problem_name, index),
         ):
             LOGGER.info(
                 "Skipping instance %s of problem %s for algorithm configuration %s.",
@@ -214,12 +215,14 @@ class Benchmarker:
     @staticmethod
     def __set_instance_algorithm_options(
         algorithm_configuration: AlgorithmConfiguration,
+        problem: Problem,
         index: int,
     ) -> AlgorithmConfiguration:
         """Return the algorithm configuration of an instance of a problem.
 
         Args:
             algorithm_configuration: The algorithm configuration.
+            problem: The benchmarking problem.
             index: The 0-based index of the problem instance.
 
         Returns:
@@ -227,7 +230,7 @@ class Benchmarker:
         """
         algorithm_options = dict(algorithm_configuration.algorithm_options)
         for name, value in algorithm_configuration.instance_algorithm_options.items():
-            algorithm_options[name] = value(index)
+            algorithm_options[name] = value(problem, index)
 
         return AlgorithmConfiguration(
             algorithm_configuration.algorithm_name,
@@ -265,13 +268,13 @@ class Benchmarker:
         """
         problem_name = history.problem_name
         algorithm_configuration = history.algorithm_configuration
-        path = self.__get_history_path(
+        path = self.get_history_path(
             algorithm_configuration, problem_name, index, make_parents=True
         )
         history.to_file(path)
         self._results.add_path(algorithm_configuration.name, problem_name, path)
 
-    def __get_history_path(
+    def get_history_path(
         self,
         algorithm_configuration: AlgorithmConfiguration,
         problem_name: str,
