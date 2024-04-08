@@ -39,7 +39,7 @@ and this project adheres to
   (refer to the "Added" section of the present changelog).
   For example:
   ``instance_algorithm_options
-  ={"log_path": lambda index: f"my/log/files/{index}.log"}``.
+  ={"log_path": lambda problem, index: f"my/log/files/{problem.name}.{index}.log"}``.
   N.B. the user is now responsible for the creation of the parent directories.
 - Class ``Worker`` no longer sets ``PerformanceHistory.doe_size``
   to the length of the value of the pSeven option ``"sample_x"``.
@@ -58,6 +58,10 @@ and this project adheres to
 
 - Algorithm options specific to problem instances (e.g. paths for output files)
   can be passed to ``AlgorithmConfiguration`` in the new argument ``instance_algorithm_options``.
+
+### Benchmarker
+
+- One can get the path to a performance history file with ``Benchmarker.get_history_path``.
 
 ## Removed
 
