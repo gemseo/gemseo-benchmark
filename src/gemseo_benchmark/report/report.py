@@ -31,7 +31,7 @@ from typing import TYPE_CHECKING
 from typing import Any
 from typing import Final
 
-from gemseo.algos.opt.opt_factory import OptimizersFactory
+from gemseo.algos.opt.factory import OptimizationLibraryFactory
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 
@@ -176,7 +176,7 @@ class Report:
         ]):
             if algo_name not in algos_descriptions:
                 try:
-                    library = OptimizersFactory().create(algo_name)
+                    library = OptimizationLibraryFactory().create(algo_name)
                 except ImportError:
                     # The algorithm is unavailable
                     algos_descriptions[algo_name] = "N/A"

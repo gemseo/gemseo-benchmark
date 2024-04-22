@@ -36,7 +36,7 @@ from typing import Union
 
 from gemseo import compute_doe
 from gemseo import execute_algo
-from gemseo.algos.opt.opt_factory import OptimizersFactory
+from gemseo.algos.opt.factory import OptimizationLibraryFactory
 from gemseo.algos.opt_problem import OptimizationProblem
 from gemseo.utils.matplotlib_figure import save_show_figure
 from matplotlib import pyplot as plt
@@ -355,7 +355,7 @@ class Problem:
         Returns:
             True if the algorithm is suited to the problem, False otherwise.
         """
-        library = OptimizersFactory().create(name)
+        library = OptimizationLibraryFactory().create(name)
         return library.is_algorithm_suited(library.descriptions[name], self._problem)
 
     def compute_targets(
@@ -604,9 +604,9 @@ class Problem:
             algos_configurations, results, infeasibility_tolerance, max_eval_number
         )
         if max_eval_number is None:
-            max_eval_number = max([
+            max_eval_number = max(
                 len(hist) for histories in minima.values() for hist in histories
-            ])
+            )
 
         y_relative_margin = 0.03
         max_feasible_objective = self.__get_infeasible_items_objective(
