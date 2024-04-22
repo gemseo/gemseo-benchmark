@@ -28,7 +28,7 @@ from unittest import mock
 import numpy
 import pytest
 from gemseo.algos.opt_problem import OptimizationProblem
-from gemseo.problems.analytical.rosenbrock import Rosenbrock
+from gemseo.problems.optimization.rosenbrock import Rosenbrock
 from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
 from numpy import ones

@@ -262,7 +262,7 @@ class TargetsGenerator:
 
         # Get the best target value
         if best_target_objective is None:
-            best_item = min([history[-1] for history in reference_histories])
+            best_item = min(history[-1] for history in reference_histories)
             best_target = TargetsGenerator.__get_best_target(
                 best_item.objective_value,
                 best_item.infeasibility_measure,

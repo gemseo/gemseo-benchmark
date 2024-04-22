@@ -27,7 +27,7 @@ from unittest import mock
 
 import pytest
 from gemseo.algos.opt_problem import OptimizationProblem
-from gemseo.problems.analytical.rosenbrock import Rosenbrock
+from gemseo.problems.optimization.rosenbrock import Rosenbrock
 from numpy import array
 from numpy import ndarray
 

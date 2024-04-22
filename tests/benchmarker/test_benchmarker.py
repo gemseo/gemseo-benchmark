@@ -25,7 +25,7 @@ import json
 from typing import TYPE_CHECKING
 
 import pytest
-from gemseo.problems.analytical.rastrigin import Rastrigin
+from gemseo.problems.optimization.rastrigin import Rastrigin
 from numpy import array
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration

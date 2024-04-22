@@ -23,11 +23,11 @@ dill==0.3.8
     # via openturns
 docstring-inheritance==2.2.0
     # via gemseo
-docutils==0.20.1
+docutils==0.21.1
     # via sphinx
 et-xmlfile==1.1.0
     # via openpyxl
-exceptiongroup==1.2.0
+exceptiongroup==1.2.1
     # via pytest
 execnet==2.1.1
     # via pytest-xdist
@@ -35,7 +35,7 @@ fastjsonschema==2.19.1
     # via gemseo
 fonttools==4.51.0
     # via matplotlib
-gemseo @ git+https://gitlab.com/gemseo/dev/gemseo.git@a431e2e67f59a949bc8f5bc23ff55d96c9b1c888
+gemseo @ git+https://gitlab.com/gemseo/dev/gemseo.git@35ef5507ac8b757120c36251096cc6217abfc511
 genson==1.2.2
     # via gemseo
 graphviz==0.20.3
@@ -97,7 +97,7 @@ pillow==10.2.0
     #   matplotlib
 plotly==5.20.0
     # via gemseo
-pluggy==1.4.0
+pluggy==1.5.0
     # via pytest
 psutil==5.9.8
     # via openturns
@@ -140,7 +140,7 @@ six==1.16.0
     # via python-dateutil
 snowballstemmer==2.2.0
     # via sphinx
-sphinx==7.2.6
+sphinx==7.3.7
 sphinxcontrib-applehelp==1.0.8
     # via sphinx
 sphinxcontrib-devhelp==1.0.6
@@ -165,6 +165,7 @@ tomli==2.0.1
     # via
     #   coverage
     #   pytest
+    #   sphinx
 tqdm==4.66.2
     # via gemseo
 typing-extensions==4.11.0

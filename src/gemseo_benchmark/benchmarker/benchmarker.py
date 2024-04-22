@@ -26,7 +26,7 @@ from typing import TYPE_CHECKING
 from typing import Final
 
 from gemseo import configure_logger
-from gemseo.algos.opt.opt_factory import OptimizersFactory
+from gemseo.algos.opt.factory import OptimizationLibraryFactory
 from gemseo.core.parallel_execution.callable_parallel_execution import (
     CallableParallelExecution,
 )
@@ -75,7 +75,7 @@ class Benchmarker:
         """  # noqa: D205, D212, D415
         self._databases_path = databases_path
         self.__histories_path = histories_path
-        self.__optimizers_factory = OptimizersFactory()
+        self.__optimizers_factory = OptimizationLibraryFactory()
         self.__is_algorithm_available = self.__optimizers_factory.is_available
         self.__results_path = results_path
         if results_path is not None and results_path.is_file():
