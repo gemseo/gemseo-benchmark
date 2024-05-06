@@ -488,7 +488,7 @@ class PerformanceHistory(collections.abc.Sequence):
 
             x_vect = design_values.unwrap()
             obj_values.append(float(output_values[obj_name]))
-            feasibility, measure = problem.get_violation_criteria(x_vect)
+            feasibility, measure = problem.check_design_point_is_feasible(x_vect)
             number_of_unsatisfied_constraints = (
                 problem.get_number_of_unsatisfied_constraints(x_vect, output_values)
             )
