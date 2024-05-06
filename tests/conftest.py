@@ -26,7 +26,7 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
-from gemseo.algos.opt_problem import OptimizationProblem
+from gemseo.algos.optimization_problem import OptimizationProblem
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
 from numpy import array
 from numpy import ndarray
@@ -130,7 +130,7 @@ def problem(
     )
     problem.get_scalar_constraint_names = problem.get_constraint_names
     problem.evaluate_functions = mock.Mock(return_value=(functions_values, None))
-    problem.get_violation_criteria = mock.Mock(return_value=(False, 1.0))
+    problem.check_design_point_is_feasible = mock.Mock(return_value=(False, 1.0))
     problem.get_number_of_unsatisfied_constraints = mock.Mock(return_value=1)
     problem.get_optimum = mock.Mock(
         return_value=(

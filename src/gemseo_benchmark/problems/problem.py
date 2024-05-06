@@ -37,7 +37,7 @@ from typing import Union
 from gemseo import compute_doe
 from gemseo import execute_algo
 from gemseo.algos.opt.factory import OptimizationLibraryFactory
-from gemseo.algos.opt_problem import OptimizationProblem
+from gemseo.algos.optimization_problem import OptimizationProblem
 from gemseo.utils.matplotlib_figure import save_show_figure
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MaxNLocator
@@ -59,7 +59,7 @@ from gemseo_benchmark.results.performance_history import PerformanceHistory
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from gemseo.algos.doe.doe_library import DOELibraryOptionType
+    from gemseo.algos.doe.doe_library import DriverLibraryOptionType
 
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
@@ -95,7 +95,7 @@ class Problem:
         target_values: TargetValues | None = None,
         doe_algo_name: str | None = None,
         doe_size: int | None = None,
-        doe_options: Mapping[str, DOELibraryOptionType] | None = None,
+        doe_options: Mapping[str, DriverLibraryOptionType] | None = None,
         description: str | None = None,
         target_values_algorithms_configurations: AlgorithmsConfigurations | None = None,
         target_values_number: int | None = None,
@@ -269,7 +269,7 @@ class Problem:
         self,
         doe_algo_name: str,
         doe_size: int | None = None,
-        doe_options: Mapping[str, DOELibraryOptionType] | None = None,
+        doe_options: Mapping[str, DriverLibraryOptionType] | None = None,
     ) -> ndarray:
         """Return the starting points of the benchmarking problem.
 
@@ -437,7 +437,7 @@ class Problem:
         feas_statuses = []
         for key, values in problem.database.items():
             obj_values.append(values[obj_name])
-            feasibility, measure = problem.get_violation_criteria(key)
+            feasibility, measure = problem.check_design_point_is_feasible(key)
             infeas_measures.append(measure)
             feas_statuses.append(feasibility)
         return obj_values, infeas_measures, feas_statuses
