@@ -90,6 +90,7 @@ class Benchmarker:
         overwrite_histories: bool = False,
         number_of_processes: int = 1,
         use_threading: bool = False,
+        log_gemseo_to_file: bool = False,
     ) -> Results:
         """Run optimization algorithms on reference problems.
 
@@ -102,6 +103,8 @@ class Benchmarker:
                 processes used to parallelize the execution.
             use_threading: Whether to use threads instead of processes
                 to parallelize the execution.
+            log_gemseo_to_file: Whether to save the GEMSEO log to a file
+                next to the performance history file.
 
         Returns:
             The results of the optimization.
@@ -119,8 +122,25 @@ class Benchmarker:
 
             self.__disable_stopping_criteria(algorithm_configuration)
             for problem in problems:
-                inputs.extend([
-                    (
+                for problem_instance_index, problem_instance in enumerate(problem):
+                    if self.__skip_instance(
+                        algorithm_configuration,
+                        problem,
+                        problem_instance_index,
+                        overwrite_histories,
+                    ):
+                        pass
+
+                    if log_gemseo_to_file:
+                        log_path = self.get_history_path(
+                            algorithm_configuration,
+                            problem.name,
+                            problem_instance_index,
+                        ).with_suffix(".log")
+                    else:
+                        log_path = None
+
+                    inputs.append((
                         self.__set_instance_algorithm_options(
                             algorithm_configuration,
                             problem,
@@ -129,15 +149,8 @@ class Benchmarker:
                         problem,
                         problem_instance,
                         problem_instance_index,
-                    )
-                    for problem_instance_index, problem_instance in enumerate(problem)
-                    if not self.__skip_instance(
-                        algorithm_configuration,
-                        problem,
-                        problem_instance_index,
-                        overwrite_histories,
-                    )
-                ])
+                        log_path,
+                    ))
 
         if inputs:
             worker = Worker(self._HISTORY_CLASS)

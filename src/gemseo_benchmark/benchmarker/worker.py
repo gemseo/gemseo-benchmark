@@ -16,16 +16,21 @@
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING
 
 from gemseo import execute_algo
+from gemseo.algos._progress_bars.custom_tqdm_progress_bar import LOGGER as TQDM_LOGGER
 from gemseo.algos.database import Database
+from gemseo.algos.driver_library import LOGGER as DRIVER_LOGGER
 from gemseo.utils.timer import Timer
 
 from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from gemseo.algos.opt_problem import OptimizationProblem
 
     from gemseo_benchmark.algorithms.algorithm_configuration import (
@@ -48,7 +53,10 @@ class Worker:
         self.__history_class = history_class
 
     def __call__(
-        self, args: tuple[AlgorithmConfiguration, Problem, OptimizationProblem, int]
+        self,
+        args: tuple[
+            AlgorithmConfiguration, Problem, OptimizationProblem, int, Path | None
+        ],
     ) -> WorkerOutputs:
         """Run an algorithm on a benchmarking problem for a particular starting point.
 
@@ -57,7 +65,8 @@ class Worker:
                 The algorithm configuration,
                 the benchmarking problem,
                 the instance of the benchmarking problem,
-                the index of the problem instance.
+                the index of the problem instance,
+                the path to the GEMSEO log file.
 
         Returns:
             The database of the algorithm run and its performance history.
@@ -67,11 +76,25 @@ class Worker:
             problem,
             problem_instance,
             problem_instance_index,
+            log_path,
         ) = args
         algo_name = algorithm_configuration.algorithm_name
         algo_options = algorithm_configuration.algorithm_options
+        if log_path is not None:
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+            file_handler = logging.FileHandler(log_path, "w")
+            loggers = [DRIVER_LOGGER, TQDM_LOGGER]
+            for logger in loggers:
+                logger.addHandler(file_handler)
+
         with Timer() as timer:
             execute_algo(problem_instance, algo_name, **algo_options)
+
+        if log_path is not None:
+            for logger in loggers:
+                logger.removeHandler(file_handler)
+
+            file_handler.close()
 
         history = self.__history_class.from_problem(problem_instance, problem.name)
         history.algorithm_configuration = algorithm_configuration
