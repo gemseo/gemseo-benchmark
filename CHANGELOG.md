@@ -26,6 +26,16 @@ The format is based on
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# Develop
+
+## Added
+
+### Benchmarker
+
+- The option ``log_gemseo_to_file`` has been added to ``Benchmarker.execute``
+  and ``Scenario.execute`` to save the GEMSEO log of each algorithm execution
+  to a file in the same directory as its performance history file.
+
 # Version 2.0.0 (December 2023)
 
 ## Changed
