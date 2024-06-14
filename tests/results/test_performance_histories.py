@@ -16,7 +16,11 @@
 
 from __future__ import annotations
 
+import matplotlib
+import matplotlib.pyplot
+import matplotlib.testing
 import pytest
+from matplotlib.testing.decorators import image_comparison
 
 from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_histories import PerformanceHistories
@@ -85,3 +89,81 @@ def test_del():
     del histories[0]
     with pytest.raises(IndexError, match="list index out of range"):
         histories[0]
+
+
+@pytest.fixture(scope="module")
+def five_performance_histories() -> PerformanceHistories:
+    """A collection of performance histories."""
+    return PerformanceHistories(
+        PerformanceHistory(
+            [4, 3, 2, 1, 0, -1, -2],
+            [10, 8, 6, 4, 2, 0, 0],
+            n_unsatisfied_constraints=[5, 4, 3, 2, 1, 0, 0],
+        ),
+        PerformanceHistory(
+            [3, 2, 1, 0, -1, -2, -3],
+            [8, 6, 4, 2, 0, 0, 0],
+            n_unsatisfied_constraints=[4, 3, 2, 1, 0, 0, 0],
+        ),
+        PerformanceHistory(
+            [2, 1, 0, -1, -2, -3, -4],
+            [6, 4, 2, 0, 0, 0, 0],
+            n_unsatisfied_constraints=[3, 2, 1, 0, 0, 0, 0],
+        ),
+        PerformanceHistory(
+            [1, 0, -1, -2, -3, -4, -5],
+            [4, 2, 0, 0, 0, 0, 0],
+            n_unsatisfied_constraints=[2, 1, 0, 0, 0, 0, 0],
+        ),
+        PerformanceHistory(
+            [0, -1, -2, -3, -4, -5, -6],
+            [2, 0, 0, 0, 0, 0, 0],
+            n_unsatisfied_constraints=[1, 0, 0, 0, 0, 0, 0],
+        ),
+    )
+
+
+@image_comparison(["performance_measure_distribution"], ["png"])
+def test_plot_performance_measure_distribution(
+    five_performance_histories,
+):
+    """Check the plot of the distribution of the performance measure."""
+    matplotlib.pyplot.close("all")
+    five_performance_histories.plot_performance_measure_distribution(
+        matplotlib.pyplot.figure().gca(), 4
+    )
+
+
+@image_comparison(["performance_measure_distribution_infeasible_centile"], ["png"])
+def test_plot_performance_measure_distribution_infeasible_centile():
+    """Check the plotting of an infeasible centile."""
+    matplotlib.pyplot.close("all")
+    PerformanceHistories(
+        PerformanceHistory([6, 5, 4], [1, 1, 1]),
+        PerformanceHistory([5, 4, 3], [1, 1, 1]),
+        PerformanceHistory([4, 3, 2], [1, 1, 1]),
+        PerformanceHistory([3, 2, 1], [1, 1, 1]),
+        PerformanceHistory([2, 1, 0], [1, 0, 0]),
+    ).plot_performance_measure_distribution(matplotlib.pyplot.figure().gca())
+
+
+@image_comparison(["infeasibility_measure_distribution"], ["png"])
+def test_plot_infeasibility_measure_distribution(
+    five_performance_histories,
+):
+    """Check the plot of the distribution of the infeasibility measure."""
+    matplotlib.pyplot.close("all")
+    five_performance_histories.plot_infeasibility_measure_distribution(
+        matplotlib.pyplot.figure().gca()
+    )
+
+
+@image_comparison(["number_of_unsatisfied_constraints_distribution"], ["png"])
+def test_plot_number_of_unsatisfied_constraints_distribution(
+    five_performance_histories,
+):
+    """Check the plot of the distribution of the number of unsatisfied constraints."""
+    matplotlib.pyplot.close("all")
+    five_performance_histories.plot_number_of_unsatisfied_constraints_distribution(
+        matplotlib.pyplot.figure().gca()
+    )

@@ -36,6 +36,7 @@ from __future__ import annotations
 
 import collections.abc
 import json
+from copy import copy
 from functools import reduce
 from itertools import chain
 from itertools import repeat
@@ -287,9 +288,10 @@ class PerformanceHistory(collections.abc.Sequence):
         Returns:
             The history of the cumulated minimum.
         """
-        minima = [reduce(min, self.__items[: i + 1]) for i in range(len(self))]
-        minimum_history = PerformanceHistory()
-        minimum_history.items = minima
+        minimum_history = copy(self)
+        minimum_history.items = [
+            reduce(min, self.__items[: i + 1]) for i in range(len(self))
+        ]
         return minimum_history
 
     # TODO: deprecate this method in favor of PerformanceHistories.compute_minimum
@@ -355,7 +357,7 @@ class PerformanceHistory(collections.abc.Sequence):
                 first_feasible = index
                 break
 
-        truncated_history = PerformanceHistory()
+        truncated_history = copy(self)
         if first_feasible is not None:
             truncated_history.items = self.items[first_feasible:]
 
@@ -558,7 +560,7 @@ class PerformanceHistory(collections.abc.Sequence):
             )
             raise ValueError(msg)
 
-        history = PerformanceHistory()
+        history = copy(self)
         history.items = list(chain(self, repeat(self[-1], (size - len(self)))))
         return history
 
@@ -573,7 +575,7 @@ class PerformanceHistory(collections.abc.Sequence):
         Returns:
             The shortened performance history.
         """
-        history = PerformanceHistory()
+        history = copy(self)
         history.items = self.items[:size]
         return history
 
