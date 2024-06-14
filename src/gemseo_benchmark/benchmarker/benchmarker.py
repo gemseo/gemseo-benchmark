@@ -129,7 +129,7 @@ class Benchmarker:
                         problem_instance_index,
                         overwrite_histories,
                     ):
-                        pass
+                        continue
 
                     if log_gemseo_to_file:
                         log_path = self.get_history_path(

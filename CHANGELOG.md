@@ -36,6 +36,30 @@ and this project adheres to
   and ``Scenario.execute`` to save the GEMSEO log of each algorithm execution
   to a file in the same directory as its performance history file.
 
+### Data profiles
+
+- Target values can be plotted on existing axes as horizontal lines with
+  ``TargetValues.plot_on_axes``.
+
+### Results
+
+- The distribution of a collection of performance histories can be plotted in terms of
+  performance measure (```PerformanceHistories.plot_performance_measure_distribution``),
+  infeasibility measure (```PerformanceHistories.plot_infeasibility_measure_distribution``)
+  and number of unsatisfied constraints
+  (```PerformanceHistories.plot_number_of_unsatisfied_constraints_distribution``).
+
+## Changed
+
+### Results
+
+- Methods
+  ``PerformanceHistory.compute_cumulated_minimum``,
+  ``PerformanceHistory.extend``,
+  ``PerformanceHistory.remove_leading_infeasible``,
+  and ``PerformanceHistory.shorten``
+  preserve the attributes other than ``PerformanceHistory.items``.
+
 # Version 2.0.0 (December 2023)
 
 ## Changed

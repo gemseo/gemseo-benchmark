@@ -79,16 +79,48 @@ def test_iter():
     assert list(iter(history)) == [HistoryItem(3.0, numpy.inf), HistoryItem(2.0, 0.0)]
 
 
-def test_compute_cumulated_minimum():
+@pytest.fixture(scope="module")
+def performance_history(algorithm_configuration) -> PerformanceHistory:
+    """A performance history."""
+    return PerformanceHistory(
+        [0.0, -3.0, -1.0, 0.0, 1.0, -1.0],
+        [2.0, 3.0, 1.0, 0.0, 0.0, 0.0],
+        [False, False, False, True, True, True],
+        [4, 6, 2, 0, 0, 0],
+        "problem",
+        "objective",
+        ["constraint1", "constraint2"],
+        6,
+        123,
+        algorithm_configuration,
+        2,
+    )
+
+
+def check_non_item_attributes(history, reference_history):
+    """Check the non-item attributes of a performance history against a reference."""
+    assert history.problem_name == reference_history.problem_name
+    assert history._objective_name == reference_history._objective_name
+    assert history._constraints_names == reference_history._constraints_names
+    assert history.doe_size == reference_history.doe_size
+    assert history.total_time == reference_history.total_time
+    assert history.algorithm_configuration == reference_history.algorithm_configuration
+    assert history._number_of_variables == reference_history._number_of_variables
+
+
+def test_compute_cumulated_minimum(performance_history, algorithm_configuration):
     """Check the computation of the cumulated minimum of a performance history."""
-    history = PerformanceHistory(
-        [0.0, -3.0, -1.0, 0.0, 1.0, -1.0], [2.0, 3.0, 1.0, 0.0, 0.0, 0.0]
-    )
-    reference = PerformanceHistory(
-        [0.0, 0.0, -1.0, 0.0, 0.0, -1.0], [2.0, 2.0, 1.0, 0.0, 0.0, 0.0]
-    )
-    cumulated_minimum = history.compute_cumulated_minimum()
-    assert cumulated_minimum.items == reference.items
+    PerformanceHistory([0.0, 0.0, -1.0, 0.0, 0.0, -1.0], [2.0, 2.0, 1.0, 0.0, 0.0, 0.0])
+    cumulated_minimum = performance_history.compute_cumulated_minimum()
+    check_non_item_attributes(cumulated_minimum, performance_history)
+    assert cumulated_minimum.items == [
+        HistoryItem(0, 2, 4),
+        HistoryItem(0, 2, 4),
+        HistoryItem(-1, 1, 2),
+        HistoryItem(0, 0, 0),
+        HistoryItem(0, 0, 0),
+        HistoryItem(-1, 0, 0),
+    ]
 
 
 history_1 = PerformanceHistory([1.0, -1.0, 0.0], [2.0, 0.0, 3.0])
@@ -129,12 +161,15 @@ def test_compute_median_history():
     assert median.items == items
 
 
-def test_remove_leading_infeasible():
+def test_remove_leading_infeasible(performance_history):
     """Check the removal of the leading infeasible items in a performance history."""
-    history = PerformanceHistory([2.0, 1.0, 0.0, 1.0, -1.0], [2.0, 1.0, 0.0, 3.0, 0.0])
-    reference = PerformanceHistory([0.0, 1.0, -1.0], [0.0, 3.0, 0.0])
-    truncation = history.remove_leading_infeasible()
-    assert truncation.items == reference.items
+    truncation = performance_history.remove_leading_infeasible()
+    check_non_item_attributes(truncation, performance_history)
+    assert truncation.items == [
+        HistoryItem(0, 0, 0),
+        HistoryItem(1, 0, 0),
+        HistoryItem(-1, 0, 0),
+    ]
 
 
 def test_to_file(tmp_path):
@@ -228,33 +263,32 @@ def test_from_problem_incomplete_database(problem, incomplete_database):
     assert len(history) == 0
 
 
-@pytest.mark.parametrize("size", [2, 5])
-def test_extend(size):
+@pytest.mark.parametrize("size", [6, 9])
+def test_extend(performance_history, size):
     """Check the extension of a performance history."""
-    history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
-    extension = history.extend(size)
+    extension = performance_history.extend(size)
+    check_non_item_attributes(extension, performance_history)
     assert len(extension) == size
-    assert extension.items[:2] == history.items[:2]
-    assert extension[size - 1] == history[1]
+    assert extension.items[:6] == performance_history.items[:6]
+    assert extension[size - 1] == performance_history[5]
 
 
-def test_extend_smaller():
+def test_extend_smaller(performance_history):
     """Check the extension of a performance history to a smaller size."""
-    history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
     with pytest.raises(
         ValueError,
-        match=re.escape("The expected size (1) is smaller than the history size (2)."),
+        match=re.escape("The expected size (1) is smaller than the history size (6)."),
     ):
-        history.extend(1)
+        performance_history.extend(1)
 
 
-@pytest.mark.parametrize("size", [1, 2])
-def test_shorten(size):
+@pytest.mark.parametrize("size", [1, 6])
+def test_shorten(performance_history, size):
     """Check the shortening of a performance history."""
-    history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])
-    shortening = history.shorten(size)
+    shortening = performance_history.shorten(size)
+    check_non_item_attributes(shortening, performance_history)
     assert len(shortening) == size
-    assert shortening.items == history.items[:size]
+    assert shortening.items == performance_history.items[:size]
 
 
 def test_get_plot_data_feasible():
