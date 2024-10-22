@@ -59,7 +59,7 @@ from gemseo_benchmark.results.performance_history import PerformanceHistory
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from gemseo.algos.doe.doe_library import DriverLibraryOptionType
+    from gemseo.algos.doe.base_doe_library import DriverLibraryOptionType
 
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
@@ -80,7 +80,7 @@ class Problem:
     Attributes:
         name (str): The name of the benchmarking problem.
         optimization_problem_creator (Callable[[], OptimizationProblem]): A callable
-        that returns an instance of the optimization problem.
+            that returns an instance of the optimization problem.
         start_points (Iterable[ndarray]): The starting points of the benchmarking
             problem.
         optimum (float): The best feasible objective value of the problem.
@@ -142,7 +142,7 @@ class Problem:
                 :class:`gemseo.algos.opt_problem.OptimizationProblem`,
                 or if a starting point is not of type ndarray.
             ValueError: If neither starting points nor DOE configurations are passed,
-               or if a starting point is of inappropriate shape.
+                or if a starting point is of inappropriate shape.
         """  # noqa: D205, D212, D415
         self.name = name
         self.__description = description
@@ -165,7 +165,7 @@ class Problem:
             self.start_points = self.__get_start_points(
                 doe_algo_name, doe_size, doe_options
             )
-        elif problem.design_space.has_current_value():
+        elif problem.design_space.has_current_value:
             self.start_points = atleast_2d(
                 self._problem.design_space.get_current_value()
             )
@@ -225,11 +225,11 @@ class Problem:
                 )
                 raise ValueError(msg)
 
-            if start_points.shape[1] != self._problem.dimension:
+            if start_points.shape[1] != self._problem.design_space.dimension:
                 msg = (
                     f"{message} The number of columns ({start_points.shape[1]}) "
                     f"is different from the problem dimension "
-                    f"({self._problem.dimension})."
+                    f"({self._problem.design_space.dimension})."
                 )
                 raise ValueError(msg)
 
@@ -254,13 +254,13 @@ class Problem:
         """
         error_message = (
             "A starting point must be a 1-dimensional NumPy array of size "
-            f"{self._problem.dimension}."
+            f"{self._problem.design_space.dimension}."
         )
         if any(not isinstance(point, ndarray) for point in start_points):
             raise TypeError(error_message)
 
         if any(
-            point.ndim != 1 or point.size != self._problem.dimension
+            point.ndim != 1 or point.size != self._problem.design_space.dimension
             for point in start_points
         ):
             raise ValueError(error_message)
@@ -284,7 +284,7 @@ class Problem:
             The starting points.
         """
         if doe_size is None:
-            doe_size = min([self._problem.dimension, 10])
+            doe_size = min([self._problem.design_space.dimension, 10])
 
         if doe_options is None:
             doe_options = {}
@@ -344,7 +344,7 @@ class Problem:
     @property
     def constraints_names(self) -> list[str]:
         """The names of the scalar constraints."""
-        return self._problem.get_scalar_constraint_names()
+        return self._problem.scalar_constraint_names
 
     def is_algorithm_suited(self, name: str) -> bool:
         """Check whether an algorithm is suited to the problem.
@@ -356,7 +356,7 @@ class Problem:
             True if the algorithm is suited to the problem, False otherwise.
         """
         library = OptimizationLibraryFactory().create(name)
-        return library.is_algorithm_suited(library.descriptions[name], self._problem)
+        return library.is_algorithm_suited(library.ALGORITHM_INFOS[name], self._problem)
 
     def compute_targets(
         self,
@@ -437,7 +437,7 @@ class Problem:
         feas_statuses = []
         for key, values in problem.database.items():
             obj_values.append(values[obj_name])
-            feasibility, measure = problem.check_design_point_is_feasible(key)
+            feasibility, measure = problem.history.check_design_point_is_feasible(key)
             infeas_measures.append(measure)
             feas_statuses.append(feasibility)
         return obj_values, infeas_measures, feas_statuses
@@ -516,7 +516,7 @@ class Problem:
     @property
     def dimension(self) -> int:
         """The dimension of the problem."""
-        return self._problem.dimension
+        return self._problem.design_space.dimension
 
     def compute_data_profile(
         self,

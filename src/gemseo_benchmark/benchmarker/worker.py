@@ -21,8 +21,8 @@ from typing import TYPE_CHECKING
 
 from gemseo import execute_algo
 from gemseo.algos._progress_bars.custom_tqdm_progress_bar import LOGGER as TQDM_LOGGER
+from gemseo.algos.base_driver_library import LOGGER as DRIVER_LOGGER
 from gemseo.algos.database import Database
-from gemseo.algos.driver_library import LOGGER as DRIVER_LOGGER
 from gemseo.utils.timer import Timer
 
 from gemseo_benchmark.problems.problem import Problem
@@ -31,7 +31,7 @@ from gemseo_benchmark.results.performance_history import PerformanceHistory
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from gemseo.algos.opt_problem import OptimizationProblem
+    from gemseo.algos.optimization_problem import OptimizationProblem
 
     from gemseo_benchmark.algorithms.algorithm_configuration import (
         AlgorithmConfiguration,
