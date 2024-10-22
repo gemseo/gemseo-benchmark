@@ -45,6 +45,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Final
 
+from numpy import atleast_1d
 from numpy import inf
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -54,7 +55,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from collections.abc import Sequence
 
-    from gemseo.algos.opt_problem import OptimizationProblem
+    from gemseo.algos.optimization_problem import OptimizationProblem
     from matplotlib.axes import Axes
 
 
@@ -482,17 +483,19 @@ class PerformanceHistory(collections.abc.Sequence):
         infeas_measures = []
         feas_statuses = []
         n_unsatisfied_constraints = []
-        functions_names = {obj_name, *problem.get_constraint_names()}
+        functions_names = {obj_name, *problem.constraints.get_names()}
         for design_values, output_values in problem.database.items():
             # Only consider points with all functions values
             if not functions_names <= set(output_values.keys()):
                 continue
 
             x_vect = design_values.unwrap()
-            obj_values.append(float(output_values[obj_name]))
-            feasibility, measure = problem.check_design_point_is_feasible(x_vect)
+            obj_values.append(atleast_1d(output_values[obj_name]).real[0])
+            feasibility, measure = problem.history.check_design_point_is_feasible(
+                x_vect
+            )
             number_of_unsatisfied_constraints = (
-                problem.get_number_of_unsatisfied_constraints(x_vect, output_values)
+                problem.constraints.get_number_of_unsatisfied_constraints(output_values)
             )
             infeas_measures.append(measure)
             feas_statuses.append(feasibility)
@@ -505,8 +508,8 @@ class PerformanceHistory(collections.abc.Sequence):
             n_unsatisfied_constraints,
             problem_name,
             problem.objective.name,
-            problem.get_scalar_constraint_names(),
-            number_of_variables=problem.dimension,
+            problem.scalar_constraint_names,
+            number_of_variables=problem.design_space.dimension,
         )
 
     def get_plot_data(

@@ -177,11 +177,11 @@ class Report:
             if algo_name not in algos_descriptions:
                 try:
                     library = OptimizationLibraryFactory().create(algo_name)
-                except ImportError:
+                except ValueError:
                     # The algorithm is unavailable
                     algos_descriptions[algo_name] = "N/A"
                 else:
-                    algos_descriptions[algo_name] = library.descriptions[
+                    algos_descriptions[algo_name] = library.ALGORITHM_INFOS[
                         algo_name
                     ].description
 
