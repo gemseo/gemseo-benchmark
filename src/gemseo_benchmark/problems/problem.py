@@ -290,7 +290,10 @@ class Problem:
             doe_options = {}
 
         return compute_doe(
-            self._problem.design_space, doe_algo_name, doe_size, **doe_options
+            self._problem.design_space,
+            algo_name=doe_algo_name,
+            n_samples=doe_size,
+            **doe_options,
         )
 
     @property
@@ -399,7 +402,12 @@ class Problem:
                 options["ftol_abs"] = 0.0
 
             for instance in self:
-                execute_algo(instance, configuration.algorithm_name, **options)
+                execute_algo(
+                    instance,
+                    algo_type="opt",
+                    algo_name=configuration.algorithm_name,
+                    **options,
+                )
                 history = PerformanceHistory.from_problem(instance)
                 self.__targets_generator.add_history(history=history)
 
