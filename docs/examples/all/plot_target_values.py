@@ -64,7 +64,7 @@ problem = Problem(
 # %%
 # We define ten starting points by optimized Latin hypercube sampling (LHS).
 design_space = problem.creator().design_space
-problem.start_points = compute_doe(design_space, "OT_OPT_LHS", 10)
+problem.start_points = compute_doe(design_space, algo_name="OT_OPT_LHS", n_samples=10)
 # %%
 # Let use the optimizer COBYLA to generate performance histories on the problem.
 algorithms_configurations = AlgorithmsConfigurations(
