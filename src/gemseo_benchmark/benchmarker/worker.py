@@ -88,7 +88,12 @@ class Worker:
                 logger.addHandler(file_handler)
 
         with Timer() as timer:
-            execute_algo(problem_instance, algo_name, **algo_options)
+            execute_algo(
+                problem_instance,
+                algo_type="opt",
+                algo_name=algo_name,
+                **algo_options,
+            )
 
         if log_path is not None:
             for logger in loggers:
