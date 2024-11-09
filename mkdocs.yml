@@ -4,7 +4,6 @@ repo_url: https://gitlab.com/gemseo/dev/gemseo-benchmark
 repo_name: gemseo-benchmark
 
 theme:
-  logo: images/logo.png
   name: material
   favicon: images/favicon.ico
   features:
