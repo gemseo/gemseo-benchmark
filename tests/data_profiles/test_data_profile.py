@@ -42,7 +42,7 @@ def test_consistent_target_values():
     """Check the setting of consistent target values."""
     with pytest.raises(
         ValueError,
-        match="The reference problems must have the same number " "of target values",
+        match="The reference problems must have the same number of target values",
     ):
         DataProfile({
             "problem_1": TargetValues([1.0, 0.0]),

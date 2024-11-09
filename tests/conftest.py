@@ -26,8 +26,8 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
-from gemseo.algos.opt_problem import OptimizationProblem
-from gemseo.problems.analytical.rosenbrock import Rosenbrock
+from gemseo.algos.optimization_problem import OptimizationProblem
+from gemseo.problems.optimization.rosenbrock import Rosenbrock
 from numpy import array
 from numpy import ndarray
 
@@ -40,7 +40,7 @@ design_variables = array([0.0, 1.0])
 @pytest.fixture(scope="package")
 def design_space() -> mock.Mock:
     """A design space."""
-    design_space = mock.Mock()
+    design_space = mock.MagicMock()
     design_space.dimension = 2
     design_space.variable_names = ["x"]
     design_space.variable_sizes = {"x": 2}
@@ -49,6 +49,8 @@ def design_space() -> mock.Mock:
     design_space.unnormalize_vect = lambda _: _
     design_space.untransform_vect = lambda x, no_check: x
     design_space.normalize = {"x": [True]}
+    design_space.__iter__.return_value = ["x"]
+    design_space.get_size = mock.Mock(return_value=2)
     return design_space
 
 
@@ -76,6 +78,17 @@ def equality_constraint() -> mock.Mock:
     eq_constr.name = "h"
     eq_constr.f_type = "eq"
     return eq_constr
+
+
+@pytest.fixture(scope="package")
+def constraints(inequality_constraint, equality_constraint) -> mock.Mock:
+    """A collection of constraints."""
+    constraints = mock.Mock()
+    constraints.get_names = mock.Mock(
+        return_value=[inequality_constraint.name, equality_constraint.name]
+    )
+    constraints.get_number_of_unsatisfied_constraints = mock.Mock(return_value=1)
+    return constraints
 
 
 @pytest.fixture(scope="package")
@@ -109,39 +122,20 @@ def database(hashable_array, functions_values) -> mock.Mock:
 
 
 @pytest.fixture(scope="package")
-def problem(
-    design_space,
-    objective,
-    inequality_constraint,
-    equality_constraint,
-    functions_values,
-) -> mock.Mock:
+def problem(design_space, objective, constraints) -> mock.Mock:
     """A solved optimization problem."""
     problem = mock.Mock(spec=OptimizationProblem)
-    problem.ineq_tolerance = 1e-4
-    problem.eq_tolerance = 1e-2
+    problem.tolerances.inequality = 1e-4
+    problem.tolerances.equality = 1e-2
     problem.design_space = design_space
-    problem.dimension = design_space.dimension
+    problem.design_space.dimension = design_space.dimension
     problem.objective = objective
-    problem.nonproc_objective = None
-    problem.constraints = [inequality_constraint, equality_constraint]
-    problem.get_constraint_names = mock.Mock(
-        return_value=[inequality_constraint.name, equality_constraint.name]
-    )
-    problem.get_scalar_constraint_names = problem.get_constraint_names
-    problem.evaluate_functions = mock.Mock(return_value=(functions_values, None))
-    problem.get_violation_criteria = mock.Mock(return_value=(False, 1.0))
-    problem.get_number_of_unsatisfied_constraints = mock.Mock(return_value=1)
-    problem.get_optimum = mock.Mock(
-        return_value=(
-            functions_values[objective.name],
-            design_variables,
-            True,
-            functions_values,
-            None,
-        )
-    )
     problem.minimize_objective = True
+    problem.history = mock.Mock()
+    problem.history.check_design_point_is_feasible = mock.Mock(
+        return_value=(False, 1.0)
+    )
+    problem.constraints = constraints
     return problem
 
 
@@ -208,7 +202,7 @@ def group(problem_a, problem_b) -> mock.Mock:
 
 
 @pytest.fixture(scope="package")
-def algorithm_configuration() -> mock.Mock():
+def algorithm_configuration() -> mock.Mock:
     """The configuration of an algorithm."""
     algo_config = mock.Mock()
     algo_config.algorithm_name = "SLSQP"
@@ -220,12 +214,12 @@ def algorithm_configuration() -> mock.Mock():
 
 
 @pytest.fixture(scope="package")
-def algorithms_configurations(algorithm_configuration) -> mock.Mock():
+def algorithms_configurations(algorithm_configuration) -> mock.Mock:
     """The configurations of algorithms."""
     algos_configs = mock.MagicMock()
     algos_configs.name = "algorithms configurations"
     algos_configs.names = [algorithm_configuration.name]
-    algos_configs.algorithms = [algorithm_configuration.algorithm]
+    algos_configs.algorithms = [algorithm_configuration.algorithm_name]
     algos_configs.__iter__.return_value = [algorithm_configuration]
     return algos_configs
 
@@ -245,7 +239,7 @@ def unknown_algorithm_configuration():
 @pytest.fixture(scope="package")
 def unknown_algorithms_configurations(
     algorithm_configuration, unknown_algorithm_configuration
-) -> mock.Mock():
+) -> mock.Mock:
     """The configurations of algorithms unknown to GEMSEO."""
     algos_configs = mock.MagicMock()
     algos_configs.name = "unknown algorithms configurations"
@@ -267,7 +261,7 @@ def unknown_algorithms_configurations(
 ALGO_NAME = "SLSQP"
 
 
-@pytest.fixture()
+@pytest.fixture
 def results(
     algorithm_configuration, unknown_algorithm_configuration, problem_a, problem_b
 ) -> mock.Mock:

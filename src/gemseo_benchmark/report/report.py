@@ -31,7 +31,7 @@ from typing import TYPE_CHECKING
 from typing import Any
 from typing import Final
 
-from gemseo.algos.opt.opt_factory import OptimizersFactory
+from gemseo.algos.opt.factory import OptimizationLibraryFactory
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 
@@ -120,10 +120,11 @@ class Report:
             group.names for group in algos_configurations_groups
         ]) - set(histories_paths.algorithms)
         if algos_diff:
-            raise ValueError(
+            msg = (
                 f"Missing histories for algorithm{'s' if len(algos_diff) > 1 else ''} "
                 f"{', '.join([f'{name!r}' for name in sorted(algos_diff)])}."
             )
+            raise ValueError(msg)
 
         self.__max_eval_numbers = max_eval_number_per_group or {
             group.name: None for group in problems_groups
@@ -175,14 +176,14 @@ class Report:
         ]):
             if algo_name not in algos_descriptions:
                 try:
-                    library = OptimizersFactory().create(algo_name)
-                except ImportError:
+                    library = OptimizationLibraryFactory().create(algo_name)
+                except ValueError:
                     # The algorithm is unavailable
                     algos_descriptions[algo_name] = "N/A"
                 else:
-                    algos_descriptions[algo_name] = (
-                        library.descriptions[algo_name].description
-                    )
+                    algos_descriptions[algo_name] = library.ALGORITHM_INFOS[
+                        algo_name
+                    ].description
 
         # Create the file
         self.__fill_template(
@@ -212,7 +213,8 @@ class Report:
                 continue
 
             if problem.optimum is None:
-                raise AttributeError("The optimum of the problem is not set.")
+                msg = "The optimum of the problem is not set."
+                raise AttributeError(msg)
 
             self.__fill_template(
                 path,

@@ -36,6 +36,7 @@ from __future__ import annotations
 
 import collections.abc
 import json
+from copy import copy
 from functools import reduce
 from itertools import chain
 from itertools import repeat
@@ -44,6 +45,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Final
 
+from numpy import atleast_1d
 from numpy import inf
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -53,7 +55,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from collections.abc import Sequence
 
-    from gemseo.algos.opt_problem import OptimizationProblem
+    from gemseo.algos.optimization_problem import OptimizationProblem
     from matplotlib.axes import Axes
 
 
@@ -184,10 +186,11 @@ class PerformanceHistory(collections.abc.Sequence):
     ) -> None:
         for item in history_items:
             if not isinstance(item, HistoryItem):
-                raise TypeError(
+                msg = (
                     "History items must be of type HistoryItem."
                     f" The following type was passed: {type(item)}."
                 )
+                raise TypeError(msg)
 
         self.__items = list(history_items)
 
@@ -230,16 +233,18 @@ class PerformanceHistory(collections.abc.Sequence):
 
         if infeasibility_measures is not None:
             if len(infeasibility_measures) != len(objective_values):
-                raise ValueError(
+                msg = (
                     "The objective history and the infeasibility history "
                     "must have same length."
                 )
+                raise ValueError(msg)
         elif feasibility_statuses is not None:
             if len(feasibility_statuses) != len(objective_values):
-                raise ValueError(
+                msg = (
                     "The objective history and the feasibility history "
                     "must have same length."
                 )
+                raise ValueError(msg)
             infeasibility_measures = [
                 0.0 if is_feas else inf for is_feas in feasibility_statuses
             ]
@@ -251,10 +256,11 @@ class PerformanceHistory(collections.abc.Sequence):
                 0 if entry == 0.0 else None for entry in infeasibility_measures
             ]
         elif len(n_unsatisfied_constraints) != len(infeasibility_measures):
-            raise ValueError(
+            msg = (
                 "The unsatisfied constraints history and the feasibility history"
                 " must have same length."
             )
+            raise ValueError(msg)
 
         return list(
             starmap(
@@ -283,9 +289,10 @@ class PerformanceHistory(collections.abc.Sequence):
         Returns:
             The history of the cumulated minimum.
         """
-        minima = [reduce(min, self.__items[: i + 1]) for i in range(len(self))]
-        minimum_history = PerformanceHistory()
-        minimum_history.items = minima
+        minimum_history = copy(self)
+        minimum_history.items = [
+            reduce(min, self.__items[: i + 1]) for i in range(len(self))
+        ]
         return minimum_history
 
     # TODO: deprecate this method in favor of PerformanceHistories.compute_minimum
@@ -351,7 +358,7 @@ class PerformanceHistory(collections.abc.Sequence):
                 first_feasible = index
                 break
 
-        truncated_history = PerformanceHistory()
+        truncated_history = copy(self)
         if first_feasible is not None:
             truncated_history.items = self.items[first_feasible:]
 
@@ -476,17 +483,19 @@ class PerformanceHistory(collections.abc.Sequence):
         infeas_measures = []
         feas_statuses = []
         n_unsatisfied_constraints = []
-        functions_names = {obj_name, *problem.get_constraint_names()}
+        functions_names = {obj_name, *problem.constraints.get_names()}
         for design_values, output_values in problem.database.items():
             # Only consider points with all functions values
             if not functions_names <= set(output_values.keys()):
                 continue
 
             x_vect = design_values.unwrap()
-            obj_values.append(float(output_values[obj_name]))
-            feasibility, measure = problem.get_violation_criteria(x_vect)
+            obj_values.append(atleast_1d(output_values[obj_name]).real[0])
+            feasibility, measure = problem.history.check_design_point_is_feasible(
+                x_vect
+            )
             number_of_unsatisfied_constraints = (
-                problem.get_number_of_unsatisfied_constraints(x_vect, output_values)
+                problem.constraints.get_number_of_unsatisfied_constraints(output_values)
             )
             infeas_measures.append(measure)
             feas_statuses.append(feasibility)
@@ -499,8 +508,8 @@ class PerformanceHistory(collections.abc.Sequence):
             n_unsatisfied_constraints,
             problem_name,
             problem.objective.name,
-            problem.get_scalar_constraint_names(),
-            number_of_variables=problem.dimension,
+            problem.scalar_constraint_names,
+            number_of_variables=problem.design_space.dimension,
         )
 
     def get_plot_data(
@@ -548,12 +557,13 @@ class PerformanceHistory(collections.abc.Sequence):
             ValueError: If the expected size is smaller than the history size.
         """
         if size < len(self):
-            raise ValueError(
+            msg = (
                 f"The expected size ({size}) is smaller than "
                 f"the history size ({len(self)})."
             )
+            raise ValueError(msg)
 
-        history = PerformanceHistory()
+        history = copy(self)
         history.items = list(chain(self, repeat(self[-1], (size - len(self)))))
         return history
 
@@ -568,7 +578,7 @@ class PerformanceHistory(collections.abc.Sequence):
         Returns:
             The shortened performance history.
         """
-        history = PerformanceHistory()
+        history = copy(self)
         history.items = self.items[:size]
         return history
 

@@ -62,9 +62,8 @@ class Scenario:
             ValueError: If the path to outputs directory does not exist.
         """  # noqa: D205, D212, D415
         if not Path(outputs_path).is_dir():
-            raise NotADirectoryError(
-                f"The path to the outputs directory does not exist: {outputs_path}."
-            )
+            msg = f"The path to the outputs directory does not exist: {outputs_path}."
+            raise NotADirectoryError(msg)
 
         self._algorithms_configurations_groups = algorithms_configurations_groups
         self._outputs_path = Path(outputs_path).resolve()
@@ -87,6 +86,7 @@ class Scenario:
         max_eval_number_per_group: dict[str, int] | None = None,
         plot_all_histories: bool = True,
         use_log_scale: bool = False,
+        log_gemseo_to_file: bool = False,
     ) -> Results:
         """Execute the benchmarking scenario.
 
@@ -114,6 +114,8 @@ class Scenario:
                 for the group.
             plot_all_histories: Whether to plot all the performance histories.
             use_log_scale: Whether to use a logarithmic scale on the value axis.
+            log_gemseo_to_file: Whether to save the GEMSEO log to a file
+                next to the performance history file.
 
         Returns:
             The performance histories.
@@ -126,6 +128,7 @@ class Scenario:
                 save_databases,
                 number_of_processes,
                 use_threading,
+                log_gemseo_to_file,
             )
 
         if not skip_report:
@@ -150,6 +153,7 @@ class Scenario:
         save_databases: bool,
         number_of_processes: int,
         use_threading: bool,
+        log_gemseo_to_file: bool,
     ) -> None:
         """Run the solvers on the benchmarking problems.
 
@@ -161,6 +165,8 @@ class Scenario:
                 processes used to parallelize the execution.
             use_threading: Whether to use threads instead of processes
                 to parallelize the execution.
+            log_gemseo_to_file: Whether to save the GEMSEO log to a file
+                next to the performance history file.
         """
         Benchmarker(
             self._histories_path,
@@ -176,6 +182,7 @@ class Scenario:
             overwrite_histories,
             number_of_processes,
             use_threading,
+            log_gemseo_to_file,
         )
 
     def _get_dir_path(self, name: str, overwrite: bool = False) -> Path:

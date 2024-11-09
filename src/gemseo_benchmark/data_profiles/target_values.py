@@ -29,8 +29,10 @@ and computes its data profile (see :mod:`.data_profiles.data_profile`).
 
 from __future__ import annotations
 
+from types import MappingProxyType
 from typing import TYPE_CHECKING
 
+import matplotlib
 import matplotlib.pyplot as plt
 from gemseo.utils.matplotlib_figure import save_show_figure
 from numpy import array
@@ -40,6 +42,7 @@ from numpy import logical_not
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
     from pathlib import Path
 
     from matplotlib.figure import Figure
@@ -116,3 +119,38 @@ class TargetValues(PerformanceHistory):
         save_show_figure(fig, show, file_path)
 
         return fig
+
+    def plot_on_axes(
+        self,
+        axes: matplotlib.axes.Axes,
+        axhline_kwargs: Mapping[str, str | int] = MappingProxyType({
+            "color": "red",
+            "linestyle": ":",
+        }),
+        yticklabels_format: str = ".4g",
+        set_ylabel_kwargs: Mapping[str, str | int] = MappingProxyType({
+            "rotation": 270,
+            "labelpad": 12,
+        }),
+    ) -> None:
+        """Plot target values as horizontal lines.
+
+        Args:
+            axes: The axes of the plot.
+            axhline_kwargs: Keyword arguments
+                for ``matplotlib.axes.Axes.axhline``.
+            yticklabels_format: The string format for the target values labels.
+            set_ylabel_kwargs: Keyword arguments
+                for ``matplotlib.axes.Axes.set_ylabel``.
+        """
+        twin_axes = axes.twinx()
+        values = [target.objective_value for target in self if target.is_feasible]
+        for value in values:
+            axes.axhline(value, **axhline_kwargs)
+
+        twin_axes.set_yticks(values)
+        twin_axes.set_yticklabels([
+            f"{{value:{yticklabels_format}}}".format(value=value) for value in values
+        ])
+        twin_axes.set_ylabel("Target values", **set_ylabel_kwargs)
+        twin_axes.set_ylim(axes.get_ylim())

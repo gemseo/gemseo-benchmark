@@ -24,6 +24,7 @@ from __future__ import annotations
 import pytest
 from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
+from matplotlib.ticker import MaxNLocator
 
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.results.performance_history import PerformanceHistory
@@ -38,12 +39,17 @@ def test_count_targets_hist():
     assert targets.compute_target_hits_history(history) == [0, 0, 0, 2, 2, 3]
 
 
+@pytest.fixture(scope="module")
+def feasible_target_values() -> TargetValues:
+    """Return feasible target value."""
+    return TargetValues([2.0, 1.0, 0.0])
+
+
 @image_comparison(baseline_images=["targets"], remove_text=True, extensions=["png"])
-def test_plot_targets():
+def test_plot_targets(feasible_target_values):
     """Check the target values figure."""
-    targets = TargetValues([2.0, 1.0, 0.0])
     pyplot.close("all")
-    targets.plot(show=False)
+    feasible_target_values.plot(show=False)
 
 
 @pytest.mark.parametrize("converter", [lambda _: _, str])
@@ -57,3 +63,12 @@ def test_plot_save(tmp_path, converter):
     path = tmp_path / "targets.png"
     targets.plot(show=False, file_path=converter(path))
     assert path.is_file()
+
+
+@image_comparison(baseline_images=["feasible_targets"], extensions=["png"])
+def test_plot_on_axes(feasible_target_values) -> None:
+    """Check the plotting of target value on specific axes."""
+    axes = pyplot.figure().gca()
+    axes.plot(range(1, 6), range(4, -1, -1))
+    axes.xaxis.set_major_locator(MaxNLocator(integer=True))
+    feasible_target_values.plot_on_axes(axes)

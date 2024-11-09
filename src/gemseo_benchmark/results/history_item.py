@@ -68,9 +68,8 @@ class HistoryItem:
                 constraints are inconsistent.
         """
         if infeasibility_measure < 0.0:
-            raise ValueError(
-                f"The infeasibility measure is negative: {infeasibility_measure}."
-            )
+            msg = f"The infeasibility measure is negative: {infeasibility_measure}."
+            raise ValueError(msg)
 
         if n_unsatisfied_constraints is None:
             if infeasibility_measure == 0.0:
@@ -78,21 +77,21 @@ class HistoryItem:
             return infeasibility_measure, None
 
         if n_unsatisfied_constraints < 0:
-            raise ValueError(
+            msg = (
                 "The number of unsatisfied constraints is negative: "
                 f"{n_unsatisfied_constraints}."
             )
+            raise ValueError(msg)
 
-        if (
-            infeasibility_measure == 0.0
-            and n_unsatisfied_constraints != 0
-            or (infeasibility_measure > 0.0 and n_unsatisfied_constraints == 0)
+        if (infeasibility_measure == 0.0 and n_unsatisfied_constraints != 0) or (
+            infeasibility_measure > 0.0 and n_unsatisfied_constraints == 0
         ):
-            raise ValueError(
+            msg = (
                 f"The infeasibility measure ({infeasibility_measure}) and the number "
                 f"of unsatisfied constraints ({n_unsatisfied_constraints}) are not "
                 f"consistent."
             )
+            raise ValueError(msg)
 
         return infeasibility_measure, n_unsatisfied_constraints
 

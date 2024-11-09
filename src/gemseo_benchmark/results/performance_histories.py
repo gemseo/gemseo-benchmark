@@ -22,11 +22,13 @@ from typing import TYPE_CHECKING
 from typing import Callable
 
 import numpy
+from matplotlib.ticker import MaxNLocator
 
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
+    from collections.abc import Mapping
     from collections.abc import Sequence
 
     from matplotlib.axes import Axes
@@ -233,3 +235,183 @@ class PerformanceHistories(collections.abc.MutableSequence):
             else value
             for index in indexes
         ]
+
+    def plot_performance_measure_distribution(
+        self, axes: Axes, max_feasible_objective: float | None = None
+    ) -> None:
+        """Plot the distribution of the performance measure.
+
+        Args:
+            axes: The axes of the plot.
+            max_feasible_objective: The maximum feasible objective value.
+        """
+        if max_feasible_objective is None:
+            max_feasible_objective = max(
+                item.objective_value
+                for history in self
+                for item in history
+                if item.is_feasible
+            )
+
+        self.__plot_distribution(
+            numpy.array([
+                [
+                    item.objective_value if item.is_feasible else numpy.nan
+                    for item in history
+                ]
+                for history in self.__get_equal_size_histories()
+            ]),
+            axes,
+            "Performance measure",
+            max_feasible_objective,
+        )
+
+    def plot_infeasibility_measure_distribution(self, axes: Axes) -> None:
+        """Plot the distribution of the infeasibility measure.
+
+        Args:
+            axes: The axes of the plot.
+        """
+        self.__plot_distribution(
+            numpy.array([history.infeasibility_measures for history in self]),
+            axes,
+            "Infeasibility measure",
+        )
+
+    def plot_number_of_unsatisfied_constraints_distribution(self, axes: Axes) -> None:
+        """Plot the distribution of the number of unsatisfied constraints.
+
+        Args:
+            axes: The axes of the plot.
+        """
+        self.__plot_distribution(
+            numpy.array([history.n_unsatisfied_constraints for history in self]),
+            axes,
+            "Number of unsatisfied constraints",
+        )
+
+    @staticmethod
+    def __plot_distribution(
+        histories: numpy.ndarray,
+        axes: Axes,
+        y_label: str,
+        infinity: float | None = None,
+    ) -> None:
+        """Plot the distribution of histories data.
+
+        Args:
+            histories: The histories data.
+            axes: The axes of the plot.
+            y_label: The label for the vertical axis.
+            infinity: The substitute value for infinite ordinates.
+        """
+        PerformanceHistories.__plot_centiles_range(
+            histories,
+            axes,
+            (0, 100),
+            {"color": "lightgray", "label": "0th-100th centiles"},
+            infinity,
+        )
+        PerformanceHistories.__plot_centiles_range(
+            histories,
+            axes,
+            (25, 75),
+            {"color": "gray", "label": "25th-75th centiles"},
+            infinity,
+        )
+        PerformanceHistories.__plot_median(
+            histories, axes, {"color": "black", "label": "median"}
+        )
+        axes.plot(
+            range(1, histories.shape[1] + 1),
+            numpy.mean(histories, 0),
+            color="orange",
+            label="mean",
+            linestyle=":",
+        )
+        # Reorder the legend
+        axes.legend(
+            *zip(*[
+                list(zip(*axes.get_legend_handles_labels()))[index]
+                for index in [3, 2, 1, 0]
+            ])
+        )
+        axes.set_xlabel("Number of functions evaluations")
+        axes.set_ylabel(y_label)
+
+    @staticmethod
+    def __plot_centiles_range(
+        histories: numpy.ndarray,
+        axes: Axes,
+        centile_range: tuple[float, float],
+        fill_between_kwargs: Mapping[str, str],
+        infinity: float | None,
+    ) -> None:
+        """Plot a range of centiles of histories data.
+
+        Args:
+            histories: The histories data.
+            axes: The axes of the plot.
+            centile_range: The range of centiles to be drawn.
+            fill_between_kwargs: Keyword arguments
+                for `matplotlib.axes.Axes.fill_between`.
+            infinity: The substitute value for infinite ordinates.
+        """
+        method = "inverted_cdf"  # supports numpy.inf
+        histories = numpy.nan_to_num(histories, nan=numpy.inf)
+        lower_centile = numpy.percentile(
+            histories, min(centile_range), 0, method=method
+        )
+        first_index = next(
+            (i for i, value in enumerate(lower_centile) if numpy.isfinite(value)),
+            len(lower_centile),
+        )
+        axes.plot(  # hack to get same limits/ticks
+            range(1, first_index + 1),
+            numpy.full(
+                first_index,
+                lower_centile[first_index]
+                if first_index < len(lower_centile)
+                else numpy.nan,
+            ),
+            alpha=0,
+        )
+        upper_centile = numpy.percentile(
+            histories[:, first_index:], max(centile_range), 0, method=method
+        )
+
+        if infinity is not None:
+            upper_centile = numpy.nan_to_num(upper_centile, posinf=infinity)
+
+        axes.fill_between(
+            range(first_index + 1, histories.shape[1] + 1),
+            lower_centile[first_index:],
+            upper_centile,
+            **fill_between_kwargs,
+        )
+        axes.xaxis.set_major_locator(MaxNLocator(integer=True))
+
+    @staticmethod
+    def __plot_median(
+        histories: numpy.ndarray,
+        axes: Axes,
+        plot_kwargs: Mapping[str, str | int | float],
+    ) -> None:
+        """Plot a range of centiles of histories data.
+
+        Args:
+            histories: The histories data.
+            axes: The axes of the plot.
+            plot_kwargs: Keyword arguments for `matplotlib.axes.Axes.plot`.
+        """
+        median = numpy.median(numpy.nan_to_num(histories, nan=numpy.inf), 0)
+        # Skip infinite values to support the ``markevery`` option.
+        first_index = next(
+            (index for index, value in enumerate(median) if numpy.isfinite(value)),
+            histories.shape[1],
+        )
+        axes.plot(
+            range(first_index + 1, histories.shape[1] + 1),
+            median[first_index:],
+            **plot_kwargs,
+        )

@@ -27,8 +27,7 @@ from unittest import mock
 
 import numpy
 import pytest
-from gemseo.algos.opt_problem import OptimizationProblem
-from gemseo.problems.analytical.rosenbrock import Rosenbrock
+from gemseo.problems.optimization.rosenbrock import Rosenbrock
 from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
 from numpy import ones
@@ -118,11 +117,10 @@ def test_generate_start_points(creator):
     assert len(problem.start_points) == 5
 
 
-def test_undefined_start_points(creator):  # TODO: use creator
+def test_undefined_start_points(creator):
     """Check the access to nonexistent starting points."""
-    opt_problem = mock.Mock(spec=OptimizationProblem)
-    opt_problem.design_space = mock.Mock()
-    opt_problem.design_space.has_current_value = mock.Mock(return_value=False)
+    opt_problem = creator()
+    opt_problem.design_space.has_current_value = False
     problem = Problem("problem", lambda: opt_problem)
     with pytest.raises(
         ValueError, match="The benchmarking problem has no starting point."
@@ -186,7 +184,7 @@ def test__get_description(
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def results():
     """Paths to performance histories."""
     paths = [Path(__file__).parent / "history.json"]
@@ -195,7 +193,7 @@ def results():
     return results
 
 
-@pytest.fixture()
+@pytest.fixture
 def target_values():
     """Target values."""
     # N.B. passing the configuration is required for the setter.
@@ -443,10 +441,7 @@ def test_objective_name(benchmarking_problem, creator):
 
 def test_constraints_names(benchmarking_problem, creator):
     """Check the accessor to the constraints names."""
-    assert (
-        benchmarking_problem.constraints_names
-        == creator().get_scalar_constraint_names()
-    )
+    assert benchmarking_problem.constraints_names == creator().scalar_constraint_names
 
 
 def test_save_start_points(tmp_path, creator):

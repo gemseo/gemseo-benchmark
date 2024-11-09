@@ -45,7 +45,7 @@ from __future__ import annotations
 
 from gemseo import compute_doe
 from gemseo import configure
-from gemseo.problems.analytical.power_2 import Power2
+from gemseo.problems.optimization.power_2 import Power2
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.algorithms.algorithms_configurations import (
@@ -54,7 +54,7 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
 from gemseo_benchmark.problems.problem import Problem
 
 # %%
-# Let us consider the problem :class:`~gemseo.problems.analytical.power_2.Power2`
+# Let us consider the problem [Power2][gemseo.problems.analytical.power_2.Power2]
 # already implemented in GEMSEO.
 problem = Problem(
     name="Power2",
@@ -64,7 +64,7 @@ problem = Problem(
 # %%
 # We define ten starting points by optimized Latin hypercube sampling (LHS).
 design_space = problem.creator().design_space
-problem.start_points = compute_doe(design_space, "OT_OPT_LHS", 10)
+problem.start_points = compute_doe(design_space, algo_name="OT_OPT_LHS", n_samples=10)
 # %%
 # Let use the optimizer COBYLA to generate performance histories on the problem.
 algorithms_configurations = AlgorithmsConfigurations(
@@ -79,16 +79,16 @@ algorithms_configurations = AlgorithmsConfigurations(
 # Here we choose to deactivate the functions counters, progress bars and bounds check
 # of GEMSEO to accelerate the script.
 configure(
-    activate_function_counters=False,
-    activate_progress_bar=False,
+    enable_function_statistics=False,
+    enable_progress_bar=False,
     check_desvars_bounds=False,
 )
 # %%
 # Let us compute five target values for the problem.
 # This automatic procedure has two stages:
 #
-# #. execution of the specified algorithms once for each of the starting points,
-# #. automatic selection of target values based on the algorithms histories.
+# 1. execution of the specified algorithms once for each of the starting points,
+# 2. automatic selection of target values based on the algorithms histories.
 #
 # These targets represent the milestones of the problem resolution.
 problem.compute_targets(5, algorithms_configurations, best_target_tolerance=1e-5)

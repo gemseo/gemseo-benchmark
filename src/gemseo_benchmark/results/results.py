@@ -55,9 +55,8 @@ class Results:
         try:
             absolute_path = Path(path).resolve(strict=True)
         except FileNotFoundError:
-            raise FileNotFoundError(
-                f"The path to the history does not exist: {path}."
-            ) from None
+            msg = f"The path to the history does not exist: {path}."
+            raise FileNotFoundError(msg) from None
         if algorithm_configuration_name not in self.__dict:
             self.__dict[algorithm_configuration_name] = {}
 
@@ -89,9 +88,8 @@ class Results:
             path: The path to the JSON file.
         """
         if not Path(path).is_file():
-            raise FileNotFoundError(
-                f"The path to the JSON file does not exist: {path}."
-            )
+            msg = f"The path to the JSON file does not exist: {path}."
+            raise FileNotFoundError(msg)
 
         with Path(path).open("r") as file:
             histories = json.load(file)
@@ -122,7 +120,8 @@ class Results:
             ValueError: If the algorithm configuration name is unknown.
         """
         if algo_name not in self.__dict:
-            raise ValueError(f"Unknown algorithm name: {algo_name}.")
+            msg = f"Unknown algorithm name: {algo_name}."
+            raise ValueError(msg)
 
         return list(self.__dict[algo_name])
 
@@ -141,10 +140,12 @@ class Results:
                 or if the problem name is unknown.
         """
         if algo_name not in self.__dict:
-            raise ValueError(f"Unknown algorithm name: {algo_name}.")
+            msg = f"Unknown algorithm name: {algo_name}."
+            raise ValueError(msg)
 
         if problem_name not in self.__dict[algo_name]:
-            raise ValueError(f"Unknown problem name: {problem_name}.")
+            msg = f"Unknown problem name: {problem_name}."
+            raise ValueError(msg)
 
         return self.__dict[algo_name][problem_name]
 

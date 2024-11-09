@@ -47,7 +47,7 @@ def results_contents() -> dict[str, dict[str, list[str]]]:
     return {algorithm_name: {problem_name: [str(history_path.resolve())]}}
 
 
-@pytest.fixture()
+@pytest.fixture
 def results_file(tmp_path, results_contents) -> Path:
     """The path to the results file."""
     results_path = tmp_path / "results_reference.json"

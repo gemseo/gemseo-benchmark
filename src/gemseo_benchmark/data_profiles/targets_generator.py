@@ -88,13 +88,11 @@ class TargetsGenerator:
         """
         if history is not None:
             if objective_values is not None:
-                raise ValueError(
-                    "Both a performance history and objective values were passed."
-                )
+                msg = "Both a performance history and objective values were passed."
+                raise ValueError(msg)
         elif objective_values is None:
-            raise ValueError(
-                "Either a performance history or objective values must be passed."
-            )
+            msg = "Either a performance history or objective values must be passed."
+            raise ValueError(msg)
         else:
             history = PerformanceHistory(
                 objective_values, infeasibility_measures, feasibility_statuses
@@ -195,11 +193,12 @@ class TargetsGenerator:
                 starting from budget_min.
         """
         if budgets_number > budget_max - budget_min + 1:
-            raise ValueError(
+            msg = (
                 f"The number of targets required ({budgets_number}) is greater "
                 f"than the size the longest history ({budget_max - budget_min + 1}) "
                 f"starting from budget_min ({budget_min})."
             )
+            raise ValueError(msg)
 
         return linspace(budget_min, budget_max, budgets_number, dtype=int)
 
@@ -263,7 +262,7 @@ class TargetsGenerator:
 
         # Get the best target value
         if best_target_objective is None:
-            best_item = min([history[-1] for history in reference_histories])
+            best_item = min(history[-1] for history in reference_histories)
             best_target = TargetsGenerator.__get_best_target(
                 best_item.objective_value,
                 best_item.infeasibility_measure,
@@ -275,16 +274,16 @@ class TargetsGenerator:
             )
 
         if feasible and not best_target.is_feasible:
-            raise RuntimeError("The best target value is not feasible.")
+            msg = "The best target value is not feasible."
+            raise RuntimeError(msg)
 
         # Get the performance histories that reach the best target value
         reference_histories = PerformanceHistories(*[
             history for history in reference_histories if history[-1] <= best_target
         ])
         if not reference_histories:
-            raise RuntimeError(
-                "There is no performance history that reaches the best target value."
-            )
+            msg = "There is no performance history that reaches the best target value."
+            raise RuntimeError(msg)
 
         return reference_histories, best_target
 

@@ -25,7 +25,7 @@ import json
 from typing import TYPE_CHECKING
 
 import pytest
-from gemseo.problems.analytical.rastrigin import Rastrigin
+from gemseo.problems.optimization.rastrigin import Rastrigin
 from numpy import array
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -148,7 +148,9 @@ def test_instance_specific_algorithm_options(results_root, rosenbrock):
         AlgorithmsConfigurations(
             AlgorithmConfiguration(
                 "L-BFGS-B",
-                instance_algorithm_options={"max_iter": lambda index: index + 2},
+                instance_algorithm_options={
+                    "max_iter": lambda problem, index: problem.dimension + index
+                },
             )
         ),
     )
@@ -173,3 +175,43 @@ def test_instance_specific_algorithm_options(results_root, rosenbrock):
             ]
             == 3
         )
+
+
+def test_log_to_file(
+    algorithms_configurations, algorithm_configuration, rosenbrock, tmp_path
+) -> None:
+    """Check the logging of algorithms."""
+    Benchmarker(tmp_path).execute(
+        [rosenbrock], algorithms_configurations, log_gemseo_to_file=True
+    )
+    path_stem = (
+        tmp_path
+        / algorithm_configuration.name
+        / rosenbrock.name
+        / f"{algorithm_configuration.name}"
+    )
+    with path_stem.with_suffix(".1.log").open("r") as file1:
+        assert """Optimization problem:
+   minimize rosen(x) = sum( 100*(x[1:] - x[:-1]**2)**2 + (1 - x[:-1])**2 )
+   with respect to x
+   over the design space:
+      +------+-------------+-------+-------------+-------+
+      | Name | Lower bound | Value | Upper bound | Type  |
+      +------+-------------+-------+-------------+-------+
+      | x[0] |      -2     |   0   |      2      | float |
+      | x[1] |      -2     |   1   |      2      | float |
+      +------+-------------+-------+-------------+-------+
+Solving optimization problem with algorithm SLSQP:""" in file1.read()
+
+    with path_stem.with_suffix(".2.log").open("r") as file2:
+        assert """Optimization problem:
+   minimize rosen(x) = sum( 100*(x[1:] - x[:-1]**2)**2 + (1 - x[:-1])**2 )
+   with respect to x
+   over the design space:
+      +------+-------------+-------+-------------+-------+
+      | Name | Lower bound | Value | Upper bound | Type  |
+      +------+-------------+-------+-------------+-------+
+      | x[0] |      -2     |   1   |      2      | float |
+      | x[1] |      -2     |   0   |      2      | float |
+      +------+-------------+-------+-------------+-------+
+Solving optimization problem with algorithm SLSQP:""" in file2.read()

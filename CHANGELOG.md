@@ -26,6 +26,40 @@ The format is based on
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# Develop
+
+## Added
+
+### Benchmarker
+
+- The option ``log_gemseo_to_file`` has been added to ``Benchmarker.execute``
+  and ``Scenario.execute`` to save the GEMSEO log of each algorithm execution
+  to a file in the same directory as its performance history file.
+
+### Data profiles
+
+- Target values can be plotted on existing axes as horizontal lines with
+  ``TargetValues.plot_on_axes``.
+
+### Results
+
+- The distribution of a collection of performance histories can be plotted in terms of
+  performance measure (```PerformanceHistories.plot_performance_measure_distribution``),
+  infeasibility measure (```PerformanceHistories.plot_infeasibility_measure_distribution``)
+  and number of unsatisfied constraints
+  (```PerformanceHistories.plot_number_of_unsatisfied_constraints_distribution``).
+
+## Changed
+
+### Results
+
+- Methods
+  ``PerformanceHistory.compute_cumulated_minimum``,
+  ``PerformanceHistory.extend``,
+  ``PerformanceHistory.remove_leading_infeasible``,
+  and ``PerformanceHistory.shorten``
+  preserve the attributes other than ``PerformanceHistory.items``.
+
 # Version 2.0.0 (December 2023)
 
 ## Changed
@@ -39,7 +73,7 @@ and this project adheres to
   (refer to the "Added" section of the present changelog).
   For example:
   ``instance_algorithm_options
-  ={"log_path": lambda index: f"my/log/files/{index}.log"}``.
+  ={"log_path": lambda problem, index: f"my/log/files/{problem.name}.{index}.log"}``.
   N.B. the user is now responsible for the creation of the parent directories.
 - Class ``Worker`` no longer sets ``PerformanceHistory.doe_size``
   to the length of the value of the pSeven option ``"sample_x"``.
@@ -58,6 +92,10 @@ and this project adheres to
 
 - Algorithm options specific to problem instances (e.g. paths for output files)
   can be passed to ``AlgorithmConfiguration`` in the new argument ``instance_algorithm_options``.
+
+### Benchmarker
+
+- One can get the path to a performance history file with ``Benchmarker.get_history_path``.
 
 ## Removed
 

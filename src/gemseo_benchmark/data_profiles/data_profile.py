@@ -99,13 +99,13 @@ class DataProfile:
     @target_values.setter
     def target_values(self, target_values: Mapping[str, TargetValues]) -> None:
         if not isinstance(target_values, Mapping):
-            raise TypeError("The target values be must passed as a mapping")
+            msg = "The target values be must passed as a mapping"
+            raise TypeError(msg)
 
         targets_numbers = {len(pb_targets) for pb_targets in target_values.values()}
         if len(targets_numbers) != 1:
-            raise ValueError(
-                "The reference problems must have the same number of target values."
-            )
+            msg = "The reference problems must have the same number of target values."
+            raise ValueError(msg)
 
         self.__target_values = dict(target_values)
         self.__targets_number = targets_numbers.pop()
@@ -136,7 +136,8 @@ class DataProfile:
             ValueError: If the problem name is not the name of a reference problem.
         """
         if problem_name not in self.__target_values:
-            raise ValueError(f"{problem_name!r} is not the name of a reference problem")
+            msg = f"{problem_name!r} is not the name of a reference problem"
+            raise ValueError(msg)
         if algorithm_configuration_name not in self.__values_histories:
             self.__values_histories[algorithm_configuration_name] = {
                 pb_name: [] for pb_name in self.__target_values
@@ -211,10 +212,10 @@ class DataProfile:
         algo_histories = self.__values_histories[algo_name]
 
         # Compute the maximal size of an optimization history
-        max_history_size = max([
-            max([len(pb_history) for pb_history in algo_history])
+        max_history_size = max(
+            max(len(pb_history) for pb_history in algo_history)
             for algo_history in algo_histories.values()
-        ])
+        )
 
         # Compute the history of the number of target hits across all optimizations
         total_hits_history = zeros(max_history_size)
@@ -250,9 +251,10 @@ class DataProfile:
             len(histories) for histories in self.__values_histories[algo_name].values()
         }
         if len(histories_numbers) != 1:
-            raise ValueError(
+            msg = (
                 f"Reference problems unequally represented for algorithm {algo_name!r}."
             )
+            raise ValueError(msg)
         return histories_numbers.pop()
 
     @staticmethod
@@ -274,7 +276,7 @@ class DataProfile:
 
         # Set the title and axes
         axes.set_title(f"Data profile{'s' if len(data_profiles) > 1 else ''}")
-        max_profile_size = max([len(profile) for profile in data_profiles.values()])
+        max_profile_size = max(len(profile) for profile in data_profiles.values())
         axes.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
         plt.xlabel("Number of functions evaluations")
         plt.xlim([1, max_profile_size])

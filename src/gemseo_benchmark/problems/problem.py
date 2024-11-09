@@ -36,8 +36,8 @@ from typing import Union
 
 from gemseo import compute_doe
 from gemseo import execute_algo
-from gemseo.algos.opt.opt_factory import OptimizersFactory
-from gemseo.algos.opt_problem import OptimizationProblem
+from gemseo.algos.opt.factory import OptimizationLibraryFactory
+from gemseo.algos.optimization_problem import OptimizationProblem
 from gemseo.utils.matplotlib_figure import save_show_figure
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MaxNLocator
@@ -59,7 +59,7 @@ from gemseo_benchmark.results.performance_history import PerformanceHistory
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from gemseo.algos.doe.doe_library import DOELibraryOptionType
+    from gemseo.algos.doe.base_doe_library import DriverLibraryOptionType
 
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
@@ -80,7 +80,7 @@ class Problem:
     Attributes:
         name (str): The name of the benchmarking problem.
         optimization_problem_creator (Callable[[], OptimizationProblem]): A callable
-        that returns an instance of the optimization problem.
+            that returns an instance of the optimization problem.
         start_points (Iterable[ndarray]): The starting points of the benchmarking
             problem.
         optimum (float): The best feasible objective value of the problem.
@@ -95,7 +95,7 @@ class Problem:
         target_values: TargetValues | None = None,
         doe_algo_name: str | None = None,
         doe_size: int | None = None,
-        doe_options: Mapping[str, DOELibraryOptionType] | None = None,
+        doe_options: Mapping[str, DriverLibraryOptionType] | None = None,
         description: str | None = None,
         target_values_algorithms_configurations: AlgorithmsConfigurations | None = None,
         target_values_number: int | None = None,
@@ -142,7 +142,7 @@ class Problem:
                 :class:`gemseo.algos.opt_problem.OptimizationProblem`,
                 or if a starting point is not of type ndarray.
             ValueError: If neither starting points nor DOE configurations are passed,
-               or if a starting point is of inappropriate shape.
+                or if a starting point is of inappropriate shape.
         """  # noqa: D205, D212, D415
         self.name = name
         self.__description = description
@@ -153,9 +153,8 @@ class Problem:
         # Set the dimension
         problem = optimization_problem_creator()
         if not isinstance(problem, OptimizationProblem):
-            raise TypeError(
-                "optimization_problem_creator must return an OptimizationProblem."
-            )
+            msg = "optimization_problem_creator must return an OptimizationProblem."
+            raise TypeError(msg)
         self._problem = problem
 
         # Set the starting points
@@ -166,7 +165,7 @@ class Problem:
             self.start_points = self.__get_start_points(
                 doe_algo_name, doe_size, doe_options
             )
-        elif problem.design_space.has_current_value():
+        elif problem.design_space.has_current_value:
             self.start_points = atleast_2d(
                 self._problem.design_space.get_current_value()
             )
@@ -194,7 +193,8 @@ class Problem:
                 shape.
         """
         if not self.__start_points:
-            raise ValueError("The benchmarking problem has no starting point.")
+            msg = "The benchmarking problem has no starting point."
+            raise ValueError(msg)
 
         return self.__start_points
 
@@ -210,9 +210,8 @@ class Problem:
                 # try to treat the starting points as an iterable
                 iter(start_points)
             except TypeError:
-                raise TypeError(
-                    f"{message} The following type was passed: {type(start_points)}."
-                ) from None
+                msg = f"{message} The following type was passed: {type(start_points)}."
+                raise TypeError(msg) from None
 
             self.__check_iterable_start_points(start_points)
             start_points_list = list(start_points)
@@ -220,17 +219,19 @@ class Problem:
         else:
             # the starting points are passed as a NumPy array
             if start_points.ndim != 2:
-                raise ValueError(
+                msg = (
                     f"{message} A {start_points.ndim}-dimensional NumPy array "
                     "was passed."
                 )
+                raise ValueError(msg)
 
-            if start_points.shape[1] != self._problem.dimension:
-                raise ValueError(
+            if start_points.shape[1] != self._problem.design_space.dimension:
+                msg = (
                     f"{message} The number of columns ({start_points.shape[1]}) "
                     f"is different from the problem dimension "
-                    f"({self._problem.dimension})."
+                    f"({self._problem.design_space.dimension})."
                 )
+                raise ValueError(msg)
 
             start_points_list = list(start_points)
 
@@ -253,13 +254,13 @@ class Problem:
         """
         error_message = (
             "A starting point must be a 1-dimensional NumPy array of size "
-            f"{self._problem.dimension}."
+            f"{self._problem.design_space.dimension}."
         )
         if any(not isinstance(point, ndarray) for point in start_points):
             raise TypeError(error_message)
 
         if any(
-            point.ndim != 1 or point.size != self._problem.dimension
+            point.ndim != 1 or point.size != self._problem.design_space.dimension
             for point in start_points
         ):
             raise ValueError(error_message)
@@ -268,7 +269,7 @@ class Problem:
         self,
         doe_algo_name: str,
         doe_size: int | None = None,
-        doe_options: Mapping[str, DOELibraryOptionType] | None = None,
+        doe_options: Mapping[str, DriverLibraryOptionType] | None = None,
     ) -> ndarray:
         """Return the starting points of the benchmarking problem.
 
@@ -283,13 +284,16 @@ class Problem:
             The starting points.
         """
         if doe_size is None:
-            doe_size = min([self._problem.dimension, 10])
+            doe_size = min([self._problem.design_space.dimension, 10])
 
         if doe_options is None:
             doe_options = {}
 
         return compute_doe(
-            self._problem.design_space, doe_algo_name, doe_size, **doe_options
+            self._problem.design_space,
+            algo_name=doe_algo_name,
+            n_samples=doe_size,
+            **doe_options,
         )
 
     @property
@@ -305,17 +309,19 @@ class Problem:
             ValueError: If the benchmarking problem has no target value.
         """
         if self.__target_values is None:
-            raise ValueError("The benchmarking problem has no target value.")
+            msg = "The benchmarking problem has no target value."
+            raise ValueError(msg)
 
         return self.__target_values
 
     @target_values.setter
     def target_values(self, target_values: TargetValues) -> None:
         if not isinstance(target_values, TargetValues):
-            raise TypeError(
+            msg = (
                 f"Target values must be of type TargetValues. "
                 f"Type {type(target_values)} was passed."
             )
+            raise TypeError(msg)
 
         self.__target_values = target_values
 
@@ -341,7 +347,7 @@ class Problem:
     @property
     def constraints_names(self) -> list[str]:
         """The names of the scalar constraints."""
-        return self._problem.get_scalar_constraint_names()
+        return self._problem.scalar_constraint_names
 
     def is_algorithm_suited(self, name: str) -> bool:
         """Check whether an algorithm is suited to the problem.
@@ -352,8 +358,8 @@ class Problem:
         Returns:
             True if the algorithm is suited to the problem, False otherwise.
         """
-        library = OptimizersFactory().create(name)
-        return library.is_algorithm_suited(library.descriptions[name], self._problem)
+        library = OptimizationLibraryFactory().create(name)
+        return library.is_algorithm_suited(library.ALGORITHM_INFOS[name], self._problem)
 
     def compute_targets(
         self,
@@ -396,7 +402,12 @@ class Problem:
                 options["ftol_abs"] = 0.0
 
             for instance in self:
-                execute_algo(instance, configuration.algorithm_name, **options)
+                execute_algo(
+                    instance,
+                    algo_type="opt",
+                    algo_name=configuration.algorithm_name,
+                    **options,
+                )
                 history = PerformanceHistory.from_problem(instance)
                 self.__targets_generator.add_history(history=history)
 
@@ -434,7 +445,7 @@ class Problem:
         feas_statuses = []
         for key, values in problem.database.items():
             obj_values.append(values[obj_name])
-            feasibility, measure = problem.get_violation_criteria(key)
+            feasibility, measure = problem.history.check_design_point_is_feasible(key)
             infeas_measures.append(measure)
             feas_statuses.append(feasibility)
         return obj_values, infeas_measures, feas_statuses
@@ -513,7 +524,7 @@ class Problem:
     @property
     def dimension(self) -> int:
         """The dimension of the problem."""
-        return self._problem.dimension
+        return self._problem.design_space.dimension
 
     def compute_data_profile(
         self,
@@ -601,9 +612,9 @@ class Problem:
             algos_configurations, results, infeasibility_tolerance, max_eval_number
         )
         if max_eval_number is None:
-            max_eval_number = max([
+            max_eval_number = max(
                 len(hist) for histories in minima.values() for hist in histories
-            ])
+            )
 
         y_relative_margin = 0.03
         max_feasible_objective = self.__get_infeasible_items_objective(

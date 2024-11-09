@@ -26,7 +26,7 @@ from typing import TYPE_CHECKING
 from typing import Final
 
 from gemseo import configure_logger
-from gemseo.algos.opt.opt_factory import OptimizersFactory
+from gemseo.algos.opt.factory import OptimizationLibraryFactory
 from gemseo.core.parallel_execution.callable_parallel_execution import (
     CallableParallelExecution,
 )
@@ -75,7 +75,7 @@ class Benchmarker:
         """  # noqa: D205, D212, D415
         self._databases_path = databases_path
         self.__histories_path = histories_path
-        self.__optimizers_factory = OptimizersFactory()
+        self.__optimizers_factory = OptimizationLibraryFactory()
         self.__is_algorithm_available = self.__optimizers_factory.is_available
         self.__results_path = results_path
         if results_path is not None and results_path.is_file():
@@ -90,6 +90,7 @@ class Benchmarker:
         overwrite_histories: bool = False,
         number_of_processes: int = 1,
         use_threading: bool = False,
+        log_gemseo_to_file: bool = False,
     ) -> Results:
         """Run optimization algorithms on reference problems.
 
@@ -102,6 +103,8 @@ class Benchmarker:
                 processes used to parallelize the execution.
             use_threading: Whether to use threads instead of processes
                 to parallelize the execution.
+            log_gemseo_to_file: Whether to save the GEMSEO log to a file
+                next to the performance history file.
 
         Returns:
             The results of the optimization.
@@ -114,28 +117,40 @@ class Benchmarker:
         for algorithm_configuration in [config.copy() for config in algorithms]:
             algorithm_name = algorithm_configuration.algorithm_name
             if not self.__is_algorithm_available(algorithm_name):
-                raise ValueError(f"The algorithm is not available: {algorithm_name}.")
+                msg = f"The algorithm is not available: {algorithm_name}."
+                raise ValueError(msg)
 
             self.__disable_stopping_criteria(algorithm_configuration)
             for problem in problems:
-                inputs.extend([
-                    (
+                for problem_instance_index, problem_instance in enumerate(problem):
+                    if self.__skip_instance(
+                        algorithm_configuration,
+                        problem,
+                        problem_instance_index,
+                        overwrite_histories,
+                    ):
+                        continue
+
+                    if log_gemseo_to_file:
+                        log_path = self.get_history_path(
+                            algorithm_configuration,
+                            problem.name,
+                            problem_instance_index,
+                        ).with_suffix(".log")
+                    else:
+                        log_path = None
+
+                    inputs.append((
                         self.__set_instance_algorithm_options(
                             algorithm_configuration,
+                            problem,
                             problem_instance_index,
                         ),
                         problem,
                         problem_instance,
                         problem_instance_index,
-                    )
-                    for problem_instance_index, problem_instance in enumerate(problem)
-                    if not self.__skip_instance(
-                        algorithm_configuration,
-                        problem,
-                        problem_instance_index,
-                        overwrite_histories,
-                    )
-                ])
+                        log_path,
+                    ))
 
         if inputs:
             worker = Worker(self._HISTORY_CLASS)
@@ -192,7 +207,7 @@ class Benchmarker:
         if not overwrite_histories and self._results.contains(
             algorithm_configuration.name,
             problem_name,
-            self.__get_history_path(algorithm_configuration, problem_name, index),
+            self.get_history_path(algorithm_configuration, problem_name, index),
         ):
             LOGGER.info(
                 "Skipping instance %s of problem %s for algorithm configuration %s.",
@@ -213,12 +228,14 @@ class Benchmarker:
     @staticmethod
     def __set_instance_algorithm_options(
         algorithm_configuration: AlgorithmConfiguration,
+        problem: Problem,
         index: int,
     ) -> AlgorithmConfiguration:
         """Return the algorithm configuration of an instance of a problem.
 
         Args:
             algorithm_configuration: The algorithm configuration.
+            problem: The benchmarking problem.
             index: The 0-based index of the problem instance.
 
         Returns:
@@ -226,7 +243,7 @@ class Benchmarker:
         """
         algorithm_options = dict(algorithm_configuration.algorithm_options)
         for name, value in algorithm_configuration.instance_algorithm_options.items():
-            algorithm_options[name] = value(index)
+            algorithm_options[name] = value(problem, index)
 
         return AlgorithmConfiguration(
             algorithm_configuration.algorithm_name,
@@ -264,13 +281,13 @@ class Benchmarker:
         """
         problem_name = history.problem_name
         algorithm_configuration = history.algorithm_configuration
-        path = self.__get_history_path(
+        path = self.get_history_path(
             algorithm_configuration, problem_name, index, make_parents=True
         )
         history.to_file(path)
         self._results.add_path(algorithm_configuration.name, problem_name, path)
 
-    def __get_history_path(
+    def get_history_path(
         self,
         algorithm_configuration: AlgorithmConfiguration,
         problem_name: str,
