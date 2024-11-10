@@ -1827,7 +1827,7 @@ treated together in a <a href="#report">benchmarking report</a>.</p>
 sub-package handles the benchmarking problems, on which the performances
 of the algorithms configurations is to be measured.</p>
 <p>A <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/problems/problem/#gemseo_benchmark.problems.problem.Problem">Problem</a> contains the mathematical
-definition of the problem, as an <a class="autorefs autorefs-external" href="https://gemseo.readthedocs.io/en/stable/_modules/gemseo.algos.opt_problem.html#gemseo.algos.opt_problem.OptimizationProblem">OptimizationProblem</a>, and requires three other features.</p>
+definition of the problem, as an [OptimizationProblem][gemseo.algos.opt_problem.OptimizationProblem], and requires three other features.</p>
 <ol>
 <li>The starting points, from which the algorithms configurations should
     be launched on the problem. Indeed, an algorithm may be quite
@@ -1848,8 +1848,8 @@ definition of the problem, as an <a class="autorefs autorefs-external" href="htt
     directly, or their generation can be configured.</li>
 </ol>
 <p>For example, we define below benchmarking problems based on
-<a class="autorefs autorefs-external" href="https://gemseo.readthedocs.io/en/stable/_modules/gemseo.problems.analytical.rastrigin.html#gemseo.problems.analytical.rastrigin.Rastrigin">Rastrigin</a> and
-<a class="autorefs autorefs-external" href="https://gemseo.readthedocs.io/en/stable/_modules/gemseo.problems.analytical.rosenbrock.html#gemseo.problems.analytical.rosenbrock.Rosenbrock">Rosenbrock</a> respectively, where</p>
+[Rastrigin][gemseo.problems.analytical.rastrigin.Rastrigin] and
+[Rosenbrock][gemseo.problems.analytical.rosenbrock.Rosenbrock] respectively, where</p>
 <ul>
 <li>
 <p>5 starting points are computed by Latin hypercube sampling (LHS),</p>
@@ -1883,7 +1883,7 @@ presented <a href="#target-values">further down</a>.)</p>
 </code></pre></div>
 <p>Note that the second argument of <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/problems/problem/#gemseo_benchmark.problems.problem.Problem">Problem</a> must be callable.
 For example, a five-variables
-benchmarking problem based on <a class="autorefs autorefs-external" href="https://gemseo.readthedocs.io/en/stable/_modules/gemseo.problems.analytical.rosenbrock.html#gemseo.problems.analytical.rosenbrock.Rosenbrock">Rosenbrock</a> may be defined as follows.</p>
+benchmarking problem based on [Rosenbrock][gemseo.problems.analytical.rosenbrock.Rosenbrock] may be defined as follows.</p>
 <div class="highlight"><pre><span></span><code><span class="n">rosenbrock_5d</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span>
     <span class="s2">&quot;Rosenbrock 5D&quot;</span><span class="p">,</span>
     <span class="k">lambda</span><span class="p">:</span> <span class="n">Rosenbrock</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span>
