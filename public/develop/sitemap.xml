@@ -136,4 +136,8 @@
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/results/results/</loc>
          <lastmod>2024-11-10</lastmod>
     </url>
+    <url>
+         <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/user_guide/</loc>
+         <lastmod>2024-11-10</lastmod>
+    </url>
 </urlset>
