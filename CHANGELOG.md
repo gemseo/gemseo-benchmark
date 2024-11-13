@@ -26,22 +26,22 @@ The format is based on
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-# Develop
+## Version 3.0.0 (November 2024)
 
-## Added
+### Added
 
-### Benchmarker
+#### Benchmarker
 
 - The option ``log_gemseo_to_file`` has been added to ``Benchmarker.execute``
   and ``Scenario.execute`` to save the GEMSEO log of each algorithm execution
   to a file in the same directory as its performance history file.
 
-### Data profiles
+#### Data profiles
 
 - Target values can be plotted on existing axes as horizontal lines with
   ``TargetValues.plot_on_axes``.
 
-### Results
+#### Results
 
 - The distribution of a collection of performance histories can be plotted in terms of
   performance measure (```PerformanceHistories.plot_performance_measure_distribution``),
@@ -49,9 +49,9 @@ and this project adheres to
   and number of unsatisfied constraints
   (```PerformanceHistories.plot_number_of_unsatisfied_constraints_distribution``).
 
-## Changed
+### Changed
 
-### Results
+#### Results
 
 - Methods
   ``PerformanceHistory.compute_cumulated_minimum``,
@@ -60,11 +60,11 @@ and this project adheres to
   and ``PerformanceHistory.shorten``
   preserve the attributes other than ``PerformanceHistory.items``.
 
-# Version 2.0.0 (December 2023)
+## Version 2.0.0 (December 2023)
 
-## Changed
+### Changed
 
-### Benchmarker
+#### Benchmarker
 
 - The option to automatically save the logs of pSeven has been removed
   from classes ``Scenario`` and ``Benchmarker``.
@@ -84,51 +84,51 @@ and this project adheres to
   The user can still set the value of ``PerformanceHistory.doe_size``
   by themselves since it is a public attribute.
 
-## Added
+### Added
 
 - Support for Python 3.11.
 
-### Algorithms
+#### Algorithms
 
 - Algorithm options specific to problem instances (e.g. paths for output files)
   can be passed to ``AlgorithmConfiguration`` in the new argument ``instance_algorithm_options``.
 
-### Benchmarker
+#### Benchmarker
 
 - One can get the path to a performance history file with ``Benchmarker.get_history_path``.
 
-## Removed
+### Removed
 
 - Support for Python 3.8.
 
-# Version 1.1.0 (September 2023)
+## Version 1.1.0 (September 2023)
 
-## Added
+### Added
 
-### Results
+#### Results
 
 - The names of functions and the number of variables are stored in the
     performance history files.
 
-### Report
+#### Report
 
 - The optimization histories can be displayed on a logarithmic scale.
 
-### Scenario
+#### Scenario
 
 - The options `custom_algos_descriptions` and
     `max_eval_number_per_group` of `Report`{.interpreted-text
     role="class"} can be passed through `Scenario`{.interpreted-text
     role="class"}.
 
-## Fixed
+### Fixed
 
-### Report
+#### Report
 
 - The sections of the PDF report are correctly numbered.
 - The graphs of the PDF report are anchored to their expected
     locations.
 
-# Version 1.0.0 (June 2023)
+## Version 1.0.0 (June 2023)
 
 First version.
