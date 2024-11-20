@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
 MarkeveryType = Union[
-    None, int, tuple[int, int], slice, list[int], float, tuple[float, float], list[bool]
+    int, tuple[int, int], slice, list[int], float, tuple[float, float], list[bool], None
 ]
 # The colors cycle for the plots
 COLORS_CYCLE = matplotlib.rcParams["axes.prop_cycle"].by_key()["color"]
