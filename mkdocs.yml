@@ -84,7 +84,7 @@ nav:
   - Changelog: changelog.md
   - Credits: credits.md
   - Licenses: licenses.md
-- User guide: user_guide.md
+- User guide: user_guide/index.md
 - Examples:
   - all: generated/examples/all
 - API documentation: reference/gemseo_benchmark/

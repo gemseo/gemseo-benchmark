@@ -110,8 +110,8 @@ slsqp_configurations = AlgorithmsConfigurations(slsqp_default, name="SLSQP")
 # --------------------------
 # Let us choose two problems already implemented in GEMSEO as references
 # to measure the performances of our selection of algorithms configurations:
-# [Rastrigin][gemseo.problems.analytical.rastrigin.Rastrigin]
-# and [Rosenbrock][gemseo.problems.analytical.rosenbrock.Rosenbrock].
+# [Rastrigin][gemseo.problems.optimization.rastrigin.Rastrigin]
+# and [Rosenbrock][gemseo.problems.optimization.rosenbrock.Rosenbrock].
 #
 # We define target values as an exponential scale of values decreasing towards zero,
 # the minimum value of both Rastrigin's and Rosenbrock's functions.
