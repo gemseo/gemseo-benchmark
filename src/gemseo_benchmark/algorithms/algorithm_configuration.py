@@ -26,11 +26,11 @@ of the algorithm.
 from __future__ import annotations
 
 from collections.abc import MutableMapping
-from types import MappingProxyType
 from typing import Any
 from typing import Callable
 from typing import Final
 
+from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 from gemseo.utils.string_tools import pretty_repr
 
 InstanceAlgorithmOptions = MutableMapping[str, Callable[[int], Any]]
@@ -48,7 +48,7 @@ class AlgorithmConfiguration:
         self,
         algorithm_name: str,
         configuration_name: str | None = None,
-        instance_algorithm_options: InstanceAlgorithmOptions = MappingProxyType({}),
+        instance_algorithm_options: InstanceAlgorithmOptions = READ_ONLY_EMPTY_DICT,
         **algorithm_options: Any,
     ) -> None:
         """

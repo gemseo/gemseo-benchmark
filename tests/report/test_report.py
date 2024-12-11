@@ -136,10 +136,12 @@ def test_figures(
     assert (group_dir / "data_profile.png").is_file()
     problem_dir = group_dir / problem_a.name.replace(" ", "_")
     assert (problem_dir / "data_profile.png").is_file()
-    assert (problem_dir / "histories.png").is_file()
+    assert (problem_dir / "performance_measure.png").is_file()
+    assert (problem_dir / "performance_measure_focus.png").is_file()
     problem_dir = group_dir / problem_b.name.replace(" ", "_")
     assert (problem_dir / "data_profile.png").is_file()
-    assert (problem_dir / "histories.png").is_file()
+    assert (problem_dir / "performance_measure.png").is_file()
+    assert (problem_dir / "performance_measure_focus.png").is_file()
 
 
 @pytest.fixture(scope="package")

@@ -17,7 +17,7 @@ The problems
 
 {{ problems_group_description }}
 
-{% for problem_name in problems_figures %}* :ref:`{{ problem_name }}`
+{% for problem_name in problems_names %}* :ref:`{{ problem_name }}`
 {% endfor %}
 
 
@@ -38,18 +38,10 @@ The performances of the algorithms on the reference problems of the group
 
 Results for each problem
 ========================
-{% for problem_name, figures in problems_figures.items() %}
-{{ problem_name }}
-{{ "-" * problem_name|length }}
+The results of the algorithms configurations for each problem are linked below.
 
-.. figure:: /{{ figures["data_profile"] }}
-   :alt: The data profiles for problem :ref:`{{ problem_name }}`.
+.. toctree::
+   :maxdepth: 1
 
-   The data profiles for problem :ref:`{{ problem_name }}`.
-
-.. figure:: /{{ figures["histories"] }}
-   :alt: The performance histories for problem :ref:`{{ problem_name }}`.
-
-   The performance histories for problem :ref:`{{ problem_name }}`.
-
+{% for path in group_problems_paths %}   {{path}}
 {% endfor %}

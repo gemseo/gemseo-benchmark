@@ -71,7 +71,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         """
         self.__histories.insert(index, history)
 
-    def __get_equal_size_histories(self) -> PerformanceHistories:
+    def get_equal_size_histories(self) -> PerformanceHistories:
         """Return the histories extended to the maximum size."""
         return PerformanceHistories(*[
             history.extend(self.__maximum_size) for history in self
@@ -131,7 +131,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         history.items = [
             statistic_computer(items)
             for items in zip(*[
-                history.items for history in self.__get_equal_size_histories()
+                history.items for history in self.get_equal_size_histories()
             ])
         ]
         return history
@@ -259,7 +259,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
                     item.objective_value if item.is_feasible else numpy.nan
                     for item in history
                 ]
-                for history in self.__get_equal_size_histories()
+                for history in self.get_equal_size_histories()
             ]),
             axes,
             "Performance measure",
@@ -305,21 +305,21 @@ class PerformanceHistories(collections.abc.MutableSequence):
             y_label: The label for the vertical axis.
             infinity: The substitute value for infinite ordinates.
         """
-        PerformanceHistories.__plot_centiles_range(
+        PerformanceHistories.plot_centiles_range(
             histories,
             axes,
             (0, 100),
             {"color": "lightgray", "label": "0th-100th centiles"},
             infinity,
         )
-        PerformanceHistories.__plot_centiles_range(
+        PerformanceHistories.plot_centiles_range(
             histories,
             axes,
             (25, 75),
             {"color": "gray", "label": "25th-75th centiles"},
             infinity,
         )
-        PerformanceHistories.__plot_median(
+        PerformanceHistories.plot_median(
             histories, axes, {"color": "black", "label": "median"}
         )
         axes.plot(
@@ -340,7 +340,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         axes.set_ylabel(y_label)
 
     @staticmethod
-    def __plot_centiles_range(
+    def plot_centiles_range(
         histories: numpy.ndarray,
         axes: Axes,
         centile_range: tuple[float, float],
@@ -392,7 +392,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         axes.xaxis.set_major_locator(MaxNLocator(integer=True))
 
     @staticmethod
-    def __plot_median(
+    def plot_median(
         histories: numpy.ndarray,
         axes: Axes,
         plot_kwargs: Mapping[str, str | int | float],

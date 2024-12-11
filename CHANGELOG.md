@@ -26,6 +26,38 @@ The format is based on
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Develop
+
+### Added
+
+#### Data profiles
+
+- The color and marker for each algorithm configuration, as well as the grid options,
+  can now be customized thanks to the new arguments ``colors``, ``markers``
+  and ``grid_kwargs``
+  (see ``DataProfile.plot``, ``Problem.compute_data_profile``,
+  and ``ProblemsGroup.compute_data_profile``).
+
+#### Report
+
+- The color and marker for each algorithm configuration can now be customized
+  at the initialization of ``Report`` thanks to the new arguments``colors``
+  and ``markers``.
+- The user can now request that ``Scenario.execute`` or ``Report.generate``
+  plot only the median of the performance measure rather than its whole range
+  thanks to the new boolean argument ``plot_only_median``.
+- On the page dedicated to the benchmarking problems,
+  the infeasibility measure of infeasibe target values is now displayed.
+- For each problem, a graph of the performance measure focusing on the target values
+  has been added below the usual one.
+
+### Changed
+
+#### Report
+
+- The results on each problem are now displayed on separate pages
+  rather than on the page of the problems group.
+
 ## Version 3.0.0 (November 2024)
 
 ### Added
