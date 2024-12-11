@@ -32,6 +32,7 @@ from typing import Any
 from typing import Final
 
 from gemseo.algos.opt.factory import OptimizationLibraryFactory
+from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 
@@ -39,11 +40,13 @@ from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
+from gemseo_benchmark.report._figures import Figures
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from collections.abc import Mapping
 
+    from gemseo_benchmark import ConfigurationPlotOptions
     from gemseo_benchmark.problems.problem import Problem
     from gemseo_benchmark.problems.problems_group import ProblemsGroup
     from gemseo_benchmark.results.results import Results
@@ -52,15 +55,14 @@ if TYPE_CHECKING:
 class FileName(enum.Enum):
     """The name of a report file."""
 
+    ALGORITHMS = "algorithms.rst"
+    ALGORITHMS_CONFIGURATIONS_GROUP = "algorithms_configurations_group.rst"
     INDEX = "index.rst"
     PROBLEM = "problem.rst"
     PROBLEMS_LIST = "problems_list.rst"
-    SUB_RESULTS = "sub_results.rst"
+    PROBLEM_RESULTS = "problem_results.rst"
     RESULTS = "results.rst"
-    ALGORITHMS = "algorithms.rst"
-    ALGORITHMS_CONFIGURATIONS_GROUP = "algorithms_configurations_group.rst"
-    DATA_PROFILE = "data_profile.png"
-    HISTORIES = "histories.png"
+    SUB_RESULTS = "sub_results.rst"
 
 
 class DirectoryName(enum.Enum):
@@ -87,6 +89,7 @@ class Report:
         histories_paths: Results,
         custom_algos_descriptions: Mapping[str, str] | None = None,
         max_eval_number_per_group: dict[str, int] | None = None,
+        plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
     ) -> None:
         """
         Args:
@@ -104,10 +107,19 @@ class Report:
                 If ``None``, all the evaluations are displayed.
                 If the key of a group is missing, all the evaluations are displayed
                 for the group.
+            plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
+                for each algorithm configuration.
 
         Raises:
             ValueError: If an algorithm has no associated histories.
         """  # noqa: D205, D212, D415
+        names = []
+        for group in algos_configurations_groups:
+            for name in group.names:
+                if name not in names:
+                    names.append(name)
+
+        self.__plot_kwargs = plot_kwargs
         self.__root_directory = Path(root_directory_path)
         self.__algorithms_configurations_groups = algos_configurations_groups
         self.__problems_groups = problems_groups
@@ -137,6 +149,7 @@ class Report:
         infeasibility_tolerance: float = 0.0,
         plot_all_histories: bool = True,
         use_log_scale: bool = False,
+        plot_only_median: bool = False,
     ) -> None:
         """Generate the benchmarking report.
 
@@ -146,12 +159,16 @@ class Report:
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             plot_all_histories: Whether to plot all the performance histories.
             use_log_scale: Whether to use a logarithmic scale on the value axis.
+            plot_only_median: Whether to plot only the median and no other centile.
         """
         self.__create_root_directory()
         self.__create_algos_file()
         self.__create_problems_files()
         self.__create_results_files(
-            infeasibility_tolerance, plot_all_histories, use_log_scale
+            infeasibility_tolerance,
+            plot_all_histories,
+            use_log_scale,
+            plot_only_median,
         )
         self.__create_index()
         self.__build_report(to_html, to_pdf)
@@ -222,9 +239,7 @@ class Report:
                 name=problem.name,
                 description=problem.description,
                 optimum=f"{problem.optimum:.6g}",
-                target_values=[
-                    f"{target.objective_value:.6g}" for target in problem.target_values
-                ],
+                target_values=problem.target_values,
             )
             problems_paths.append(path.relative_to(self.__root_directory).as_posix())
 
@@ -253,6 +268,7 @@ class Report:
         infeasibility_tolerance: float = 0.0,
         plot_all_histories: bool = True,
         use_log_scale: bool = False,
+        plot_only_median: bool = False,
     ) -> None:
         """Create the files corresponding to the benchmarking results.
 
@@ -260,93 +276,197 @@ class Report:
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             plot_all_histories: Whether to plot all the performance histories.
             use_log_scale: Whether to use a logarithmic scale on the value axis.
+            plot_only_median: Whether to plot only the median and no other centile.
         """
-        results_root = self.__root_directory / DirectoryName.RESULTS.value
-        algos_configs_groups_paths = []
-        for algorithms_configurations_group in self.__algorithms_configurations_groups:
-            results_paths = []
-            for problems_group in self.__problems_groups:
-                # Get the algorithms with results for all the problems of the group
-                algorithms_configurations = AlgorithmsConfigurations(*[
-                    algo_config
-                    for algo_config in algorithms_configurations_group
-                    if set(self.__histories_paths.get_problems(algo_config.name))
-                    >= {problem.name for problem in problems_group}
-                ])
-                if not algorithms_configurations:
-                    # There is no algorithm to display for the group
-                    continue
-
-                # Create the directory dedicated to the results of the group of
-                # algorithms configurations on the group of problems
-                results_dir = (
-                    self.__root_directory
-                    / DirectoryName.IMAGES.value
-                    / join_substrings(algorithms_configurations_group.name)
-                    / join_substrings(problems_group.name)
-                )
-                results_dir.mkdir(parents=True, exist_ok=False)
-
-                # Generate the figures
-                data_profile = self.__compute_data_profile(
-                    problems_group,
-                    algorithms_configurations,
-                    results_dir,
-                    infeasibility_tolerance,
-                )
-                problems_figures = self.__plot_problems_figures(
-                    problems_group,
-                    algorithms_configurations,
-                    results_dir,
-                    infeasibility_tolerance,
-                    plot_all_histories,
-                    use_log_scale,
-                )
-
-                # Create the file
-                results_path = (
-                    results_root
-                    / join_substrings(algorithms_configurations_group.name)
-                    / f"{join_substrings(problems_group.name)}.rst"
-                )
-                results_path.parent.mkdir(exist_ok=True)
-                results_paths.append(results_path.relative_to(results_root).as_posix())
-                algorithms_configurations_names = [
-                    algo_config.name
-                    for algo_config in algorithms_configurations_group.configurations
-                ]
-                self.__fill_template(
-                    results_path,
-                    FileName.SUB_RESULTS.value,
-                    algorithms_group_name=algorithms_configurations_group.name,
-                    algorithms_configurations_names=algorithms_configurations_names,
-                    problems_group_name=problems_group.name,
-                    problems_group_description=problems_group.description,
-                    data_profile=data_profile,
-                    problems_figures=problems_figures,
-                )
-
-            # Create the file of the group of algorithms configurations
-            algos_configs_group_path = (
-                results_root
-                / f"{join_substrings(algorithms_configurations_group.name)}.rst"
-            )
-            self.__fill_template(
-                algos_configs_group_path,
-                FileName.ALGORITHMS_CONFIGURATIONS_GROUP.value,
-                name=algorithms_configurations_group.name,
-                documents=results_paths,
-            )
-            algos_configs_groups_paths.append(
-                algos_configs_group_path.relative_to(self.__root_directory).as_posix()
-            )
-
-        # Create the file listing the problems groups
         self.__fill_template(
             self.__root_directory / FileName.RESULTS.value,
             FileName.RESULTS.value,
-            documents=algos_configs_groups_paths,
+            documents=[
+                self.__create_algorithms_group_files(
+                    group,
+                    infeasibility_tolerance,
+                    plot_all_histories,
+                    use_log_scale,
+                    plot_only_median,
+                )
+                for group in self.__algorithms_configurations_groups
+            ],
         )
+
+    def __create_algorithms_group_files(
+        self,
+        algorithm_configurations: AlgorithmsConfigurations,
+        infeasibility_tolerance: float,
+        plot_all_histories: bool,
+        use_log_scale: bool,
+        plot_only_median: bool,
+    ) -> str:
+        """Create the results files of a group of algorithm configurations.
+
+        Args:
+            algorithm_configurations: The algorithm configurations.
+            infeasibility_tolerance: The tolerance on the infeasibility measure.
+            plot_all_histories: Whether to plot all the performance histories.
+            use_log_scale: Whether to use a logarithmic scale on the value axis.
+            plot_only_median: Whether to plot only the median and no other centile.
+
+        Returns:
+            The path to the main file.
+        """
+        results_root = self.__root_directory / DirectoryName.RESULTS.value
+        configurations_dirname = join_substrings(algorithm_configurations.name)
+        configurations_dir = results_root / configurations_dirname
+        configurations_dir.mkdir()
+        paths = []
+        for group in self.__problems_groups:
+            # Get the configurations with results for all the problems of the group
+            actual_configurations = AlgorithmsConfigurations(
+                *[
+                    configuration
+                    for configuration in algorithm_configurations
+                    if set(self.__histories_paths.get_problems(configuration.name))
+                    >= {problem.name for problem in group}
+                ],
+                name=algorithm_configurations.name,
+            )
+            if not actual_configurations:
+                # There is no configuration to display for the group
+                continue
+
+            problems_dirname = join_substrings(group.name)
+            paths.append(
+                self.__create_problems_group_files(
+                    group,
+                    actual_configurations,
+                    configurations_dir,
+                    self.__root_directory
+                    / DirectoryName.IMAGES.value
+                    / configurations_dirname
+                    / problems_dirname,
+                    infeasibility_tolerance,
+                    plot_all_histories,
+                    use_log_scale,
+                    plot_only_median,
+                )
+                .relative_to(results_root)
+                .as_posix()
+            )
+
+        # Create the file of the group of algorithm configurations
+        configurations_path = configurations_dir.with_suffix(".rst")
+        self.__fill_template(
+            configurations_path,
+            FileName.ALGORITHMS_CONFIGURATIONS_GROUP.value,
+            name=algorithm_configurations.name,
+            documents=paths,
+        )
+        return configurations_path.relative_to(self.__root_directory).as_posix()
+
+    def __create_problems_group_files(
+        self,
+        problems: ProblemsGroup,
+        algorithm_configurations: AlgorithmsConfigurations,
+        destination_dir: Path,
+        figures_dir: Path,
+        infeasibility_tolerance: float,
+        plot_all_histories: bool,
+        use_log_scale: bool,
+        plot_only_median: bool,
+    ) -> Path:
+        """Create the results file of a group of algorithm configurations.
+
+        Args:
+            problems: The problems.
+            algorithm_configurations: The algorithm configurations.
+            destination_dir: The path to the directory where to save the files.
+            figures_dir: The path to the directory where to save the figures.
+            infeasibility_tolerance: The tolerance on the infeasibility measure.
+            plot_all_histories: Whether to plot all the performance histories.
+            use_log_scale: Whether to use a logarithmic scale on the value axis.
+            plot_only_median: Whether to plot only the median and no other centile.
+
+        Returns:
+            The path to the main file.
+        """
+        # Generate the figures
+        figures_dir.mkdir(parents=True, exist_ok=False)
+        plotter = Figures(
+            algorithm_configurations,
+            problems,
+            self.__histories_paths,
+            figures_dir,
+            infeasibility_tolerance,
+            self.__max_eval_numbers.get(problems.name),
+            plot_kwargs=self.__plot_kwargs,
+        )
+        figures = plotter.plot(plot_all_histories, use_log_scale, plot_only_median)
+
+        # Create the file dedicated to the group of problems
+        path = destination_dir / f"{join_substrings(problems.name)}.rst"
+        problems_dir = destination_dir / join_substrings(problems.name)
+        problems_dir.mkdir()
+        self.__fill_template(
+            path,
+            FileName.SUB_RESULTS.value,
+            algorithms_group_name=algorithm_configurations.name,
+            algorithms_configurations_names=[
+                algo_config.name for algo_config in algorithm_configurations
+            ],
+            problems_group_name=problems.name,
+            problems_group_description=problems.description,
+            data_profile=self.__get_relative_path(plotter.plot_data_profiles()),
+            problems_names=[problem.name for problem in problems],
+            group_problems_paths=[
+                self.__create_problem_results_files(
+                    problem,
+                    algorithm_configurations,
+                    figures[problem.name],
+                    problems_dir,
+                )
+                .relative_to(destination_dir)
+                .as_posix()
+                for problem in problems
+            ],
+        )
+        return path
+
+    def __create_problem_results_files(
+        self,
+        problem: Problem,
+        algorithm_configurations: AlgorithmsConfigurations,
+        figures: dict[str, str],
+        destination_dir: Path,
+    ) -> Path:
+        """Create the files dedicated to the results obtained on a single problem.
+
+        This methods creates
+        * one file to present the results of all the algorithm configurations,
+        * one file per algorithm configuration to present its own results.
+
+        Args:
+            problem: The problem.
+            algorithm_configurations: The algorithm configurations.
+            figures: The figures illustrating the results.
+            destination_dir: The path to the directory where to save the files.
+
+        Returns:
+            The path to the main file.
+        """
+        path = (destination_dir / problem.name).with_suffix(".rst")
+        self.__fill_template(
+            path,
+            FileName.PROBLEM_RESULTS.value,
+            algorithm_configurations=algorithm_configurations,
+            problem=problem,
+            figures={
+                name: self.__get_relative_path(path) for name, path in figures.items()
+            },
+        )
+        return path
+
+    def __get_relative_path(self, path: Path) -> str:
+        """Return a POSIX path relative to the root directory."""
+        return path.relative_to(self.__root_directory).as_posix()
 
     def __create_index(self) -> None:
         """Create the index file of the reST report."""
@@ -403,153 +523,3 @@ class Report:
                 )
         finally:
             os.chdir(initial_dir)
-
-    def __compute_data_profile(
-        self,
-        group: ProblemsGroup,
-        algorithms_configurations: AlgorithmsConfigurations,
-        destination_dir: Path,
-        infeasibility_tolerance: float = 0.0,
-    ) -> str:
-        """Compute the data profile for a group of benchmarking problems.
-
-        Args:
-            group: The group of benchmarking problems.
-            algorithms_configurations: The algorithms configurations.
-            destination_dir: The destination directory for the data profile.
-            infeasibility_tolerance: The tolerance on the infeasibility measure.
-
-        Returns:
-            The path to the data profile, relative to the report root directory.
-        """
-        group_path = destination_dir / FileName.DATA_PROFILE.value
-        group.compute_data_profile(
-            algorithms_configurations,
-            self.__histories_paths,
-            show=False,
-            plot_path=group_path,
-            infeasibility_tolerance=infeasibility_tolerance,
-            max_eval_number=self.__max_eval_numbers.get(group.name),
-        )
-        return group_path.relative_to(self.__root_directory).as_posix()
-
-    def __plot_problems_figures(
-        self,
-        group: ProblemsGroup,
-        algorithms_configurations: AlgorithmsConfigurations,
-        group_dir: Path,
-        infeasibility_tolerance: float = 0.0,
-        plot_all_histories: bool = True,
-        use_log_scale: bool = False,
-    ) -> dict[str, dict[str, str]]:
-        """Plot the results figures for each problem of a group.
-
-        Args:
-            group: The group of benchmarking problems.
-            algorithms_configurations: The algorithms configurations.
-            group_dir: The path to the directory where to save the figures.
-            infeasibility_tolerance: The tolerance on the infeasibility measure.
-            plot_all_histories: Whether to plot all the performance histories.
-            use_log_scale: Whether to use a logarithmic scale on the value axis.
-
-        Returns:
-            The paths to the figures.
-            The keys are the names of the problems and the values are dictionaries
-            mapping "data profile" and "histories" to the path of the corresponding
-            figures.
-        """
-        max_eval_number = self.__max_eval_numbers.get(group.name)
-        figures = {}
-        for problem in group:
-            problem_dir = group_dir / join_substrings(problem.name)
-            problem_dir.mkdir()
-            figures[problem.name] = {
-                "data_profile": self.__plot_problem_data_profile(
-                    problem,
-                    algorithms_configurations,
-                    problem_dir,
-                    infeasibility_tolerance,
-                    max_eval_number,
-                ),
-                "histories": self.__plot_problem_histories(
-                    problem,
-                    algorithms_configurations,
-                    problem_dir,
-                    infeasibility_tolerance,
-                    max_eval_number,
-                    plot_all_histories,
-                    use_log_scale,
-                ),
-            }
-
-        # Sort the keys of the dictionary
-        return {key: figures[key] for key in sorted(figures.keys(), key=str.lower)}
-
-    def __plot_problem_data_profile(
-        self,
-        problem: Problem,
-        algorithms_configurations: AlgorithmsConfigurations,
-        destination_dir: Path,
-        infeasibility_tolerance: float = 0.0,
-        max_eval_number: int | None = None,
-    ) -> str:
-        """Plot the data profile of a problem.
-
-        Args:
-            problem: The benchmarking problem.
-            algorithms_configurations: The algorithms configurations.
-            destination_dir: The destination directory for the figure.
-            infeasibility_tolerance: The tolerance on the infeasibility measure.
-            max_eval_number: The maximum evaluations number to be displayed on the
-                graph.
-
-        Returns:
-            The path to the figure, relative to the root of the report.
-        """
-        path = destination_dir / FileName.DATA_PROFILE.value
-        problem.compute_data_profile(
-            algorithms_configurations,
-            self.__histories_paths,
-            file_path=path,
-            infeasibility_tolerance=infeasibility_tolerance,
-            max_eval_number=max_eval_number,
-        )
-        return path.relative_to(self.__root_directory).as_posix()
-
-    def __plot_problem_histories(
-        self,
-        problem: Problem,
-        algorithms_configurations: AlgorithmsConfigurations,
-        destination_dir: Path,
-        infeasibility_tolerance: float = 0.0,
-        max_eval_number: int | None = None,
-        plot_all_histories: bool = True,
-        use_log_scale: bool = False,
-    ) -> str:
-        """Plot the performance histories of a problem.
-
-        Args:
-            problem: The benchmarking problem.
-            algorithms_configurations: The algorithms configurations.
-            destination_dir: The destination directory for the figure.
-            infeasibility_tolerance: The tolerance on the infeasibility measure.
-            max_eval_number: The maximum evaluations number to be displayed on the
-                graph.
-            plot_all_histories: Whether to plot all the performance histories.
-            use_log_scale: Whether to use a logarithmic scale on the value axis.
-
-        Returns:
-            The path to the figure, relative to the root of the report.
-        """
-        path = destination_dir / FileName.HISTORIES.value
-        problem.plot_histories(
-            algorithms_configurations,
-            self.__histories_paths,
-            show=False,
-            file_path=path,
-            plot_all_histories=plot_all_histories,
-            infeasibility_tolerance=infeasibility_tolerance,
-            max_eval_number=max_eval_number,
-            use_log_scale=use_log_scale,
-        )
-        return path.relative_to(self.__root_directory).as_posix()

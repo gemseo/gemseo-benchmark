@@ -23,12 +23,14 @@ from __future__ import annotations
 
 import itertools
 import re
+from collections.abc import Mapping
 from typing import TYPE_CHECKING
 from typing import Union
 
 import matplotlib
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from collections.abc import Iterator
 
 MarkeveryType = Union[
@@ -59,3 +61,43 @@ def join_substrings(string: str) -> str:
         The joined sub-strings.
     """
     return re.sub(r"\s+", "_", string)
+
+
+ConfigurationPlotOptions = Mapping[str, str]
+
+
+__DEFAULT_OPTIONS = {"color": lambda: COLORS_CYCLE, "marker": get_markers_cycle}
+
+
+def _get_configuration_plot_options(
+    options: Mapping[str, ConfigurationPlotOptions],
+    names: Iterable[str],
+) -> dict[str, str]:
+    """Return the plot options of algorithm configurations.
+
+    Args:
+        options: The plot options of the algorithm configurations.
+        names: The names of the algorithm configurations.
+
+    Returns:
+        The plot options of each algorithm configuration.
+    """
+    options = options.copy()
+    for configuration_name in names:
+        if configuration_name in options:
+            options[configuration_name]["label"] = configuration_name
+        else:
+            options[configuration_name] = {"label": configuration_name}
+
+    for option_name in __DEFAULT_OPTIONS:
+        for configuration_name, default_value in zip(
+            (
+                configuration_name
+                for configuration_name in names
+                if option_name not in options[configuration_name]
+            ),
+            __DEFAULT_OPTIONS[option_name](),
+        ):
+            options[configuration_name][option_name] = default_value
+
+    return options

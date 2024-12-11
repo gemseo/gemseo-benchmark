@@ -87,6 +87,7 @@ class Scenario:
         plot_all_histories: bool = True,
         use_log_scale: bool = False,
         log_gemseo_to_file: bool = False,
+        plot_only_median: bool = False,
     ) -> Results:
         """Execute the benchmarking scenario.
 
@@ -116,6 +117,7 @@ class Scenario:
             use_log_scale: Whether to use a logarithmic scale on the value axis.
             log_gemseo_to_file: Whether to save the GEMSEO log to a file
                 next to the performance history file.
+            plot_only_median: Whether to plot only the median and no other centile.
 
         Returns:
             The performance histories.
@@ -142,6 +144,7 @@ class Scenario:
                 max_eval_number_per_group,
                 plot_all_histories,
                 use_log_scale,
+                plot_only_median,
             )
 
         return Results(self._results_path)
@@ -212,6 +215,7 @@ class Scenario:
         max_eval_number_per_group: dict[str, int],
         plot_all_histories: bool = True,
         use_log_scale: bool = False,
+        plot_only_median: bool = False,
     ) -> None:
         """Generate the benchmarking report.
 
@@ -231,6 +235,7 @@ class Scenario:
                 for the group.
             plot_all_histories: Whether to plot all the performance histories.
             use_log_scale: Whether to use a logarithmic scale on the value axis.
+            plot_only_median: Whether to plot only the median and no other centile.
         """
         report = Report(
             self.__get_report_path(),
@@ -246,6 +251,7 @@ class Scenario:
             infeasibility_tolerance,
             plot_all_histories,
             use_log_scale,
+            plot_only_median,
         )
 
     def __get_report_path(self) -> Path:

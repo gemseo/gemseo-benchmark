@@ -28,6 +28,7 @@ from unittest import mock
 import pytest
 from gemseo.algos.optimization_problem import OptimizationProblem
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
+from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 from numpy import array
 from numpy import ndarray
 
@@ -148,6 +149,8 @@ def side_effect(
     infeasibility_tolerance=0.0,
     max_eval_number=None,
     use_log_scale=False,
+    plot_kwargs=READ_ONLY_EMPTY_DICT,
+    grid_kwargs=READ_ONLY_EMPTY_DICT,
 ):
     """Side effect for the computation of a data profile."""
     shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(file_path))
@@ -194,6 +197,8 @@ def group(problem_a, problem_b) -> mock.Mock:
         plot_path=None,
         infeasibility_tolerance=0.0,
         max_eval_number=None,
+        plot_kwargs=READ_ONLY_EMPTY_DICT,
+        grid_kwargs=READ_ONLY_EMPTY_DICT,
     ):
         shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(plot_path))
 

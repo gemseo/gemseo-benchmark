@@ -38,6 +38,7 @@ from gemseo import compute_doe
 from gemseo import execute_algo
 from gemseo.algos.opt.factory import OptimizationLibraryFactory
 from gemseo.algos.optimization_problem import OptimizationProblem
+from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 from gemseo.utils.matplotlib_figure import save_show_figure
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MaxNLocator
@@ -61,6 +62,7 @@ if TYPE_CHECKING:
 
     from gemseo.algos.doe.base_doe_library import DriverLibraryOptionType
 
+    from gemseo_benchmark import ConfigurationPlotOptions
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
     )
@@ -534,6 +536,8 @@ class Problem:
         file_path: str | Path | None = None,
         infeasibility_tolerance: float = 0.0,
         max_eval_number: int | None = None,
+        plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        grid_kwargs: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
     ) -> None:
         """Generate the data profiles of given algorithms.
 
@@ -546,6 +550,9 @@ class Problem:
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             max_eval_number: The maximum evaluations number to be displayed.
                 If ``None``, this value is inferred from the longest history.
+            colors: The color of each data profile.
+            markers: The marker of each data profile.
+            grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.
         """
         # Initialize the data profile
         data_profile = DataProfile({self.name: self.target_values})
@@ -566,7 +573,12 @@ class Problem:
                 )
 
         # Plot and/or save the data profile
-        data_profile.plot(show=show, file_path=file_path)
+        data_profile.plot(
+            show=show,
+            file_path=file_path,
+            plot_kwargs=plot_kwargs,
+            grid_kwargs=grid_kwargs,
+        )
 
     def plot_histories(
         self,
