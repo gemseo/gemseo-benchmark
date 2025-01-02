@@ -22,6 +22,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -67,7 +68,7 @@ def test_add_invalid_path():
     results = Results()
     with pytest.raises(
         FileNotFoundError,
-        match="The path to the history does not exist: not_a_file.json.",
+        match=re.escape("The path to the history does not exist: not_a_file.json."),
     ):
         results.add_path(algorithm_name, problem_name, "not_a_file.json")
 
@@ -93,7 +94,7 @@ def test_from_invalid_file():
     results = Results()
     with pytest.raises(
         FileNotFoundError,
-        match="The path to the JSON file does not exist: not_a_path.json.",
+        match=re.escape("The path to the JSON file does not exist: not_a_path.json."),
     ):
         results.from_file("not_a_path.json")
 
@@ -110,7 +111,7 @@ def test_get_problems(results):
 
 def test_get_problems_unknown_algorithm(results):
     """Check the accessor to the problems names for an unknown algorithm."""
-    with pytest.raises(ValueError, match="Unknown algorithm name: unknown."):
+    with pytest.raises(ValueError, match=re.escape("Unknown algorithm name: unknown.")):
         results.get_problems("unknown")
 
 
@@ -121,13 +122,13 @@ def test_get_paths(results):
 
 def test_get_paths_unknown_algorithm(results):
     """Check the accessor to the histories paths for an unknown algorithm."""
-    with pytest.raises(ValueError, match="Unknown algorithm name: unknown."):
+    with pytest.raises(ValueError, match=re.escape("Unknown algorithm name: unknown.")):
         results.get_paths("unknown", problem_name)
 
 
 def test_get_paths_unknown_problem(results):
     """Check the accessor to the histories paths for an unknown problem."""
-    with pytest.raises(ValueError, match="Unknown problem name: unknown."):
+    with pytest.raises(ValueError, match=re.escape("Unknown problem name: unknown.")):
         results.get_paths(algorithm_name, "unknown")
 
 

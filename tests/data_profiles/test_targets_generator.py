@@ -120,7 +120,8 @@ def test_no_histories():
     """Check the computation of target values without histories."""
     generator = TargetsGenerator()
     with pytest.raises(
-        RuntimeError, match="There are no histories to generate the targets from."
+        RuntimeError,
+        match=re.escape("There are no histories to generate the targets from."),
     ):
         generator.compute_target_values(2, show=False)
 
@@ -143,7 +144,9 @@ def test_infeasible_best_target():
     generator = TargetsGenerator()
     generator.add_history([2.0, 1.0], [1.0, 1.0])
     generator.add_history([1.0, 0.0], [1.0, 1.0])
-    with pytest.raises(RuntimeError, match="The best target value is not feasible."):
+    with pytest.raises(
+        RuntimeError, match=re.escape("The best target value is not feasible.")
+    ):
         generator.compute_target_values(2, show=False)
 
 
@@ -153,7 +156,9 @@ def test_best_target_not_reached():
     generator.add_history([2.0, 1.0])
     with pytest.raises(
         RuntimeError,
-        match="There is no performance history that reaches the best target value.",
+        match=re.escape(
+            "There is no performance history that reaches the best target value."
+        ),
     ):
         generator.compute_target_values(2, show=False, best_target_objective=0.0)
 

@@ -31,7 +31,7 @@ from gemseo_benchmark.results.history_item import HistoryItem
 def test_nonnegative_infeasibility_measure():
     """Check the non-negative infeasibility measure exception."""
     with pytest.raises(
-        ValueError, match="The infeasibility measure is negative: -1.0."
+        ValueError, match=re.escape("The infeasibility measure is negative: -1.0.")
     ):
         HistoryItem(1.0, -1.0)
 
@@ -65,7 +65,8 @@ def test_repr():
 def test_unsatisfied_constraints_number():
     """Check the setting of a negative number of unsatisfied constraints."""
     with pytest.raises(
-        ValueError, match="The number of unsatisfied constraints is negative: -1."
+        ValueError,
+        match=re.escape("The number of unsatisfied constraints is negative: -1."),
     ):
         HistoryItem(1.0, 1.0, -1)
 

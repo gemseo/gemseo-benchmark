@@ -22,6 +22,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from unittest import mock
 
@@ -166,7 +167,9 @@ def test_problem_without_optimum(
     """Check the handling of a benchmarking problem without an optimum."""
     groups = [incomplete_group]
     report = Report(tmp_path, [algorithms_configurations], groups, results)
-    with pytest.raises(AttributeError, match="The optimum of the problem is not set."):
+    with pytest.raises(
+        AttributeError, match=re.escape("The optimum of the problem is not set.")
+    ):
         report.generate()
 
 
