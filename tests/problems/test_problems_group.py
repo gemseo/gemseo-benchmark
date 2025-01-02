@@ -21,6 +21,8 @@
 
 from __future__ import annotations
 
+import re
+
 import pytest
 from gemseo.problems.optimization.power_2 import Power2
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
@@ -55,7 +57,7 @@ def test_compute_targets():
     """Check the computation of target values."""
     rosenbrock = Problem("Rosenbrock", Rosenbrock, [zeros(2)])
     with pytest.raises(
-        ValueError, match="The benchmarking problem has no target value."
+        ValueError, match=re.escape("The benchmarking problem has no target value.")
     ):
         _ = rosenbrock.target_values
     ProblemsGroup("group", [rosenbrock]).compute_targets(2, algorithms_configurations)

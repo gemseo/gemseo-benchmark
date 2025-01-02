@@ -44,7 +44,9 @@ def test_invalid_creator():
     """Check initialization with an invalid problem creator."""
     with pytest.raises(
         TypeError,
-        match="optimization_problem_creator must return an OptimizationProblem.",
+        match=re.escape(
+            "optimization_problem_creator must return an OptimizationProblem."
+        ),
     ):
         Problem("A problem", lambda: None)
 
@@ -72,7 +74,9 @@ def test_wrong_start_points_type(creator):
     """Check initialization with starting points of the wrong type."""
     with pytest.raises(
         TypeError,
-        match="A starting point must be a 1-dimensional NumPy array of size 2.",
+        match=re.escape(
+            "A starting point must be a 1-dimensional NumPy array of size 2."
+        ),
     ):
         Problem("problem", creator, [[0.0, 0.0]])
 
@@ -81,7 +85,9 @@ def test_inconsistent_start_points(creator):
     """Check initialization with starting points of inadequate size."""
     with pytest.raises(
         ValueError,
-        match="A starting point must be a 1-dimensional NumPy array of size 2.",
+        match=re.escape(
+            "A starting point must be a 1-dimensional NumPy array of size 2."
+        ),
     ):
         Problem("problem", creator, [zeros(3)])
 
@@ -106,7 +112,7 @@ def test_undefined_targets(creator):
     """Check the access to undefined targets."""
     problem = Problem("problem", creator, [zeros(2)])
     with pytest.raises(
-        ValueError, match="The benchmarking problem has no target value."
+        ValueError, match=re.escape("The benchmarking problem has no target value.")
     ):
         _ = problem.target_values
 
@@ -123,7 +129,7 @@ def test_undefined_start_points(creator):
     opt_problem.design_space.has_current_value = False
     problem = Problem("problem", lambda: opt_problem)
     with pytest.raises(
-        ValueError, match="The benchmarking problem has no starting point."
+        ValueError, match=re.escape("The benchmarking problem has no starting point.")
     ):
         _ = problem.start_points
 

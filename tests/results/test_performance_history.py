@@ -37,20 +37,24 @@ def test_invalid_init_lengths():
     """Check the initialization of a history with lists of inconsistent lengths."""
     with pytest.raises(
         ValueError,
-        match="The objective history and the infeasibility history must have same"
-        " length.",
+        match=re.escape(
+            "The objective history and the infeasibility history must have same length."
+        ),
     ):
         PerformanceHistory([3.0, 2.0], [1.0])
     with pytest.raises(
         ValueError,
-        match="The objective history and the feasibility history must have same"
-        " length.",
+        match=re.escape(
+            "The objective history and the feasibility history must have same length."
+        ),
     ):
         PerformanceHistory([3.0, 2.0], feasibility_statuses=[False])
     with pytest.raises(
         ValueError,
-        match="The unsatisfied constraints history and the feasibility history"
-        " must have same length.",
+        match=re.escape(
+            "The unsatisfied constraints history and the feasibility history"
+            " must have same length."
+        ),
     ):
         PerformanceHistory([3.0, 2.0], [1.0, 0.0], n_unsatisfied_constraints=[1])
 
@@ -223,7 +227,9 @@ def test_from_file():
 def test_history_items_setter():
     """Check the setting of history items."""
     history = PerformanceHistory()
-    with pytest.raises(TypeError, match="History items must be of type HistoryItem."):
+    with pytest.raises(
+        TypeError, match=re.escape("History items must be of type HistoryItem.")
+    ):
         history.items = [1.0, 2.0]
 
 

@@ -21,6 +21,7 @@
 
 from __future__ import annotations
 
+import re
 from unittest import mock
 
 import pytest
@@ -34,8 +35,10 @@ def test_init(algorithm_configuration):
     """Check the initialization of algorithms configurations."""
     with pytest.raises(
         ValueError,
-        match="The collection already contains an algorithm configuration named "
-        f"{algorithm_configuration.algorithm_name}.",
+        match=re.escape(
+            "The collection already contains an algorithm configuration named "
+            f"{algorithm_configuration.algorithm_name}."
+        ),
     ):
         AlgorithmsConfigurations(algorithm_configuration, algorithm_configuration)
 
@@ -135,6 +138,7 @@ def test_unnamed_collection(configuration_b, configuration_c, configuration_a):
         configuration_a,
     )
     with pytest.raises(
-        ValueError, match="The collection of algorithms configurations has no name."
+        ValueError,
+        match=re.escape("The collection of algorithms configurations has no name."),
     ):
         algorithms_configurations.name  # noqa: B018
