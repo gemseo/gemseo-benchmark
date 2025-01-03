@@ -150,12 +150,13 @@ class DataProfile:
             history
         )
 
+    # TODO: remove argument 'markevery' in favor of 'plot_kwargs' (API break)
     def plot(
         self,
         algo_names: Iterable[str] | None = None,
         show: bool = True,
         file_path: str | Path | None = None,
-        markevery: MarkeveryType = 0.1,
+        markevery: MarkeveryType | None = None,
         plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
         grid_kwargs: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
     ) -> None:
@@ -177,9 +178,12 @@ class DataProfile:
             algo_names = ()
 
         data_profiles = self.compute_data_profiles(*algo_names)
-        figure = self._plot_data_profiles(
-            data_profiles, markevery, plot_kwargs, grid_kwargs
-        )
+        plot_kwargs_copy = plot_kwargs.copy()
+        for kwargs in plot_kwargs_copy.values():
+            if "markevery" not in kwargs:
+                kwargs["markevery"] = markevery
+
+        figure = self._plot_data_profiles(data_profiles, plot_kwargs_copy, grid_kwargs)
         save_show_figure(figure, show, file_path)
 
     def compute_data_profiles(self, *algo_names: str) -> dict[str, list[Number]]:
@@ -268,7 +272,6 @@ class DataProfile:
     @staticmethod
     def _plot_data_profiles(
         data_profiles: Mapping[str, Sequence[Number]],
-        markevery: MarkeveryType = 0.1,
         plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
         grid_kwargs: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
     ) -> Figure:
@@ -276,8 +279,6 @@ class DataProfile:
 
         Args:
             data_profiles: The data profiles.
-            markevery: The sampling parameter for the markers of the plot.
-                Refer to the Matplotlib documentation.
             colors: The color of each data profile.
             markers: The marker of each data profile.
             plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
@@ -306,12 +307,7 @@ class DataProfile:
         for name, profile in data_profiles.items():
             # Plot the data profile
             profile_size = len(profile)
-            axes.plot(
-                range(1, profile_size + 1),
-                profile,
-                markevery=markevery,
-                **plot_kwargs[name],
-            )
+            axes.plot(range(1, profile_size + 1), profile, **plot_kwargs[name])
 
             # Extend the profile with an horizontal line if necessary
             if profile_size < max_profile_size:

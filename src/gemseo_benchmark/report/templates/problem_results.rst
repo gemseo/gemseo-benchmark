@@ -22,7 +22,7 @@ Performance measure
 
    The performance measure of group ':ref:`{{ algorithm_configurations.name }}`' for problem ':ref:`{{ problem.name }}`'.
 
-.. figure:: /{{ figures["performance_measure.focus.png"] }}
+.. figure:: /{{ figures["performance_measure_focus.png"] }}
    :alt: The performance measure of group {{ algorithm_configurations.name }} for problem {{ problem.name }}.
 
    The performance measure of group ':ref:`{{ algorithm_configurations.name }}`' for problem ':ref:`{{ problem.name }}`'.

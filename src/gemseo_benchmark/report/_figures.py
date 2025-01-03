@@ -27,7 +27,6 @@ import numpy
 from gemseo.utils.matplotlib_figure import save_show_figure
 from matplotlib.ticker import MaxNLocator
 
-from gemseo_benchmark import MarkeveryType
 from gemseo_benchmark import _get_configuration_plot_options
 from gemseo_benchmark import join_substrings
 from gemseo_benchmark.results.performance_histories import PerformanceHistories
@@ -70,10 +69,6 @@ class Figures:
 
     __infeasibility_tolerance: int | float
     """The tolerance on the infeasibility measure."""
-
-    __MARKEVERY: Final[MarkeveryType] = 0.1
-    """"The sampling parameter for the plot markers.
-    (Refer to the Matplotlib documentation.)"""
 
     __max_eval_number: int
     """The maximum number of evaluations to be displayed on the figures."""
@@ -392,14 +387,7 @@ class Figures:
                     max_feasible_objective,
                 )
 
-            PerformanceHistories.plot_median(
-                data,
-                axes,
-                dict(
-                    markevery=self.__MARKEVERY,
-                    **self.__plot_kwargs[name],
-                ),
-            )
+            PerformanceHistories.plot_median(data, axes, self.__plot_kwargs[name])
 
         axes.xaxis.set_major_locator(MaxNLocator(integer=True))
         axes.grid(**self.__GRID_KWARGS)
