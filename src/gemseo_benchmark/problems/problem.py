@@ -550,8 +550,8 @@ class Problem:
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             max_eval_number: The maximum evaluations number to be displayed.
                 If ``None``, this value is inferred from the longest history.
-            colors: The color of each data profile.
-            markers: The marker of each data profile.
+            plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
+                for each algorithm configuration.
             grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.
         """
         # Initialize the data profile
