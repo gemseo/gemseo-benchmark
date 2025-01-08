@@ -54,7 +54,7 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
 from gemseo_benchmark.problems.problem import Problem
 
 # %%
-# Let us consider the problem [Power2][gemseo.problems.analytical.power_2.Power2]
+# Let us consider the problem [Power2][gemseo.problems.optimization.power_2.Power2]
 # already implemented in GEMSEO.
 problem = Problem(
     name="Power2",
