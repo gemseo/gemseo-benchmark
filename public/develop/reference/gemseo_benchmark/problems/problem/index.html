@@ -2736,17 +2736,14 @@ If <code>None</code>, this value is inferred from the longest history.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>colors</code></b>
+            <b><code>plot_kwargs</code></b>
+              (<code><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <span title="gemseo_benchmark.ConfigurationPlotOptions">ConfigurationPlotOptions</span>]</code>, default:
+                  <code><a class="autorefs autorefs-external" title="gemseo.utils.constants.READ_ONLY_EMPTY_DICT" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.utils.constants.html#gemseo.utils.constants.READ_ONLY_EMPTY_DICT">READ_ONLY_EMPTY_DICT</a></code>
+)
           –
           <div class="doc-md-description">
-            <p>The color of each data profile.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>markers</code></b>
-          –
-          <div class="doc-md-description">
-            <p>The marker of each data profile.</p>
+            <p>The keyword arguments of <code>matplotlib.axes.Axes.plot</code>
+for each algorithm configuration.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -2835,8 +2832,8 @@ If <code>None</code>, this value is inferred from the longest history.</p>
 <span class="sd">        infeasibility_tolerance: The tolerance on the infeasibility measure.</span>
 <span class="sd">        max_eval_number: The maximum evaluations number to be displayed.</span>
 <span class="sd">            If ``None``, this value is inferred from the longest history.</span>
-<span class="sd">        colors: The color of each data profile.</span>
-<span class="sd">        markers: The marker of each data profile.</span>
+<span class="sd">        plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`</span>
+<span class="sd">            for each algorithm configuration.</span>
 <span class="sd">        grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Initialize the data profile</span>
