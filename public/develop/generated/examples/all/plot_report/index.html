@@ -1646,7 +1646,7 @@
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a href="#download_links">here</a>
+<p>Click (#download_links)
 to download the full example code</p>
 </div>
 <h1 id="generate-a-benchmarking-report">Generate a benchmarking report<a class="headerlink" href="#generate-a-benchmarking-report" title="Permanent link">&para;</a></h1>
@@ -1740,15 +1740,14 @@ Let us put it in a group of its own.</p>
 
 <h2 id="set-the-reference-problems">Set the reference problems<a class="headerlink" href="#set-the-reference-problems" title="Permanent link">&para;</a></h2>
 <p>Let us choose two problems already implemented in GEMSEO as references
-to measure the performances of our selection of algorithms configurations:
-<a class="autorefs autorefs-external" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.problems.optimization.rastrigin.html#gemseo.problems.optimization.rastrigin.Rastrigin">Rastrigin</a>
-and <a class="autorefs autorefs-external" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.problems.optimization.rosenbrock.html#gemseo.problems.optimization.rosenbrock.Rosenbrock">Rosenbrock</a>.</p>
+to measure the performances of our selection of algorithms configurations:</p>
+<p>and .</p>
 <p>We define target values as an exponential scale of values decreasing towards zero,
 the minimum value of both Rastrigin's and Rosenbrock's functions.</p>
 <!-- GENERATED FROM PYTHON SOURCE LINES 118-120 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">optimum</span> <span class="o">=</span> <span class="mf">0.0</span>
-<span class="n">target_values</span> <span class="o">=</span> <span class="n">TargetValues</span><span class="p">([</span><span class="mi">10</span><span class="o">**-</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="n">optimum</span><span class="p">])</span>
+<span class="n">target_values</span> <span class="o">=</span> <span class="n">TargetValues</span><span class="p">(</span> <span class="o">+</span> <span class="p">)</span>
 </code></pre></div>
 <!-- GENERATED FROM PYTHON SOURCE LINES 121-126 -->
 
@@ -1783,7 +1782,7 @@ to generate five starting points by optimized Latin hypercube sampling (LHS).</p
 so that they will be treated together.</p>
 <!-- GENERATED FROM PYTHON SOURCE LINES 148-149 -->
 
-<div class="highlight"><pre><span></span><code><span class="n">problems_2d</span> <span class="o">=</span> <span class="n">ProblemsGroup</span><span class="p">(</span><span class="s2">&quot;2D problems&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">rastrigin_2d</span><span class="p">,</span> <span class="n">rosenbrock_2d</span><span class="p">])</span>
+<div class="highlight"><pre><span></span><code><span class="n">problems_2d</span> <span class="o">=</span> <span class="n">ProblemsGroup</span><span class="p">(</span><span class="s2">&quot;2D problems&quot;</span><span class="p">,</span> <span class="p">)</span>
 </code></pre></div>
 <!-- GENERATED FROM PYTHON SOURCE LINES 150-153 -->
 
@@ -1800,20 +1799,20 @@ Let us put it in a group of its own.</p>
     <span class="n">doe_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
     <span class="n">doe_algo_name</span><span class="o">=</span><span class="s2">&quot;OT_OPT_LHS&quot;</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">problems_5d</span> <span class="o">=</span> <span class="n">ProblemsGroup</span><span class="p">(</span><span class="s2">&quot;5D problems&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">rosenbrock_5d</span><span class="p">])</span>
+<span class="n">problems_5d</span> <span class="o">=</span> <span class="n">ProblemsGroup</span><span class="p">(</span><span class="s2">&quot;5D problems&quot;</span><span class="p">,</span> <span class="p">)</span>
 </code></pre></div>
 <!-- GENERATED FROM PYTHON SOURCE LINES 163-171 -->
 
 <h2 id="generate-the-benchmarking-results">Generate the benchmarking results<a class="headerlink" href="#generate-the-benchmarking-results" title="Permanent link">&para;</a></h2>
 <p>Now that the algorithms configurations and the reference problems are properly set,
 we can measure the performances of the former on the latter.</p>
-<p>We set up a <a class="autorefs autorefs-internal" href="../../../../reference/gemseo_benchmark/scenario/#gemseo_benchmark.scenario.Scenario">Scenario</a> with
+<p>We set up a  with
 our two groups of algorithms configurations
 and a path to a directory where to save the performance histories and the report.</p>
 <!-- GENERATED FROM PYTHON SOURCE LINES 171-173 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">scenario_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">())</span>
-<span class="n">scenario</span> <span class="o">=</span> <span class="n">Scenario</span><span class="p">([</span><span class="n">lbfgsb_configurations</span><span class="p">,</span> <span class="n">slsqp_configurations</span><span class="p">],</span> <span class="n">scenario_dir</span><span class="p">)</span>
+<span class="n">scenario</span> <span class="o">=</span> <span class="n">Scenario</span><span class="p">(,</span> <span class="n">scenario_dir</span><span class="p">)</span>
 </code></pre></div>
 <!-- GENERATED FROM PYTHON SOURCE LINES 174-176 -->
 
@@ -1832,10 +1831,10 @@ of GEMSEO to accelerate the script.</p>
 <p>Let us execute the benchmarking scenario on our two groups of reference problems.</p>
 <!-- GENERATED FROM PYTHON SOURCE LINES 183-184 -->
 
-<div class="highlight"><pre><span></span><code><span class="n">scenario</span><span class="o">.</span><span class="n">execute</span><span class="p">([</span><span class="n">problems_2d</span><span class="p">,</span> <span class="n">problems_5d</span><span class="p">])</span>
+<div class="highlight"><pre><span></span><code><span class="n">scenario</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
 </code></pre></div>
 <p class="mkd-glr-script-out">Out:</p>
-<div class="mkd-glr-script-out-disp highlight"><pre><span></span><code>&lt;gemseo_benchmark.results.results.Results<span class="w"> </span>object<span class="w"> </span>at<span class="w"> </span>0x7b252067f670&gt;
+<div class="mkd-glr-script-out-disp highlight"><pre><span></span><code>&lt;gemseo_benchmark.results.results.Results<span class="w"> </span>object<span class="w"> </span>at<span class="w"> </span>0x7aab015b9e20&gt;
 </code></pre></div>
 <!-- GENERATED FROM PYTHON SOURCE LINES 185-186 -->
 
@@ -1845,7 +1844,7 @@ of GEMSEO to accelerate the script.</p>
 <div class="highlight"><pre><span></span><code><span class="nb">str</span><span class="p">((</span><span class="n">scenario_dir</span> <span class="o">/</span> <span class="s2">&quot;report&quot;</span> <span class="o">/</span> <span class="s2">&quot;_build&quot;</span> <span class="o">/</span> <span class="s2">&quot;html&quot;</span> <span class="o">/</span> <span class="s2">&quot;index.html&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">absolute</span><span class="p">())</span>
 </code></pre></div>
 <p class="mkd-glr-script-out">Out:</p>
-<div class="mkd-glr-script-out-disp highlight"><pre><span></span><code><span class="s1">&#39;/tmp/tmp6t9cd3q_/report/_build/html/index.html&#39;</span>
+<div class="mkd-glr-script-out-disp highlight"><pre><span></span><code><span class="s1">&#39;/tmp/tmpzh6_z6iv/report/_build/html/index.html&#39;</span>
 </code></pre></div>
 <!-- GENERATED FROM PYTHON SOURCE LINES 188-189 -->
 
@@ -1854,12 +1853,12 @@ of GEMSEO to accelerate the script.</p>
 
 <div class="highlight"><pre><span></span><code><span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">scenario_dir</span><span class="p">)</span>
 </code></pre></div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  10.329 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  10.130 seconds)</p>
 <div id="download_links"></div>
 
-<p><a class="md-button center" href="../plot_report.py"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32v242.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64h384c35.3 0 64-28.7 64-64v-32c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48"/></svg></span> Download Python source code: plot_report.py</a></p>
-<p><a class="md-button center" href="../plot_report.ipynb"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32v242.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64h384c35.3 0 64-28.7 64-64v-32c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48"/></svg></span> Download Jupyter notebook: plot_report.ipynb</a></p>
-<p><a class="mkd-glr-signature" href="https://smarie.github.io/mkdocs-gallery">Gallery generated by mkdocs-gallery</a></p>
+<p>(./plot_report.py){ .md-button .center}</p>
+<p>(./plot_report.ipynb){ .md-button .center}</p>
+<p>(https://smarie.github.io/mkdocs-gallery){: .mkd-glr-signature }</p>
 
 
 
