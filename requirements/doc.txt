@@ -43,7 +43,7 @@ fastjsonschema==2.20.0
     # via gemseo
 fonttools==4.55.3
     # via matplotlib
-gemseo @ git+https://gitlab.com/gemseo/dev/gemseo.git@06280de53f1f7ca23841fcab69170baf8752c43d
+gemseo @ git+https://gitlab.com/gemseo/dev/gemseo.git@bdffb176b18afc793d1c1e716992ff958659fc9f
     # via
     #   -c requirements/test-constraints.in
     #   gemseo-benchmark (pyproject.toml)
@@ -65,7 +65,7 @@ idna==3.10
     # via requests
 imagesize==1.4.1
     # via sphinx
-importlib-metadata==8.5.0
+importlib-metadata==8.6.1
     # via
     #   gemseo
     #   markdown
@@ -133,7 +133,7 @@ mkdocs-autorefs==1.3.0
     # via
     #   mkdocstrings
     #   mkdocstrings-python
-mkdocs-bibtex==3.0.0
+mkdocs-bibtex==4.0.1
     # via gemseo-benchmark (pyproject.toml)
 mkdocs-gallery==0.10.4
     # via gemseo-benchmark (pyproject.toml)
