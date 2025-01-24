@@ -40,7 +40,6 @@ from copy import copy
 from functools import reduce
 from itertools import chain
 from itertools import repeat
-from itertools import starmap
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Final
@@ -263,11 +262,11 @@ class PerformanceHistory(collections.abc.Sequence):
             raise ValueError(msg)
 
         return list(
-            starmap(
+            map(
                 HistoryItem,
-                zip(
-                    objective_values, infeasibility_measures, n_unsatisfied_constraints
-                ),
+                objective_values,
+                infeasibility_measures,
+                n_unsatisfied_constraints,
             )
         )
 
