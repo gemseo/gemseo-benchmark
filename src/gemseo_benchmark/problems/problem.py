@@ -708,9 +708,9 @@ class Problem:
         max_feasible_objective = None
         for configuration_name in algos_configurations.names:
             minima[configuration_name] = PerformanceHistories()
-            for path in results.get_paths(configuration_name, self.name):
+            for file_path in results.get_paths(configuration_name, self.name):
                 # Get the history of the cumulated minimum
-                history = PerformanceHistory.from_file(path)
+                history = PerformanceHistory.from_file(file_path)
                 if max_eval_number is not None:
                     history = history.shorten(max_eval_number)
 

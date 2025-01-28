@@ -9,5 +9,5 @@
    :caption: The results of the group of algorithms configurations "{{ name }}"
              on the groups of problems.
 
-{% for document in documents %}   {{ document }}
+{% for document in documents %}   /results/{{ document }}
 {% endfor %}

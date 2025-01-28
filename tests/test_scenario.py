@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+import os
+
 import pytest
 
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
@@ -54,3 +56,14 @@ def test_execute(
     assert (tmp_path / "results.json").is_file()
     assert (tmp_path / "report").is_dir()
     assert (tmp_path / "databases").is_dir() == save_databases
+
+
+def test_report_overwrite(algorithms_configurations, tmp_path, rosenbrock) -> None:
+    """Check that the report directory can be overwritten."""
+    directory_path = tmp_path / "report"
+    directory_path.mkdir()
+    time = os.path.getmtime(directory_path)
+    Scenario([algorithms_configurations], tmp_path).execute(
+        [ProblemsGroup("Rosenbrock", [rosenbrock])],
+    )
+    assert os.path.getmtime(directory_path) > time

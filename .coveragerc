@@ -1,6 +1,9 @@
 [run]
 plugins = covdefaults
 source = gemseo_benchmark
+omit =
+    # omit configuration file for benchmarking report generation with sphinx-build
+    */gemseo_benchmark/report/conf.py
 
 [report]
 # Override covdefaults.

@@ -55,6 +55,7 @@ if TYPE_CHECKING:
 class FileName(enum.Enum):
     """The name of a report file."""
 
+    ALGORTIHM_CONFIGURATION_RESULTS = "algorithm_configuration_results.rst"
     ALGORITHMS = "algorithms.rst"
     ALGORITHMS_CONFIGURATIONS_GROUP = "algorithms_configurations_group.rst"
     INDEX = "index.rst"
@@ -150,6 +151,7 @@ class Report:
         plot_all_histories: bool = True,
         use_log_scale: bool = False,
         plot_only_median: bool = False,
+        use_time_log_scale: bool = False,
     ) -> None:
         """Generate the benchmarking report.
 
@@ -160,6 +162,8 @@ class Report:
             plot_all_histories: Whether to plot all the performance histories.
             use_log_scale: Whether to use a logarithmic scale on the value axis.
             plot_only_median: Whether to plot only the median and no other centile.
+            use_time_log_scale: Whether to use a logarithmic scale
+                for the time axis.
         """
         self.__create_root_directory()
         self.__create_algos_file()
@@ -169,6 +173,7 @@ class Report:
             plot_all_histories,
             use_log_scale,
             plot_only_median,
+            use_time_log_scale,
         )
         self.__create_index()
         self.__build_report(to_html, to_pdf)
@@ -223,25 +228,22 @@ class Report:
         problems = [problem for group in self.__problems_groups for problem in group]
         problems = sorted(problems, key=lambda pb: pb.name.lower())
         for problem in problems:
-            # Create the problem file
-            path = self.__get_problem_path(problem)
-            # Skip duplicate problems
-            if path.is_file():
-                continue
-
             if problem.optimum is None:
                 msg = "The optimum of the problem is not set."
                 raise AttributeError(msg)
 
+            file_path = self.__get_problem_path(problem)
             self.__fill_template(
-                path,
+                file_path,
                 FileName.PROBLEM.value,
                 name=problem.name,
                 description=problem.description,
                 optimum=f"{problem.optimum:.6g}",
                 target_values=problem.target_values,
             )
-            problems_paths.append(path.relative_to(self.__root_directory).as_posix())
+            problems_paths.append(
+                file_path.relative_to(self.__root_directory).as_posix()
+            )
 
         # Create the list of problems
         self.__fill_template(
@@ -269,6 +271,7 @@ class Report:
         plot_all_histories: bool = True,
         use_log_scale: bool = False,
         plot_only_median: bool = False,
+        use_time_log_scale: bool = False,
     ) -> None:
         """Create the files corresponding to the benchmarking results.
 
@@ -277,6 +280,8 @@ class Report:
             plot_all_histories: Whether to plot all the performance histories.
             use_log_scale: Whether to use a logarithmic scale on the value axis.
             plot_only_median: Whether to plot only the median and no other centile.
+            use_time_log_scale: Whether to use a logarithmic scale
+                for the time axis.
         """
         self.__fill_template(
             self.__root_directory / FileName.RESULTS.value,
@@ -288,6 +293,7 @@ class Report:
                     plot_all_histories,
                     use_log_scale,
                     plot_only_median,
+                    use_time_log_scale,
                 )
                 for group in self.__algorithms_configurations_groups
             ],
@@ -300,6 +306,7 @@ class Report:
         plot_all_histories: bool,
         use_log_scale: bool,
         plot_only_median: bool,
+        use_time_log_scale: bool,
     ) -> str:
         """Create the results files of a group of algorithm configurations.
 
@@ -309,6 +316,8 @@ class Report:
             plot_all_histories: Whether to plot all the performance histories.
             use_log_scale: Whether to use a logarithmic scale on the value axis.
             plot_only_median: Whether to plot only the median and no other centile.
+            use_time_log_scale: Whether to use a logarithmic scale
+                for the time axis.
 
         Returns:
             The path to the main file.
@@ -347,6 +356,7 @@ class Report:
                     plot_all_histories,
                     use_log_scale,
                     plot_only_median,
+                    use_time_log_scale,
                 )
                 .relative_to(results_root)
                 .as_posix()
@@ -366,24 +376,27 @@ class Report:
         self,
         problems: ProblemsGroup,
         algorithm_configurations: AlgorithmsConfigurations,
-        destination_dir: Path,
+        directory_path: Path,
         figures_dir: Path,
         infeasibility_tolerance: float,
         plot_all_histories: bool,
         use_log_scale: bool,
         plot_only_median: bool,
+        use_time_log_scale: bool,
     ) -> Path:
         """Create the results file of a group of algorithm configurations.
 
         Args:
             problems: The problems.
             algorithm_configurations: The algorithm configurations.
-            destination_dir: The path to the directory where to save the files.
+            directory_path: The path to the directory where to save the files.
             figures_dir: The path to the directory where to save the figures.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             plot_all_histories: Whether to plot all the performance histories.
             use_log_scale: Whether to use a logarithmic scale on the value axis.
             plot_only_median: Whether to plot only the median and no other centile.
+            use_time_log_scale: Whether to use a logarithmic scale
+                for the time axis.
 
         Returns:
             The path to the main file.
@@ -399,14 +412,16 @@ class Report:
             self.__max_eval_numbers.get(problems.name),
             plot_kwargs=self.__plot_kwargs,
         )
-        figures = plotter.plot(plot_all_histories, use_log_scale, plot_only_median)
+        figures = plotter.plot(
+            plot_all_histories, use_log_scale, plot_only_median, use_time_log_scale
+        )
 
         # Create the file dedicated to the group of problems
-        path = destination_dir / f"{join_substrings(problems.name)}.rst"
-        problems_dir = destination_dir / join_substrings(problems.name)
+        file_path = directory_path / f"{join_substrings(problems.name)}.rst"
+        problems_dir = directory_path / join_substrings(problems.name)
         problems_dir.mkdir()
         self.__fill_template(
-            path,
+            file_path,
             FileName.SUB_RESULTS.value,
             algorithms_group_name=algorithm_configurations.name,
             algorithms_configurations_names=[
@@ -423,19 +438,19 @@ class Report:
                     figures[problem.name],
                     problems_dir,
                 )
-                .relative_to(destination_dir)
+                .relative_to(directory_path)
                 .as_posix()
                 for problem in problems
             ],
         )
-        return path
+        return file_path
 
     def __create_problem_results_files(
         self,
         problem: Problem,
         algorithm_configurations: AlgorithmsConfigurations,
         figures: dict[str, str],
-        destination_dir: Path,
+        directory_path: Path,
     ) -> Path:
         """Create the files dedicated to the results obtained on a single problem.
 
@@ -447,26 +462,52 @@ class Report:
             problem: The problem.
             algorithm_configurations: The algorithm configurations.
             figures: The figures illustrating the results.
-            destination_dir: The path to the directory where to save the files.
+            directory_path: The path to the directory where to save the files.
 
         Returns:
             The path to the main file.
         """
-        path = (destination_dir / problem.name).with_suffix(".rst")
+        # Create the files that present the results of each algorithm configuration.
+        algorithm_configurations_results = []
+        for algorithm_configuration in algorithm_configurations:
+            file_path = (
+                directory_path / join_substrings(algorithm_configuration.name)
+            ).with_suffix(".rst")
+            self.__fill_template(
+                file_path,
+                FileName.ALGORTIHM_CONFIGURATION_RESULTS.value,
+                algorithm_configuration=algorithm_configuration,
+                problem=problem,
+                figures={
+                    name.value: self.__get_relative_path(
+                        figures[algorithm_configuration.name][name]
+                    )
+                    for name in figures[algorithm_configuration.name]
+                },
+            )
+            algorithm_configurations_results.append(
+                file_path.relative_to(directory_path).as_posix()
+            )
+
+        # Create the file that present the results of all the algorithm configurations
+        file_path = (directory_path / problem.name).with_suffix(".rst")
         self.__fill_template(
-            path,
+            file_path,
             FileName.PROBLEM_RESULTS.value,
             algorithm_configurations=algorithm_configurations,
+            algorithm_configurations_results=algorithm_configurations_results,
             problem=problem,
             figures={
-                name: self.__get_relative_path(path) for name, path in figures.items()
+                name.value: self.__get_relative_path(figures[name])
+                for name in Figures._FileName
+                if name in figures
             },
         )
-        return path
+        return file_path
 
-    def __get_relative_path(self, path: Path) -> str:
+    def __get_relative_path(self, file_path: Path) -> str:
         """Return a POSIX path relative to the root directory."""
-        return path.relative_to(self.__root_directory).as_posix()
+        return file_path.relative_to(self.__root_directory).as_posix()
 
     def __create_index(self) -> None:
         """Create the index file of the reST report."""

@@ -176,6 +176,14 @@ def test_remove_leading_infeasible(performance_history):
     ]
 
 
+def test_remove_leading_infeasible_from_infeasible_history() -> None:
+    """Check the removal of the leading infeasible items from an infeasible history."""
+    performance_history = PerformanceHistory([3, 2, 1], [1, 1, 1])
+    truncation = performance_history.remove_leading_infeasible()
+    check_non_item_attributes(truncation, performance_history)
+    assert truncation.items == []
+
+
 def test_to_file(tmp_path):
     """Check the writing of a performance history into a file."""
     algorithm_configuration = AlgorithmConfiguration("algorithm")

@@ -285,7 +285,13 @@ class PerformanceHistories(collections.abc.MutableSequence):
             axes: The axes of the plot.
         """
         self.__plot_distribution(
-            numpy.array([history.n_unsatisfied_constraints for history in self]),
+            numpy.array([
+                [
+                    numpy.nan if n is None else n
+                    for n in history.n_unsatisfied_constraints
+                ]
+                for history in self
+            ]),
             axes,
             "Number of unsatisfied constraints",
         )
