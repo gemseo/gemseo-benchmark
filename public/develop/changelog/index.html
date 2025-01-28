@@ -542,6 +542,30 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fixed
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fixed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Results
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -586,7 +610,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#results" class="md-nav__link">
+  <a href="#results_1" class="md-nav__link">
     <span class="md-ellipsis">
       Results
     </span>
@@ -610,7 +634,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#results_1" class="md-nav__link">
+  <a href="#results_2" class="md-nav__link">
     <span class="md-ellipsis">
       Results
     </span>
@@ -730,7 +754,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#results_2" class="md-nav__link">
+  <a href="#results_3" class="md-nav__link">
     <span class="md-ellipsis">
       Results
     </span>
@@ -762,7 +786,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fixed" class="md-nav__link">
+  <a href="#fixed_1" class="md-nav__link">
     <span class="md-ellipsis">
       Fixed
     </span>
@@ -1933,6 +1957,30 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fixed
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fixed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Results
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1977,7 +2025,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#results" class="md-nav__link">
+  <a href="#results_1" class="md-nav__link">
     <span class="md-ellipsis">
       Results
     </span>
@@ -2001,7 +2049,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#results_1" class="md-nav__link">
+  <a href="#results_2" class="md-nav__link">
     <span class="md-ellipsis">
       Results
     </span>
@@ -2121,7 +2169,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#results_2" class="md-nav__link">
+  <a href="#results_3" class="md-nav__link">
     <span class="md-ellipsis">
       Results
     </span>
@@ -2153,7 +2201,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fixed" class="md-nav__link">
+  <a href="#fixed_1" class="md-nav__link">
     <span class="md-ellipsis">
       Fixed
     </span>
@@ -2261,14 +2309,27 @@ and this project adheres to
   thanks to the new boolean argument <code>plot_only_median</code>.</li>
 <li>On the page dedicated to the benchmarking problems,
   the infeasibility measure of infeasibe target values is now displayed.</li>
-<li>For each problem, a graph of the performance measure focusing on the target values
-  has been added below the usual one.</li>
+<li>Graphs have been added to the pages dedicated to each problem:
+  they show a focus on the performance measure near the target values,
+  the execution time,
+  the infeasibility measure,
+  and the number of unsatisfied constraints.</li>
+<li>Pages dedicated to the results of each algorithm configuration on each problem
+  have been added.
+  They feature graphs representing the performance measure, the infeasibility measure,
+  and the number of unsatisfied constraints.</li>
 </ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <h4 id="report_1">Report<a class="headerlink" href="#report_1" title="Permanent link">&para;</a></h4>
 <ul>
 <li>The results on each problem are now displayed on separate pages
   rather than on the page of the problems group.</li>
+</ul>
+<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<h4 id="results">Results<a class="headerlink" href="#results" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Removing leading infeasible items from an infeasible performance history
+  now returns an empty performance history.</li>
 </ul>
 <h2 id="version-300-november-2024">Version 3.0.0 (November 2024)<a class="headerlink" href="#version-300-november-2024" title="Permanent link">&para;</a></h2>
 <h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
@@ -2283,7 +2344,7 @@ and this project adheres to
 <li>Target values can be plotted on existing axes as horizontal lines with
   <code>TargetValues.plot_on_axes</code>.</li>
 </ul>
-<h4 id="results">Results<a class="headerlink" href="#results" title="Permanent link">&para;</a></h4>
+<h4 id="results_1">Results<a class="headerlink" href="#results_1" title="Permanent link">&para;</a></h4>
 <ul>
 <li>The distribution of a collection of performance histories can be plotted in terms of
   performance measure (<code>PerformanceHistories.plot_performance_measure_distribution``),
@@ -2292,7 +2353,7 @@ and this project adheres to
   (```PerformanceHistories.plot_number_of_unsatisfied_constraints_distribution</code>).</li>
 </ul>
 <h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
-<h4 id="results_1">Results<a class="headerlink" href="#results_1" title="Permanent link">&para;</a></h4>
+<h4 id="results_2">Results<a class="headerlink" href="#results_2" title="Permanent link">&para;</a></h4>
 <ul>
 <li>Methods
   <code>PerformanceHistory.compute_cumulated_minimum</code>,
@@ -2342,7 +2403,7 @@ and this project adheres to
 </ul>
 <h2 id="version-110-september-2023">Version 1.1.0 (September 2023)<a class="headerlink" href="#version-110-september-2023" title="Permanent link">&para;</a></h2>
 <h3 id="added_3">Added<a class="headerlink" href="#added_3" title="Permanent link">&para;</a></h3>
-<h4 id="results_2">Results<a class="headerlink" href="#results_2" title="Permanent link">&para;</a></h4>
+<h4 id="results_3">Results<a class="headerlink" href="#results_3" title="Permanent link">&para;</a></h4>
 <ul>
 <li>The names of functions and the number of variables are stored in the
     performance history files.</li>
@@ -2358,7 +2419,7 @@ and this project adheres to
     role="class"} can be passed through <code>Scenario</code>{.interpreted-text
     role="class"}.</li>
 </ul>
-<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<h3 id="fixed_1">Fixed<a class="headerlink" href="#fixed_1" title="Permanent link">&para;</a></h3>
 <h4 id="report_3">Report<a class="headerlink" href="#report_3" title="Permanent link">&para;</a></h4>
 <ul>
 <li>The sections of the PDF report are correctly numbered.</li>

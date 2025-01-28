@@ -1875,6 +1875,7 @@ to be benchmarked.</p>
     <span class="n">plot_all_histories</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">use_log_scale</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">log_gemseo_to_file</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">directory_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">plot_only_median</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="gemseo_benchmark.results.results.Results" href="../results/results/#gemseo_benchmark.results.results.Results">Results</a></span>
 </code></pre></div>
@@ -2045,6 +2046,17 @@ next to the performance history file.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
+            <b><code>directory_path</code></b>
+              (<code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>, default:
+                  <code>None</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>The path to the directory where the report
+will be generated.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
             <b><code>plot_only_median</code></b>
               (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>, default:
                   <code>False</code>
@@ -2147,7 +2159,11 @@ next to the performance history file.</p>
 <span class="normal">147</span>
 <span class="normal">148</span>
 <span class="normal">149</span>
-<span class="normal">150</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">problems_groups</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ProblemsGroup</span><span class="p">],</span>
     <span class="n">overwrite_histories</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -2164,6 +2180,7 @@ next to the performance history file.</p>
     <span class="n">plot_all_histories</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">use_log_scale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">log_gemseo_to_file</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">directory_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">plot_only_median</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Results</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute the benchmarking scenario.</span>
@@ -2194,6 +2211,8 @@ next to the performance history file.</p>
 <span class="sd">        use_log_scale: Whether to use a logarithmic scale on the value axis.</span>
 <span class="sd">        log_gemseo_to_file: Whether to save the GEMSEO log to a file</span>
 <span class="sd">            next to the performance history file.</span>
+<span class="sd">        directory_path: The path to the directory where the report</span>
+<span class="sd">            will be generated.</span>
 <span class="sd">        plot_only_median: Whether to plot only the median and no other centile.</span>
 
 <span class="sd">    Returns:</span>
@@ -2221,6 +2240,7 @@ next to the performance history file.</p>
             <span class="n">max_eval_number_per_group</span><span class="p">,</span>
             <span class="n">plot_all_histories</span><span class="p">,</span>
             <span class="n">use_log_scale</span><span class="p">,</span>
+            <span class="n">directory_path</span><span class="p">,</span>
             <span class="n">plot_only_median</span><span class="p">,</span>
         <span class="p">)</span>
 

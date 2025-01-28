@@ -2623,13 +2623,7 @@ for <code>matplotlib.axes.Axes.fill_between</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/results/performance_histories.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">342</span>
-<span class="normal">343</span>
-<span class="normal">344</span>
-<span class="normal">345</span>
-<span class="normal">346</span>
-<span class="normal">347</span>
-<span class="normal">348</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">348</span>
 <span class="normal">349</span>
 <span class="normal">350</span>
 <span class="normal">351</span>
@@ -2673,7 +2667,13 @@ for <code>matplotlib.axes.Axes.fill_between</code>.</p>
 <span class="normal">389</span>
 <span class="normal">390</span>
 <span class="normal">391</span>
-<span class="normal">392</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_centiles_range</span><span class="p">(</span>
     <span class="n">histories</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">axes</span><span class="p">:</span> <span class="n">Axes</span><span class="p">,</span>
@@ -2841,13 +2841,7 @@ for <code>matplotlib.axes.Axes.fill_between</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/results/performance_histories.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">394</span>
-<span class="normal">395</span>
-<span class="normal">396</span>
-<span class="normal">397</span>
-<span class="normal">398</span>
-<span class="normal">399</span>
-<span class="normal">400</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">400</span>
 <span class="normal">401</span>
 <span class="normal">402</span>
 <span class="normal">403</span>
@@ -2864,7 +2858,13 @@ for <code>matplotlib.axes.Axes.fill_between</code>.</p>
 <span class="normal">414</span>
 <span class="normal">415</span>
 <span class="normal">416</span>
-<span class="normal">417</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_median</span><span class="p">(</span>
     <span class="n">histories</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">axes</span><span class="p">:</span> <span class="n">Axes</span><span class="p">,</span>
@@ -2936,14 +2936,26 @@ for <code>matplotlib.axes.Axes.fill_between</code>.</p>
 <span class="normal">288</span>
 <span class="normal">289</span>
 <span class="normal">290</span>
-<span class="normal">291</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">plot_number_of_unsatisfied_constraints_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="p">:</span> <span class="n">Axes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">plot_number_of_unsatisfied_constraints_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="p">:</span> <span class="n">Axes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the distribution of the number of unsatisfied constraints.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        axes: The axes of the plot.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__plot_distribution</span><span class="p">(</span>
-        <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">history</span><span class="o">.</span><span class="n">n_unsatisfied_constraints</span> <span class="k">for</span> <span class="n">history</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]),</span>
+        <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+            <span class="p">[</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span> <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">n</span>
+                <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">history</span><span class="o">.</span><span class="n">n_unsatisfied_constraints</span>
+            <span class="p">]</span>
+            <span class="k">for</span> <span class="n">history</span> <span class="ow">in</span> <span class="bp">self</span>
+        <span class="p">]),</span>
         <span class="n">axes</span><span class="p">,</span>
         <span class="s2">&quot;Number of unsatisfied constraints&quot;</span><span class="p">,</span>
     <span class="p">)</span>
