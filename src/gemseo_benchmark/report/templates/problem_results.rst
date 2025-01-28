@@ -26,3 +26,40 @@ Performance measure
    :alt: The performance measure of group {{ algorithm_configurations.name }} for problem {{ problem.name }}.
 
    The performance measure of group ':ref:`{{ algorithm_configurations.name }}`' for problem ':ref:`{{ problem.name }}`'.
+
+{% if problem.constraints_names %}
+Infeasibility measure
+---------------------
+
+.. figure:: /{{ figures["infeasibility_measure.png"] }}
+   :alt: The infeasibility measure of group {{ algorithm_configurations.name }} for problem {{ problem.name }}.
+
+   The infeasibility measure of group ':ref:`{{ algorithm_configurations.name }}`' for problem ':ref:`{{ problem.name }}`'.
+
+
+Number of unsatisfied constraints
+---------------------------------
+
+.. figure:: /{{ figures["number_of_unsatisfied_constraints.png"] }}
+   :alt: The number of unsatisfied constraints of group {{ algorithm_configurations.name }} for problem {{ problem.name }}.
+
+   The number of unsatisfied constraints of group ':ref:`{{ algorithm_configurations.name }}`' for problem ':ref:`{{ problem.name }}`'.
+{% endif %}
+
+Execution time
+--------------
+
+.. figure:: /{{ figures["execution_time.png"] }}
+   :alt: The execution time of group {{ algorithm_configurations.name }} for problem {{ problem.name }}.
+
+   The execution time of group ':ref:`{{ algorithm_configurations.name }}`' for problem ':ref:`{{ problem.name }}`'.
+
+
+Results for each algorithm configuration
+----------------------------------------
+
+.. toctree::
+   :maxdepth: 1
+
+{% for algo_config_results in algorithm_configurations_results %}   {{ algo_config_results }}
+{% endfor %}

@@ -279,8 +279,6 @@ class DataProfile:
 
         Args:
             data_profiles: The data profiles.
-            colors: The color of each data profile.
-            markers: The marker of each data profile.
             plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
             grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.

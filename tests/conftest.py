@@ -277,7 +277,11 @@ def results(
         unknown_algorithm_configuration.name,
     ]
     results.get_problems = mock.Mock(return_value=[problem_a.name, problem_b.name])
-    paths = [Path(__file__).parent / "history.json"]
+    directory = Path(__file__).parent
+    paths = [
+        directory / "history.json",
+        directory / "unfeasible_history.json",
+    ]
     results.get_paths = mock.Mock(return_value=paths)
     return results
 

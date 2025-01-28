@@ -48,8 +48,15 @@ and this project adheres to
   thanks to the new boolean argument ``plot_only_median``.
 - On the page dedicated to the benchmarking problems,
   the infeasibility measure of infeasibe target values is now displayed.
-- For each problem, a graph of the performance measure focusing on the target values
-  has been added below the usual one.
+- Graphs have been added to the pages dedicated to each problem:
+  they show a focus on the performance measure near the target values,
+  the execution time,
+  the infeasibility measure,
+  and the number of unsatisfied constraints.
+- Pages dedicated to the results of each algorithm configuration on each problem
+  have been added.
+  They feature graphs representing the performance measure, the infeasibility measure,
+  and the number of unsatisfied constraints.
 
 ### Changed
 
@@ -57,6 +64,13 @@ and this project adheres to
 
 - The results on each problem are now displayed on separate pages
   rather than on the page of the problems group.
+
+### Fixed
+
+#### Results
+
+- Removing leading infeasible items from an infeasible performance history
+  now returns an empty performance history.
 
 ## Version 3.0.0 (November 2024)
 

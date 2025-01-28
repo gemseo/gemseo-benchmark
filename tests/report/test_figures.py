@@ -48,30 +48,35 @@ def test_plot_data_profiles(tmp_path, problems_figures):
 @pytest.mark.parametrize("plot_all_histories", [False, True])
 @pytest.mark.parametrize("use_performance_log_scale", [False, True])
 @pytest.mark.parametrize("plot_only_median", [False, True])
+@pytest.mark.parametrize("use_time_log_scale", [False, True])
 def test_plot(
     tmp_path,
     problems_figures,
     plot_all_histories,
     use_performance_log_scale,
     plot_only_median,
+    use_time_log_scale,
 ) -> None:
     """Check the plotting of the figures dedicated to each problem."""
     figures = problems_figures.plot(
-        plot_all_histories, use_performance_log_scale, plot_only_median
+        plot_all_histories,
+        use_performance_log_scale,
+        plot_only_median,
+        use_time_log_scale,
     )
     __check_problem_paths(tmp_path, figures["Problem A"], "Problem_A")
     __check_problem_paths(tmp_path, figures["Problem B"], "Problem_B")
 
 
 def __check_problem_paths(tmp_path, paths, name) -> None:
-    __check_path(tmp_path, paths, name, "data_profile.png")
-    __check_path(tmp_path, paths, name, "performance_measure.png")
-    __check_path(tmp_path, paths, name, "performance_measure_focus.png")
+    __check_path(tmp_path, paths, name, Figures._FileName.DATA_PROFILE)
+    __check_path(tmp_path, paths, name, Figures._FileName.PERFORMANCE_MEASURE)
+    __check_path(tmp_path, paths, name, Figures._FileName.PERFORMANCE_MEASURE_FOCUS)
 
 
 def __check_path(tmp_path, paths, problem_name, file_name) -> None:
     path = paths[file_name]
-    assert path == tmp_path / problem_name / file_name
+    assert path == tmp_path / problem_name / file_name.value
     assert path.is_file()
 
 
@@ -105,6 +110,6 @@ def test_no_data_profiles_duplicates(
     group_call_count = group.compute_data_profile.call_count
     problem_call_count = problem_a.compute_data_profile.call_count
     figures.plot_data_profiles()
-    figures.plot(False, False, False)
+    figures.plot(False, False, False, False)
     assert group.compute_data_profile.call_count == group_call_count + 1
     assert problem_a.compute_data_profile.call_count == problem_call_count

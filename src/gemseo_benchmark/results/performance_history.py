@@ -351,7 +351,7 @@ class PerformanceHistory(collections.abc.Sequence):
         Returns:
             The truncated performance history.
         """
-        first_feasible = None
+        first_feasible = len(self)
         for index, item in enumerate(self):
             if item.is_feasible:
                 first_feasible = index

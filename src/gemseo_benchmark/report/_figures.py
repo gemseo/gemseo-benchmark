@@ -17,6 +17,7 @@
 
 from __future__ import annotations
 
+import datetime
 import enum
 from typing import TYPE_CHECKING
 from typing import ClassVar
@@ -33,6 +34,7 @@ from gemseo_benchmark.results.performance_histories import PerformanceHistories
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from collections.abc import Mapping
     from pathlib import Path
 
@@ -58,7 +60,7 @@ class Figures:
     """The opacity level for overlapping areas.
     (Refer to the Matplotlib documentation.)"""
 
-    __destination_dir: Path
+    __directory_path: Path
     """The path to the root directory for the figures."""
 
     __GRID_KWARGS: Final[Mapping[str, str]] = {"visible": True, "linestyle": ":"}
@@ -93,6 +95,9 @@ class Figures:
         """The name of a figure file."""
 
         DATA_PROFILE = "data_profile.png"
+        EXECUTION_TIME = "execution_time.png"
+        INFEASIBILITY_MEASURE = "infeasibility_measure.png"
+        NUMBER_OF_UNSATISFIED_CONSTRAINTS = "number_of_unsatisfied_constraints.png"
         PERFORMANCE_MEASURE = "performance_measure.png"
         PERFORMANCE_MEASURE_FOCUS = "performance_measure_focus.png"
 
@@ -101,7 +106,7 @@ class Figures:
         algorithm_configurations: AlgorithmsConfigurations,
         group: ProblemsGroup,
         results: Results,
-        destination_dir: Path,
+        directory_path: Path,
         infeasibility_tolerance: float,
         max_eval_number: int,
         plot_kwargs: Mapping[str, ConfigurationPlotOptions],
@@ -112,7 +117,7 @@ class Figures:
             group: The group of problems.
             results: The paths to the reference histories
                 for each algorithm configuration and reference problem.
-            destination_dir: The path to the root directory for the figures.
+            directory_path: The path to the root directory for the figures.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             max_eval_number: The maximum number of evaluations to be displayed
                 on the figures.
@@ -121,7 +126,7 @@ class Figures:
                 for each algorithm configuration.
         """  # noqa: D205, D212, D415
         self.__algorithm_configurations = algorithm_configurations
-        self.__destination_dir = destination_dir
+        self.__directory_path = directory_path
         self.__group = group
         self.__infeasibility_tolerance = infeasibility_tolerance
         self.__max_eval_number = max_eval_number
@@ -151,13 +156,14 @@ class Figures:
 
     def __get_data_profiles_path(self) -> Path:
         """Return the path to the data profiles of the group of problems."""
-        return self.__destination_dir / self._FileName.DATA_PROFILE.value
+        return self.__directory_path / self._FileName.DATA_PROFILE.value
 
     def plot(
         self,
         plot_all_histories: bool,
         use_performance_log_scale: bool,
         plot_only_median: bool,
+        use_time_log_scale: bool,
     ) -> dict[str, dict[str, str]]:
         """Plot the figures for each problem of the group.
 
@@ -166,6 +172,8 @@ class Figures:
             use_performance_log_scale: Whether to use a logarithmic scale
                 for the performance measure axis.
             plot_only_median: Whether to plot only the median and no other centile.
+            use_time_log_scale: Whether to use a logarithmic scale
+                for the time axis.
 
         Returns:
             The paths to the figures.
@@ -174,7 +182,7 @@ class Figures:
         """
         problems_to_figures = {}
         for problem in self.__group:
-            problem_dir = self.__destination_dir / join_substrings(problem.name)
+            problem_dir = self.__directory_path / join_substrings(problem.name)
             problem_dir.mkdir()
             # Gather the performance histories
             performance_histories = {
@@ -188,6 +196,16 @@ class Figures:
                 .get_equal_size_histories()
                 for algorithm_configuration in self.__algorithm_configurations
             }
+            max_feasible_performance = -float("inf")
+            for histories in performance_histories.values():
+                for history in histories:
+                    feasible_history = history.remove_leading_infeasible()
+                    if len(feasible_history) > 0:
+                        max_feasible_performance = max(
+                            feasible_history[0].objective_value,
+                            max_feasible_performance,
+                        )
+
             # Draw the plots dedicated to each problem
             problems_to_figures[problem.name] = self.__get_problem_figures(
                 problem,
@@ -196,6 +214,8 @@ class Figures:
                 plot_all_histories,
                 use_performance_log_scale,
                 plot_only_median,
+                max_feasible_performance,
+                use_time_log_scale,
             )
 
         return problems_to_figures
@@ -204,87 +224,119 @@ class Figures:
         self,
         problem: Problem,
         performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
-        destination_dir: Path,
+        directory_path: Path,
         plot_all_histories: bool,
         use_performance_log_scale: bool,
         plot_only_median: bool,
+        max_feasible_performance: float,
+        use_time_log_scale: bool,
     ) -> dict[str, str]:
         """Return the results figures of a problem.
 
         Args:
             problem: The problem.
             performance_histories: The performance histories for the problem.
-            destination_dir: The path to the root directory for the figures.
+            directory_path: The path to the root directory for the figures.
             plot_all_histories: Whether to plot all the performance histories.
             use_performance_log_scale: Whether to use a logarithmic scale
                 for the performance measure axis.
             plot_only_median: Whether to plot only the median and no other centile.
+            max_feasible_performance: The maximum feasible performance value.
+            use_time_log_scale: Whether to use a logarithmic scale
+                for the time axis.
 
         Returns:
             The paths to the figures.
         """
-        performance_path, focus_path = self.__plot_performance_measure(
+        figures = {
+            self._FileName.DATA_PROFILE: self.__plot_data_profiles(
+                problem, directory_path
+            )
+        }
+        (
+            figures[self._FileName.PERFORMANCE_MEASURE],
+            figures[self._FileName.PERFORMANCE_MEASURE_FOCUS],
+        ) = self.__plot_performance_measure(
             problem,
             performance_histories,
-            destination_dir,
+            directory_path,
             plot_all_histories,
             use_performance_log_scale,
             plot_only_median,
         )
-        return {
-            self._FileName.DATA_PROFILE.value: self.__plot_data_profiles(
-                problem, destination_dir
-            ),
-            self._FileName.PERFORMANCE_MEASURE.value: performance_path,
-            self._FileName.PERFORMANCE_MEASURE_FOCUS.value: focus_path,
-        }
+        figures[self._FileName.EXECUTION_TIME] = self.__plot_execution_time(
+            performance_histories,
+            directory_path,
+            use_time_log_scale,
+        )
+        if problem.constraints_names:
+            figures[self._FileName.INFEASIBILITY_MEASURE] = (
+                self.__plot_infeasibility_measure(
+                    performance_histories, directory_path, plot_only_median
+                )
+            )
+            figures[self._FileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS] = (
+                self.__plot_number_of_unsatisfied_constraints(
+                    performance_histories, directory_path, plot_only_median
+                )
+            )
 
-    def __plot_data_profiles(self, problem: Problem, destination_dir: Path) -> Path:
+        figures.update(
+            self.__get_algorithms_plots(
+                problem,
+                performance_histories,
+                max_feasible_performance,
+                directory_path,
+            )
+        )
+        return figures
+
+    def __plot_data_profiles(self, problem: Problem, directory_path: Path) -> Path:
         """Plot the data profiles for a problem.
 
         Args:
             problem: The problem.
-            destination_dir: The destination directory for the figure.
+            directory_path: The destination directory for the figure.
 
         Returns:
             The path to the figure.
         """
         if len(self.__group) == 1:
             # Return the path to the data profiles of the group.
-            path = self.__get_data_profiles_path()
-            if path.is_file():
-                return path
+            file_path = self.__get_data_profiles_path()
+            if file_path.is_file():
+                return file_path
 
             return self.plot_data_profiles()
 
-        path = destination_dir / self._FileName.DATA_PROFILE.value
+        file_path = directory_path / self._FileName.DATA_PROFILE.value
         problem.compute_data_profile(
             self.__algorithm_configurations,
             self.__results,
             False,
-            path,
+            file_path,
             self.__infeasibility_tolerance,
             self.__max_eval_number,
             self.__plot_kwargs,
             self.__GRID_KWARGS,
         )
-        return path
+        return file_path
 
     def __plot_performance_measure(
         self,
         problem: Problem,
         performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
-        destination_dir: Path,
+        directory_path: Path,
         plot_all_histories: bool,
         use_performance_log_scale: bool,
         plot_only_median: bool,
     ) -> tuple[Path, Path]:
-        """Plot the range of the performance measure for a problem.
+        """Plot the performance measure of algorithm configurations on a problem.
 
         Args:
             problem: The problem.
             performance_histories: The performance histories for the problem.
-            destination_dir: The path to the root directory for the figures.
+            directory_path: The path to the root directory for the figures.
             plot_all_histories: Whether to plot all the performance histories.
             use_performance_log_scale: Whether to use a logarithmic scale
                 for the performance measure axis.
@@ -328,8 +380,8 @@ class Figures:
         if use_performance_log_scale:
             axes.set_yscale("log")
 
-        path = destination_dir / self._FileName.PERFORMANCE_MEASURE.value
-        save_show_figure(figure, False, path)
+        file_path = directory_path / self._FileName.PERFORMANCE_MEASURE.value
+        save_show_figure(figure, False, file_path)
 
         # Plot a focus on the target values
         performance_axes, targets_axes = figure.axes
@@ -347,9 +399,78 @@ class Figures:
             ).objective_value,
         )
         targets_axes.set_ylim(performance_axes.get_ylim())
-        focus_path = destination_dir / self._FileName.PERFORMANCE_MEASURE_FOCUS.value
-        save_show_figure(figure, False, focus_path)
-        return path, focus_path
+        focus_file_path = (
+            directory_path / self._FileName.PERFORMANCE_MEASURE_FOCUS.value
+        )
+        save_show_figure(figure, False, focus_file_path)
+        return file_path, focus_file_path
+
+    def __plot_infeasibility_measure(
+        self,
+        performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
+        directory_path: Path,
+        plot_only_median: bool,
+    ) -> Path:
+        """Plot the infeasibility measure of algorithm configurations on a problem.
+
+        Args:
+            performance_histories: The performance histories for the problem.
+            directory_path: The path to the root directory for the figures.
+            plot_only_median: Whether to plot only the median and no other centile.
+
+        Returns:
+            The path to the figure.
+        """
+        file_path = directory_path / self._FileName.INFEASIBILITY_MEASURE.value
+        figure = matplotlib.pyplot.figure()
+        axes = figure.gca()
+        axes.set_yscale("log")
+        self.__plot_range(
+            axes,
+            performance_histories,
+            lambda history: [item.infeasibility_measure for item in history],
+            "Infeasibility measure",
+            None,
+            plot_only_median,
+        )
+        save_show_figure(figure, False, file_path)
+        return file_path
+
+    def __plot_number_of_unsatisfied_constraints(
+        self,
+        performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
+        directory_path: Path,
+        plot_only_median: bool,
+    ) -> Path:
+        """Plot the number of constraints unsatisfied by algorithm configurations.
+
+        Args:
+            performance_histories: The performance histories
+                of each algorithm configuration.
+            directory_path: The path to the directory where to save the figure.
+            plot_only_median: Whether to plot only the median and no other centile.
+
+        Returns:
+            The path to the figure.
+        """
+        file_path = (
+            directory_path / self._FileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS.value
+        )
+        figure = matplotlib.pyplot.figure()
+        axes = figure.gca()
+        self.__plot_range(
+            axes,
+            performance_histories,
+            lambda history: [
+                numpy.nan if n is None else n for n in history.n_unsatisfied_constraints
+            ],
+            "Number of unsatisfied constraints",
+            None,
+            plot_only_median,
+        )
+        axes.yaxis.set_major_locator(MaxNLocator(integer=True))
+        save_show_figure(figure, False, file_path)
+        return file_path
 
     def __plot_range(
         self,
@@ -394,3 +515,194 @@ class Figures:
         axes.set_xlabel("Number of functions evaluations")
         axes.set_ylabel(y_label)
         axes.legend()
+
+    def __plot_execution_time(
+        self,
+        performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
+        directory_path: Path,
+        use_log_scale: bool,
+    ) -> Path:
+        """Plot the execution time of algorithm configurations on a problem.
+
+        Args:
+            performance_histories: The performance histories
+                of each algorithm configuration.
+            directory_path: The path to the directory where to save the figure.
+            use_log_scale: Whether to use a logarithmic time scale.
+
+        Returns:
+            The path to the figure.
+        """
+        file_path = directory_path / self._FileName.EXECUTION_TIME.value
+        figure, axes = matplotlib.pyplot.subplots()
+        data = [
+            [
+                float("inf") if history.total_time is None else history.total_time
+                for history in histories
+            ]
+            for histories in performance_histories.values()
+        ]
+        labels = [algo_config.name for algo_config in performance_histories]
+        artists = axes.boxplot(data, whis=(0, 100), patch_artist=True, labels=labels)
+        for index, (box, median) in enumerate(
+            zip(artists["boxes"], artists["medians"])
+        ):
+            name = labels[index]
+            color = self.__plot_kwargs[name]["color"]
+            box.set(
+                edgecolor=color,
+                facecolor=(*matplotlib.colors.to_rgb(color), self.__ALPHA),
+            )
+            median.set(
+                color=color, linewidth=2, marker=self.__plot_kwargs[name]["marker"]
+            )
+            for whisker in artists["whiskers"][2 * index : 2 * (index + 1)]:
+                whisker.set(color=color)
+
+            for cap in artists["caps"][2 * index : 2 * (index + 1)]:
+                cap.set(color=color)
+
+        axes.yaxis.set_major_formatter(
+            matplotlib.ticker.FuncFormatter(
+                lambda x, _: str(datetime.timedelta(seconds=x))
+            )
+        )
+        axes.grid(axis="y", **self.__GRID_KWARGS)
+        axes.tick_params(axis="x", labelrotation=45)
+        axes.set_ylabel(f"Execution time{' (in seconds)' if use_log_scale else ''}")
+        if use_log_scale:
+            axes.set_yscale("log")
+
+        axes.legend(
+            artists["medians"],
+            [algo_config.name for algo_config in performance_histories],
+        )
+        save_show_figure(figure, False, file_path)
+        return file_path
+
+    def __get_algorithms_plots(
+        self,
+        problem: Problem,
+        performance_histories: Mapping[str, PerformanceHistories],
+        max_feasible_performance: float,
+        directory_path: Path,
+    ) -> dict[str, dict[_FileName, Path]]:
+        """Return the figures associated with algorithm configurations for a problem.
+
+        Args:
+            problem: The problem.
+            performance_histories: The performance histories for the problem.
+            max_feasible_performance: The maximum feasible performance value.
+            directory_path: The path to the directory where to save the figures.
+
+        Returns:
+            The paths to the figures for each algorithm configuration.
+        """
+        figures = {}
+        # Plot the performance measure distribution for each configuration
+        performance_figures = {}
+        for configuration in self.__algorithm_configurations:
+            figure, axes = matplotlib.pyplot.subplots()
+            performance_histories[configuration].plot_performance_measure_distribution(
+                axes, max_feasible_performance
+            )
+            axes.grid(**self.__GRID_KWARGS)
+            performance_figures[configuration] = figure
+
+        self.__set_common_limits(performance_figures.values())
+
+        for configuration, figure in performance_figures.items():
+            # Add the target values and save the figure
+            problem.target_values.plot_on_axes(
+                figure.gca(), self.__TARGET_VALUES_PLOT_KWARGS
+            )
+            configuration_dir = directory_path / join_substrings(configuration.name)
+            configuration_dir.mkdir()
+            file_path = configuration_dir / self._FileName.PERFORMANCE_MEASURE.value
+            save_show_figure(figure, False, file_path)
+            figures[configuration.name] = {
+                self._FileName.PERFORMANCE_MEASURE: file_path
+            }
+            # Focus on the targets qnd save another figure
+            performance_axes, targets_axes = figure.axes
+            performance_axes.autoscale(enable=True, axis="y", tight=True)
+            performance_axes.set_ylim(top=max(problem.target_values).objective_value)
+            targets_axes.set_ylim(performance_axes.get_ylim())
+            file_path = (
+                configuration_dir / self._FileName.PERFORMANCE_MEASURE_FOCUS.value
+            )
+            save_show_figure(figure, False, file_path)
+            figures[configuration.name][self._FileName.PERFORMANCE_MEASURE_FOCUS] = (
+                file_path
+            )
+
+        if problem.constraints_names:
+            # Plot the infeasibility measure distribution for each configuration
+            infeasibility_figures = {}
+            for configuration in self.__algorithm_configurations:
+                figure, axes = matplotlib.pyplot.subplots()
+                performance_histories[
+                    configuration
+                ].plot_infeasibility_measure_distribution(axes)
+                axes.set_yscale("log")
+                axes.grid(**self.__GRID_KWARGS)
+                infeasibility_figures[configuration] = figure
+
+            self.__set_common_limits(infeasibility_figures.values())
+
+            for configuration, figure in infeasibility_figures.items():
+                file_path = (
+                    directory_path
+                    / join_substrings(configuration.name)
+                    / self._FileName.INFEASIBILITY_MEASURE.value
+                )
+                save_show_figure(figure, False, file_path)
+                figures[configuration.name][self._FileName.INFEASIBILITY_MEASURE] = (
+                    file_path
+                )
+
+            constraints_figures = {}
+            for configuration in self.__algorithm_configurations:
+                figure, axes = matplotlib.pyplot.subplots()
+                performance_histories[
+                    configuration
+                ].plot_number_of_unsatisfied_constraints_distribution(axes)
+                axes.yaxis.set_major_locator(MaxNLocator(integer=True))  # TODO: move
+                axes.grid(**self.__GRID_KWARGS)
+                constraints_figures[configuration] = figure
+
+            self.__set_common_limits(constraints_figures.values())
+
+            for configuration, figure in constraints_figures.items():
+                file_path = (
+                    directory_path
+                    / join_substrings(configuration.name)
+                    / self._FileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS.value
+                )
+                save_show_figure(figure, False, file_path)
+                figures[configuration.name][
+                    self._FileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS
+                ] = file_path
+
+        return figures
+
+    def __set_common_limits(self, figures: Iterable[matplotlib.Figure]) -> None:
+        """Set common limits to figures.
+
+        Args:
+            figures: The figures.
+        """
+        xlim = [float("inf"), -float("inf")]
+        ylim = [float("inf"), -float("inf")]
+        for figure in figures:
+            for lim, get_lim in (
+                (xlim, figure.gca().get_xlim),
+                (ylim, figure.gca().get_ylim),
+            ):
+                lim_min, lim_max = get_lim()
+                lim[0] = min(lim[0], lim_min)
+                lim[1] = max(lim[1], lim_max)
+
+        for figure in figures:
+            figure.gca().set_xlim(*xlim)
+            figure.gca().set_ylim(*ylim)
