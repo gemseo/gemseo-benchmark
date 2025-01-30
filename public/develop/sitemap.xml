@@ -2,138 +2,138 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/changelog/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/credits/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/licenses/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/generated/examples/all/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/generated/examples/all/mg_execution_times/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/generated/examples/all/plot_data_profiles/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/generated/examples/all/plot_report/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/generated/examples/all/plot_target_values/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/SUMMARY/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/scenario/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/algorithms/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/algorithms/algorithm_configuration/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/algorithms/algorithms_configurations/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/benchmarker/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/benchmarker/benchmarker/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/benchmarker/worker/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/data_profiles/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/data_profiles/data_profile/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/data_profiles/target_values/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/data_profiles/targets_generator/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/problems/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/problems/problem/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/problems/problems_group/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/report/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/report/conf/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/report/report/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/results/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/results/history_item/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/results/performance_histories/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/results/performance_history/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/results/results/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/user_guide/</loc>
-         <lastmod>2025-01-29</lastmod>
+         <lastmod>2025-01-30</lastmod>
     </url>
 </urlset>
