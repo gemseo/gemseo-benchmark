@@ -4,7 +4,7 @@ alabaster==0.7.16
     # via sphinx
 annotated-types==0.7.0
     # via pydantic
-babel==2.16.0
+babel==2.17.0
     # via sphinx
 certifi==2025.1.31
     # via requests
@@ -34,7 +34,7 @@ fastjsonschema==2.20.0
     # via gemseo
 fonttools==4.55.8
     # via matplotlib
-gemseo @ git+https://gitlab.com/gemseo/dev/gemseo.git@254680cdcd08878e0ae2f4ec2f2dc6103793d2de
+gemseo @ git+https://gitlab.com/gemseo/dev/gemseo.git@ecda233c8799f18db00053857543a17bb5fa7036
     # via
     #   -c requirements/test-constraints.in
     #   gemseo-benchmark (pyproject.toml)
