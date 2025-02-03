@@ -72,6 +72,11 @@ and this project adheres to
 - Removing leading infeasible items from an infeasible performance history
   now returns an empty performance history.
 
+#### Scenario
+
+- An algorithm configuration can now belong to several groups
+  of algorithm configurations.
+
 ## Version 3.0.0 (November 2024)
 
 ### Added

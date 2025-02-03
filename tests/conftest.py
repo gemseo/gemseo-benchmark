@@ -34,6 +34,7 @@ from numpy import ndarray
 
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.problems.problem import Problem
+from gemseo_benchmark.problems.problems_group import ProblemsGroup
 
 design_variables = array([0.0, 1.0])
 
@@ -286,7 +287,7 @@ def results(
     return results
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="package")
 def rosenbrock() -> Problem:
     """A benchmarking problem based on the 2-dimensional Rosenbrock function."""
     return Problem(
@@ -296,6 +297,12 @@ def rosenbrock() -> Problem:
         TargetValues([1e-2, 1e-4, 1e-6, 0.0]),
         optimum=0.0,
     )
+
+
+@pytest.fixture(scope="package")
+def problems_group(rosenbrock) -> ProblemsGroup:
+    """A group of problems."""
+    return ProblemsGroup("Rosenbrock", [rosenbrock])
 
 
 @pytest.fixture(scope="module")
