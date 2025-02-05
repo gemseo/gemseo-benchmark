@@ -25,7 +25,9 @@ of the algorithm.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from collections.abc import MutableMapping
+from pathlib import Path
 from typing import Any
 from typing import Callable
 from typing import Final
@@ -73,9 +75,11 @@ class AlgorithmConfiguration:
         )
         self.__instance_algorithm_options = instance_algorithm_options
 
-    @staticmethod
-    def __get_configuration_name(algorithm_name: str, **algorithm_options: Any) -> str:
-        """Define a name for the configuration based on the algorithm name and options.
+    @classmethod
+    def __get_configuration_name(
+        cls, algorithm_name: str, **algorithm_options: Any
+    ) -> str:
+        """Return a name for the configuration based on the algorithm name and options.
 
         Args:
             algorithm_name: The name of the algorithm.
@@ -87,7 +91,10 @@ class AlgorithmConfiguration:
         if not algorithm_options:
             return algorithm_name
 
-        return f"{algorithm_name}_{pretty_repr(algorithm_options)}"
+        return (
+            f"{algorithm_name}"
+            f"_{pretty_repr(cls.__make_json_serializable(algorithm_options))}"
+        )
 
     @property
     def name(self) -> str:
@@ -124,7 +131,9 @@ class AlgorithmConfiguration:
         dictionary = {
             self.__CONFIGURATION_NAME: self.__configuration_name,
             self.__ALGORITHM_NAME: self.__algorithm_name,
-            self.__ALGORITHM_OPTIONS: self.__algorithm_options,
+            self.__ALGORITHM_OPTIONS: self.__make_json_serializable(
+                self.__algorithm_options
+            ),
         }
         if not skip_instance_algorithm_options:
             dictionary[self.__INSTANCE_ALGORITHM_OPTIONS] = (
@@ -132,6 +141,23 @@ class AlgorithmConfiguration:
             )
 
         return dictionary
+
+    @staticmethod
+    def __make_json_serializable(
+        data: Mapping,
+    ) -> dict[str, bool | int | float | tuple | list | dict | None]:
+        """Make data JSON-serializable.
+
+        Args:
+            data: The data.
+
+        Returns:
+            The JSON-serializable data.
+        """
+        return {
+            key: str(value) if isinstance(value, Path) else value
+            for key, value in data.items()
+        }
 
     @classmethod
     def from_dict(

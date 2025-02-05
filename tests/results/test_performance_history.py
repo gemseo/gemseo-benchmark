@@ -186,7 +186,9 @@ def test_remove_leading_infeasible_from_infeasible_history() -> None:
 
 def test_to_file(tmp_path):
     """Check the writing of a performance history into a file."""
-    algorithm_configuration = AlgorithmConfiguration("algorithm")
+    algorithm_configuration = AlgorithmConfiguration(
+        "algorithm", optional_path=Path("path")
+    )
     history = PerformanceHistory(
         [-2.0, -3.0],
         [1.0, 0.0],
@@ -200,7 +202,7 @@ def test_to_file(tmp_path):
         number_of_variables=4,
     )
     file_path = tmp_path / "history.json"
-    history.to_file(str(file_path))
+    history.to_file(file_path)
     with file_path.open("r") as file:
         contents = file.read()
 
@@ -220,8 +222,10 @@ def test_from_file():
     assert history._objective_name == "f"
     assert history._constraints_names == ["g", "h"]
     assert history.algorithm_configuration.algorithm_name == "algorithm"
-    assert history.algorithm_configuration.name == "algorithm"
-    assert history.algorithm_configuration.algorithm_options == {}
+    assert history.algorithm_configuration.name == "algorithm_optional_path='path'"
+    assert history.algorithm_configuration.algorithm_options == {
+        "optional_path": "path"
+    }
     assert history.doe_size == 7
     assert history.total_time == 123.45
     assert history.items[0].objective_value == -2.0

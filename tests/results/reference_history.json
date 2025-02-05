@@ -7,9 +7,11 @@
     "h"
   ],
   "algorithm_configuration": {
-    "configuration_name": "algorithm",
+    "configuration_name": "algorithm_optional_path='path'",
     "algorithm_name": "algorithm",
-    "algorithm_options": {}
+    "algorithm_options": {
+      "optional_path": "path"
+    }
   },
   "DOE_size": 7,
   "execution_time": 123.45,
