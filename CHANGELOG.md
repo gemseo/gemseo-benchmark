@@ -71,6 +71,7 @@ and this project adheres to
 
 - Removing leading infeasible items from an infeasible performance history
   now returns an empty performance history.
+- Path options are now properly supported.
 
 #### Scenario
 
