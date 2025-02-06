@@ -22,7 +22,6 @@
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
 from unittest import mock
 
@@ -54,6 +53,9 @@ def test_init_missing_algorithms(
         f"'{algorithm_configuration.name}'.",
     ):
         Report(tmp_path, [unknown_algorithms_configurations], problems_groups, results)
+
+
+# TODO: generate report sources once and for all
 
 
 @pytest.fixture
@@ -161,16 +163,36 @@ def incomplete_group(incomplete_problem):
     return group
 
 
-def test_problem_without_optimum(
-    tmp_path, incomplete_group, algorithms_configurations, results
-):
-    """Check the handling of a benchmarking problem without an optimum."""
-    groups = [incomplete_group]
-    report = Report(tmp_path, [algorithms_configurations], groups, results)
-    with pytest.raises(
-        AttributeError, match=re.escape("The optimum of the problem is not set.")
-    ):
-        report.generate()
+@pytest.mark.parametrize(
+    ("fixture_name", "optimum"), [("problem_a", "1"), ("problem_b", "N/A")]
+)
+def test_problem_files(tmp_path, report, fixture_name, optimum, request) -> None:
+    """Check the problem files."""
+    report.generate()
+    problem = request.getfixturevalue(fixture_name)
+    name = problem.name
+    with (tmp_path / "problems" / name).with_suffix(".rst").open("r") as file:
+        assert (
+            file.read()
+            == f""".. _{name}:
+
+{name}
+=========
+
+
+Description
+-----------
+
+{problem.description}
+
+Optimal feasible objective value: {optimum}.
+
+
+Target values
+-------------
+* {problem.target_values[0].objective_value} (feasible)
+"""
+        )
 
 
 @pytest.fixture

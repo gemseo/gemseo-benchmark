@@ -176,8 +176,8 @@ def problem_b() -> mock.Mock:
     problem = mock.Mock()
     problem.name = "Problem B"
     problem.description = "The description of problem B."
-    problem.optimum = 2.0
-    problem.target_values = TargetValues([problem.optimum])
+    problem.optimum = None
+    problem.target_values = TargetValues([2.0])
     problem.compute_data_profile = mock.Mock(side_effect=side_effect)
     problem.plot_histories = mock.Mock(side_effect=side_effect)
     return problem

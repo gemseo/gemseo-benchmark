@@ -79,8 +79,9 @@ class Report:
     """A benchmarking report."""
 
     __FILE_DIRECTORY: Final[Path] = Path(__file__).parent
-    __TEMPLATES_DIR_PATH: Final[Path] = __FILE_DIRECTORY / "templates"
     __CONF_PATH: Final[Path] = __FILE_DIRECTORY / "conf.py"
+    __NOT_AVAILABLE: Final[str] = "N/A"
+    __TEMPLATES_DIR_PATH: Final[Path] = __FILE_DIRECTORY / "templates"
 
     def __init__(
         self,
@@ -201,7 +202,7 @@ class Report:
                     library = OptimizationLibraryFactory().create(algo_name)
                 except ValueError:
                     # The algorithm is unavailable
-                    algos_descriptions[algo_name] = "N/A"
+                    algos_descriptions[algo_name] = self.__NOT_AVAILABLE
                 else:
                     algos_descriptions[algo_name] = library.ALGORITHM_INFOS[
                         algo_name
@@ -215,11 +216,7 @@ class Report:
         )
 
     def __create_problems_files(self) -> None:
-        """Create the files describing the benchmarking problems.
-
-        Raises:
-            AttributeError: If the optimum of the problem is not set.
-        """
+        """Create the files describing the benchmarking problems."""
         problems_dir = self.__root_directory / DirectoryName.PROBLEMS.value
         problems_dir.mkdir()
 
@@ -228,17 +225,16 @@ class Report:
         problems = [problem for group in self.__problems_groups for problem in group]
         problems = sorted(problems, key=lambda pb: pb.name.lower())
         for problem in problems:
-            if problem.optimum is None:
-                msg = "The optimum of the problem is not set."
-                raise AttributeError(msg)
-
+            # Create the problem file
             file_path = self.__get_problem_path(problem)
             self.__fill_template(
                 file_path,
                 FileName.PROBLEM.value,
                 name=problem.name,
                 description=problem.description,
-                optimum=f"{problem.optimum:.6g}",
+                optimum=self.__NOT_AVAILABLE
+                if problem.optimum is None
+                else f"{problem.optimum:.6g}",
                 target_values=problem.target_values,
             )
             problems_paths.append(

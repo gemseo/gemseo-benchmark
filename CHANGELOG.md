@@ -64,6 +64,7 @@ and this project adheres to
 
 - The results on each problem are now displayed on separate pages
   rather than on the page of the problems group.
+- Setting the optimum of a problem is no longer mandatory.
 
 ### Fixed
 
