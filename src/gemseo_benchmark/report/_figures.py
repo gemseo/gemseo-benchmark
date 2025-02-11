@@ -75,6 +75,9 @@ class Figures:
     __max_eval_number: int
     """The maximum number of evaluations to be displayed on the figures."""
 
+    __MATPLOTLIB_LOG_SCALE: Final[str] = "log"
+    """The Matplotlib value for logarithmic scale."""
+
     __plot_kwargs: Mapping[str, ConfigurationPlotOptions]
     """The keyword arguments of `matplotlib.axes.Axes.plot`
       for each algorithm configuration."""
@@ -135,8 +138,12 @@ class Figures:
         )
         self.__results = results
 
-    def plot_data_profiles(self) -> Path:
+    def plot_data_profiles(self, use_evaluation_log_scale: bool = False) -> Path:
         """Plot the data profiles of the group of problems.
+
+        Args:
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
 
         Returns:
             The path to the figure.
@@ -151,6 +158,7 @@ class Figures:
             max_eval_number=self.__max_eval_number,
             plot_kwargs=self.__plot_kwargs,
             grid_kwargs=self.__GRID_KWARGS,
+            use_evaluation_log_scale=use_evaluation_log_scale,
         )
         return plot_path
 
@@ -164,6 +172,7 @@ class Figures:
         use_performance_log_scale: bool,
         plot_only_median: bool,
         use_time_log_scale: bool,
+        use_evaluation_log_scale: bool,
     ) -> dict[str, dict[str, str]]:
         """Plot the figures for each problem of the group.
 
@@ -174,6 +183,8 @@ class Figures:
             plot_only_median: Whether to plot only the median and no other centile.
             use_time_log_scale: Whether to use a logarithmic scale
                 for the time axis.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
 
         Returns:
             The paths to the figures.
@@ -216,6 +227,7 @@ class Figures:
                 plot_only_median,
                 max_feasible_performance,
                 use_time_log_scale,
+                use_evaluation_log_scale,
             )
 
         return problems_to_figures
@@ -230,6 +242,7 @@ class Figures:
         plot_only_median: bool,
         max_feasible_performance: float,
         use_time_log_scale: bool,
+        use_evaluation_log_scale: bool,
     ) -> dict[str, str]:
         """Return the results figures of a problem.
 
@@ -244,13 +257,15 @@ class Figures:
             max_feasible_performance: The maximum feasible performance value.
             use_time_log_scale: Whether to use a logarithmic scale
                 for the time axis.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
 
         Returns:
             The paths to the figures.
         """
         figures = {
             self._FileName.DATA_PROFILE: self.__plot_data_profiles(
-                problem, directory_path
+                problem, directory_path, use_evaluation_log_scale
             )
         }
         (
@@ -263,6 +278,7 @@ class Figures:
             plot_all_histories,
             use_performance_log_scale,
             plot_only_median,
+            use_evaluation_log_scale,
         )
         figures[self._FileName.EXECUTION_TIME] = self.__plot_execution_time(
             performance_histories,
@@ -272,12 +288,18 @@ class Figures:
         if problem.constraints_names:
             figures[self._FileName.INFEASIBILITY_MEASURE] = (
                 self.__plot_infeasibility_measure(
-                    performance_histories, directory_path, plot_only_median
+                    performance_histories,
+                    directory_path,
+                    plot_only_median,
+                    use_evaluation_log_scale,
                 )
             )
             figures[self._FileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS] = (
                 self.__plot_number_of_unsatisfied_constraints(
-                    performance_histories, directory_path, plot_only_median
+                    performance_histories,
+                    directory_path,
+                    plot_only_median,
+                    use_evaluation_log_scale,
                 )
             )
 
@@ -287,16 +309,24 @@ class Figures:
                 performance_histories,
                 max_feasible_performance,
                 directory_path,
+                use_evaluation_log_scale,
             )
         )
         return figures
 
-    def __plot_data_profiles(self, problem: Problem, directory_path: Path) -> Path:
+    def __plot_data_profiles(
+        self,
+        problem: Problem,
+        directory_path: Path,
+        use_evaluation_log_scale: bool,
+    ) -> Path:
         """Plot the data profiles for a problem.
 
         Args:
             problem: The problem.
             directory_path: The destination directory for the figure.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
 
         Returns:
             The path to the figure.
@@ -307,7 +337,7 @@ class Figures:
             if file_path.is_file():
                 return file_path
 
-            return self.plot_data_profiles()
+            return self.plot_data_profiles(use_evaluation_log_scale)
 
         file_path = directory_path / self._FileName.DATA_PROFILE.value
         problem.compute_data_profile(
@@ -319,6 +349,7 @@ class Figures:
             self.__max_eval_number,
             self.__plot_kwargs,
             self.__GRID_KWARGS,
+            use_evaluation_log_scale,
         )
         return file_path
 
@@ -330,6 +361,7 @@ class Figures:
         plot_all_histories: bool,
         use_performance_log_scale: bool,
         plot_only_median: bool,
+        use_evaluation_log_scale: bool,
     ) -> tuple[Path, Path]:
         """Plot the performance measure of algorithm configurations on a problem.
 
@@ -341,6 +373,8 @@ class Figures:
             use_performance_log_scale: Whether to use a logarithmic scale
                 for the performance measure axis.
             plot_only_median: Whether to plot only the median and no other centile.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
 
         Returns:
             The path to the main figure
@@ -370,6 +404,7 @@ class Figures:
             "Performance measure",
             max_feasible_objective,
             plot_only_median,
+            use_evaluation_log_scale,
         )
         problem.target_values.plot_on_axes(
             axes,
@@ -378,7 +413,7 @@ class Figures:
         )
         axes.grid(**self.__GRID_KWARGS)
         if use_performance_log_scale:
-            axes.set_yscale("log")
+            axes.set_yscale(self.__MATPLOTLIB_LOG_SCALE)
 
         file_path = directory_path / self._FileName.PERFORMANCE_MEASURE.value
         save_show_figure(figure, False, file_path)
@@ -410,6 +445,7 @@ class Figures:
         performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
         directory_path: Path,
         plot_only_median: bool,
+        use_evaluation_log_scale: bool,
     ) -> Path:
         """Plot the infeasibility measure of algorithm configurations on a problem.
 
@@ -417,6 +453,8 @@ class Figures:
             performance_histories: The performance histories for the problem.
             directory_path: The path to the root directory for the figures.
             plot_only_median: Whether to plot only the median and no other centile.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
 
         Returns:
             The path to the figure.
@@ -424,7 +462,7 @@ class Figures:
         file_path = directory_path / self._FileName.INFEASIBILITY_MEASURE.value
         figure = matplotlib.pyplot.figure()
         axes = figure.gca()
-        axes.set_yscale("log")
+        axes.set_yscale(self.__MATPLOTLIB_LOG_SCALE)
         self.__plot_range(
             axes,
             performance_histories,
@@ -432,6 +470,7 @@ class Figures:
             "Infeasibility measure",
             None,
             plot_only_median,
+            use_evaluation_log_scale,
         )
         save_show_figure(figure, False, file_path)
         return file_path
@@ -441,6 +480,7 @@ class Figures:
         performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
         directory_path: Path,
         plot_only_median: bool,
+        use_evaluation_log_scale: bool,
     ) -> Path:
         """Plot the number of constraints unsatisfied by algorithm configurations.
 
@@ -449,6 +489,8 @@ class Figures:
                 of each algorithm configuration.
             directory_path: The path to the directory where to save the figure.
             plot_only_median: Whether to plot only the median and no other centile.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
 
         Returns:
             The path to the figure.
@@ -467,6 +509,7 @@ class Figures:
             "Number of unsatisfied constraints",
             None,
             plot_only_median,
+            use_evaluation_log_scale,
         )
         axes.yaxis.set_major_locator(MaxNLocator(integer=True))
         save_show_figure(figure, False, file_path)
@@ -480,6 +523,7 @@ class Figures:
         y_label: str,
         max_feasible_objective: float,
         plot_only_median: bool,
+        use_evaluation_log_scale: bool,
     ) -> None:
         """Plot the range of data from performance histories.
 
@@ -493,6 +537,8 @@ class Figures:
             max_feasible_objective: The maximum feasible value
                 of the objective function.
             plot_only_median: Whether to plot only the median and no other centile.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
         """
         for algo_config, histories in performance_histories.items():
             name = algo_config.name
@@ -510,7 +556,11 @@ class Figures:
 
             PerformanceHistories.plot_median(data, axes, self.__plot_kwargs[name])
 
-        axes.xaxis.set_major_locator(MaxNLocator(integer=True))
+        if use_evaluation_log_scale:
+            axes.set_xscale(self.__MATPLOTLIB_LOG_SCALE)
+        else:
+            axes.xaxis.set_major_locator(MaxNLocator(integer=True))
+
         axes.grid(**self.__GRID_KWARGS)
         axes.set_xlabel("Number of functions evaluations")
         axes.set_ylabel(y_label)
@@ -571,7 +621,7 @@ class Figures:
         axes.tick_params(axis="x", labelrotation=45)
         axes.set_ylabel(f"Execution time{' (in seconds)' if use_log_scale else ''}")
         if use_log_scale:
-            axes.set_yscale("log")
+            axes.set_yscale(self.__MATPLOTLIB_LOG_SCALE)
 
         axes.legend(
             artists["medians"],
@@ -586,6 +636,7 @@ class Figures:
         performance_histories: Mapping[str, PerformanceHistories],
         max_feasible_performance: float,
         directory_path: Path,
+        use_evaluation_log_scale: bool,
     ) -> dict[str, dict[_FileName, Path]]:
         """Return the figures associated with algorithm configurations for a problem.
 
@@ -594,6 +645,8 @@ class Figures:
             performance_histories: The performance histories for the problem.
             max_feasible_performance: The maximum feasible performance value.
             directory_path: The path to the directory where to save the figures.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
 
         Returns:
             The paths to the figures for each algorithm configuration.
@@ -606,6 +659,9 @@ class Figures:
             performance_histories[configuration].plot_performance_measure_distribution(
                 axes, max_feasible_performance
             )
+            if use_evaluation_log_scale:
+                axes.set_xscale(self.__MATPLOTLIB_LOG_SCALE)
+
             axes.grid(**self.__GRID_KWARGS)
             performance_figures[configuration] = figure
 
@@ -644,7 +700,10 @@ class Figures:
                 performance_histories[
                     configuration
                 ].plot_infeasibility_measure_distribution(axes)
-                axes.set_yscale("log")
+                axes.set_yscale(self.__MATPLOTLIB_LOG_SCALE)
+                if use_evaluation_log_scale:
+                    axes.set_xscale(self.__MATPLOTLIB_LOG_SCALE)
+
                 axes.grid(**self.__GRID_KWARGS)
                 infeasibility_figures[configuration] = figure
 
@@ -668,6 +727,9 @@ class Figures:
                     configuration
                 ].plot_number_of_unsatisfied_constraints_distribution(axes)
                 axes.yaxis.set_major_locator(MaxNLocator(integer=True))  # TODO: move
+                if use_evaluation_log_scale:
+                    axes.set_xscale(self.__MATPLOTLIB_LOG_SCALE)
+
                 axes.grid(**self.__GRID_KWARGS)
                 constraints_figures[configuration] = figure
 

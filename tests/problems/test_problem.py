@@ -22,7 +22,6 @@
 from __future__ import annotations
 
 import re
-from pathlib import Path
 from unittest import mock
 
 import numpy
@@ -188,15 +187,6 @@ def test__get_description(
         )
         == description
     )
-
-
-@pytest.fixture
-def results():
-    """Paths to performance histories."""
-    paths = [Path(__file__).parent / "history.json"]
-    results = mock.Mock()
-    results.get_paths = mock.Mock(return_value=paths)
-    return results
 
 
 @pytest.fixture
@@ -482,11 +472,24 @@ def test_compute_performance(problem, database):
     assert feas_statuses == [False]
 
 
-@image_comparison(
-    baseline_images=["data_profiles"], remove_text=True, extensions=["png"]
+@pytest.mark.parametrize(
+    ("baseline_images", "use_evaluation_log_scale"),
+    [
+        (
+            [f"data_profiles[use_evaluation_log_scale={use_evaluation_log_scale}]"],
+            use_evaluation_log_scale,
+        )
+        for use_evaluation_log_scale in [False, True]
+    ],
 )
+@image_comparison(None, ["png"])
 def test_compute_data_profile(
-    creator, target_values, algorithms_configurations, results
+    baseline_images,
+    creator,
+    target_values,
+    algorithms_configurations,
+    results,
+    use_evaluation_log_scale,
 ):
     """Check the computation of data profiles."""
     target_values.compute_target_hits_history = mock.Mock(
@@ -494,7 +497,11 @@ def test_compute_data_profile(
     )
     bench_problem = Problem("Problem", creator, target_values=target_values)
     pyplot.close("all")
-    bench_problem.compute_data_profile(algorithms_configurations, results)
+    bench_problem.compute_data_profile(
+        algorithms_configurations,
+        results,
+        use_evaluation_log_scale=use_evaluation_log_scale,
+    )
 
 
 @image_comparison(

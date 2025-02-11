@@ -37,6 +37,8 @@ and this project adheres to
   and ``grid_kwargs``
   (see ``DataProfile.plot``, ``Problem.compute_data_profile``,
   and ``ProblemsGroup.compute_data_profile``).
+- The scale of the axis showing the number of function evaluations
+  can now be made logarithmic.
 
 #### Report
 
@@ -57,6 +59,8 @@ and this project adheres to
   have been added.
   They feature graphs representing the performance measure, the infeasibility measure,
   and the number of unsatisfied constraints.
+- The scale of the axis showing the number of function evaluations
+  can now be made logarithmic.
 
 ### Changed
 

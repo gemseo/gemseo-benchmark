@@ -16,10 +16,13 @@
 """Tests for the figures of the report."""
 
 import shutil
+from collections.abc import Mapping
 from pathlib import Path
+from typing import Union
 from unittest import mock
 
 import pytest
+from matplotlib.testing.compare import compare_images
 
 from gemseo_benchmark.report._figures import Figures
 
@@ -45,39 +48,173 @@ def test_plot_data_profiles(tmp_path, problems_figures):
     assert path.is_file()
 
 
-@pytest.mark.parametrize("plot_all_histories", [False, True])
-@pytest.mark.parametrize("use_performance_log_scale", [False, True])
-@pytest.mark.parametrize("plot_only_median", [False, True])
-@pytest.mark.parametrize("use_time_log_scale", [False, True])
+@pytest.mark.parametrize(
+    (
+        "use_performance_log_scale",
+        "plot_only_median",
+        "use_time_log_scale",
+        "use_evaluation_log_scale",
+    ),
+    [
+        (False, False, False, False),
+        (False, False, False, True),
+        (False, False, True, False),
+        (False, True, False, False),
+        (True, False, False, False),
+    ],
+)
 def test_plot(
     tmp_path,
     problems_figures,
-    plot_all_histories,
     use_performance_log_scale,
     plot_only_median,
     use_time_log_scale,
+    use_evaluation_log_scale,
 ) -> None:
     """Check the plotting of the figures dedicated to each problem."""
     figures = problems_figures.plot(
-        plot_all_histories,
+        False,
         use_performance_log_scale,
         plot_only_median,
         use_time_log_scale,
+        use_evaluation_log_scale,
     )
-    __check_problem_paths(tmp_path, figures["Problem A"], "Problem_A")
-    __check_problem_paths(tmp_path, figures["Problem B"], "Problem_B")
+    baseline_path = (
+        Path(__file__).parent
+        / "baseline_images"
+        / "test_figures"
+        / (
+            "test_plot"
+            f"-{use_performance_log_scale}"
+            f"-{plot_only_median}"
+            f"-{use_time_log_scale}"
+            f"-{use_evaluation_log_scale}"
+        )
+    )
+    __check_problem_images(tmp_path, figures, "Problem_A", "SLSQP", baseline_path)
+    __check_problem_images(tmp_path, figures, "Problem_B", "SLSQP", baseline_path)
 
 
-def __check_problem_paths(tmp_path, paths, name) -> None:
-    __check_path(tmp_path, paths, name, Figures._FileName.DATA_PROFILE)
-    __check_path(tmp_path, paths, name, Figures._FileName.PERFORMANCE_MEASURE)
-    __check_path(tmp_path, paths, name, Figures._FileName.PERFORMANCE_MEASURE_FOCUS)
+def __check_problem_images(
+    tmp_path: Path,
+    paths: Mapping[str, Union[Figures._FileName, Mapping[str, Figures._FileName]]],
+    problem_name: str,
+    algorithm_name: str,
+    baseline_path: Path,
+) -> None:
+    """Check the plotting of the figures dedicated to a problem."""
+    __check_problem_image(
+        tmp_path,
+        paths,
+        problem_name,
+        Figures._FileName.PERFORMANCE_MEASURE,
+        baseline_path,
+    )
+    __check_problem_image(
+        tmp_path,
+        paths,
+        problem_name,
+        Figures._FileName.PERFORMANCE_MEASURE_FOCUS,
+        baseline_path,
+    )
+    __check_problem_image(
+        tmp_path,
+        paths,
+        problem_name,
+        Figures._FileName.INFEASIBILITY_MEASURE,
+        baseline_path,
+    )
+    __check_problem_image(
+        tmp_path,
+        paths,
+        problem_name,
+        Figures._FileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS,
+        baseline_path,
+    )
+    __check_problem_image(
+        tmp_path, paths, problem_name, Figures._FileName.EXECUTION_TIME, baseline_path
+    )
+    __check_algorithm_image(
+        tmp_path,
+        paths,
+        problem_name,
+        algorithm_name,
+        Figures._FileName.PERFORMANCE_MEASURE,
+        baseline_path,
+    )
+    __check_algorithm_image(
+        tmp_path,
+        paths,
+        problem_name,
+        algorithm_name,
+        Figures._FileName.PERFORMANCE_MEASURE_FOCUS,
+        baseline_path,
+    )
+    __check_algorithm_image(
+        tmp_path,
+        paths,
+        problem_name,
+        algorithm_name,
+        Figures._FileName.INFEASIBILITY_MEASURE,
+        baseline_path,
+    )
+    __check_algorithm_image(
+        tmp_path,
+        paths,
+        problem_name,
+        algorithm_name,
+        Figures._FileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS,
+        baseline_path,
+    )
 
 
-def __check_path(tmp_path, paths, problem_name, file_name) -> None:
-    path = paths[file_name]
-    assert path == tmp_path / problem_name / file_name.value
-    assert path.is_file()
+def __check_problem_image(
+    tmp_path: Path,
+    paths: Mapping[str, Figures._FileName],
+    problem_name: str,
+    file_name: Figures._FileName,
+    baseline_path: Path,
+) -> None:
+    """Check the plotting of a figure dedicated to a problem."""
+    __check_image(
+        tmp_path,
+        paths[problem_name.replace("_", " ")][file_name],
+        tmp_path / problem_name / file_name.value,
+        baseline_path,
+    )
+
+
+def __check_algorithm_image(
+    tmp_path: Path,
+    paths: Mapping[str, Figures._FileName],
+    problem_name: str,
+    algorithm_name: str,
+    file_name: Figures._FileName,
+    baseline_path: Path,
+) -> None:
+    """Check the plotting of a figure dedicated to an algorithm configuration."""
+    __check_image(
+        tmp_path,
+        paths[problem_name.replace("_", " ")][algorithm_name][file_name],
+        tmp_path / problem_name / algorithm_name / file_name.value,
+        baseline_path,
+    )
+
+
+def __check_image(
+    tmp_path: Path, generated_path: Path, expected_path: Path, baseline_path: Path
+) -> None:
+    """Check an image."""
+    assert generated_path == expected_path
+    assert (
+        compare_images(
+            baseline_path / generated_path.relative_to(tmp_path),
+            generated_path,
+            0,
+            False,
+        )
+        is None
+    )
 
 
 def test_no_data_profiles_duplicates(
@@ -110,6 +247,6 @@ def test_no_data_profiles_duplicates(
     group_call_count = group.compute_data_profile.call_count
     problem_call_count = problem_a.compute_data_profile.call_count
     figures.plot_data_profiles()
-    figures.plot(False, False, False, False)
+    figures.plot(False, False, False, False, False)
     assert group.compute_data_profile.call_count == group_call_count + 1
     assert problem_a.compute_data_profile.call_count == problem_call_count

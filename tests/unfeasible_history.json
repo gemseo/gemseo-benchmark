@@ -1,26 +1,36 @@
-[
-  {
-    "performance": 1.0,
-    "infeasibility": 1.0
-  },
-  {
-    "performance": 0.5,
-    "infeasibility": 1.0
-  },
-  {
-    "performance": 2.0,
-    "infeasibility": 1.0
-  },
-  {
-    "performance": 1.0,
-    "infeasibility": 1.0
-  },
-  {
-    "performance": 0.3,
-    "infeasibility": 1.0
-  },
-  {
-    "performance": 0.0,
-    "infeasibility": 1.0
-  }
-]
+{
+  "objective_name": "f",
+  "execution_time": 2.0,
+  "history_items": [
+    {
+      "performance": 1.0,
+      "infeasibility": 1.0,
+      "n_unsatisfied_constraints": 6
+    },
+    {
+      "performance": 0.5,
+      "infeasibility": 1.0,
+      "n_unsatisfied_constraints": 5
+    },
+    {
+      "performance": 2.0,
+      "infeasibility": 1.0,
+      "n_unsatisfied_constraints": 4
+    },
+    {
+      "performance": 1.0,
+      "infeasibility": 1.0,
+      "n_unsatisfied_constraints": 3
+    },
+    {
+      "performance": 0.3,
+      "infeasibility": 1.0,
+      "n_unsatisfied_constraints": 2
+    },
+    {
+      "performance": 0.0,
+      "infeasibility": 1.0,
+      "n_unsatisfied_constraints": 1
+    }
+  ]
+}

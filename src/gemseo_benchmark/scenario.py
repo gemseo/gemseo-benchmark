@@ -89,6 +89,7 @@ class Scenario:
         log_gemseo_to_file: bool = False,
         directory_path: Path | None = None,
         plot_only_median: bool = False,
+        use_evaluation_log_scale: bool = False,
     ) -> Results:
         """Execute the benchmarking scenario.
 
@@ -121,6 +122,8 @@ class Scenario:
             directory_path: The path to the directory where the report
                 will be generated.
             plot_only_median: Whether to plot only the median and no other centile.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
 
         Returns:
             The performance histories.
@@ -149,6 +152,7 @@ class Scenario:
                 use_log_scale,
                 directory_path,
                 plot_only_median,
+                use_evaluation_log_scale,
             )
 
         return Results(self._results_path)
@@ -223,6 +227,7 @@ class Scenario:
         use_log_scale: bool = False,
         directory_path: Path | None = None,
         plot_only_median: bool = False,
+        use_evaluation_log_scale: bool = False,
     ) -> None:
         """Generate the benchmarking report.
 
@@ -245,6 +250,8 @@ class Scenario:
             directory_path: The path to the directory where the report
                 will be generated.
             plot_only_median: Whether to plot only the median and no other centile.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
         """
         report = Report(
             self.__get_report_path()
@@ -263,6 +270,7 @@ class Scenario:
             plot_all_histories,
             use_log_scale,
             plot_only_median,
+            use_evaluation_log_scale=use_evaluation_log_scale,
         )
 
     def __get_report_path(self) -> Path:
