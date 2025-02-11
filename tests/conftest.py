@@ -35,6 +35,8 @@ from numpy import ndarray
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
+from gemseo_benchmark.results.performance_histories import PerformanceHistories
+from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 design_variables = array([0.0, 1.0])
 
@@ -200,6 +202,7 @@ def group(problem_a, problem_b) -> mock.Mock:
         max_eval_number=None,
         plot_kwargs=READ_ONLY_EMPTY_DICT,
         grid_kwargs=READ_ONLY_EMPTY_DICT,
+        use_evaluation_log_scale=False,
     ):
         shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(plot_path))
 
@@ -309,3 +312,14 @@ def problems_group(rosenbrock) -> ProblemsGroup:
 def results_root(tmp_path_factory) -> Path:
     """The root the L-BFGS-B results file tree."""
     return tmp_path_factory.mktemp("results")
+
+
+@pytest.fixture(scope="package")
+def performance_histories() -> PerformanceHistories:
+    """A collection of performance histories."""
+    return PerformanceHistories(
+        PerformanceHistory([1.0, -1.0, 0.0], [2.0, 0.0, 3.0]),
+        PerformanceHistory([-2.0, -2.0, 2.0], [0.0, 3.0, 0.0]),
+        PerformanceHistory([3.0, -3.0, 3.0], [0.0, 0.0, 0.0]),
+        PerformanceHistory([0.0, -2.0, 4.0], [0.0, 0.0, 0.0]),
+    )

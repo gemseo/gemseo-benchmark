@@ -27,17 +27,6 @@ from gemseo_benchmark.results.performance_histories import PerformanceHistories
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 
-@pytest.fixture(scope="module")
-def performance_histories() -> PerformanceHistories:
-    """A collection of performance histories."""
-    return PerformanceHistories(
-        PerformanceHistory([1.0, -1.0, 0.0], [2.0, 0.0, 3.0]),
-        PerformanceHistory([-2.0, -2.0, 2.0], [0.0, 3.0, 0.0]),
-        PerformanceHistory([3.0, -3.0, 3.0], [0.0, 0.0, 0.0]),
-        PerformanceHistory([0.0, -2.0, 4.0], [0.0, 0.0, 0.0]),
-    )
-
-
 def test_compute_minimum(performance_histories):
     """Check the computation of the minimum history."""
     assert performance_histories.compute_minimum().items == [

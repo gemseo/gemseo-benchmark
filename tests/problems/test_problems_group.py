@@ -64,15 +64,29 @@ def test_compute_targets():
     assert isinstance(rosenbrock.target_values, TargetValues)
 
 
-@image_comparison(
-    baseline_images=["data_profile"], remove_text=True, extensions=["png"]
+@pytest.mark.parametrize(
+    ("baseline_images", "use_evaluation_log_scale"),
+    [
+        (
+            [f"data_profile[use_evaluation_log_scale={use_evaluation_log_scale}]"],
+            use_evaluation_log_scale,
+        )
+        for use_evaluation_log_scale in [False, True]
+    ],
 )
-def test_compute_data_profile(problem_a, problem_b, results):
+@image_comparison(None, ["png"])
+def test_compute_data_profile(
+    baseline_images, problem_a, problem_b, results, use_evaluation_log_scale
+):
     """Check the computation of data profiles."""
     group = ProblemsGroup("A group", [problem_a, problem_b])
     pyplot.close("all")
     group.compute_data_profile(
-        algorithms_configurations, results, show=False, max_eval_number=5
+        algorithms_configurations,
+        results,
+        show=False,
+        max_eval_number=5,
+        use_evaluation_log_scale=use_evaluation_log_scale,
     )
 
 

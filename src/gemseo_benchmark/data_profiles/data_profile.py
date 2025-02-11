@@ -159,6 +159,7 @@ class DataProfile:
         markevery: MarkeveryType | None = None,
         plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
         grid_kwargs: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
+        use_evaluation_log_scale: bool = False,
     ) -> None:
         """Plot the data profiles of the required algorithms.
 
@@ -173,6 +174,8 @@ class DataProfile:
             plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
             grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
         """
         if algo_names is None:
             algo_names = ()
@@ -183,7 +186,9 @@ class DataProfile:
             if "markevery" not in kwargs:
                 kwargs["markevery"] = markevery
 
-        figure = self._plot_data_profiles(data_profiles, plot_kwargs_copy, grid_kwargs)
+        figure = self._plot_data_profiles(
+            data_profiles, plot_kwargs_copy, grid_kwargs, use_evaluation_log_scale
+        )
         save_show_figure(figure, show, file_path)
 
     def compute_data_profiles(self, *algo_names: str) -> dict[str, list[Number]]:
@@ -274,6 +279,7 @@ class DataProfile:
         data_profiles: Mapping[str, Sequence[Number]],
         plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
         grid_kwargs: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
+        use_evaluation_log_scale: bool = False,
     ) -> Figure:
         """Plot the data profiles.
 
@@ -282,6 +288,8 @@ class DataProfile:
             plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
             grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
 
         Returns:
             The data profiles figure.
@@ -294,6 +302,9 @@ class DataProfile:
         axes.set_title(f"Data profile{'s' if len(data_profiles) > 1 else ''}")
         max_profile_size = max(len(profile) for profile in data_profiles.values())
         axes.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
+        if use_evaluation_log_scale:
+            axes.set_xscale("log")
+
         plt.xlabel("Number of functions evaluations")
         plt.xlim([1, max_profile_size])
         y_ticks = linspace(0.0, 1.0, 11)

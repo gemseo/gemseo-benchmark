@@ -538,6 +538,7 @@ class Problem:
         max_eval_number: int | None = None,
         plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
         grid_kwargs: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
+        use_evaluation_log_scale: bool = False,
     ) -> None:
         """Generate the data profiles of given algorithms.
 
@@ -553,6 +554,8 @@ class Problem:
             plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
             grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
         """
         # Initialize the data profile
         data_profile = DataProfile({self.name: self.target_values})
@@ -578,6 +581,7 @@ class Problem:
             file_path=file_path,
             plot_kwargs=plot_kwargs,
             grid_kwargs=grid_kwargs,
+            use_evaluation_log_scale=use_evaluation_log_scale,
         )
 
     def plot_histories(
