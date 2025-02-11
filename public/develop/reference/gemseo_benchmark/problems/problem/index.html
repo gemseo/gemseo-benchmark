@@ -2702,6 +2702,7 @@ shape.</p>
         <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><span title="gemseo_benchmark.ConfigurationPlotOptions">ConfigurationPlotOptions</span></span>
     <span class="p">]</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.utils.constants.READ_ONLY_EMPTY_DICT" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.utils.constants.html#gemseo.utils.constants.READ_ONLY_EMPTY_DICT">READ_ONLY_EMPTY_DICT</a></span><span class="p">,</span>
     <span class="n">grid_kwargs</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">]</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.utils.constants.READ_ONLY_EMPTY_DICT" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.utils.constants.html#gemseo.utils.constants.READ_ONLY_EMPTY_DICT">READ_ONLY_EMPTY_DICT</a></span><span class="p">,</span>
+    <span class="n">use_evaluation_log_scale</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
@@ -2791,6 +2792,17 @@ for each algorithm configuration.</p>
             <p>The keyword arguments of <code>matplotlib.pyplot.grid</code>.</p>
           </div>
         </li>
+        <li class="doc-section-item field-body">
+            <b><code>use_evaluation_log_scale</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>, default:
+                  <code>False</code>
+)
+          –
+          <div class="doc-md-description">
+            <p>Whether to use a logarithmic scale
+for the number of function evaluations axis.</p>
+          </div>
+        </li>
     </ul>
 
             <details class="quote">
@@ -2845,7 +2857,11 @@ for each algorithm configuration.</p>
 <span class="normal">578</span>
 <span class="normal">579</span>
 <span class="normal">580</span>
-<span class="normal">581</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_data_profile</span><span class="p">(</span>
+<span class="normal">581</span>
+<span class="normal">582</span>
+<span class="normal">583</span>
+<span class="normal">584</span>
+<span class="normal">585</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_data_profile</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">algos_configurations</span><span class="p">:</span> <span class="n">AlgorithmsConfigurations</span><span class="p">,</span>
     <span class="n">results</span><span class="p">:</span> <span class="n">Results</span><span class="p">,</span>
@@ -2855,6 +2871,7 @@ for each algorithm configuration.</p>
     <span class="n">max_eval_number</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">plot_kwargs</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ConfigurationPlotOptions</span><span class="p">]</span> <span class="o">=</span> <span class="n">READ_ONLY_EMPTY_DICT</span><span class="p">,</span>
     <span class="n">grid_kwargs</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">READ_ONLY_EMPTY_DICT</span><span class="p">,</span>
+    <span class="n">use_evaluation_log_scale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate the data profiles of given algorithms.</span>
 
@@ -2870,6 +2887,8 @@ for each algorithm configuration.</p>
 <span class="sd">        plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`</span>
 <span class="sd">            for each algorithm configuration.</span>
 <span class="sd">        grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.</span>
+<span class="sd">        use_evaluation_log_scale: Whether to use a logarithmic scale</span>
+<span class="sd">            for the number of function evaluations axis.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Initialize the data profile</span>
     <span class="n">data_profile</span> <span class="o">=</span> <span class="n">DataProfile</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_values</span><span class="p">})</span>
@@ -2895,6 +2914,7 @@ for each algorithm configuration.</p>
         <span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
         <span class="n">plot_kwargs</span><span class="o">=</span><span class="n">plot_kwargs</span><span class="p">,</span>
         <span class="n">grid_kwargs</span><span class="o">=</span><span class="n">grid_kwargs</span><span class="p">,</span>
+        <span class="n">use_evaluation_log_scale</span><span class="o">=</span><span class="n">use_evaluation_log_scale</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -3508,11 +3528,7 @@ If <code>None</code>, this value is inferred from the longest history.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/problems/problem.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">583</span>
-<span class="normal">584</span>
-<span class="normal">585</span>
-<span class="normal">586</span>
-<span class="normal">587</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">587</span>
 <span class="normal">588</span>
 <span class="normal">589</span>
 <span class="normal">590</span>
@@ -3611,7 +3627,11 @@ If <code>None</code>, this value is inferred from the longest history.</p>
 <span class="normal">683</span>
 <span class="normal">684</span>
 <span class="normal">685</span>
-<span class="normal">686</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">plot_histories</span><span class="p">(</span>
+<span class="normal">686</span>
+<span class="normal">687</span>
+<span class="normal">688</span>
+<span class="normal">689</span>
+<span class="normal">690</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">plot_histories</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">algos_configurations</span><span class="p">:</span> <span class="n">AlgorithmsConfigurations</span><span class="p">,</span>
     <span class="n">results</span><span class="p">:</span> <span class="n">Results</span><span class="p">,</span>
