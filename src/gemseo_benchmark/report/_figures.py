@@ -310,6 +310,7 @@ class Figures:
                 max_feasible_performance,
                 directory_path,
                 use_evaluation_log_scale,
+                use_performance_log_scale,
             )
         )
         return figures
@@ -637,6 +638,7 @@ class Figures:
         max_feasible_performance: float,
         directory_path: Path,
         use_evaluation_log_scale: bool,
+        use_performance_log_scale: bool,
     ) -> dict[str, dict[_FileName, Path]]:
         """Return the figures associated with algorithm configurations for a problem.
 
@@ -647,6 +649,8 @@ class Figures:
             directory_path: The path to the directory where to save the figures.
             use_evaluation_log_scale: Whether to use a logarithmic scale
                 for the number of function evaluations axis.
+            use_performance_log_scale: Whether to use a logarithmic scale
+                for the performance measure axis.
 
         Returns:
             The paths to the figures for each algorithm configuration.
@@ -659,6 +663,9 @@ class Figures:
             performance_histories[configuration].plot_performance_measure_distribution(
                 axes, max_feasible_performance
             )
+            if use_performance_log_scale:
+                axes.set_yscale(self.__MATPLOTLIB_LOG_SCALE)
+
             if use_evaluation_log_scale:
                 axes.set_xscale(self.__MATPLOTLIB_LOG_SCALE)
 
