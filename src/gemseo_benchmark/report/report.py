@@ -149,7 +149,7 @@ class Report:
         to_html: bool = True,
         to_pdf: bool = False,
         infeasibility_tolerance: float = 0.0,
-        plot_all_histories: bool = True,
+        plot_all_histories: bool = False,
         use_log_scale: bool = False,
         plot_only_median: bool = False,
         use_time_log_scale: bool = False,

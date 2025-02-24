@@ -237,13 +237,17 @@ class PerformanceHistories(collections.abc.MutableSequence):
         ]
 
     def plot_performance_measure_distribution(
-        self, axes: Axes, max_feasible_objective: float | None = None
+        self,
+        axes: Axes,
+        max_feasible_objective: float | None = None,
+        plot_all_histories: bool = False,
     ) -> None:
         """Plot the distribution of the performance measure.
 
         Args:
             axes: The axes of the plot.
             max_feasible_objective: The maximum feasible objective value.
+            plot_all_histories: Whether to plot all the performance histories.
         """
         if max_feasible_objective is None:
             max_feasible_objective = max(
@@ -264,25 +268,33 @@ class PerformanceHistories(collections.abc.MutableSequence):
             axes,
             "Performance measure",
             max_feasible_objective,
+            plot_all_histories,
         )
 
-    def plot_infeasibility_measure_distribution(self, axes: Axes) -> None:
+    def plot_infeasibility_measure_distribution(
+        self, axes: Axes, plot_all_histories: bool = False
+    ) -> None:
         """Plot the distribution of the infeasibility measure.
 
         Args:
             axes: The axes of the plot.
+            plot_all_histories: Whether to plot all the performance histories.
         """
         self.__plot_distribution(
             numpy.array([history.infeasibility_measures for history in self]),
             axes,
             "Infeasibility measure",
+            plot_all_histories=plot_all_histories,
         )
 
-    def plot_number_of_unsatisfied_constraints_distribution(self, axes: Axes) -> None:
+    def plot_number_of_unsatisfied_constraints_distribution(
+        self, axes: Axes, plot_all_histories: bool = False
+    ) -> None:
         """Plot the distribution of the number of unsatisfied constraints.
 
         Args:
             axes: The axes of the plot.
+            plot_all_histories: Whether to plot all the performance histories.
         """
         self.__plot_distribution(
             numpy.array([
@@ -294,6 +306,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
             ]),
             axes,
             "Number of unsatisfied constraints",
+            plot_all_histories=plot_all_histories,
         )
 
     @staticmethod
@@ -302,6 +315,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         axes: Axes,
         y_label: str,
         infinity: float | None = None,
+        plot_all_histories: bool = False,
     ) -> None:
         """Plot the distribution of histories data.
 
@@ -310,7 +324,20 @@ class PerformanceHistories(collections.abc.MutableSequence):
             axes: The axes of the plot.
             y_label: The label for the vertical axis.
             infinity: The substitute value for infinite ordinates.
+            plot_all_histories: Whether to plot all the performance histories.
         """
+        abscissas = range(1, histories.shape[1] + 1)
+        legend_handles_offset = 0
+        if plot_all_histories:
+            legend_handles_offset = histories.shape[0] - 1
+            axes.plot(
+                abscissas,
+                histories.T,
+                color="black",
+                label="histories",
+                linestyle=":",
+            )
+
         PerformanceHistories.plot_centiles_range(
             histories,
             axes,
@@ -329,7 +356,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
             histories, axes, {"color": "black", "label": "median"}
         )
         axes.plot(
-            range(1, histories.shape[1] + 1),
+            abscissas,
             numpy.mean(histories, 0),
             color="orange",
             label="mean",
@@ -338,8 +365,10 @@ class PerformanceHistories(collections.abc.MutableSequence):
         # Reorder the legend
         axes.legend(
             *zip(*[
-                list(zip(*axes.get_legend_handles_labels()))[index]
-                for index in [3, 2, 1, 0]
+                list(zip(*axes.get_legend_handles_labels()))[
+                    index + legend_handles_offset
+                ]
+                for index in range(3 + plot_all_histories, -1, -1)
             ])
         )
         axes.set_xlabel("Number of functions evaluations")

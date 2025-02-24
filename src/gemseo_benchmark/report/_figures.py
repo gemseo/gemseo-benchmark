@@ -292,6 +292,7 @@ class Figures:
                     directory_path,
                     plot_only_median,
                     use_evaluation_log_scale,
+                    plot_all_histories,
                 )
             )
             figures[self._FileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS] = (
@@ -300,6 +301,7 @@ class Figures:
                     directory_path,
                     plot_only_median,
                     use_evaluation_log_scale,
+                    plot_all_histories,
                 )
             )
 
@@ -311,6 +313,7 @@ class Figures:
                 directory_path,
                 use_evaluation_log_scale,
                 use_performance_log_scale,
+                plot_all_histories,
             )
         )
         return figures
@@ -383,11 +386,6 @@ class Figures:
         """
         figure = matplotlib.pyplot.figure()
         axes = figure.gca()
-        if plot_all_histories:
-            for algorithm_configuration, histories in performance_histories.items():
-                name = algorithm_configuration.name
-                for history in histories:
-                    history.plot(axes, False, color=self.__plot_kwargs[name]["color"])
         # Find the maximum feasible objective value
         max_feasible_objective = max(
             history.remove_leading_infeasible()[0].objective_value
@@ -406,6 +404,7 @@ class Figures:
             max_feasible_objective,
             plot_only_median,
             use_evaluation_log_scale,
+            plot_all_histories,
         )
         problem.target_values.plot_on_axes(
             axes,
@@ -447,6 +446,7 @@ class Figures:
         directory_path: Path,
         plot_only_median: bool,
         use_evaluation_log_scale: bool,
+        plot_all_histories: bool,
     ) -> Path:
         """Plot the infeasibility measure of algorithm configurations on a problem.
 
@@ -456,6 +456,7 @@ class Figures:
             plot_only_median: Whether to plot only the median and no other centile.
             use_evaluation_log_scale: Whether to use a logarithmic scale
                 for the number of function evaluations axis.
+            plot_all_histories: Whether to plot all the performance histories.
 
         Returns:
             The path to the figure.
@@ -472,6 +473,7 @@ class Figures:
             None,
             plot_only_median,
             use_evaluation_log_scale,
+            plot_all_histories,
         )
         save_show_figure(figure, False, file_path)
         return file_path
@@ -482,6 +484,7 @@ class Figures:
         directory_path: Path,
         plot_only_median: bool,
         use_evaluation_log_scale: bool,
+        plot_all_histories: bool,
     ) -> Path:
         """Plot the number of constraints unsatisfied by algorithm configurations.
 
@@ -492,6 +495,7 @@ class Figures:
             plot_only_median: Whether to plot only the median and no other centile.
             use_evaluation_log_scale: Whether to use a logarithmic scale
                 for the number of function evaluations axis.
+            plot_all_histories: Whether to plot all the performance histories.
 
         Returns:
             The path to the figure.
@@ -511,6 +515,7 @@ class Figures:
             None,
             plot_only_median,
             use_evaluation_log_scale,
+            plot_all_histories,
         )
         axes.yaxis.set_major_locator(MaxNLocator(integer=True))
         save_show_figure(figure, False, file_path)
@@ -520,11 +525,12 @@ class Figures:
         self,
         axes: matplotlib.axes.Axes,
         performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
-        data_getter: callable[[PerformanceHistory], float],
+        data_getter: callable[[PerformanceHistory], list[int | float]],
         y_label: str,
         max_feasible_objective: float,
         plot_only_median: bool,
         use_evaluation_log_scale: bool,
+        plot_all_histories: bool,
     ) -> None:
         """Plot the range of data from performance histories.
 
@@ -540,12 +546,20 @@ class Figures:
             plot_only_median: Whether to plot only the median and no other centile.
             use_evaluation_log_scale: Whether to use a logarithmic scale
                 for the number of function evaluations axis.
+            plot_all_histories: Whether to plot all the performance histories.
         """
         for algo_config, histories in performance_histories.items():
             name = algo_config.name
             data = numpy.array([
                 data_getter(history) for history in histories.get_equal_size_histories()
             ])
+            if plot_all_histories:
+                axes.plot(
+                    range(1, data.shape[1] + 1),
+                    data.T,
+                    color=self.__plot_kwargs[name]["color"],
+                )
+
             if not plot_only_median:
                 PerformanceHistories.plot_centiles_range(
                     data,
@@ -639,6 +653,7 @@ class Figures:
         directory_path: Path,
         use_evaluation_log_scale: bool,
         use_performance_log_scale: bool,
+        plot_all_histories: bool,
     ) -> dict[str, dict[_FileName, Path]]:
         """Return the figures associated with algorithm configurations for a problem.
 
@@ -651,6 +666,7 @@ class Figures:
                 for the number of function evaluations axis.
             use_performance_log_scale: Whether to use a logarithmic scale
                 for the performance measure axis.
+            plot_all_histories: Whether to plot all the performance histories.
 
         Returns:
             The paths to the figures for each algorithm configuration.
@@ -661,7 +677,7 @@ class Figures:
         for configuration in self.__algorithm_configurations:
             figure, axes = matplotlib.pyplot.subplots()
             performance_histories[configuration].plot_performance_measure_distribution(
-                axes, max_feasible_performance
+                axes, max_feasible_performance, plot_all_histories
             )
             if use_performance_log_scale:
                 axes.set_yscale(self.__MATPLOTLIB_LOG_SCALE)
@@ -706,7 +722,7 @@ class Figures:
                 figure, axes = matplotlib.pyplot.subplots()
                 performance_histories[
                     configuration
-                ].plot_infeasibility_measure_distribution(axes)
+                ].plot_infeasibility_measure_distribution(axes, plot_all_histories)
                 axes.set_yscale(self.__MATPLOTLIB_LOG_SCALE)
                 if use_evaluation_log_scale:
                     axes.set_xscale(self.__MATPLOTLIB_LOG_SCALE)
@@ -732,7 +748,9 @@ class Figures:
                 figure, axes = matplotlib.pyplot.subplots()
                 performance_histories[
                     configuration
-                ].plot_number_of_unsatisfied_constraints_distribution(axes)
+                ].plot_number_of_unsatisfied_constraints_distribution(
+                    axes, plot_all_histories
+                )
                 axes.yaxis.set_major_locator(MaxNLocator(integer=True))  # TODO: move
                 if use_evaluation_log_scale:
                     axes.set_xscale(self.__MATPLOTLIB_LOG_SCALE)
