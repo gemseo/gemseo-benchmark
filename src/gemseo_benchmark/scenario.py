@@ -84,7 +84,7 @@ class Scenario:
         use_threading: bool = False,
         custom_algos_descriptions: Mapping[str, str] | None = None,
         max_eval_number_per_group: dict[str, int] | None = None,
-        plot_all_histories: bool = True,
+        plot_all_histories: bool = False,
         use_log_scale: bool = False,
         log_gemseo_to_file: bool = False,
         directory_path: Path | None = None,
