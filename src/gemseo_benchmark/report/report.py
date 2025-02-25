@@ -423,7 +423,7 @@ class Report:
             self.__max_eval_numbers.get(problems.name),
             plot_kwargs=self.__plot_kwargs,
         )
-        figures = plotter.plot(
+        figures, tables = plotter.plot(
             plot_all_histories,
             use_log_scale,
             plot_only_median,
@@ -454,6 +454,7 @@ class Report:
                     algorithm_configurations,
                     figures[problem.name],
                     problems_dir,
+                    tables[problem.name],
                 )
                 .relative_to(directory_path)
                 .as_posix()
@@ -466,8 +467,9 @@ class Report:
         self,
         problem: Problem,
         algorithm_configurations: AlgorithmsConfigurations,
-        figures: dict[str, str],
+        figures: Figures.ProblemFigurePaths,
         directory_path: Path,
+        tables: Figures.ProblemTablePaths,
     ) -> Path:
         """Create the files dedicated to the results obtained on a single problem.
 
@@ -478,17 +480,20 @@ class Report:
         Args:
             problem: The problem.
             algorithm_configurations: The algorithm configurations.
-            figures: The figures illustrating the results.
+            figures: The paths to the figures dedicated to the problem.
             directory_path: The path to the directory where to save the files.
+            tables: The paths to the tables dedicated to the problem.
 
         Returns:
             The path to the main file.
         """
         # Create the files that present the results of each algorithm configuration.
+        problem_path = directory_path / join_substrings(problem.name)
+        problem_path.mkdir()
         algorithm_configurations_results = []
         for algorithm_configuration in algorithm_configurations:
             file_path = (
-                directory_path / join_substrings(algorithm_configuration.name)
+                problem_path / join_substrings(algorithm_configuration.name)
             ).with_suffix(".rst")
             self.__fill_template(
                 file_path,
@@ -501,13 +506,19 @@ class Report:
                     )
                     for name in figures[algorithm_configuration.name]
                 },
+                tables={
+                    name.value: self.__get_relative_path(
+                        tables[algorithm_configuration.name][name]
+                    )
+                    for name in tables[algorithm_configuration.name]
+                },
             )
             algorithm_configurations_results.append(
                 file_path.relative_to(directory_path).as_posix()
             )
 
-        # Create the file that present the results of all the algorithm configurations
-        file_path = (directory_path / problem.name).with_suffix(".rst")
+        # Create the file that presents the results of all the algorithm configurations.
+        file_path = problem_path.with_suffix(".rst")
         self.__fill_template(
             file_path,
             FileName.PROBLEM_RESULTS.value,
@@ -516,8 +527,13 @@ class Report:
             problem=problem,
             figures={
                 name.value: self.__get_relative_path(figures[name])
-                for name in Figures._FileName
+                for name in Figures._FigureFileName
                 if name in figures
+            },
+            tables={
+                name.value: self.__get_relative_path(tables[name])
+                for name in Figures._TableFileName
+                if name in tables
             },
         )
         return file_path

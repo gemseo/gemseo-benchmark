@@ -19,12 +19,15 @@ from __future__ import annotations
 
 import datetime
 import enum
+from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import ClassVar
 from typing import Final
+from typing import Union
 
 import matplotlib.pyplot
 import numpy
+import pandas
 from gemseo.utils.matplotlib_figure import save_show_figure
 from matplotlib.ticker import MaxNLocator
 
@@ -36,7 +39,6 @@ from gemseo_benchmark.results.performance_history import PerformanceHistory
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from collections.abc import Mapping
-    from pathlib import Path
 
     from gemseo_benchmark import ConfigurationPlotOptions
     from gemseo_benchmark.algorithms.algorithm_configuration import (
@@ -47,6 +49,7 @@ if TYPE_CHECKING:
     )
     from gemseo_benchmark.problems.problem import Problem
     from gemseo_benchmark.problems.problems_group import ProblemsGroup
+    from gemseo_benchmark.results.history_item import HistoryItem
     from gemseo_benchmark.results.results import Results
 
 
@@ -86,6 +89,15 @@ class Figures:
     """The paths to the reference histories
     for each algorithm configuration and reference problem."""
 
+    __TABLE_PERCENTILES: Final[dict[str, int]] = {
+        "maximum": 100,
+        "75th centile": 75,
+        "median": 50,
+        "25th centile": 25,
+        "minimum": 0,
+    }
+    """The percentiles to be displayed in the report tables."""
+
     __TARGET_VALUES_PLOT_KWARGS: ClassVar[Mapping[str, str | float]] = {
         "color": "red",
         "linestyle": ":",
@@ -94,7 +106,7 @@ class Figures:
     """The keyword arguments for `matplotlib.axes.Axes.axhline`
     when plotting target values."""
 
-    class _FileName(enum.Enum):
+    class _FigureFileName(enum.Enum):
         """The name of a figure file."""
 
         DATA_PROFILE = "data_profile.png"
@@ -103,6 +115,23 @@ class Figures:
         NUMBER_OF_UNSATISFIED_CONSTRAINTS = "number_of_unsatisfied_constraints.png"
         PERFORMANCE_MEASURE = "performance_measure.png"
         PERFORMANCE_MEASURE_FOCUS = "performance_measure_focus.png"
+
+    ProblemFigurePaths = dict[
+        Union[_FigureFileName, str], Union[Path, dict[_FigureFileName, Path]]
+    ]
+    """The paths to the figures dedicated to a problem."""
+
+    class _TableFileName(enum.Enum):
+        """The name of a table file."""
+
+        INFEASIBILITY_MEASURE = "infeasibility_measure.csv"
+        NUMBER_OF_UNSATISFIED_CONSTRAINTS = "number_of_unsatisfied_constraints.csv"
+        PERFORMANCE_MEASURE = "performance_measure.csv"
+
+    ProblemTablePaths = dict[
+        Union[_TableFileName, str], Union[Path, dict[_TableFileName, Path]]
+    ]
+    """The paths to the tables dedicated to a problem."""
 
     def __init__(
         self,
@@ -164,7 +193,7 @@ class Figures:
 
     def __get_data_profiles_path(self) -> Path:
         """Return the path to the data profiles of the group of problems."""
-        return self.__directory_path / self._FileName.DATA_PROFILE.value
+        return self.__directory_path / self._FigureFileName.DATA_PROFILE.value
 
     def plot(
         self,
@@ -173,7 +202,8 @@ class Figures:
         plot_only_median: bool,
         use_time_log_scale: bool,
         use_evaluation_log_scale: bool,
-    ) -> dict[str, dict[str, str]]:
+        table_values_format: str = ".6g",
+    ) -> tuple[dict[str, ProblemFigurePaths], dict[str, ProblemTablePaths]]:
         """Plot the figures for each problem of the group.
 
         Args:
@@ -185,13 +215,15 @@ class Figures:
                 for the time axis.
             use_evaluation_log_scale: Whether to use a logarithmic scale
                 for the number of function evaluations axis.
+            table_values_format: The string format for the table values.
 
         Returns:
-            The paths to the figures.
+            The paths to the figures and the paths to the tables.
             The keys are the names of the problems and the values
-            are the corresponding dictionaries of figures.
+            are the corresponding dictionaries of figures or tables.
         """
         problems_to_figures = {}
+        problems_to_tables = {}
         for problem in self.__group:
             problem_dir = self.__directory_path / join_substrings(problem.name)
             problem_dir.mkdir()
@@ -217,7 +249,7 @@ class Figures:
                             max_feasible_performance,
                         )
 
-            # Draw the plots dedicated to each problem
+            # Draw the plots dedicated to each problem.
             problems_to_figures[problem.name] = self.__get_problem_figures(
                 problem,
                 performance_histories,
@@ -229,8 +261,12 @@ class Figures:
                 use_time_log_scale,
                 use_evaluation_log_scale,
             )
+            # Fill the tables dedicated to each problem.
+            problems_to_tables[problem.name] = self.__get_problem_tables(
+                performance_histories, problem_dir, table_values_format
+            )
 
-        return problems_to_figures
+        return problems_to_figures, problems_to_tables
 
     def __get_problem_figures(
         self,
@@ -243,7 +279,7 @@ class Figures:
         max_feasible_performance: float,
         use_time_log_scale: bool,
         use_evaluation_log_scale: bool,
-    ) -> dict[str, str]:
+    ) -> ProblemFigurePaths:
         """Return the results figures of a problem.
 
         Args:
@@ -261,16 +297,16 @@ class Figures:
                 for the number of function evaluations axis.
 
         Returns:
-            The paths to the figures.
+            The paths to the figures dedicated to the problem.
         """
         figures = {
-            self._FileName.DATA_PROFILE: self.__plot_data_profiles(
+            self._FigureFileName.DATA_PROFILE: self.__plot_data_profiles(
                 problem, directory_path, use_evaluation_log_scale
             )
         }
         (
-            figures[self._FileName.PERFORMANCE_MEASURE],
-            figures[self._FileName.PERFORMANCE_MEASURE_FOCUS],
+            figures[self._FigureFileName.PERFORMANCE_MEASURE],
+            figures[self._FigureFileName.PERFORMANCE_MEASURE_FOCUS],
         ) = self.__plot_performance_measure(
             problem,
             performance_histories,
@@ -280,13 +316,13 @@ class Figures:
             plot_only_median,
             use_evaluation_log_scale,
         )
-        figures[self._FileName.EXECUTION_TIME] = self.__plot_execution_time(
+        figures[self._FigureFileName.EXECUTION_TIME] = self.__plot_execution_time(
             performance_histories,
             directory_path,
             use_time_log_scale,
         )
         if problem.constraints_names:
-            figures[self._FileName.INFEASIBILITY_MEASURE] = (
+            figures[self._FigureFileName.INFEASIBILITY_MEASURE] = (
                 self.__plot_infeasibility_measure(
                     performance_histories,
                     directory_path,
@@ -295,7 +331,7 @@ class Figures:
                     plot_all_histories,
                 )
             )
-            figures[self._FileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS] = (
+            figures[self._FigureFileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS] = (
                 self.__plot_number_of_unsatisfied_constraints(
                     performance_histories,
                     directory_path,
@@ -343,7 +379,7 @@ class Figures:
 
             return self.plot_data_profiles(use_evaluation_log_scale)
 
-        file_path = directory_path / self._FileName.DATA_PROFILE.value
+        file_path = directory_path / self._FigureFileName.DATA_PROFILE.value
         problem.compute_data_profile(
             self.__algorithm_configurations,
             self.__results,
@@ -396,10 +432,7 @@ class Figures:
         self.__plot_range(
             axes,
             performance_histories,
-            lambda history: [
-                item.objective_value if item.is_feasible else numpy.nan
-                for item in history
-            ],
+            self.__get_performance_measure,
             "Performance measure",
             max_feasible_objective,
             plot_only_median,
@@ -415,7 +448,7 @@ class Figures:
         if use_performance_log_scale:
             axes.set_yscale(self.__MATPLOTLIB_LOG_SCALE)
 
-        file_path = directory_path / self._FileName.PERFORMANCE_MEASURE.value
+        file_path = directory_path / self._FigureFileName.PERFORMANCE_MEASURE.value
         save_show_figure(figure, False, file_path)
 
         # Plot a focus on the target values
@@ -435,10 +468,15 @@ class Figures:
         )
         targets_axes.set_ylim(performance_axes.get_ylim())
         focus_file_path = (
-            directory_path / self._FileName.PERFORMANCE_MEASURE_FOCUS.value
+            directory_path / self._FigureFileName.PERFORMANCE_MEASURE_FOCUS.value
         )
         save_show_figure(figure, False, focus_file_path)
         return file_path, focus_file_path
+
+    @staticmethod
+    def __get_performance_measure(item: HistoryItem) -> float:
+        """Return the performance measure of a history item."""
+        return item.objective_value if item.is_feasible else numpy.nan
 
     def __plot_infeasibility_measure(
         self,
@@ -461,14 +499,14 @@ class Figures:
         Returns:
             The path to the figure.
         """
-        file_path = directory_path / self._FileName.INFEASIBILITY_MEASURE.value
+        file_path = directory_path / self._FigureFileName.INFEASIBILITY_MEASURE.value
         figure = matplotlib.pyplot.figure()
         axes = figure.gca()
         axes.set_yscale(self.__MATPLOTLIB_LOG_SCALE)
         self.__plot_range(
             axes,
             performance_histories,
-            lambda history: [item.infeasibility_measure for item in history],
+            self.__get_infeasibility_measure,
             "Infeasibility measure",
             None,
             plot_only_median,
@@ -477,6 +515,11 @@ class Figures:
         )
         save_show_figure(figure, False, file_path)
         return file_path
+
+    @staticmethod
+    def __get_infeasibility_measure(item: HistoryItem) -> float:
+        """Return the infeasibility measure of a history item."""
+        return item.infeasibility_measure
 
     def __plot_number_of_unsatisfied_constraints(
         self,
@@ -501,16 +544,15 @@ class Figures:
             The path to the figure.
         """
         file_path = (
-            directory_path / self._FileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS.value
+            directory_path
+            / self._FigureFileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS.value
         )
         figure = matplotlib.pyplot.figure()
         axes = figure.gca()
         self.__plot_range(
             axes,
             performance_histories,
-            lambda history: [
-                numpy.nan if n is None else n for n in history.n_unsatisfied_constraints
-            ],
+            self.__get_number_of_unsatisfied_constraints,
             "Number of unsatisfied constraints",
             None,
             plot_only_median,
@@ -521,11 +563,17 @@ class Figures:
         save_show_figure(figure, False, file_path)
         return file_path
 
+    @staticmethod
+    def __get_number_of_unsatisfied_constraints(item: HistoryItem) -> int | float:
+        """Return the number of unsatisfied constraints of a history item."""
+        number = item.n_unsatisfied_constraints
+        return numpy.nan if number is None else number
+
     def __plot_range(
         self,
         axes: matplotlib.axes.Axes,
         performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
-        data_getter: callable[[PerformanceHistory], list[int | float]],
+        data_getter: callable[[HistoryItem], int | float],
         y_label: str,
         max_feasible_objective: float,
         plot_only_median: bool,
@@ -539,7 +587,7 @@ class Figures:
             performance_histories: The performance histories
                 of each algorithm configuration.
             data_getter: A function that gets the data of interest
-                from a performance history.
+                from an item of a performance history.
             y_label: The label of the vertical axis.
             max_feasible_objective: The maximum feasible value
                 of the objective function.
@@ -551,7 +599,8 @@ class Figures:
         for algo_config, histories in performance_histories.items():
             name = algo_config.name
             data = numpy.array([
-                data_getter(history) for history in histories.get_equal_size_histories()
+                [data_getter(item) for item in history]
+                for history in histories.get_equal_size_histories()
             ])
             if plot_all_histories:
                 axes.plot(
@@ -598,7 +647,7 @@ class Figures:
         Returns:
             The path to the figure.
         """
-        file_path = directory_path / self._FileName.EXECUTION_TIME.value
+        file_path = directory_path / self._FigureFileName.EXECUTION_TIME.value
         figure, axes = matplotlib.pyplot.subplots()
         data = [
             [
@@ -654,7 +703,7 @@ class Figures:
         use_evaluation_log_scale: bool,
         use_performance_log_scale: bool,
         plot_all_histories: bool,
-    ) -> dict[str, dict[_FileName, Path]]:
+    ) -> dict[str, dict[_FigureFileName, Path]]:
         """Return the figures associated with algorithm configurations for a problem.
 
         Args:
@@ -697,10 +746,12 @@ class Figures:
             )
             configuration_dir = directory_path / join_substrings(configuration.name)
             configuration_dir.mkdir()
-            file_path = configuration_dir / self._FileName.PERFORMANCE_MEASURE.value
+            file_path = (
+                configuration_dir / self._FigureFileName.PERFORMANCE_MEASURE.value
+            )
             save_show_figure(figure, False, file_path)
             figures[configuration.name] = {
-                self._FileName.PERFORMANCE_MEASURE: file_path
+                self._FigureFileName.PERFORMANCE_MEASURE: file_path
             }
             # Focus on the targets qnd save another figure
             performance_axes, targets_axes = figure.axes
@@ -708,12 +759,12 @@ class Figures:
             performance_axes.set_ylim(top=max(problem.target_values).objective_value)
             targets_axes.set_ylim(performance_axes.get_ylim())
             file_path = (
-                configuration_dir / self._FileName.PERFORMANCE_MEASURE_FOCUS.value
+                configuration_dir / self._FigureFileName.PERFORMANCE_MEASURE_FOCUS.value
             )
             save_show_figure(figure, False, file_path)
-            figures[configuration.name][self._FileName.PERFORMANCE_MEASURE_FOCUS] = (
-                file_path
-            )
+            figures[configuration.name][
+                self._FigureFileName.PERFORMANCE_MEASURE_FOCUS
+            ] = file_path
 
         if problem.constraints_names:
             # Plot the infeasibility measure distribution for each configuration
@@ -736,12 +787,12 @@ class Figures:
                 file_path = (
                     directory_path
                     / join_substrings(configuration.name)
-                    / self._FileName.INFEASIBILITY_MEASURE.value
+                    / self._FigureFileName.INFEASIBILITY_MEASURE.value
                 )
                 save_show_figure(figure, False, file_path)
-                figures[configuration.name][self._FileName.INFEASIBILITY_MEASURE] = (
-                    file_path
-                )
+                figures[configuration.name][
+                    self._FigureFileName.INFEASIBILITY_MEASURE
+                ] = file_path
 
             constraints_figures = {}
             for configuration in self.__algorithm_configurations:
@@ -764,11 +815,11 @@ class Figures:
                 file_path = (
                     directory_path
                     / join_substrings(configuration.name)
-                    / self._FileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS.value
+                    / self._FigureFileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS.value
                 )
                 save_show_figure(figure, False, file_path)
                 figures[configuration.name][
-                    self._FileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS
+                    self._FigureFileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS
                 ] = file_path
 
         return figures
@@ -793,3 +844,69 @@ class Figures:
         for figure in figures:
             figure.gca().set_xlim(*xlim)
             figure.gca().set_ylim(*ylim)
+
+    @classmethod
+    def __get_problem_tables(
+        cls,
+        performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
+        directory_path: Path,
+        table_values_format: str,
+    ) -> ProblemTablePaths:
+        """Tabulate statistics on final data achieved by algorithm configurations.
+
+        Args:
+            performance_histories: The performance histories
+                of each algorithm configuration.
+            directory_path: The path to the directory where to save the CSV files.
+            table_values_format: The string format for the table values.
+
+        Returns:
+            The paths to the tables dedicated to the problem.
+        """
+        tables = {configuration.name: {} for configuration in performance_histories}
+        final_history_items = {
+            configuration: [history[-1] for history in histories]
+            for configuration, histories in performance_histories.items()
+        }
+        for data_getter, file_name in [
+            (
+                cls.__get_performance_measure,
+                Figures._TableFileName.PERFORMANCE_MEASURE,
+            ),
+            (
+                cls.__get_infeasibility_measure,
+                Figures._TableFileName.INFEASIBILITY_MEASURE,
+            ),
+            (
+                cls.__get_number_of_unsatisfied_constraints,
+                Figures._TableFileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS,
+            ),
+        ]:
+            data = pandas.DataFrame(
+                {
+                    configuration.name: [
+                        f"{{value:{table_values_format}}}".format(value=value)
+                        for value in numpy.percentile(
+                            [data_getter(item) for item in history_items],
+                            tuple(cls.__TABLE_PERCENTILES.values()),
+                        )
+                    ]
+                    for configuration, history_items in final_history_items.items()
+                },
+                cls.__TABLE_PERCENTILES,
+            )
+            # Save the data for the whole group of algorithm configurations.
+            file_path = directory_path / file_name.value
+            data.iloc[::-1].T.to_csv(file_path)
+            tables[file_name] = file_path
+            # Save the data for each algorithm configuration.
+            for configuration in performance_histories:
+                file_path = (
+                    directory_path
+                    / join_substrings(configuration.name)
+                    / file_name.value
+                )
+                data[configuration.name].to_csv(file_path)
+                tables[configuration.name][file_name] = file_path
+
+        return tables

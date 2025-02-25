@@ -18,7 +18,6 @@
 import shutil
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Union
 from unittest import mock
 
 import pytest
@@ -81,7 +80,7 @@ def test_plot(
         plot_only_median,
         use_time_log_scale,
         use_evaluation_log_scale,
-    )
+    )[0]
     baseline_path = (
         Path(__file__).parent
         / "baseline_images"
@@ -101,7 +100,7 @@ def test_plot(
 
 def __check_problem_images(
     tmp_path: Path,
-    paths: Mapping[str, Union[Figures._FileName, Mapping[str, Figures._FileName]]],
+    paths: Mapping[str, Figures.ProblemFigurePaths],
     problem_name: str,
     algorithm_name: str,
     baseline_path: Path,
@@ -111,47 +110,35 @@ def __check_problem_images(
         tmp_path,
         paths,
         problem_name,
-        Figures._FileName.PERFORMANCE_MEASURE,
+        Figures._FigureFileName.PERFORMANCE_MEASURE,
         baseline_path,
     )
     __check_problem_image(
         tmp_path,
         paths,
         problem_name,
-        Figures._FileName.PERFORMANCE_MEASURE_FOCUS,
+        Figures._FigureFileName.PERFORMANCE_MEASURE_FOCUS,
         baseline_path,
     )
     __check_problem_image(
         tmp_path,
         paths,
         problem_name,
-        Figures._FileName.INFEASIBILITY_MEASURE,
+        Figures._FigureFileName.INFEASIBILITY_MEASURE,
         baseline_path,
     )
     __check_problem_image(
         tmp_path,
         paths,
         problem_name,
-        Figures._FileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS,
+        Figures._FigureFileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS,
         baseline_path,
     )
     __check_problem_image(
-        tmp_path, paths, problem_name, Figures._FileName.EXECUTION_TIME, baseline_path
-    )
-    __check_algorithm_image(
         tmp_path,
         paths,
         problem_name,
-        algorithm_name,
-        Figures._FileName.PERFORMANCE_MEASURE,
-        baseline_path,
-    )
-    __check_algorithm_image(
-        tmp_path,
-        paths,
-        problem_name,
-        algorithm_name,
-        Figures._FileName.PERFORMANCE_MEASURE_FOCUS,
+        Figures._FigureFileName.EXECUTION_TIME,
         baseline_path,
     )
     __check_algorithm_image(
@@ -159,7 +146,7 @@ def __check_problem_images(
         paths,
         problem_name,
         algorithm_name,
-        Figures._FileName.INFEASIBILITY_MEASURE,
+        Figures._FigureFileName.PERFORMANCE_MEASURE,
         baseline_path,
     )
     __check_algorithm_image(
@@ -167,16 +154,32 @@ def __check_problem_images(
         paths,
         problem_name,
         algorithm_name,
-        Figures._FileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS,
+        Figures._FigureFileName.PERFORMANCE_MEASURE_FOCUS,
+        baseline_path,
+    )
+    __check_algorithm_image(
+        tmp_path,
+        paths,
+        problem_name,
+        algorithm_name,
+        Figures._FigureFileName.INFEASIBILITY_MEASURE,
+        baseline_path,
+    )
+    __check_algorithm_image(
+        tmp_path,
+        paths,
+        problem_name,
+        algorithm_name,
+        Figures._FigureFileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS,
         baseline_path,
     )
 
 
 def __check_problem_image(
     tmp_path: Path,
-    paths: Mapping[str, Figures._FileName],
+    paths: Mapping[str, Figures.ProblemFigurePaths],
     problem_name: str,
-    file_name: Figures._FileName,
+    file_name: Figures._FigureFileName,
     baseline_path: Path,
 ) -> None:
     """Check the plotting of a figure dedicated to a problem."""
@@ -190,10 +193,10 @@ def __check_problem_image(
 
 def __check_algorithm_image(
     tmp_path: Path,
-    paths: Mapping[str, Figures._FileName],
+    paths: Mapping[str, Figures.ProblemFigurePaths],
     problem_name: str,
     algorithm_name: str,
-    file_name: Figures._FileName,
+    file_name: Figures._FigureFileName,
     baseline_path: Path,
 ) -> None:
     """Check the plotting of a figure dedicated to an algorithm configuration."""
@@ -218,6 +221,115 @@ def __check_image(
             False,
         )
         is None
+    )
+
+
+def test_tables(tmp_path, problems_figures) -> None:
+    """Check the tables dedicated to each problem."""
+    tables = problems_figures.plot(False, False, False, False, False)[1]
+    baseline_path = (
+        Path(__file__).parent / "baseline_tables" / "test_figures" / "test_tables"
+    )
+    __check_problem_tables(tmp_path, tables, "Problem_A", "SLSQP", baseline_path)
+    __check_problem_tables(tmp_path, tables, "Problem_B", "SLSQP", baseline_path)
+
+
+def __check_problem_tables(
+    tmp_path: Path,
+    paths: Mapping[str, Figures.ProblemTablePaths],
+    problem_name: str,
+    algorithm_name: str,
+    baseline_path: Path,
+) -> None:
+    """Check the tables dedicated to a problem."""
+    __check_problem_table(
+        tmp_path,
+        paths,
+        problem_name,
+        Figures._TableFileName.PERFORMANCE_MEASURE,
+        baseline_path,
+    )
+    __check_problem_table(
+        tmp_path,
+        paths,
+        problem_name,
+        Figures._TableFileName.INFEASIBILITY_MEASURE,
+        baseline_path,
+    )
+    __check_problem_table(
+        tmp_path,
+        paths,
+        problem_name,
+        Figures._TableFileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS,
+        baseline_path,
+    )
+    __check_algorithm_table(
+        tmp_path,
+        paths,
+        problem_name,
+        algorithm_name,
+        Figures._TableFileName.PERFORMANCE_MEASURE,
+        baseline_path,
+    )
+    __check_algorithm_table(
+        tmp_path,
+        paths,
+        problem_name,
+        algorithm_name,
+        Figures._TableFileName.INFEASIBILITY_MEASURE,
+        baseline_path,
+    )
+    __check_algorithm_table(
+        tmp_path,
+        paths,
+        problem_name,
+        algorithm_name,
+        Figures._TableFileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS,
+        baseline_path,
+    )
+
+
+def __check_problem_table(
+    tmp_path: Path,
+    paths: Mapping[str, Figures.ProblemTablePaths],
+    problem_name: str,
+    file_name: Figures._TableFileName,
+    baseline_path: Path,
+) -> None:
+    """Check a table dedicated to a problem."""
+    __check_table(
+        tmp_path,
+        paths[problem_name.replace("_", " ")][file_name],
+        tmp_path / problem_name / file_name.value,
+        baseline_path,
+    )
+
+
+def __check_algorithm_table(
+    tmp_path: Path,
+    paths: Mapping[str, Figures.ProblemTablePaths],
+    problem_name: str,
+    algorithm_name: str,
+    file_name: Figures._TableFileName,
+    baseline_path: Path,
+) -> None:
+    """Check a table dedicated to an algorithm configuration."""
+    __check_table(
+        tmp_path,
+        paths[problem_name.replace("_", " ")][algorithm_name][file_name],
+        tmp_path / problem_name / algorithm_name / file_name.value,
+        baseline_path,
+    )
+
+
+def __check_table(
+    tmp_path: Path, generated_path: Path, expected_path: Path, baseline_path: Path
+) -> None:
+    """Check a table."""
+    assert generated_path == expected_path
+    assert (
+        generated_path.open().readlines()
+        == (baseline_path / generated_path.relative_to(tmp_path)).open().readlines()
     )
 
 
