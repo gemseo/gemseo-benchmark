@@ -15,6 +15,10 @@ Performance measure
 
    The performance measure of algorithm configuration '{{ algorithm_configuration.name }}' for problem ':ref:`{{ problem.name }}`'.
 
+.. csv-table:: The *final* feasible performance measure of algorithm configuration '{{ algorithm_configuration.name }}' for problem ':ref:`{{ problem.name }}`'.
+   :file: /{{ tables["performance_measure.csv"] }}
+   :header-rows: 1
+   :stub-columns: 1
 {% if problem.constraints_names %}
 Infeasibility measure
 ---------------------
@@ -24,6 +28,10 @@ Infeasibility measure
 
    The infeasibility measure of algorithm configuration '{{ algorithm_configuration.name }}' for problem ':ref:`{{ problem.name }}`'.
 
+.. csv-table:: The *final* infeasibility measure of algorithm configuration '{{ algorithm_configuration.name }}' for problem ':ref:`{{ problem.name }}`'.
+   :file: /{{ tables["infeasibility_measure.csv"] }}
+   :header-rows: 1
+   :stub-columns: 1
 
 Number of unsatisfied constraints
 ---------------------------------
@@ -33,4 +41,8 @@ Number of unsatisfied constraints
 
    The number of unsatisfied constraints of algorithm configuration '{{ algorithm_configuration.name }}' for problem ':ref:`{{ problem.name }}`'.
 
+.. csv-table:: The *final* number of unsatisfied constraints of algorithm configuration '{{ algorithm_configuration.name }}' for problem ':ref:`{{ problem.name }}`'.
+   :file: /{{ tables["number_of_unsatisfied_constraints.csv"] }}
+   :header-rows: 1
+   :stub-columns: 1
 {% endif %}

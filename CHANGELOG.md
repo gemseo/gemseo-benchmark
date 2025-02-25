@@ -49,16 +49,16 @@ and this project adheres to
   plot only the median of the performance measure rather than its whole range
   thanks to the new boolean argument ``plot_only_median``.
 - On the page dedicated to the benchmarking problems,
-  the infeasibility measure of infeasibe target values is now displayed.
-- Graphs have been added to the pages dedicated to each problem:
+  the infeasibility measure of infeasible target values is now displayed.
+- Graphs and tables have been added to the pages dedicated to each problem:
   they show a focus on the performance measure near the target values,
   the execution time,
   the infeasibility measure,
   and the number of unsatisfied constraints.
 - Pages dedicated to the results of each algorithm configuration on each problem
   have been added.
-  They feature graphs representing the performance measure, the infeasibility measure,
-  and the number of unsatisfied constraints.
+  They feature graphs and tables representing the performance measure,
+  the infeasibility measure, and the number of unsatisfied constraints.
 - The scale of the axis showing the number of function evaluations
   can now be made logarithmic.
 
