@@ -8,6 +8,8 @@ babel==2.17.0
     # via
     #   mkdocs-material
     #   sphinx
+backrefs==5.8
+    # via mkdocs-material
 black==25.1.0
     # via gemseo-benchmark (pyproject.toml)
 bracex==2.5.post1
@@ -42,7 +44,7 @@ fastjsonschema==2.21.1
     # via gemseo
 fonttools==4.56.0
     # via matplotlib
-gemseo @ git+https://gitlab.com/gemseo/dev/gemseo.git@95d1851bb08153a3c8635eb87121a3ab4d264b38
+gemseo @ git+https://gitlab.com/gemseo/dev/gemseo.git@a2d4011c32797588f7fad04c6c81728cef5bb0ac
     # via
     #   -c requirements/test-constraints.in
     #   gemseo-benchmark (pyproject.toml)
@@ -52,7 +54,7 @@ ghp-import==2.1.0
     # via mkdocs
 graphviz==0.20.3
     # via gemseo
-griffe==1.5.7
+griffe==1.6.0
     # via
     #   griffe-inherited-docstrings
     #   mkdocstrings-python
@@ -132,7 +134,7 @@ mkdocs-autorefs==1.4.0
     # via
     #   mkdocstrings
     #   mkdocstrings-python
-mkdocs-bibtex==4.2.1
+mkdocs-bibtex==4.2.2
     # via gemseo-benchmark (pyproject.toml)
 mkdocs-gallery==0.10.4
     # via gemseo-benchmark (pyproject.toml)
@@ -146,7 +148,7 @@ mkdocs-include-markdown-plugin==7.1.4
     # via gemseo-benchmark (pyproject.toml)
 mkdocs-literate-nav==0.6.1
     # via gemseo-benchmark (pyproject.toml)
-mkdocs-material==9.6.5
+mkdocs-material==9.6.6
     # via
     #   gemseo-benchmark (pyproject.toml)
     #   mkdocs-gallery
@@ -264,8 +266,6 @@ pyyaml-env-tag==0.1
     # via
     #   mike
     #   mkdocs
-regex==2024.11.6
-    # via mkdocs-material
 requests==2.32.3
     # via
     #   gemseo
