@@ -1750,6 +1750,7 @@
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -1770,7 +1771,7 @@
 <a href="#gemseo_benchmark.scenario.Scenario" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">Scenario</span><span class="p">(</span>
     <span class="n">algorithms_configurations_groups</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a></span><span class="p">[</span>
-        <span class="n"><a class="autorefs autorefs-internal" title="gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations" href="../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></span>
+        <span class="n"><a class="autorefs autorefs-internal" title="            AlgorithmsConfigurations (gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations)" href="../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></span>
     <span class="p">],</span>
     <span class="n">outputs_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span><span class="p">,</span>
 <span class="p">)</span>
@@ -1787,7 +1788,7 @@
     <ul>
         <li class="doc-section-item field-body">
             <b><code>algorithms_configurations_groups</code></b>
-              (<code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-internal" title="gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations" href="../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a>]</code>)
+              (<code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-internal" title="            AlgorithmsConfigurations (gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations)" href="../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a>]</code>)
           –
           <div class="doc-md-description">
             <p>The groups of algorithms configurations
@@ -1816,6 +1817,7 @@ to be benchmarked.</p>
           </div>
         </li>
     </ul>
+
 
 
 
@@ -1893,7 +1895,7 @@ to be benchmarked.</p>
 
 <a href="#gemseo_benchmark.scenario.Scenario.execute" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">execute</span><span class="p">(</span>
-    <span class="n">problems_groups</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="gemseo_benchmark.problems.problems_group.ProblemsGroup" href="../problems/problems_group/#gemseo_benchmark.problems.problems_group.ProblemsGroup">ProblemsGroup</a></span><span class="p">],</span>
+    <span class="n">problems_groups</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            ProblemsGroup (gemseo_benchmark.problems.problems_group.ProblemsGroup)" href="../problems/problems_group/#gemseo_benchmark.problems.problems_group.ProblemsGroup">ProblemsGroup</a></span><span class="p">],</span>
     <span class="n">overwrite_histories</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">skip_solvers</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">skip_report</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -1913,7 +1915,7 @@ to be benchmarked.</p>
     <span class="n">directory_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">plot_only_median</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">use_evaluation_log_scale</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="gemseo_benchmark.results.results.Results" href="../results/results/#gemseo_benchmark.results.results.Results">Results</a></span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            Results (gemseo_benchmark.results.results.Results)" href="../results/results/#gemseo_benchmark.results.results.Results">Results</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1925,7 +1927,7 @@ to be benchmarked.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>problems_groups</code></b>
-              (<code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-internal" title="gemseo_benchmark.problems.problems_group.ProblemsGroup" href="../problems/problems_group/#gemseo_benchmark.problems.problems_group.ProblemsGroup">ProblemsGroup</a>]</code>)
+              (<code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-internal" title="            ProblemsGroup (gemseo_benchmark.problems.problems_group.ProblemsGroup)" href="../problems/problems_group/#gemseo_benchmark.problems.problems_group.ProblemsGroup">ProblemsGroup</a>]</code>)
           –
           <div class="doc-md-description">
             <p>The groups of benchmarking problems.</p>
@@ -2119,13 +2121,14 @@ for the number of function evaluations axis.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-internal" title="gemseo_benchmark.results.results.Results" href="../results/results/#gemseo_benchmark.results.results.Results">Results</a></code>
+              <code><a class="autorefs autorefs-internal" title="            Results (gemseo_benchmark.results.results.Results)" href="../results/results/#gemseo_benchmark.results.results.Results">Results</a></code>
           –
           <div class="doc-md-description">
             <p>The performance histories.</p>
           </div>
         </li>
     </ul>
+
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/scenario.py</code></summary>

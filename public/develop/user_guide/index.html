@@ -1792,7 +1792,7 @@
 -->
 
 <h1 id="user-guide">User guide<a class="headerlink" href="#user-guide" title="Permanent link">&para;</a></h1>
-<p>The <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/#gemseo_benchmark">gemseo_benchmark</a> package provides
+<p>The <a class="autorefs autorefs-internal" title="            gemseo_benchmark" href="../reference/gemseo_benchmark/#gemseo_benchmark">gemseo_benchmark</a> package provides
 functionalities to benchmark optimization algorithms, that is, to
 measure and compare their performances.</p>
 <p>A typical use of this package consists of the following steps:</p>
@@ -1815,12 +1815,12 @@ measure and compare their performances.</p>
 <p class="admonition-title">Note</p>
 <p>Other algorithms will be supported in the future (ex: root-finding algorithms).</p>
 </div>
-<p>The following sections present the sub-packages of <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/#gemseo_benchmark">gemseo_benchmark</a>.</p>
+<p>The following sections present the sub-packages of <a class="autorefs autorefs-internal" title="            gemseo_benchmark" href="../reference/gemseo_benchmark/#gemseo_benchmark">gemseo_benchmark</a>.</p>
 <h2 id="algorithms-configurations">Algorithms configurations<a class="headerlink" href="#algorithms-configurations" title="Permanent link">&para;</a></h2>
-<p>The <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/algorithms/#gemseo_benchmark.algorithms">gemseo_benchmark.algorithms</a>
+<p>The <a class="autorefs autorefs-internal" title="            algorithms" href="../reference/gemseo_benchmark/algorithms/#gemseo_benchmark.algorithms">gemseo_benchmark.algorithms</a>
 sub-package is responsible for the definition of the algorithms
 configurations to be investigated in a benchmarking study.</p>
-<p>An <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/algorithms/algorithm_configuration/#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration">AlgorithmConfiguration</a> contains:</p>
+<p>An <a class="autorefs autorefs-internal" title="            AlgorithmConfiguration" href="../reference/gemseo_benchmark/algorithms/algorithm_configuration/#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration">AlgorithmConfiguration</a> contains:</p>
 <ul>
 <li>the name of an algorithm,</li>
 <li>optionally, a name for the configuration (it will be generated
@@ -1849,7 +1849,7 @@ value, say 20.</p>
 options set to their default values.</p>
 <div class="highlight"><pre><span></span><code><span class="n">slsqp_default</span> <span class="o">=</span> <span class="n">AlgorithmConfiguration</span><span class="p">(</span><span class="s2">&quot;SLSQP&quot;</span><span class="p">)</span>
 </code></pre></div>
-<p>The class <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a>
+<p>The class <a class="autorefs autorefs-internal" title="            AlgorithmsConfigurations" href="../reference/gemseo_benchmark/algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a>
 is
 useful to gather algorithms configurations in groups so that they be
 treated together in a <a href="#report">benchmarking report</a>.</p>
@@ -1860,10 +1860,10 @@ treated together in a <a href="#report">benchmarking report</a>.</p>
 <span class="p">)</span>
 </code></pre></div>
 <h2 id="benchmarking-problems">Benchmarking problems<a class="headerlink" href="#benchmarking-problems" title="Permanent link">&para;</a></h2>
-<p>The <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/problems/#gemseo_benchmark.problems">gemseo_benchmark.problems</a>
+<p>The <a class="autorefs autorefs-internal" title="            problems" href="../reference/gemseo_benchmark/problems/#gemseo_benchmark.problems">gemseo_benchmark.problems</a>
 sub-package handles the benchmarking problems, on which the performances
 of the algorithms configurations is to be measured.</p>
-<p>A <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/problems/problem/#gemseo_benchmark.problems.problem.Problem">Problem</a> contains the mathematical
+<p>A <a class="autorefs autorefs-internal" title="            Problem" href="../reference/gemseo_benchmark/problems/problem/#gemseo_benchmark.problems.problem.Problem">Problem</a> contains the mathematical
 definition of the problem, as an <a class="autorefs autorefs-external" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.algos.optimization_problem.html#gemseo.algos.optimization_problem.OptimizationProblem">OptimizationProblem</a>, and requires three other features.</p>
 <ol>
 <li>The starting points, from which the algorithms configurations should
@@ -1900,7 +1900,7 @@ definition of the problem, as an <a class="autorefs autorefs-external" href="htt
 </code></pre></div>
 </li>
 </ul>
-<p>(The class <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/data_profiles/target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a> will be
+<p>(The class <a class="autorefs autorefs-internal" title="            TargetValues" href="../reference/gemseo_benchmark/data_profiles/target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a> will be
 presented <a href="#target-values">further down</a>.)</p>
 <div class="highlight"><pre><span></span><code><span class="n">rastrigin</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span>
     <span class="s2">&quot;Rastrigin&quot;</span><span class="p">,</span>
@@ -1918,7 +1918,7 @@ presented <a href="#target-values">further down</a>.)</p>
     <span class="n">optimum</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
-<p>Note that the second argument of <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/problems/problem/#gemseo_benchmark.problems.problem.Problem">Problem</a> must be callable.
+<p>Note that the second argument of <a class="autorefs autorefs-internal" title="            Problem" href="../reference/gemseo_benchmark/problems/problem/#gemseo_benchmark.problems.problem.Problem">Problem</a> must be callable.
 For example, a five-variables
 benchmarking problem based on <a class="autorefs autorefs-external" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.problems.optimization.rosenbrock.html#gemseo.problems.optimization.rosenbrock.Rosenbrock">Rosenbrock</a> may be defined as follows.</p>
 <div class="highlight"><pre><span></span><code><span class="n">rosenbrock_5d</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span>
@@ -1929,7 +1929,7 @@ benchmarking problem based on <a class="autorefs autorefs-external" href="https:
     <span class="n">optimum</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
-<p>The class <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/problems/problems_group/#gemseo_benchmark.problems.problems_group.ProblemsGroup">ProblemsGroup</a> is useful to
+<p>The class <a class="autorefs autorefs-internal" title="            ProblemsGroup" href="../reference/gemseo_benchmark/problems/problems_group/#gemseo_benchmark.problems.problems_group.ProblemsGroup">ProblemsGroup</a> is useful to
 gather reference problems in groups so that they be treated together in
 a <a href="#report">benchmarking report</a>.</p>
 <div class="highlight"><pre><span></span><code><span class="n">problems_2D</span> <span class="o">=</span> <span class="n">ProblemsGroup</span><span class="p">(</span>
@@ -1939,12 +1939,12 @@ a <a href="#report">benchmarking report</a>.</p>
 <span class="p">)</span>
 </code></pre></div>
 <h2 id="results">Results<a class="headerlink" href="#results" title="Permanent link">&para;</a></h2>
-<p>The <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/results/#gemseo_benchmark.results">gemseo_benchmark.results</a>
+<p>The <a class="autorefs autorefs-internal" title="            results" href="../reference/gemseo_benchmark/results/#gemseo_benchmark.results">gemseo_benchmark.results</a>
 sub-package manages the results produced by the algorithms
 configurations on the benchmarking problems.</p>
 <p>The history of the data produced by an algorithm configuration on a
 benchmarking problem is stored in a
-<a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/results/performance_history/#gemseo_benchmark.results.performance_history.PerformanceHistory">PerformanceHistory</a>.
+<a class="autorefs autorefs-internal" title="            PerformanceHistory" href="../reference/gemseo_benchmark/results/performance_history/#gemseo_benchmark.results.performance_history.PerformanceHistory">PerformanceHistory</a>.
 More precisely:</p>
 <ul>
 <li>A value of interest in the benchmarking of algorithms is defined and
@@ -1953,35 +1953,35 @@ More precisely:</p>
     value of the objective function for an optimization problem, or the
     value of a residual for a nonlinear equation.</li>
 <li>Each performance value is stored in a
-    <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/results/history_item/#gemseo_benchmark.results.history_item.HistoryItem">HistoryItem</a>, along with an
+    <a class="autorefs autorefs-internal" title="            HistoryItem" href="../reference/gemseo_benchmark/results/history_item/#gemseo_benchmark.results.history_item.HistoryItem">HistoryItem</a>, along with an
     infeasibility measure (especially for problems subject to
     constraints).</li>
-<li>A <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/results/performance_history/#gemseo_benchmark.results.performance_history.PerformanceHistory">PerformanceHistory</a> is a
-    sequence of <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/results/history_item/#gemseo_benchmark.results.history_item.HistoryItem">HistoryItem</a>s.
+<li>A <a class="autorefs autorefs-internal" title="            PerformanceHistory" href="../reference/gemseo_benchmark/results/performance_history/#gemseo_benchmark.results.performance_history.PerformanceHistory">PerformanceHistory</a> is a
+    sequence of <a class="autorefs autorefs-internal" title="            HistoryItem" href="../reference/gemseo_benchmark/results/history_item/#gemseo_benchmark.results.history_item.HistoryItem">HistoryItem</a>s.
     The index of the sequence is understood as the 0-based number of
     functions evaluations.</li>
 </ul>
-<p>A <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/results/performance_history/#gemseo_benchmark.results.performance_history.PerformanceHistory">PerformanceHistory</a> may be saved to
+<p>A <a class="autorefs autorefs-internal" title="            PerformanceHistory" href="../reference/gemseo_benchmark/results/performance_history/#gemseo_benchmark.results.performance_history.PerformanceHistory">PerformanceHistory</a> may be saved to
 a file in <a href="https://www.json.org">JavaScript Object Notation (JSON)</a>.</p>
-<p>The class <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/results/results/#gemseo_benchmark.results.results.Results">Results</a> gathers the paths
-to each <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/results/performance_history/#gemseo_benchmark.results.performance_history.PerformanceHistory">PerformanceHistory</a> in a
+<p>The class <a class="autorefs autorefs-internal" title="            Results" href="../reference/gemseo_benchmark/results/results/#gemseo_benchmark.results.results.Results">Results</a> gathers the paths
+to each <a class="autorefs autorefs-internal" title="            PerformanceHistory" href="../reference/gemseo_benchmark/results/performance_history/#gemseo_benchmark.results.performance_history.PerformanceHistory">PerformanceHistory</a> in a
 benchmarking study.
-In practice, <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/results/results/#gemseo_benchmark.results.results.Results">Results</a> are generated by a
+In practice, <a class="autorefs autorefs-internal" title="            Results" href="../reference/gemseo_benchmark/results/results/#gemseo_benchmark.results.results.Results">Results</a> are generated by a
 <a href="#scenario">benchmarking scenario</a>, thanks
-to <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/benchmarker/benchmarker/#gemseo_benchmark.benchmarker.benchmarker.Benchmarker.execute">Benchmarker.execute</a>.</p>
+to <a class="autorefs autorefs-internal" title="            execute" href="../reference/gemseo_benchmark/benchmarker/benchmarker/#gemseo_benchmark.benchmarker.benchmarker.Benchmarker.execute">Benchmarker.execute</a>.</p>
 <h2 id="benchmarker">Benchmarker<a class="headerlink" href="#benchmarker" title="Permanent link">&para;</a></h2>
-<p>The <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/benchmarker/#gemseo_benchmark.benchmarker">gemseo_benchmark.benchmarker</a>
+<p>The <a class="autorefs autorefs-internal" title="            benchmarker" href="../reference/gemseo_benchmark/benchmarker/#gemseo_benchmark.benchmarker">gemseo_benchmark.benchmarker</a>
 sub-package is responsible for the generation of the results.</p>
-<p>The class <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/benchmarker/benchmarker/#gemseo_benchmark.benchmarker.benchmarker.Benchmarker">Benchmarker</a> is responsible
+<p>The class <a class="autorefs autorefs-internal" title="            Benchmarker" href="../reference/gemseo_benchmark/benchmarker/benchmarker/#gemseo_benchmark.benchmarker.benchmarker.Benchmarker">Benchmarker</a> is responsible
 for two tasks:</p>
 <ol>
 <li>executing (possibly in parallel) the algorithms configurations on
     the reference problems,</li>
 <li>saving the performance histories to files, and storing their paths
-    in <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/results/results/#gemseo_benchmark.results.results.Results">Results</a>.</li>
+    in <a class="autorefs autorefs-internal" title="            Results" href="../reference/gemseo_benchmark/results/results/#gemseo_benchmark.results.results.Results">Results</a>.</li>
 </ol>
 <h2 id="data-profiles">Datas profiles<a class="headerlink" href="#data-profiles" title="Permanent link">&para;</a></h2>
-<p>The <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/data_profiles/#gemseo_benchmark.data_profiles">gemseo_benchmark.data_profiles</a>
+<p>The <a class="autorefs autorefs-internal" title="            data_profiles" href="../reference/gemseo_benchmark/data_profiles/#gemseo_benchmark.data_profiles">gemseo_benchmark.data_profiles</a>
 sub-package handles the computation of data profiles.</p>
 <p>A <em>data profile</em> is a graph that represents the extent to which an
 algorithm solves a problem (or a group of problems) for a given number
@@ -1998,18 +1998,18 @@ best value known.</p>
 <div class="highlight"><pre><span></span><code>target_values = TargetValues([10**-4, 10**-5, 10**-6, 0.0])
 </code></pre></div>
 <p>Since a sequence of target values is in fact a sequence of
-<a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/results/history_item/#gemseo_benchmark.results.history_item.HistoryItem">HistoryItem</a>s, the class
-<a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/data_profiles/target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a> is a subclass of
-<a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/results/performance_history/#gemseo_benchmark.results.performance_history.PerformanceHistory">PerformanceHistory</a>.</p>
+<a class="autorefs autorefs-internal" title="            HistoryItem" href="../reference/gemseo_benchmark/results/history_item/#gemseo_benchmark.results.history_item.HistoryItem">HistoryItem</a>s, the class
+<a class="autorefs autorefs-internal" title="            TargetValues" href="../reference/gemseo_benchmark/data_profiles/target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a> is a subclass of
+<a class="autorefs autorefs-internal" title="            PerformanceHistory" href="../reference/gemseo_benchmark/results/performance_history/#gemseo_benchmark.results.performance_history.PerformanceHistory">PerformanceHistory</a>.</p>
 <h3 id="targets-generator">Targets generator<a class="headerlink" href="#targets-generator" title="Permanent link">&para;</a></h3>
 <p>The target values of a problem can be handpicked but they can also be
 automatically computed with a generator of target values.</p>
-<p>A <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/data_profiles/targets_generator/#gemseo_benchmark.data_profiles.targets_generator.TargetsGenerator">TargetsGenerator</a> relies on
+<p>A <a class="autorefs autorefs-internal" title="            TargetsGenerator" href="../reference/gemseo_benchmark/data_profiles/targets_generator/#gemseo_benchmark.data_profiles.targets_generator.TargetsGenerator">TargetsGenerator</a> relies on
 algorithms chosen as references.</p>
 <ol>
 <li>The problem is solved with the reference algorithms from each
     starting point.</li>
-<li>Instances of <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/results/performance_history/#gemseo_benchmark.results.performance_history.PerformanceHistory">PerformanceHistory</a>
+<li>Instances of <a class="autorefs autorefs-internal" title="            PerformanceHistory" href="../reference/gemseo_benchmark/results/performance_history/#gemseo_benchmark.results.performance_history.PerformanceHistory">PerformanceHistory</a>
     representing the history of the best performance value (which is
     decreasing) are computed, e.g.
     <span class="arithmatex">\(\{\min_{0\leq i \leq k} f(x_i)\}_{0 \leq k \leq K}\)</span> where <span class="arithmatex">\(f\)</span> is
@@ -2026,7 +2026,7 @@ ratio of target values reached by the algorithm relative to the number
 functions evaluations performed by the algorithm.</p>
 <p><img alt="images/data_profiles.png" src="images/data_profiles.png" /></p>
 <h2 id="report">Report<a class="headerlink" href="#report" title="Permanent link">&para;</a></h2>
-<p>The <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/report/#gemseo_benchmark.report">gemseo_benchmark.report</a> sub-package
+<p>The <a class="autorefs autorefs-internal" title="            report" href="../reference/gemseo_benchmark/report/#gemseo_benchmark.report">gemseo_benchmark.report</a> sub-package
 manages the automatic generation of a benchmarking report in PDF or HTML
 format describing:</p>
 <ul>
@@ -2036,7 +2036,7 @@ format describing:</p>
     in the form of data profiles.</li>
 </ul>
 <h2 id="scenario">Scenario<a class="headerlink" href="#scenario" title="Permanent link">&para;</a></h2>
-<p>The class <a class="autorefs autorefs-internal" href="../reference/gemseo_benchmark/scenario/#gemseo_benchmark.scenario.Scenario">Scenario</a> is the
+<p>The class <a class="autorefs autorefs-internal" title="            Scenario" href="../reference/gemseo_benchmark/scenario/#gemseo_benchmark.scenario.Scenario">Scenario</a> is the
 highest-level class of the package: it lets the user execute the
 algorithms configurations on the problems and generate a benchmarking
 report by calling a single method.</p>

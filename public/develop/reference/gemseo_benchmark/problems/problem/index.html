@@ -2039,6 +2039,7 @@ defining an instance of the problem) and its targets (refer to
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -2063,7 +2064,7 @@ defining an instance of the problem) and its targets (refer to
         <span class="p">[],</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.algos.optimization_problem.OptimizationProblem" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.algos.optimization_problem.html#gemseo.algos.optimization_problem.OptimizationProblem">OptimizationProblem</a></span>
     <span class="p">],</span>
     <span class="n">start_points</span><span class="p">:</span> <span class="n"><span title="gemseo_benchmark.problems.problem.InputStartPoints">InputStartPoints</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">target_values</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="gemseo_benchmark.data_profiles.target_values.TargetValues" href="../../data_profiles/target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">target_values</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            TargetValues (gemseo_benchmark.data_profiles.target_values.TargetValues)" href="../../data_profiles/target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">doe_algo_name</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">doe_size</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">doe_options</span><span class="p">:</span> <span class="p">(</span>
@@ -2071,7 +2072,7 @@ defining an instance of the problem) and its targets (refer to
     <span class="p">)</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">description</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">target_values_algorithms_configurations</span><span class="p">:</span> <span class="p">(</span>
-        <span class="n"><a class="autorefs autorefs-internal" title="gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></span> <span class="o">|</span> <span class="kc">None</span>
+        <span class="n"><a class="autorefs autorefs-internal" title="            AlgorithmsConfigurations (gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations)" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></span> <span class="o">|</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">target_values_number</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">optimum</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2108,7 +2109,13 @@ that returns an instance of the optimization problem.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-          <b><code><a class="autorefs autorefs-internal" title="gemseo_benchmark.problems.problem.Problem.start_points" href="#gemseo_benchmark.problems.problem.Problem.start_points">start_points</a></code></b>
+          <b><code><a class="autorefs autorefs-internal" title="            start_points
+
+
+  
+      property
+      writable
+   (gemseo_benchmark.problems.problem.Problem.start_points)" href="#gemseo_benchmark.problems.problem.Problem.start_points">start_points</a></code></b>
               (<code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-external" title="numpy.ndarray" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a>]</code>)
           –
           <div class="doc-md-description">
@@ -2165,7 +2172,7 @@ will set as the single starting point.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>target_values</code></b>
-              (<code><a class="autorefs autorefs-internal" title="gemseo_benchmark.data_profiles.target_values.TargetValues" href="../../data_profiles/target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a> | None</code>, default:
+              (<code><a class="autorefs autorefs-internal" title="            TargetValues (gemseo_benchmark.data_profiles.target_values.TargetValues)" href="../../data_profiles/target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a> | None</code>, default:
                   <code>None</code>
 )
           –
@@ -2224,7 +2231,7 @@ If <code>None</code>, the problem will not have a description.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>target_values_algorithms_configurations</code></b>
-              (<code><a class="autorefs autorefs-internal" title="gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a> | None</code>, default:
+              (<code><a class="autorefs autorefs-internal" title="            AlgorithmsConfigurations (gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations)" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a> | None</code>, default:
                   <code>None</code>
 )
           –
@@ -2282,6 +2289,7 @@ or if a starting point is of inappropriate shape.</p>
           </div>
         </li>
     </ul>
+
 
 
 
@@ -2511,6 +2519,7 @@ or if a starting point is of inappropriate shape.</p>
     <div class="doc doc-contents ">
 
         <p>The names of the scalar constraints.</p>
+
     </div>
 
 </div>
@@ -2534,6 +2543,7 @@ or if a starting point is of inappropriate shape.</p>
     <div class="doc doc-contents ">
 
         <p>The description of the problem.</p>
+
     </div>
 
 </div>
@@ -2557,6 +2567,7 @@ or if a starting point is of inappropriate shape.</p>
     <div class="doc doc-contents ">
 
         <p>The dimension of the problem.</p>
+
     </div>
 
 </div>
@@ -2580,6 +2591,7 @@ or if a starting point is of inappropriate shape.</p>
     <div class="doc doc-contents ">
 
         <p>The name of the objective function.</p>
+
     </div>
 
 </div>
@@ -2618,6 +2630,7 @@ shape.</p>
           </div>
         </li>
     </ul>
+
     </div>
 
 </div>
@@ -2636,7 +2649,7 @@ shape.</p>
   </span>
 
 <a href="#gemseo_benchmark.problems.problem.Problem.target_values" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">target_values</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="gemseo_benchmark.data_profiles.target_values.TargetValues" href="../../data_profiles/target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a></span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">target_values</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            TargetValues (gemseo_benchmark.data_profiles.target_values.TargetValues)" href="../../data_profiles/target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2654,6 +2667,7 @@ shape.</p>
           </div>
         </li>
     </ul>
+
     </div>
 
 </div>
@@ -2671,12 +2685,13 @@ shape.</p>
   </span>
 
 <a href="#gemseo_benchmark.problems.problem.Problem.targets_generator" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">targets_generator</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="gemseo_benchmark.data_profiles.targets_generator.TargetsGenerator" href="../../data_profiles/targets_generator/#gemseo_benchmark.data_profiles.targets_generator.TargetsGenerator">TargetsGenerator</a></span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">targets_generator</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            TargetsGenerator (gemseo_benchmark.data_profiles.targets_generator.TargetsGenerator)" href="../../data_profiles/targets_generator/#gemseo_benchmark.data_profiles.targets_generator.TargetsGenerator">TargetsGenerator</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>The generator for target values.</p>
+
     </div>
 
 </div>
@@ -2692,8 +2707,8 @@ shape.</p>
 
 <a href="#gemseo_benchmark.problems.problem.Problem.compute_data_profile" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">compute_data_profile</span><span class="p">(</span>
-    <span class="n">algos_configurations</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></span><span class="p">,</span>
-    <span class="n">results</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="gemseo_benchmark.results.results.Results" href="../../results/results/#gemseo_benchmark.results.results.Results">Results</a></span><span class="p">,</span>
+    <span class="n">algos_configurations</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            AlgorithmsConfigurations (gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations)" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></span><span class="p">,</span>
+    <span class="n">results</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Results (gemseo_benchmark.results.results.Results)" href="../../results/results/#gemseo_benchmark.results.results.Results">Results</a></span><span class="p">,</span>
     <span class="n">show</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">file_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">infeasibility_tolerance</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -2715,7 +2730,7 @@ shape.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>algos_configurations</code></b>
-              (<code><a class="autorefs autorefs-internal" title="gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></code>)
+              (<code><a class="autorefs autorefs-internal" title="            AlgorithmsConfigurations (gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations)" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></code>)
           –
           <div class="doc-md-description">
             <p>The algorithms configurations.</p>
@@ -2723,7 +2738,7 @@ shape.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>results</code></b>
-              (<code><a class="autorefs autorefs-internal" title="gemseo_benchmark.results.results.Results" href="../../results/results/#gemseo_benchmark.results.results.Results">Results</a></code>)
+              (<code><a class="autorefs autorefs-internal" title="            Results (gemseo_benchmark.results.results.Results)" href="../../results/results/#gemseo_benchmark.results.results.Results">Results</a></code>)
           –
           <div class="doc-md-description">
             <p>The paths to the reference histories for each algorithm.</p>
@@ -2804,6 +2819,7 @@ for the number of function evaluations axis.</p>
           </div>
         </li>
     </ul>
+
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/problems/problem.py</code></summary>
@@ -2970,6 +2986,7 @@ the history of feasibility statuses.</p>
         </li>
     </ul>
 
+
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/problems/problem.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">430</span>
@@ -3035,14 +3052,14 @@ the history of feasibility statuses.</p>
 <a href="#gemseo_benchmark.problems.problem.Problem.compute_targets" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">compute_targets</span><span class="p">(</span>
     <span class="n">targets_number</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span><span class="p">,</span>
-    <span class="n">ref_algo_configurations</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></span><span class="p">,</span>
+    <span class="n">ref_algo_configurations</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            AlgorithmsConfigurations (gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations)" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></span><span class="p">,</span>
     <span class="n">only_feasible</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">budget_min</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">show</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">file_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">best_target_tolerance</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">disable_stopping</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="gemseo_benchmark.data_profiles.target_values.TargetValues" href="../../data_profiles/target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a></span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            TargetValues (gemseo_benchmark.data_profiles.target_values.TargetValues)" href="../../data_profiles/target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3062,7 +3079,7 @@ the history of feasibility statuses.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>ref_algo_configurations</code></b>
-              (<code><a class="autorefs autorefs-internal" title="gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></code>)
+              (<code><a class="autorefs autorefs-internal" title="            AlgorithmsConfigurations (gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations)" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></code>)
           –
           <div class="doc-md-description">
             <p>The configurations of the reference algorithms.</p>
@@ -3136,13 +3153,14 @@ best target value.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-internal" title="gemseo_benchmark.data_profiles.target_values.TargetValues" href="../../data_profiles/target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a></code>
+              <code><a class="autorefs autorefs-internal" title="            TargetValues (gemseo_benchmark.data_profiles.target_values.TargetValues)" href="../../data_profiles/target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a></code>
           –
           <div class="doc-md-description">
             <p>The generated targets.</p>
           </div>
         </li>
     </ul>
+
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/problems/problem.py</code></summary>
@@ -3317,6 +3335,7 @@ best target value.</p>
         </li>
     </ul>
 
+
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/problems/problem.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">354</span>
@@ -3374,6 +3393,7 @@ best target value.</p>
         </li>
     </ul>
 
+
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/problems/problem.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">463</span>
@@ -3404,8 +3424,8 @@ best target value.</p>
 
 <a href="#gemseo_benchmark.problems.problem.Problem.plot_histories" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">plot_histories</span><span class="p">(</span>
-    <span class="n">algos_configurations</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></span><span class="p">,</span>
-    <span class="n">results</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="gemseo_benchmark.results.results.Results" href="../../results/results/#gemseo_benchmark.results.results.Results">Results</a></span><span class="p">,</span>
+    <span class="n">algos_configurations</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            AlgorithmsConfigurations (gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations)" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></span><span class="p">,</span>
+    <span class="n">results</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Results (gemseo_benchmark.results.results.Results)" href="../../results/results/#gemseo_benchmark.results.results.Results">Results</a></span><span class="p">,</span>
     <span class="n">show</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">file_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">plot_all_histories</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -3426,7 +3446,7 @@ best target value.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>algos_configurations</code></b>
-              (<code><a class="autorefs autorefs-internal" title="gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></code>)
+              (<code><a class="autorefs autorefs-internal" title="            AlgorithmsConfigurations (gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations)" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></code>)
           –
           <div class="doc-md-description">
             <p>The algorithms configurations.</p>
@@ -3434,7 +3454,7 @@ best target value.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>results</code></b>
-              (<code><a class="autorefs autorefs-internal" title="gemseo_benchmark.results.results.Results" href="../../results/results/#gemseo_benchmark.results.results.Results">Results</a></code>)
+              (<code><a class="autorefs autorefs-internal" title="            Results (gemseo_benchmark.results.results.Results)" href="../../results/results/#gemseo_benchmark.results.results.Results">Results</a></code>)
           –
           <div class="doc-md-description">
             <p>The paths to the reference histories for each algorithm.</p>
@@ -3525,6 +3545,7 @@ If <code>None</code>, this value is inferred from the longest history.</p>
           </div>
         </li>
     </ul>
+
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/problems/problem.py</code></summary>
@@ -3768,6 +3789,7 @@ If <code>None</code>, this value is inferred from the longest history.</p>
           </div>
         </li>
     </ul>
+
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/problems/problem.py</code></summary>

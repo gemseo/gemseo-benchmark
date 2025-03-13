@@ -1788,6 +1788,7 @@
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -1855,6 +1856,7 @@ If <code>None</code>, the databases will not be saved.</p>
           </div>
         </li>
     </ul>
+
 
 
 
@@ -1936,13 +1938,13 @@ If <code>None</code>, the databases will not be saved.</p>
 
 <a href="#gemseo_benchmark.benchmarker.benchmarker.Benchmarker.execute" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">execute</span><span class="p">(</span>
-    <span class="n">problems</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="gemseo_benchmark.problems.problem.Problem" href="../../problems/problem/#gemseo_benchmark.problems.problem.Problem">Problem</a></span><span class="p">],</span>
-    <span class="n">algorithms</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></span><span class="p">,</span>
+    <span class="n">problems</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            Problem (gemseo_benchmark.problems.problem.Problem)" href="../../problems/problem/#gemseo_benchmark.problems.problem.Problem">Problem</a></span><span class="p">],</span>
+    <span class="n">algorithms</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            AlgorithmsConfigurations (gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations)" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></span><span class="p">,</span>
     <span class="n">overwrite_histories</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">number_of_processes</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">use_threading</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">log_gemseo_to_file</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="gemseo_benchmark.results.results.Results" href="../../results/results/#gemseo_benchmark.results.results.Results">Results</a></span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            Results (gemseo_benchmark.results.results.Results)" href="../../results/results/#gemseo_benchmark.results.results.Results">Results</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1954,7 +1956,7 @@ If <code>None</code>, the databases will not be saved.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>problems</code></b>
-              (<code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-internal" title="gemseo_benchmark.problems.problem.Problem" href="../../problems/problem/#gemseo_benchmark.problems.problem.Problem">Problem</a>]</code>)
+              (<code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-internal" title="            Problem (gemseo_benchmark.problems.problem.Problem)" href="../../problems/problem/#gemseo_benchmark.problems.problem.Problem">Problem</a>]</code>)
           –
           <div class="doc-md-description">
             <p>The benchmarking problems.</p>
@@ -1962,7 +1964,7 @@ If <code>None</code>, the databases will not be saved.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>algorithms</code></b>
-              (<code><a class="autorefs autorefs-internal" title="gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></code>)
+              (<code><a class="autorefs autorefs-internal" title="            AlgorithmsConfigurations (gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations)" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></code>)
           –
           <div class="doc-md-description">
             <p>The algorithms configurations.</p>
@@ -2018,7 +2020,7 @@ next to the performance history file.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-internal" title="gemseo_benchmark.results.results.Results" href="../../results/results/#gemseo_benchmark.results.results.Results">Results</a></code>
+              <code><a class="autorefs autorefs-internal" title="            Results (gemseo_benchmark.results.results.Results)" href="../../results/results/#gemseo_benchmark.results.results.Results">Results</a></code>
           –
           <div class="doc-md-description">
             <p>The results of the optimization.</p>
@@ -2037,6 +2039,7 @@ next to the performance history file.</p>
           </div>
         </li>
     </ul>
+
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/benchmarker/benchmarker.py</code></summary>
@@ -2218,7 +2221,7 @@ next to the performance history file.</p>
 
 <a href="#gemseo_benchmark.benchmarker.benchmarker.Benchmarker.get_history_path" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_history_path</span><span class="p">(</span>
-    <span class="n">algorithm_configuration</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration" href="../../algorithms/algorithm_configuration/#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration">AlgorithmConfiguration</a></span><span class="p">,</span>
+    <span class="n">algorithm_configuration</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            AlgorithmConfiguration (gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration)" href="../../algorithms/algorithm_configuration/#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration">AlgorithmConfiguration</a></span><span class="p">,</span>
     <span class="n">problem_name</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span>
     <span class="n">index</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span><span class="p">,</span>
     <span class="n">make_parents</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -2234,7 +2237,7 @@ next to the performance history file.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>algorithm_configuration</code></b>
-              (<code><a class="autorefs autorefs-internal" title="gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration" href="../../algorithms/algorithm_configuration/#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration">AlgorithmConfiguration</a></code>)
+              (<code><a class="autorefs autorefs-internal" title="            AlgorithmConfiguration (gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration)" href="../../algorithms/algorithm_configuration/#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration">AlgorithmConfiguration</a></code>)
           –
           <div class="doc-md-description">
             <p>The algorithm configuration.</p>
@@ -2279,6 +2282,7 @@ next to the performance history file.</p>
           </div>
         </li>
     </ul>
+
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/benchmarker/benchmarker.py</code></summary>
