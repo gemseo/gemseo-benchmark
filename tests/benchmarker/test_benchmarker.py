@@ -22,6 +22,7 @@
 from __future__ import annotations
 
 import json
+import os
 from typing import TYPE_CHECKING
 
 import pytest
@@ -215,3 +216,37 @@ Solving optimization problem with algorithm SLSQP:""" in file1.read()
       | x[1] |      -2     |   0   |      2      | float |
       +------+-------------+-------+-------------+-------+
 Solving optimization problem with algorithm SLSQP:""" in file2.read()
+
+
+@pytest.mark.parametrize("overwrite_histories", [False, True])
+def test_overwrite_histories_results_update(
+    tmp_path, rosenbrock, algorithms_configurations, overwrite_histories
+) -> None:
+    """Check that results are correctly updated when overwriting histories."""
+    results_path = tmp_path / "results.json"
+    history1_path = tmp_path / "SLSQP" / "Rosenbrock" / "SLSQP.1.json"
+    history2_path = tmp_path / "SLSQP" / "Rosenbrock" / "SLSQP.2.json"
+    benchmarker = Benchmarker(tmp_path, results_path)
+    benchmarker.execute([rosenbrock], algorithms_configurations)
+    results_contents = {
+        "SLSQP": {"Rosenbrock": [str(history1_path), str(history2_path)]}
+    }
+    with results_path.open() as results_file:
+        assert json.load(results_file) == results_contents
+
+    results_time = os.path.getmtime(results_path)
+    history1_time = os.path.getmtime(history1_path)
+    history2_time = os.path.getmtime(history2_path)
+
+    benchmarker.execute([rosenbrock], algorithms_configurations, overwrite_histories)
+    with results_path.open() as results_file:
+        assert json.load(results_file) == results_contents
+
+    if overwrite_histories:
+        assert os.path.getmtime(results_path) > results_time
+        assert os.path.getmtime(history1_path) > history1_time
+        assert os.path.getmtime(history2_path) > history2_time
+    else:
+        assert os.path.getmtime(results_path) == results_time
+        assert os.path.getmtime(history1_path) == history1_time
+        assert os.path.getmtime(history2_path) == history2_time

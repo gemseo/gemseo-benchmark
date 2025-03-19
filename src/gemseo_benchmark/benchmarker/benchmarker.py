@@ -122,6 +122,11 @@ class Benchmarker:
 
             self.__disable_stopping_criteria(algorithm_configuration)
             for problem in problems:
+                if overwrite_histories:
+                    self._results.remove_paths(
+                        algorithm_configuration.name, problem.name
+                    )
+
                 for problem_instance_index, problem_instance in enumerate(problem):
                     if self.__skip_instance(
                         algorithm_configuration,

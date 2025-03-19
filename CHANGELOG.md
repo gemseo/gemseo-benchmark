@@ -40,6 +40,10 @@ and this project adheres to
 - The scale of the axis showing the number of function evaluations
   can now be made logarithmic.
 
+#### Results
+
+- The paths associated with an algorithm/problem pair can now be removed.
+
 #### Report
 
 - The color and marker for each algorithm configuration can now be customized
@@ -77,6 +81,11 @@ and this project adheres to
 - Removing leading infeasible items from an infeasible performance history
   now returns an empty performance history.
 - Path options are now properly supported.
+
+#### Benchmarker
+
+- When overwriting histories,
+  the paths already in the ``Results`` are now effectively removed.
 
 #### Scenario
 
