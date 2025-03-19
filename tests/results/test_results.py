@@ -144,3 +144,18 @@ def test_get_paths_unknown_problem(results):
 def test_contains(results, algorithm, problem, path, contained):
     """Check the membership assessment of a history path to the results."""
     assert results.contains(algorithm, problem, path) == contained
+
+
+@pytest.mark.parametrize("empty", [False, True])
+def test_remove_paths(empty) -> None:
+    """Check the removal of paths."""
+    results = Results()
+    if not empty:
+        results.add_path(algorithm_name, problem_name, history_path)
+        assert problem_name in results.get_problems(algorithm_name)
+        assert results.contains(algorithm_name, problem_name, history_path)
+
+    results.remove_paths(algorithm_name, problem_name)
+    if not empty:
+        assert problem_name not in results.get_problems(algorithm_name)
+        assert not results.contains(algorithm_name, problem_name, history_path)
