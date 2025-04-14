@@ -239,23 +239,34 @@ class PerformanceHistories(collections.abc.MutableSequence):
     def plot_performance_measure_distribution(
         self,
         axes: Axes,
+        # TODO: API BREAK: Rename argument 'max_feasible_objective'
+        # into 'extremal_feasible_performance'.
         max_feasible_objective: float | None = None,
         plot_all_histories: bool = False,
+        performance_measure_is_minimized: bool = True,
     ) -> None:
         """Plot the distribution of the performance measure.
 
         Args:
             axes: The axes of the plot.
-            max_feasible_objective: The maximum feasible objective value.
+            max_feasible_objective: The extremal feasible performance measure.
             plot_all_histories: Whether to plot all the performance histories.
+            performance_measure_is_minimized: Whether the performance measure
+                is minimized (rather than maximized).
         """
         if max_feasible_objective is None:
-            max_feasible_objective = max(
+            feasible_performances = [
                 item.objective_value
                 for history in self
                 for item in history
                 if item.is_feasible
-            )
+            ]
+            if performance_measure_is_minimized:
+                extremal_feasible_performance = max(feasible_performances)
+            else:
+                extremal_feasible_performance = min(feasible_performances)
+        else:
+            extremal_feasible_performance = max_feasible_objective
 
         self.__plot_distribution(
             numpy.array([
@@ -267,8 +278,9 @@ class PerformanceHistories(collections.abc.MutableSequence):
             ]),
             axes,
             "Performance measure",
-            max_feasible_objective,
+            extremal_feasible_performance,
             plot_all_histories,
+            performance_measure_is_minimized,
         )
 
     def plot_infeasibility_measure_distribution(
@@ -316,6 +328,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         y_label: str,
         infinity: float | None = None,
         plot_all_histories: bool = False,
+        performance_measure_is_minimized: bool = True,
     ) -> None:
         """Plot the distribution of histories data.
 
@@ -325,6 +338,8 @@ class PerformanceHistories(collections.abc.MutableSequence):
             y_label: The label for the vertical axis.
             infinity: The substitute value for infinite ordinates.
             plot_all_histories: Whether to plot all the performance histories.
+            performance_measure_is_minimized: Whether the performance measure
+                is minimized (rather than maximized).
         """
         abscissas = range(1, histories.shape[1] + 1)
         legend_handles_offset = 0
@@ -344,6 +359,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
             (0, 100),
             {"color": "lightgray", "label": "0th-100th centiles"},
             infinity,
+            performance_measure_is_minimized,
         )
         PerformanceHistories.plot_centiles_range(
             histories,
@@ -351,9 +367,13 @@ class PerformanceHistories(collections.abc.MutableSequence):
             (25, 75),
             {"color": "gray", "label": "25th-75th centiles"},
             infinity,
+            performance_measure_is_minimized,
         )
         PerformanceHistories.plot_median(
-            histories, axes, {"color": "black", "label": "median"}
+            histories,
+            axes,
+            {"color": "black", "label": "median"},
+            performance_measure_is_minimized,
         )
         axes.plot(
             abscissas,
@@ -381,6 +401,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         centile_range: tuple[float, float],
         fill_between_kwargs: Mapping[str, str],
         infinity: float | None,
+        performance_measure_is_minimized: bool,
     ) -> None:
         """Plot a range of centiles of histories data.
 
@@ -391,37 +412,45 @@ class PerformanceHistories(collections.abc.MutableSequence):
             fill_between_kwargs: Keyword arguments
                 for `matplotlib.axes.Axes.fill_between`.
             infinity: The substitute value for infinite ordinates.
+            performance_measure_is_minimized: Whether the performance measure
+                is minimized (rather than maximized).
         """
-        method = "inverted_cdf"  # supports numpy.inf
-        histories = numpy.nan_to_num(histories, nan=numpy.inf)
+        method = "inverted_cdf"  # N.B. This method supports infinite values.
+        histories = numpy.nan_to_num(
+            histories,
+            nan=float("inf") if performance_measure_is_minimized else -float("inf"),
+        )
         lower_centile = numpy.percentile(
             histories, min(centile_range), 0, method=method
         )
+        upper_centile = numpy.percentile(
+            histories, max(centile_range), 0, method=method
+        )
+        # Determine the first index with a finite value to plot.
+        centile = lower_centile if performance_measure_is_minimized else upper_centile
         first_index = next(
-            (i for i, value in enumerate(lower_centile) if numpy.isfinite(value)),
-            len(lower_centile),
+            (i for i, value in enumerate(centile) if numpy.isfinite(value)),
+            len(centile),
         )
         axes.plot(  # hack to get same limits/ticks
             range(1, first_index + 1),
             numpy.full(
                 first_index,
-                lower_centile[first_index]
-                if first_index < len(lower_centile)
-                else numpy.nan,
+                centile[first_index] if first_index < len(centile) else numpy.nan,
             ),
             alpha=0,
         )
-        upper_centile = numpy.percentile(
-            histories[:, first_index:], max(centile_range), 0, method=method
-        )
 
         if infinity is not None:
-            upper_centile = numpy.nan_to_num(upper_centile, posinf=infinity)
+            if performance_measure_is_minimized:
+                upper_centile = numpy.nan_to_num(upper_centile, posinf=infinity)
+            else:
+                lower_centile = numpy.nan_to_num(lower_centile, neginf=infinity)
 
         axes.fill_between(
             range(first_index + 1, histories.shape[1] + 1),
             lower_centile[first_index:],
-            upper_centile,
+            upper_centile[first_index:],
             **fill_between_kwargs,
         )
         axes.xaxis.set_major_locator(MaxNLocator(integer=True))
@@ -431,6 +460,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         histories: numpy.ndarray,
         axes: Axes,
         plot_kwargs: Mapping[str, str | int | float],
+        performance_measure_is_minimized: bool,
     ) -> None:
         """Plot a range of centiles of histories data.
 
@@ -438,8 +468,16 @@ class PerformanceHistories(collections.abc.MutableSequence):
             histories: The histories data.
             axes: The axes of the plot.
             plot_kwargs: Keyword arguments for `matplotlib.axes.Axes.plot`.
+            performance_measure_is_minimized: Whether the performance measure
+                is minimized (rather than maximized).
         """
-        median = numpy.median(numpy.nan_to_num(histories, nan=numpy.inf), 0)
+        median = numpy.median(
+            numpy.nan_to_num(
+                histories,
+                nan=float("inf") if performance_measure_is_minimized else -float("inf"),
+            ),
+            0,
+        )
         # Skip infinite values to support the ``markevery`` option.
         first_index = next(
             (index for index, value in enumerate(median) if numpy.isfinite(value)),
@@ -450,3 +488,8 @@ class PerformanceHistories(collections.abc.MutableSequence):
             median[first_index:],
             **plot_kwargs,
         )
+
+    def switch_performance_measure_sign(self) -> None:
+        """Switch the sign of the performance measure."""
+        for history in self:
+            history.switch_performance_measure_sign()

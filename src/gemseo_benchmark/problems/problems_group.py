@@ -133,10 +133,10 @@ class ProblemsGroup:
                 for the number of function evaluations axis.
         """
         # Initialize the data profile
-        target_values = {
-            problem.name: problem.target_values for problem in self.__problems
-        }
-        data_profile = DataProfile(target_values)
+        data_profile = DataProfile({
+            problem.name: problem.minimization_target_values
+            for problem in self.__problems
+        })
 
         # Generate the performance histories
         for configuration_name in algos_configurations.names:
