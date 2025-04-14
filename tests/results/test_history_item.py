@@ -88,3 +88,20 @@ def test_inconsistent_unsatisfied_constraints_number(measure, number):
 def test_default_unsatisfied_constraints_number(measure, number):
     """Check the default number of unsatisfied constraints."""
     assert HistoryItem(1.0, measure).n_unsatisfied_constraints == number
+
+
+def test_copy() -> None:
+    """Check the copy of a history item."""
+    item = HistoryItem(1, 2, 3)
+    copy = item.copy()
+    assert copy == item
+    assert copy is not item
+
+
+def test_switch_performance_measure_sign() -> None:
+    """Check the switch of sign of the performance measure."""
+    item = HistoryItem(1, 2, 3)
+    item.switch_performance_measure_sign()
+    assert item.objective_value == -1
+    assert item.infeasibility_measure == 2
+    assert item.n_unsatisfied_constraints == 3

@@ -81,6 +81,9 @@ class Figures:
     __MATPLOTLIB_LOG_SCALE: Final[str] = "log"
     """The Matplotlib value for logarithmic scale."""
 
+    __MATPLOTLIB_SYMMETRIC_LOG_SCALE: Final[str] = "symlog"
+    """The Matplotlib value for symmetric logarithmic scale."""
+
     __plot_kwargs: Mapping[str, ConfigurationPlotOptions]
     """The keyword arguments of `matplotlib.axes.Axes.plot`
       for each algorithm configuration."""
@@ -249,6 +252,11 @@ class Figures:
                             max_feasible_performance,
                         )
 
+            if not problem.minimize_objective:
+                max_feasible_performance = -max_feasible_performance
+                for histories in performance_histories.values():
+                    histories.switch_performance_measure_sign()
+
             # Draw the plots dedicated to each problem.
             problems_to_figures[problem.name] = self.__get_problem_figures(
                 problem,
@@ -322,6 +330,7 @@ class Figures:
             use_time_log_scale,
         )
         if problem.constraints_names:
+            performance_measure_is_minimized = problem.minimize_objective
             figures[self._FigureFileName.INFEASIBILITY_MEASURE] = (
                 self.__plot_infeasibility_measure(
                     performance_histories,
@@ -329,6 +338,7 @@ class Figures:
                     plot_only_median,
                     use_evaluation_log_scale,
                     plot_all_histories,
+                    performance_measure_is_minimized,
                 )
             )
             figures[self._FigureFileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS] = (
@@ -338,6 +348,7 @@ class Figures:
                     plot_only_median,
                     use_evaluation_log_scale,
                     plot_all_histories,
+                    performance_measure_is_minimized,
                 )
             )
 
@@ -422,8 +433,8 @@ class Figures:
         """
         figure = matplotlib.pyplot.figure()
         axes = figure.gca()
-        # Find the maximum feasible objective value
-        max_feasible_objective = max(
+        # Find the extremal feasible performance measure.
+        extremal_feasible_performance = max(
             history.remove_leading_infeasible()[0].objective_value
             for histories in performance_histories.values()
             for history in histories
@@ -434,10 +445,11 @@ class Figures:
             performance_histories,
             self.__get_performance_measure,
             "Performance measure",
-            max_feasible_objective,
+            extremal_feasible_performance,
             plot_only_median,
             use_evaluation_log_scale,
             plot_all_histories,
+            problem.minimize_objective,
         )
         problem.target_values.plot_on_axes(
             axes,
@@ -446,26 +458,31 @@ class Figures:
         )
         axes.grid(**self.__GRID_KWARGS)
         if use_performance_log_scale:
-            axes.set_yscale(self.__MATPLOTLIB_LOG_SCALE)
+            axes.set_yscale(self.__MATPLOTLIB_SYMMETRIC_LOG_SCALE)
 
         file_path = directory_path / self._FigureFileName.PERFORMANCE_MEASURE.value
         save_show_figure(figure, False, file_path)
 
         # Plot a focus on the target values
         performance_axes, targets_axes = figure.axes
-        performance_axes.set_ylim(
-            bottom=min(
-                [
-                    history[-1]
-                    for histories in performance_histories.values()
-                    for history in histories
-                ]
-                + list(problem.target_values)
-            ).objective_value,
-            top=max(
-                target for target in problem.target_values if target.is_feasible
-            ).objective_value,
-        )
+        history_items = [
+            history[-1]
+            for histories in performance_histories.values()
+            for history in histories
+        ] + list(problem.minimization_target_values)
+        target_items = [
+            target
+            for target in problem.minimization_target_values
+            if target.is_feasible
+        ]
+        best_performance_measure = min(history_items).objective_value
+        worst_performance_measure = max(target_items).objective_value
+        if problem.minimize_objective:
+            args = (best_performance_measure, worst_performance_measure)
+        else:
+            args = (-worst_performance_measure, -best_performance_measure)
+
+        performance_axes.set_ylim(*args)
         targets_axes.set_ylim(performance_axes.get_ylim())
         focus_file_path = (
             directory_path / self._FigureFileName.PERFORMANCE_MEASURE_FOCUS.value
@@ -485,6 +502,7 @@ class Figures:
         plot_only_median: bool,
         use_evaluation_log_scale: bool,
         plot_all_histories: bool,
+        performance_measure_is_minimized: bool,
     ) -> Path:
         """Plot the infeasibility measure of algorithm configurations on a problem.
 
@@ -495,6 +513,8 @@ class Figures:
             use_evaluation_log_scale: Whether to use a logarithmic scale
                 for the number of function evaluations axis.
             plot_all_histories: Whether to plot all the performance histories.
+            performance_measure_is_minimized: Whether the performance measure
+                is minimized (rather than maximized).
 
         Returns:
             The path to the figure.
@@ -512,6 +532,7 @@ class Figures:
             plot_only_median,
             use_evaluation_log_scale,
             plot_all_histories,
+            performance_measure_is_minimized,
         )
         save_show_figure(figure, False, file_path)
         return file_path
@@ -528,6 +549,7 @@ class Figures:
         plot_only_median: bool,
         use_evaluation_log_scale: bool,
         plot_all_histories: bool,
+        performance_measure_is_minimized: bool,
     ) -> Path:
         """Plot the number of constraints unsatisfied by algorithm configurations.
 
@@ -539,6 +561,8 @@ class Figures:
             use_evaluation_log_scale: Whether to use a logarithmic scale
                 for the number of function evaluations axis.
             plot_all_histories: Whether to plot all the performance histories.
+            performance_measure_is_minimized: Whether the performance measure
+                is minimized (rather than maximized).
 
         Returns:
             The path to the figure.
@@ -558,6 +582,7 @@ class Figures:
             plot_only_median,
             use_evaluation_log_scale,
             plot_all_histories,
+            performance_measure_is_minimized,
         )
         axes.yaxis.set_major_locator(MaxNLocator(integer=True))
         save_show_figure(figure, False, file_path)
@@ -579,6 +604,7 @@ class Figures:
         plot_only_median: bool,
         use_evaluation_log_scale: bool,
         plot_all_histories: bool,
+        performance_measure_is_minimized: bool,
     ) -> None:
         """Plot the range of data from performance histories.
 
@@ -595,6 +621,8 @@ class Figures:
             use_evaluation_log_scale: Whether to use a logarithmic scale
                 for the number of function evaluations axis.
             plot_all_histories: Whether to plot all the performance histories.
+            performance_measure_is_minimized: Whether the performance measure
+                is minimized (rather than maximized).
         """
         for algo_config, histories in performance_histories.items():
             name = algo_config.name
@@ -616,9 +644,12 @@ class Figures:
                     (0, 100),
                     {"alpha": self.__ALPHA, "color": self.__plot_kwargs[name]["color"]},
                     max_feasible_objective,
+                    performance_measure_is_minimized,
                 )
 
-            PerformanceHistories.plot_median(data, axes, self.__plot_kwargs[name])
+            PerformanceHistories.plot_median(
+                data, axes, self.__plot_kwargs[name], performance_measure_is_minimized
+            )
 
         if use_evaluation_log_scale:
             axes.set_xscale(self.__MATPLOTLIB_LOG_SCALE)
@@ -729,7 +760,7 @@ class Figures:
                 axes, max_feasible_performance, plot_all_histories
             )
             if use_performance_log_scale:
-                axes.set_yscale(self.__MATPLOTLIB_LOG_SCALE)
+                axes.set_yscale(self.__MATPLOTLIB_SYMMETRIC_LOG_SCALE)
 
             if use_evaluation_log_scale:
                 axes.set_xscale(self.__MATPLOTLIB_LOG_SCALE)
@@ -756,7 +787,15 @@ class Figures:
             # Focus on the targets qnd save another figure
             performance_axes, targets_axes = figure.axes
             performance_axes.autoscale(enable=True, axis="y", tight=True)
-            performance_axes.set_ylim(top=max(problem.target_values).objective_value)
+            if problem.minimize_objective:
+                performance_axes.set_ylim(
+                    top=max(problem.target_values).objective_value
+                )
+            else:
+                performance_axes.set_ylim(
+                    bottom=min(problem.target_values).objective_value
+                )
+
             targets_axes.set_ylim(performance_axes.get_ylim())
             file_path = (
                 configuration_dir / self._FigureFileName.PERFORMANCE_MEASURE_FOCUS.value

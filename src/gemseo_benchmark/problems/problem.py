@@ -30,6 +30,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from collections.abc import Mapping
+from copy import deepcopy
 from typing import TYPE_CHECKING
 from typing import Callable
 from typing import Union
@@ -174,16 +175,25 @@ class Problem:
 
         # Set the target values:
         self.__target_values = None
+        self.__minimization_target_values = None
         if target_values is not None:
             self.target_values = target_values
+            self.__set_minimization_target_values()
         elif (
             target_values_algorithms_configurations is not None
             and target_values_number is not None
         ):
-            self.target_values = self.compute_targets(
-                target_values_number,
-                target_values_algorithms_configurations,
+            self.compute_targets(
+                target_values_number, target_values_algorithms_configurations
             )
+
+    def __set_minimization_target_values(self) -> None:
+        """Set the target values for minimization."""
+        if self._problem.minimize_objective:
+            self.__minimization_target_values = self.__target_values
+        else:
+            self.__minimization_target_values = deepcopy(self.__target_values)
+            self.__minimization_target_values.switch_performance_measure_sign()
 
     @property
     def start_points(self) -> list[ndarray]:
@@ -326,6 +336,7 @@ class Problem:
             raise TypeError(msg)
 
         self.__target_values = target_values
+        self.__set_minimization_target_values()
 
     def __iter__(self) -> OptimizationProblem:
         """Iterate on the problem instances with respect to the starting points."""
@@ -423,9 +434,13 @@ class Problem:
             self.optimum,
             best_target_tolerance,
         )
-        self.__target_values = target_values
+        self.__minimization_target_values = target_values
+        self.target_values = deepcopy(target_values)
+        if self._problem.minimize_objective:
+            return self.target_values
 
-        return target_values
+        self.__target_values.switch_performance_measure_sign()
+        return self.target_values
 
     @staticmethod
     def compute_performance(
@@ -558,7 +573,7 @@ class Problem:
                 for the number of function evaluations axis.
         """
         # Initialize the data profile
-        data_profile = DataProfile({self.name: self.target_values})
+        data_profile = DataProfile({self.name: self.__minimization_target_values})
 
         # Generate the performance histories
         for configuration_name in algos_configurations.names:
@@ -763,3 +778,13 @@ class Problem:
         return max_feasible_objective + y_relative_margin * (
             max_feasible_objective - self.optimum
         )
+
+    @property
+    def minimization_target_values(self) -> TargetValues:
+        """The target values for minimization."""
+        return self.__minimization_target_values
+
+    @property
+    def minimize_objective(self) -> bool:
+        """Whether the objective function is to be minimized."""
+        return self._problem.minimize_objective

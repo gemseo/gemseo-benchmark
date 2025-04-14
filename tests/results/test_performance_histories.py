@@ -112,14 +112,54 @@ def five_performance_histories() -> PerformanceHistories:
     )
 
 
-@image_comparison(["performance_measure_distribution"], ["png"])
+@pytest.mark.parametrize(
+    (
+        "baseline_images",
+        "plot_all_histories",
+        "extremal_feasible_performance",
+        "performance_measure_is_minimized",
+    ),
+    [
+        (
+            [
+                "performance_measure_distribution"
+                f"[plot_all={plot_all_histories},extremum={extremal_feasible_performance},minimize={performance_measure_is_minimized}]"
+            ],
+            plot_all_histories,
+            extremal_feasible_performance,
+            performance_measure_is_minimized,
+        )
+        for (
+            plot_all_histories,
+            extremal_feasible_performance,
+            performance_measure_is_minimized,
+        ) in [
+            (False, None, False),
+            (False, -6, False),
+            (True, None, False),
+            (True, -6, False),
+            (False, None, True),
+            (False, -1, True),
+            (True, None, True),
+            (True, -1, True),
+        ]
+    ],
+)
+@image_comparison(None, ["png"])
 def test_plot_performance_measure_distribution(
+    baseline_images,
     five_performance_histories,
+    plot_all_histories,
+    extremal_feasible_performance,
+    performance_measure_is_minimized,
 ):
     """Check the plot of the distribution of the performance measure."""
     matplotlib.pyplot.close("all")
     five_performance_histories.plot_performance_measure_distribution(
-        matplotlib.pyplot.figure().gca(), 4
+        matplotlib.pyplot.figure().gca(),
+        extremal_feasible_performance,
+        plot_all_histories,
+        performance_measure_is_minimized,
     )
 
 
@@ -156,3 +196,15 @@ def test_plot_number_of_unsatisfied_constraints_distribution(
     five_performance_histories.plot_number_of_unsatisfied_constraints_distribution(
         matplotlib.pyplot.figure().gca()
     )
+
+
+def test_switch_performance_measure_sign() -> None:
+    """Check the switch of sign of the performance measure."""
+    histories = PerformanceHistories(
+        PerformanceHistory([1, 2], [3, 4]), PerformanceHistory([5, 6], [7, 8])
+    )
+    histories.switch_performance_measure_sign()
+    assert histories[0].objective_values == [-1, -2]
+    assert histories[0].infeasibility_measures == [3, 4]
+    assert histories[1].objective_values == [-5, -6]
+    assert histories[1].infeasibility_measures == [7, 8]

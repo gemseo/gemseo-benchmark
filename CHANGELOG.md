@@ -43,6 +43,9 @@ and this project adheres to
 #### Results
 
 - The paths associated with an algorithm/problem pair can now be removed.
+- A performance history item can now be copied.
+- The sign of performance measures can now be changed in history items
+  and performance histories.
 
 #### Report
 
@@ -73,6 +76,9 @@ and this project adheres to
 - The results on each problem are now displayed on separate pages
   rather than on the page of the problems group.
 - Setting the optimum of a problem is no longer mandatory.
+- The performance histories returned by ``PerformanceHistory.compute_cumulated_minimum``
+  and ``PerformanceHistory.extend`` now contain copies of history items
+  rather than replications of the same objects.
 
 ### Fixed
 
@@ -81,6 +87,12 @@ and this project adheres to
 - Removing leading infeasible items from an infeasible performance history
   now returns an empty performance history.
 - Path options are now properly supported.
+
+#### Report
+
+- The performance measures and target values of maximization problems
+  are now correctly displayed instead of being treated as minimization data.
+- Negative performance measures are now properly represented on logarithmic scales.
 
 #### Benchmarker
 

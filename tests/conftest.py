@@ -49,6 +49,7 @@ def design_space() -> mock.Mock:
     design_space.variable_names = ["x"]
     design_space.variable_sizes = {"x": 2}
     design_space.get_current_value = mock.Mock(return_value=design_variables)
+    design_space.has_current_value = mock.Mock(return_value=True)
     design_space.set_current_value = mock.Mock()
     design_space.unnormalize_vect = lambda _: _
     design_space.untransform_vect = lambda x, no_check: x
@@ -126,8 +127,8 @@ def database(hashable_array, functions_values) -> mock.Mock:
 
 
 @pytest.fixture(scope="package")
-def problem(design_space, objective, constraints) -> mock.Mock:
-    """A solved optimization problem."""
+def minimization_problem(design_space, objective, constraints) -> mock.Mock:
+    """A solved minimization problem."""
     problem = mock.Mock(spec=OptimizationProblem)
     problem.tolerances.inequality = 1e-4
     problem.tolerances.equality = 1e-2
@@ -135,6 +136,24 @@ def problem(design_space, objective, constraints) -> mock.Mock:
     problem.design_space.dimension = design_space.dimension
     problem.objective = objective
     problem.minimize_objective = True
+    problem.history = mock.Mock()
+    problem.history.check_design_point_is_feasible = mock.Mock(
+        return_value=(False, 1.0)
+    )
+    problem.constraints = constraints
+    return problem
+
+
+@pytest.fixture(scope="package")
+def maximization_problem(design_space, objective, constraints) -> mock.Mock:
+    """A solved maximization problem."""
+    problem = mock.Mock(spec=OptimizationProblem)
+    problem.tolerances.inequality = 1e-4
+    problem.tolerances.equality = 1e-2
+    problem.design_space = design_space
+    problem.design_space.dimension = design_space.dimension
+    problem.objective = objective
+    problem.minimize_objective = False
     problem.history = mock.Mock()
     problem.history.check_design_point_is_feasible = mock.Mock(
         return_value=(False, 1.0)
@@ -167,6 +186,8 @@ def problem_a() -> mock.Mock:
     problem.description = "The description of problem A."
     problem.optimum = 1.0
     problem.target_values = TargetValues([problem.optimum])
+    problem.minimization_target_values = TargetValues([problem.optimum])
+    problem.minimize_objective = True
     problem.compute_data_profile = mock.Mock(side_effect=side_effect)
     problem.plot_histories = mock.Mock(side_effect=side_effect)
     return problem
@@ -179,7 +200,9 @@ def problem_b() -> mock.Mock:
     problem.name = "Problem B"
     problem.description = "The description of problem B."
     problem.optimum = None
-    problem.target_values = TargetValues([2.0])
+    problem.target_values = TargetValues([-1.0])
+    problem.minimization_target_values = TargetValues([1.0])
+    problem.minimize_objective = False
     problem.compute_data_profile = mock.Mock(side_effect=side_effect)
     problem.plot_histories = mock.Mock(side_effect=side_effect)
     return problem
