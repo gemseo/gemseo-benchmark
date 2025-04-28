@@ -21,11 +21,11 @@
 
 from __future__ import annotations
 
+import logging
 import sys
 from typing import TYPE_CHECKING
 from typing import Final
 
-from gemseo import configure_logger
 from gemseo.algos.opt.factory import OptimizationLibraryFactory
 from gemseo.core.parallel_execution.callable_parallel_execution import (
     CallableParallelExecution,
@@ -49,7 +49,7 @@ if TYPE_CHECKING:
     )
     from gemseo_benchmark.problems.problem import Problem
 
-LOGGER = configure_logger()
+LOGGER = logging.getLogger(__name__)
 
 
 class Benchmarker:

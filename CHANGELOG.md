@@ -68,6 +68,10 @@ and this project adheres to
   the infeasibility measure, and the number of unsatisfied constraints.
 - The scale of the axis showing the number of function evaluations
   can now be made logarithmic.
+- By default, it is now checked that, for a given problem, each algorithm configuration
+  is represented by the same number of performance histories.
+  This check can be bypassed by setting argument ``bypass_unequal_representation``
+  of ``Figures.plot`` at ``True``.
 
 ### Changed
 
