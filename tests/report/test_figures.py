@@ -15,6 +15,8 @@
 
 """Tests for the figures of the report."""
 
+import logging
+import re
 import shutil
 from collections.abc import Mapping
 from pathlib import Path
@@ -366,3 +368,67 @@ def test_no_data_profiles_duplicates(
     figures.plot(False, False, False, False, False)
     assert group.compute_data_profile.call_count == group_call_count + 1
     assert problem_a.compute_data_profile.call_count == problem_call_count
+
+
+@pytest.fixture
+def figures_unequal_representation(
+    tmp_path, unknown_algorithms_configurations, group, results
+) -> Figures:
+    """The results figures for unequally represented algorithm configurations."""
+    paths = results.get_paths.return_value
+    results.get_paths = mock.MagicMock(side_effect=[paths, paths[:1]] * 2)
+    return Figures(
+        unknown_algorithms_configurations,
+        group,
+        results,
+        tmp_path,
+        0,
+        None,
+        {"SLSQP": {"color": "blue", "marker": "o"}},
+    )
+
+
+def test_unequal_representation(
+    figures_unequal_representation,
+    problem_a,
+    algorithm_configuration,
+    unknown_algorithm_configuration,
+) -> None:
+    """Check the handling of unequally represented algorithm configurations."""
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            f"The number of performance histories varies for '{problem_a.name}': "
+            f"2 for '{algorithm_configuration.name}' "
+            f"and 1 for '{unknown_algorithm_configuration.name}'."
+        ),
+    ):
+        figures_unequal_representation.plot(False, False, False, False, False)
+
+
+def test_bypass_unequal_representation(
+    figures_unequal_representation,
+    problem_a,
+    problem_b,
+    algorithm_configuration,
+    unknown_algorithm_configuration,
+    caplog,
+) -> None:
+    """Check the handling of unequally represented algorithm configurations."""
+    with caplog.at_level(logging.WARNING):
+        figures_unequal_representation.plot(
+            False, False, False, False, False, bypass_unequal_representation=True
+        )
+
+    assert caplog.record_tuples == [
+        (
+            "gemseo_benchmark.report._figures",
+            logging.WARNING,
+            (
+                f"The number of performance histories varies for '{problem.name}': "
+                f"2 for '{algorithm_configuration.name}' "
+                f"and 1 for '{unknown_algorithm_configuration.name}'."
+            ),
+        )
+        for problem in [problem_a, problem_b]
+    ]

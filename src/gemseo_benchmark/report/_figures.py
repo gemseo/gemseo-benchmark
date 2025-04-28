@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import datetime
 import enum
+import logging
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import ClassVar
@@ -29,6 +30,7 @@ import matplotlib.pyplot
 import numpy
 import pandas
 from gemseo.utils.matplotlib_figure import save_show_figure
+from gemseo.utils.string_tools import pretty_str
 from matplotlib.ticker import MaxNLocator
 
 from gemseo_benchmark import _get_configuration_plot_options
@@ -51,6 +53,8 @@ if TYPE_CHECKING:
     from gemseo_benchmark.problems.problems_group import ProblemsGroup
     from gemseo_benchmark.results.history_item import HistoryItem
     from gemseo_benchmark.results.results import Results
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Figures:
@@ -206,6 +210,7 @@ class Figures:
         use_time_log_scale: bool,
         use_evaluation_log_scale: bool,
         table_values_format: str = ".6g",
+        bypass_unequal_representation: bool = False,
     ) -> tuple[dict[str, ProblemFigurePaths], dict[str, ProblemTablePaths]]:
         """Plot the figures for each problem of the group.
 
@@ -219,11 +224,19 @@ class Figures:
             use_evaluation_log_scale: Whether to use a logarithmic scale
                 for the number of function evaluations axis.
             table_values_format: The string format for the table values.
+            bypass_unequal_representation: Whether to bypass the check that ensures
+                that each algorithm configuration is represented by the same number of
+                performance histories for a given problem.
 
         Returns:
             The paths to the figures and the paths to the tables.
             The keys are the names of the problems and the values
             are the corresponding dictionaries of figures or tables.
+
+        Raises:
+            ValueError: If ``bypass_unequal_representation`` is ``False`` and at least
+                one algorithm configuration is represented by fewer performance
+                histories than another on an given problem.
         """
         problems_to_figures = {}
         problems_to_tables = {}
@@ -242,6 +255,30 @@ class Figures:
                 .get_equal_size_histories()
                 for algorithm_configuration in self.__algorithm_configurations
             }
+
+            # Check the algorithm configurations are equally represented on the problem.
+            number_of_histories = {
+                algorithm_configuration.name: len(histories)
+                for algorithm_configuration, histories in performance_histories.items()
+            }
+            if len(set(number_of_histories.values())) > 1:
+                numbers = pretty_str(
+                    [
+                        f"{n_histories} for '{name}'"
+                        for name, n_histories in number_of_histories.items()
+                    ],
+                    sort=False,
+                    use_and=True,
+                )
+                message = (
+                    "The number of performance histories varies for "
+                    f"'{problem.name}': {numbers}."
+                )
+                if bypass_unequal_representation:
+                    LOGGER.warning(message)
+                else:
+                    raise ValueError(message)
+
             max_feasible_performance = -float("inf")
             for histories in performance_histories.values():
                 for history in histories:
