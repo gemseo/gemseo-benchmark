@@ -1,2 +1,2 @@
 ,minimum,25th centile,median,75th centile,maximum
-SLSQP,nan,nan,nan,nan,nan
+SLSQP,0,0,0,infeasible,infeasible

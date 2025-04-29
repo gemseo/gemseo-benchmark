@@ -27,7 +27,7 @@ Performance measure
 
    The performance measure of group ':ref:`{{ algorithm_configurations.name }}`' for problem ':ref:`{{ problem.name }}`'.
 
-.. csv-table:: The *final* performance measure of group ':ref:`{{ algorithm_configurations.name }}`' for problem ':ref:`{{ problem.name }}`'.
+.. csv-table:: The *final* feasible performance measure of group ':ref:`{{ algorithm_configurations.name }}`' for problem ':ref:`{{ problem.name }}`'.
    :file: /{{ tables["performance_measure.csv"] }}
    :header-rows: 1
    :stub-columns: 1

@@ -115,12 +115,6 @@ class Report:
         Raises:
             ValueError: If an algorithm has no associated histories.
         """  # noqa: D205, D212, D415
-        names = []
-        for group in algos_configurations_groups:
-            for name in group.names:
-                if name not in names:
-                    names.append(name)
-
         self.__plot_kwargs = plot_kwargs
         self.__root_directory = Path(root_directory_path)
         self.__algorithms_configurations_groups = algos_configurations_groups

@@ -1,2 +1,2 @@
 ,minimum,25th centile,median,75th centile,maximum
-SLSQP,0,0.25,0.5,0.75,1
+SLSQP,0,0,0,1,1
