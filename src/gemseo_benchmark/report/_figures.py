@@ -19,7 +19,9 @@ from __future__ import annotations
 
 import datetime
 import enum
+import functools
 import logging
+from math import isinf
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import ClassVar
@@ -308,7 +310,10 @@ class Figures:
             )
             # Fill the tables dedicated to each problem.
             problems_to_tables[problem.name] = self.__get_problem_tables(
-                performance_histories, problem_dir, table_values_format
+                performance_histories,
+                problem_dir,
+                table_values_format,
+                problem.minimize_objective,
             )
 
         return problems_to_figures, problems_to_tables
@@ -471,16 +476,24 @@ class Figures:
         figure = matplotlib.pyplot.figure()
         axes = figure.gca()
         # Find the extremal feasible performance measure.
-        extremal_feasible_performance = max(
+        worst_feasible_performances = [
             history.remove_leading_infeasible()[0].objective_value
             for histories in performance_histories.values()
             for history in histories
             if history[-1].is_feasible
-        )
+        ]
+        if problem.minimize_objective:
+            extremal_feasible_performance = max(worst_feasible_performances)
+        else:
+            extremal_feasible_performance = min(worst_feasible_performances)
+
         self.__plot_range(
             axes,
             performance_histories,
-            self.__get_performance_measure,
+            functools.partial(
+                self.__get_performance_measure,
+                infeasible_performance_measure=float("nan"),
+            ),
             "Performance measure",
             extremal_feasible_performance,
             plot_only_median,
@@ -528,9 +541,22 @@ class Figures:
         return file_path, focus_file_path
 
     @staticmethod
-    def __get_performance_measure(item: HistoryItem) -> float:
-        """Return the performance measure of a history item."""
-        return item.objective_value if item.is_feasible else numpy.nan
+    def __get_performance_measure(
+        item: HistoryItem, infeasible_performance_measure: float
+    ) -> float:
+        """Return the performance measure of a history item.
+
+        Args:
+            item: The history item.
+            infeasible_performance_measure: The performance measure to return
+                for infeasible history items.
+
+        Returns:
+            The performance measure of the history item.
+        """
+        return (
+            item.objective_value if item.is_feasible else infeasible_performance_measure
+        )
 
     def __plot_infeasibility_measure(
         self,
@@ -794,7 +820,10 @@ class Figures:
         for configuration in self.__algorithm_configurations:
             figure, axes = matplotlib.pyplot.subplots()
             performance_histories[configuration].plot_performance_measure_distribution(
-                axes, max_feasible_performance, plot_all_histories
+                axes,
+                max_feasible_performance,
+                plot_all_histories,
+                problem.minimize_objective,
             )
             if use_performance_log_scale:
                 axes.set_yscale(self.__MATPLOTLIB_SYMMETRIC_LOG_SCALE)
@@ -927,6 +956,7 @@ class Figures:
         performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
         directory_path: Path,
         table_values_format: str,
+        performance_measure_is_minimized: bool,
     ) -> ProblemTablePaths:
         """Tabulate statistics on final data achieved by algorithm configurations.
 
@@ -935,6 +965,8 @@ class Figures:
                 of each algorithm configuration.
             directory_path: The path to the directory where to save the CSV files.
             table_values_format: The string format for the table values.
+            performance_measure_is_minimized: Whether the performance measure
+                is minimized (rather than maximized).
 
         Returns:
             The paths to the tables dedicated to the problem.
@@ -946,7 +978,12 @@ class Figures:
         }
         for data_getter, file_name in [
             (
-                cls.__get_performance_measure,
+                functools.partial(
+                    cls.__get_performance_measure,
+                    infeasible_performance_measure=float("inf")
+                    if performance_measure_is_minimized
+                    else -float("inf"),
+                ),
                 Figures._TableFileName.PERFORMANCE_MEASURE,
             ),
             (
@@ -961,10 +998,13 @@ class Figures:
             data = pandas.DataFrame(
                 {
                     configuration.name: [
-                        f"{{value:{table_values_format}}}".format(value=value)
+                        "infeasible"
+                        if isinf(value)
+                        else f"{{value:{table_values_format}}}".format(value=value)
                         for value in numpy.percentile(
                             [data_getter(item) for item in history_items],
                             tuple(cls.__TABLE_PERCENTILES.values()),
+                            method="inverted_cdf",
                         )
                     ]
                     for configuration, history_items in final_history_items.items()

@@ -26,6 +26,7 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
+from gemseo.algos.opt.scipy_local.scipy_local import ScipyOpt
 
 from gemseo_benchmark.report.report import Report
 
@@ -90,12 +91,23 @@ def test_generate_pdf(tmp_path, report):
     assert (tmp_path / "_build" / "latex" / "benchmarking_report.pdf").is_file()
 
 
-def test_retrieve_description(
-    tmp_path, unknown_algorithms_configurations, problems_groups, results
+@pytest.mark.parametrize(
+    "custom_algos_descriptions", [None, {"Algorithm": "Description"}]
+)
+def test_algorithm_descriptions(
+    tmp_path,
+    unknown_algorithms_configurations,
+    problems_groups,
+    results,
+    custom_algos_descriptions,
 ):
-    """Check the retrieval of a GEMSEO algorithm description."""
+    """Check the description of the algorithms."""
     report = Report(
-        tmp_path, [unknown_algorithms_configurations], problems_groups, results
+        tmp_path,
+        [unknown_algorithms_configurations],
+        problems_groups,
+        results,
+        custom_algos_descriptions,
     )
     ref_contents = [
         "Algorithms\n",
@@ -104,11 +116,10 @@ def test_retrieve_description(
         "The following algorithms are considered in this benchmarking report.\n",
         "\n",
         "Algorithm\n",
-        "   N/A\n",
+        f"   {'Description' if custom_algos_descriptions else 'N/A'}\n",
         "\n",
         "SLSQP\n",
-        "   Sequential Least-Squares Quadratic Programming (SLSQP) implemented in the "
-        "SciPy library\n",
+        f"   {ScipyOpt.ALGORITHM_INFOS['SLSQP'].description}\n",
     ]
     report.generate()
     with open(tmp_path / "algorithms.rst") as file:
