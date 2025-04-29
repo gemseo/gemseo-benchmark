@@ -38,9 +38,6 @@ import collections.abc
 import json
 from copy import copy
 from functools import reduce
-from itertools import chain
-from itertools import repeat
-from itertools import starmap
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Final
@@ -83,6 +80,8 @@ class PerformanceHistory(collections.abc.Sequence):
 
     def __init__(
         self,
+        # TODO: API BREAK:
+        # rename argument 'objective_values' into 'performance_measures'.
         objective_values: Sequence[float] | None = None,
         infeasibility_measures: Sequence[float] | None = None,
         feasibility_statuses: Sequence[bool] | None = None,
@@ -97,7 +96,7 @@ class PerformanceHistory(collections.abc.Sequence):
     ) -> None:
         """
         Args:
-            objective_values: The history of the quantity to be minimized.
+            objective_values: The history of performance measures.
                 If ``None``, will be considered empty.
             infeasibility_measures: The history of infeasibility measures.
                 An infeasibility measure is a non-negative real number representing
@@ -155,9 +154,10 @@ class PerformanceHistory(collections.abc.Sequence):
         self._number_of_variables = number_of_variables
         self.total_time = total_time
 
+    # TODO: API BREAK: rename property 'objective_values' into 'performance_measures'.
     @property
     def objective_values(self) -> list[float]:
-        """The objective values."""
+        """The performance measures."""
         return [item.objective_value for item in self.items]
 
     @property
@@ -196,7 +196,7 @@ class PerformanceHistory(collections.abc.Sequence):
 
     @staticmethod
     def __get_history_items(
-        objective_values: Sequence[float] | None = None,
+        performance_measures: Sequence[float] | None = None,
         infeasibility_measures: Sequence[float] | None = None,
         feasibility_statuses: Sequence[bool] | None = None,
         n_unsatisfied_constraints: Sequence[int] | None = None,
@@ -204,7 +204,7 @@ class PerformanceHistory(collections.abc.Sequence):
         """Return history items based on values histories.
 
         Args:
-            objective_values: The history of the quantity to be minimized.
+            performance_measures: The history of performance measures.
                 If ``None``, will be considered empty.
             infeasibility_measures: The history of infeasibility measures.
                 An infeasibility measure is a non-negative real number representing
@@ -228,20 +228,20 @@ class PerformanceHistory(collections.abc.Sequence):
         Returns:
             The history items.
         """
-        if objective_values is None:
-            objective_values = []
+        if performance_measures is None:
+            performance_measures = []
 
         if infeasibility_measures is not None:
-            if len(infeasibility_measures) != len(objective_values):
+            if len(infeasibility_measures) != len(performance_measures):
                 msg = (
-                    "The objective history and the infeasibility history "
+                    "The performance history and the infeasibility history "
                     "must have same length."
                 )
                 raise ValueError(msg)
         elif feasibility_statuses is not None:
-            if len(feasibility_statuses) != len(objective_values):
+            if len(feasibility_statuses) != len(performance_measures):
                 msg = (
-                    "The objective history and the feasibility history "
+                    "The performance history and the feasibility history "
                     "must have same length."
                 )
                 raise ValueError(msg)
@@ -249,7 +249,7 @@ class PerformanceHistory(collections.abc.Sequence):
                 0.0 if is_feas else inf for is_feas in feasibility_statuses
             ]
         else:
-            infeasibility_measures = [0.0] * len(objective_values)
+            infeasibility_measures = [0.0] * len(performance_measures)
 
         if n_unsatisfied_constraints is None:
             n_unsatisfied_constraints = [
@@ -263,11 +263,11 @@ class PerformanceHistory(collections.abc.Sequence):
             raise ValueError(msg)
 
         return list(
-            starmap(
+            map(
                 HistoryItem,
-                zip(
-                    objective_values, infeasibility_measures, n_unsatisfied_constraints
-                ),
+                performance_measures,
+                infeasibility_measures,
+                n_unsatisfied_constraints,
             )
         )
 
@@ -291,7 +291,9 @@ class PerformanceHistory(collections.abc.Sequence):
         """
         minimum_history = copy(self)
         minimum_history.items = [
-            reduce(min, self.__items[: i + 1]) for i in range(len(self))
+            reduce(min, self.__items[: i + 1]).copy()
+            # N.B. The copy ensures the new items are independent objects.
+            for i in range(len(self))
         ]
         return minimum_history
 
@@ -352,7 +354,7 @@ class PerformanceHistory(collections.abc.Sequence):
         Returns:
             The truncated performance history.
         """
-        first_feasible = None
+        first_feasible = len(self)
         for index, item in enumerate(self):
             if item.is_feasible:
                 first_feasible = index
@@ -564,7 +566,11 @@ class PerformanceHistory(collections.abc.Sequence):
             raise ValueError(msg)
 
         history = copy(self)
-        history.items = list(chain(self, repeat(self[-1], (size - len(self)))))
+        history.items = list(self)
+        for _ in range(size - len(self)):
+            history.items.append(self[-1].copy())
+            # N.B. The copy ensures the new items are independent objects.
+
         return history
 
     def shorten(self, size: int) -> PerformanceHistory:
@@ -605,3 +611,8 @@ class PerformanceHistory(collections.abc.Sequence):
         """
         for item in self.items:
             item.apply_infeasibility_tolerance(infeasibility_tolerance)
+
+    def switch_performance_measure_sign(self) -> None:
+        """Switch the sign of the performance measure."""
+        for item in self:
+            item.switch_performance_measure_sign()

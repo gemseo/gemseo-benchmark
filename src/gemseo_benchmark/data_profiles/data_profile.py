@@ -43,15 +43,16 @@ from typing import TYPE_CHECKING
 
 import matplotlib
 import matplotlib.pyplot as plt
+from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 from gemseo.utils.matplotlib_figure import save_show_figure
 from numpy import array
 from numpy import linspace
 from numpy import ndarray
 from numpy import zeros
 
-from gemseo_benchmark import COLORS_CYCLE
+from gemseo_benchmark import ConfigurationPlotOptions
 from gemseo_benchmark import MarkeveryType
-from gemseo_benchmark import get_markers_cycle
+from gemseo_benchmark import _get_configuration_plot_options
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
@@ -149,12 +150,16 @@ class DataProfile:
             history
         )
 
+    # TODO: remove argument 'markevery' in favor of 'plot_kwargs' (API break)
     def plot(
         self,
         algo_names: Iterable[str] | None = None,
         show: bool = True,
         file_path: str | Path | None = None,
-        markevery: MarkeveryType = 0.1,
+        markevery: MarkeveryType | None = None,
+        plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        grid_kwargs: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
+        use_evaluation_log_scale: bool = False,
     ) -> None:
         """Plot the data profiles of the required algorithms.
 
@@ -166,12 +171,24 @@ class DataProfile:
                 If ``None``, the plot is not saved.
             markevery: The sampling parameter for the markers of the plot.
                 Refer to the Matplotlib documentation.
+            plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
+                for each algorithm configuration.
+            grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
         """
         if algo_names is None:
             algo_names = ()
 
         data_profiles = self.compute_data_profiles(*algo_names)
-        figure = self._plot_data_profiles(data_profiles, markevery)
+        plot_kwargs_copy = plot_kwargs.copy()
+        for kwargs in plot_kwargs_copy.values():
+            if "markevery" not in kwargs:
+                kwargs["markevery"] = markevery
+
+        figure = self._plot_data_profiles(
+            data_profiles, plot_kwargs_copy, grid_kwargs, use_evaluation_log_scale
+        )
         save_show_figure(figure, show, file_path)
 
     def compute_data_profiles(self, *algo_names: str) -> dict[str, list[Number]]:
@@ -259,18 +276,25 @@ class DataProfile:
 
     @staticmethod
     def _plot_data_profiles(
-        data_profiles: Mapping[str, Sequence[Number]], markevery: MarkeveryType = 0.1
+        data_profiles: Mapping[str, Sequence[Number]],
+        plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        grid_kwargs: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
+        use_evaluation_log_scale: bool = False,
     ) -> Figure:
         """Plot the data profiles.
 
         Args:
             data_profiles: The data profiles.
-            markevery: The sampling parameter for the markers of the plot.
-                Refer to the Matplotlib documentation.
+            plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
+                for each algorithm configuration.
+            grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
 
         Returns:
             The data profiles figure.
         """
+        plot_kwargs = _get_configuration_plot_options(plot_kwargs, data_profiles)
         fig = plt.figure()
         axes = fig.add_subplot(1, 1, 1)
 
@@ -278,33 +302,25 @@ class DataProfile:
         axes.set_title(f"Data profile{'s' if len(data_profiles) > 1 else ''}")
         max_profile_size = max(len(profile) for profile in data_profiles.values())
         axes.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
+        if use_evaluation_log_scale:
+            axes.set_xscale("log")
+
         plt.xlabel("Number of functions evaluations")
         plt.xlim([1, max_profile_size])
         y_ticks = linspace(0.0, 1.0, 11)
-        plt.yticks(y_ticks, (f"{ratio * 100.0:02.0f}%" for ratio in y_ticks))
+        plt.yticks(y_ticks, (f"{ratio * 100.0:.0f}%" for ratio in y_ticks))
         plt.ylabel("Ratios of targets reached")
         plt.ylim([0.0, 1.05])
 
-        # Plot the 100% line
-        axes.axhline(1.0, linestyle=":", color="black")
-
         # Plot the data profiles
-        for color, marker, (name, profile) in zip(
-            COLORS_CYCLE, get_markers_cycle(), data_profiles.items()
-        ):
+        for name, profile in data_profiles.items():
             # Plot the data profile
             profile_size = len(profile)
-            axes.plot(
-                range(1, profile_size + 1),
-                profile,
-                color=color,
-                label=name,
-                marker=marker,
-                markevery=markevery,
-            )
+            axes.plot(range(1, profile_size + 1), profile, **plot_kwargs[name])
 
             # Extend the profile with an horizontal line if necessary
             if profile_size < max_profile_size:
+                color = plot_kwargs[name]["color"]
                 tail_size = max_profile_size - profile_size + 1
                 last_value = profile[-1]
                 axes.plot(
@@ -315,6 +331,7 @@ class DataProfile:
                 )
                 # Mark the last entry of the data profile
                 axes.plot(profile_size, last_value, marker="*", color=color)
-        plt.legend()
 
+        plt.legend()
+        plt.grid(**grid_kwargs)
         return fig

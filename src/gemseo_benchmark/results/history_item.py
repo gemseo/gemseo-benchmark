@@ -27,20 +27,21 @@ class HistoryItem:
 
     def __init__(
         self,
+        # TODO: API BREAK: rename argument 'objective_value' into 'performance_measure'.
         objective_value: float,
         infeasibility_measure: float,
         n_unsatisfied_constraints: int | None = None,
     ) -> None:
         """
         Args:
-            objective_value: The objective function value of the item.
+            objective_value: The performance measure of the item.
             infeasibility_measure: The infeasibility measure of the item.
             n_unsatisfied_constraints: The number of unsatisfied constraints of the
                 item.
                 If ``None``, it will be set to 0 if the infeasibility measure is zero,
                 and if the infeasibility measure is positive it will be set to None.
         """  # noqa: D205, D212, D415
-        self.__objective_value = objective_value
+        self.__performance_measure = objective_value
         (
             self.__infeas_measure,
             self.__n_unsatisfied_constraints,
@@ -95,10 +96,11 @@ class HistoryItem:
 
         return infeasibility_measure, n_unsatisfied_constraints
 
+    # TODO: API BREAK: rename property 'objective_value' into 'performance_measure'.
     @property
     def objective_value(self) -> float:
-        """The objective value of the history item."""
-        return self.__objective_value
+        """The performance measure of the history item."""
+        return self.__performance_measure
 
     @property
     def infeasibility_measure(self) -> float:
@@ -173,3 +175,15 @@ class HistoryItem:
         if self.__infeas_measure <= infeasibility_tolerance:
             self.__infeas_measure = 0.0
             self.__n_unsatisfied_constraints = 0
+
+    def copy(self) -> HistoryItem:
+        """Return a deep copy of the history item."""
+        return HistoryItem(
+            self.__performance_measure,
+            self.__infeas_measure,
+            self.__n_unsatisfied_constraints,
+        )
+
+    def switch_performance_measure_sign(self) -> None:
+        """Switch the sign of the performance measure."""
+        self.__performance_measure = -self.__performance_measure

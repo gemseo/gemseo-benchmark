@@ -26,6 +26,7 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
+from gemseo.algos.opt.scipy_local.scipy_local import ScipyOpt
 
 from gemseo_benchmark.report.report import Report
 
@@ -53,6 +54,9 @@ def test_init_missing_algorithms(
         f"'{algorithm_configuration.name}'.",
     ):
         Report(tmp_path, [unknown_algorithms_configurations], problems_groups, results)
+
+
+# TODO: generate report sources once and for all
 
 
 @pytest.fixture
@@ -87,12 +91,23 @@ def test_generate_pdf(tmp_path, report):
     assert (tmp_path / "_build" / "latex" / "benchmarking_report.pdf").is_file()
 
 
-def test_retrieve_description(
-    tmp_path, unknown_algorithms_configurations, problems_groups, results
+@pytest.mark.parametrize(
+    "custom_algos_descriptions", [None, {"Algorithm": "Description"}]
+)
+def test_algorithm_descriptions(
+    tmp_path,
+    unknown_algorithms_configurations,
+    problems_groups,
+    results,
+    custom_algos_descriptions,
 ):
-    """Check the retrieval of a GEMSEO algorithm description."""
+    """Check the description of the algorithms."""
     report = Report(
-        tmp_path, [unknown_algorithms_configurations], problems_groups, results
+        tmp_path,
+        [unknown_algorithms_configurations],
+        problems_groups,
+        results,
+        custom_algos_descriptions,
     )
     ref_contents = [
         "Algorithms\n",
@@ -101,11 +116,10 @@ def test_retrieve_description(
         "The following algorithms are considered in this benchmarking report.\n",
         "\n",
         "Algorithm\n",
-        "   N/A\n",
+        f"   {'Description' if custom_algos_descriptions else 'N/A'}\n",
         "\n",
         "SLSQP\n",
-        "   Sequential Least-Squares Quadratic Programming (SLSQP) implemented in the "
-        "SciPy library\n",
+        f"   {ScipyOpt.ALGORITHM_INFOS['SLSQP'].description}\n",
     ]
     report.generate()
     with open(tmp_path / "algorithms.rst") as file:
@@ -136,10 +150,12 @@ def test_figures(
     assert (group_dir / "data_profile.png").is_file()
     problem_dir = group_dir / problem_a.name.replace(" ", "_")
     assert (problem_dir / "data_profile.png").is_file()
-    assert (problem_dir / "histories.png").is_file()
+    assert (problem_dir / "performance_measure.png").is_file()
+    assert (problem_dir / "performance_measure_focus.png").is_file()
     problem_dir = group_dir / problem_b.name.replace(" ", "_")
     assert (problem_dir / "data_profile.png").is_file()
-    assert (problem_dir / "histories.png").is_file()
+    assert (problem_dir / "performance_measure.png").is_file()
+    assert (problem_dir / "performance_measure_focus.png").is_file()
 
 
 @pytest.fixture(scope="package")
@@ -158,14 +174,36 @@ def incomplete_group(incomplete_problem):
     return group
 
 
-def test_problem_without_optimum(
-    tmp_path, incomplete_group, algorithms_configurations, results
-):
-    """Check the handling of a benchmarking problem without an optimum."""
-    groups = [incomplete_group]
-    report = Report(tmp_path, [algorithms_configurations], groups, results)
-    with pytest.raises(AttributeError, match="The optimum of the problem is not set."):
-        report.generate()
+@pytest.mark.parametrize(
+    ("fixture_name", "optimum"), [("problem_a", "1"), ("problem_b", "N/A")]
+)
+def test_problem_files(tmp_path, report, fixture_name, optimum, request) -> None:
+    """Check the problem files."""
+    report.generate()
+    problem = request.getfixturevalue(fixture_name)
+    name = problem.name
+    with (tmp_path / "problems" / name).with_suffix(".rst").open("r") as file:
+        assert (
+            file.read()
+            == f""".. _{name}:
+
+{name}
+=========
+
+
+Description
+-----------
+
+{problem.description}
+
+Optimal feasible objective value: {optimum}.
+
+
+Target values
+-------------
+* {problem.target_values[0].objective_value} (feasible)
+"""
+        )
 
 
 @pytest.fixture

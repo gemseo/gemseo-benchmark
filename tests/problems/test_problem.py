@@ -22,7 +22,8 @@
 from __future__ import annotations
 
 import re
-from pathlib import Path
+from typing import TYPE_CHECKING
+from typing import Callable
 from unittest import mock
 
 import numpy
@@ -39,57 +40,78 @@ from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.problems.problem import Problem
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
+if TYPE_CHECKING:
+    from gemseo import OptimizationProblem
+
 
 def test_invalid_creator():
     """Check initialization with an invalid problem creator."""
     with pytest.raises(
         TypeError,
-        match="optimization_problem_creator must return an OptimizationProblem.",
+        match=re.escape(
+            "optimization_problem_creator must return an OptimizationProblem."
+        ),
     ):
         Problem("A problem", lambda: None)
 
 
 @pytest.fixture(scope="module")
-def creator(problem):
-    """An optimization problem creator."""
-    return lambda: problem
+def minimization_problem_creator(
+    minimization_problem,
+) -> Callable[[], OptimizationProblem]:
+    """A minimization problem creator."""
+    return lambda: minimization_problem
 
 
 @pytest.fixture(scope="module")
-def benchmarking_problem(creator):
+def maximization_problem_creator(
+    maximization_problem,
+) -> Callable[[], OptimizationProblem]:
+    """A maximization problem creator."""
+    return lambda: maximization_problem
+
+
+@pytest.fixture(scope="module")
+def benchmarking_problem(minimization_problem_creator):
     """A benchmarking problem."""
-    return Problem("Problem", creator)
+    return Problem("Problem", minimization_problem_creator)
 
 
-def test_default_start_point(benchmarking_problem, problem):
+def test_default_start_point(benchmarking_problem, minimization_problem):
     """Check that the default starting point is properly set."""
     start_points = benchmarking_problem.start_points
     assert len(start_points) == 1
-    assert (start_points[0] == problem.design_space.get_current_value()).all()
+    assert (
+        start_points[0] == minimization_problem.design_space.get_current_value()
+    ).all()
 
 
-def test_wrong_start_points_type(creator):
+def test_wrong_start_points_type(minimization_problem_creator):
     """Check initialization with starting points of the wrong type."""
     with pytest.raises(
         TypeError,
-        match="A starting point must be a 1-dimensional NumPy array of size 2.",
+        match=re.escape(
+            "A starting point must be a 1-dimensional NumPy array of size 2."
+        ),
     ):
-        Problem("problem", creator, [[0.0, 0.0]])
+        Problem("problem", minimization_problem_creator, [[0.0, 0.0]])
 
 
-def test_inconsistent_start_points(creator):
+def test_inconsistent_start_points(minimization_problem_creator):
     """Check initialization with starting points of inadequate size."""
     with pytest.raises(
         ValueError,
-        match="A starting point must be a 1-dimensional NumPy array of size 2.",
+        match=re.escape(
+            "A starting point must be a 1-dimensional NumPy array of size 2."
+        ),
     ):
-        Problem("problem", creator, [zeros(3)])
+        Problem("problem", minimization_problem_creator, [zeros(3)])
 
 
-def test_start_points_iteration(creator):
+def test_start_points_iteration(minimization_problem_creator):
     """Check the iteration on start points."""
     start_points = [zeros(2), ones(2)]
-    problem = Problem("problem", creator, start_points)
+    problem = Problem("problem", minimization_problem_creator, start_points)
     problem_instances = list(problem)
     assert len(problem_instances) == 2
     assert_allclose(
@@ -102,28 +124,30 @@ def test_start_points_iteration(creator):
     )
 
 
-def test_undefined_targets(creator):
+def test_undefined_targets(minimization_problem_creator):
     """Check the access to undefined targets."""
-    problem = Problem("problem", creator, [zeros(2)])
+    problem = Problem("problem", minimization_problem_creator, [zeros(2)])
     with pytest.raises(
-        ValueError, match="The benchmarking problem has no target value."
+        ValueError, match=re.escape("The benchmarking problem has no target value.")
     ):
         _ = problem.target_values
 
 
-def test_generate_start_points(creator):
+def test_generate_start_points(minimization_problem_creator):
     """Check the generation of starting points."""
-    problem = Problem("problem", creator, doe_algo_name="DiagonalDOE", doe_size=5)
+    problem = Problem(
+        "problem", minimization_problem_creator, doe_algo_name="DiagonalDOE", doe_size=5
+    )
     assert len(problem.start_points) == 5
 
 
-def test_undefined_start_points(creator):
+def test_undefined_start_points(minimization_problem_creator):
     """Check the access to nonexistent starting points."""
-    opt_problem = creator()
+    opt_problem = minimization_problem_creator()
     opt_problem.design_space.has_current_value = False
     problem = Problem("problem", lambda: opt_problem)
     with pytest.raises(
-        ValueError, match="The benchmarking problem has no starting point."
+        ValueError, match=re.escape("The benchmarking problem has no starting point.")
     ):
         _ = problem.start_points
 
@@ -185,15 +209,6 @@ def test__get_description(
 
 
 @pytest.fixture
-def results():
-    """Paths to performance histories."""
-    paths = [Path(__file__).parent / "history.json"]
-    results = mock.Mock()
-    results.get_paths = mock.Mock(return_value=paths)
-    return results
-
-
-@pytest.fixture
 def target_values():
     """Target values."""
     # N.B. passing the configuration is required for the setter.
@@ -207,11 +222,18 @@ def target_values():
     return target_values
 
 
-def test_init_targets_computation(creator, algorithms_configurations):
+@pytest.mark.parametrize("minimize_objective", [False, True])
+def test_init_targets_computation(algorithms_configurations, minimize_objective):
     """Check the computation of targets at the problem creation."""
+
+    def create() -> OptimizationProblem:
+        problem = Rosenbrock()
+        problem.minimize_objective = minimize_objective
+        return problem
+
     problem = Problem(
         "Problem",
-        lambda: Rosenbrock(),
+        create,
         target_values_algorithms_configurations=algorithms_configurations,
         target_values_number=2,
     )
@@ -220,10 +242,16 @@ def test_init_targets_computation(creator, algorithms_configurations):
 
 @image_comparison(baseline_images=["histories"], remove_text=True, extensions=["png"])
 def test_plot_histories(
-    creator, target_values, algorithms_configurations, results, algorithm_configuration
+    minimization_problem_creator,
+    target_values,
+    algorithms_configurations,
+    results,
+    algorithm_configuration,
 ):
     """Check the histories graphs."""
-    problem = Problem("problem", creator, target_values=target_values)
+    problem = Problem(
+        "problem", minimization_problem_creator, target_values=target_values
+    )
     pyplot.close("all")
     problem.plot_histories(algorithms_configurations, results, show=False)
     results.get_paths.assert_called_once_with(algorithm_configuration.name, "problem")
@@ -233,14 +261,19 @@ def test_plot_histories(
     baseline_images=["histories_single_target"], remove_text=True, extensions=["png"]
 )
 def test_plot_histories_single_target(
-    creator, algorithms_configurations, results, algorithm_configuration
+    minimization_problem_creator,
+    algorithms_configurations,
+    results,
+    algorithm_configuration,
 ):
     """Check the histories graphs for a problem with a single target value."""
     target_values = mock.MagicMock(spec=TargetValues)
     target = mock.Mock()
     target.objective_value = -1.0
     target_values.__iter__.return_value = [target]
-    problem = Problem("problem", creator, target_values=target_values)
+    problem = Problem(
+        "problem", minimization_problem_creator, target_values=target_values
+    )
     pyplot.close("all")
     problem.plot_histories(algorithms_configurations, results, show=False)
     results.get_paths.assert_called_once_with(algorithm_configuration.name, "problem")
@@ -250,7 +283,11 @@ def test_plot_histories_single_target(
     baseline_images=["three_histories"], remove_text=True, extensions=["png"]
 )
 def test_plot_3_histories(
-    tmpdir, creator, target_values, algorithms_configurations, algorithm_configuration
+    tmpdir,
+    minimization_problem_creator,
+    target_values,
+    algorithms_configurations,
+    algorithm_configuration,
 ):
     """Check the histories graph for three histories."""
     histories = [
@@ -265,7 +302,9 @@ def test_plot_3_histories(
         paths.append(path)
     results = mock.Mock()
     results.get_paths = mock.Mock(return_value=paths)
-    problem = Problem("problem", creator, target_values=target_values)
+    problem = Problem(
+        "problem", minimization_problem_creator, target_values=target_values
+    )
     pyplot.close("all")
     problem.plot_histories(algorithms_configurations, results, show=False)
     results.get_paths.assert_called_once_with(algorithm_configuration.name, "problem")
@@ -275,7 +314,11 @@ def test_plot_3_histories(
     baseline_images=["infeasible_histories"], remove_text=True, extensions=["png"]
 )
 def test_plot_infeasible_histories(
-    tmpdir, creator, target_values, algorithms_configurations, algorithm_configuration
+    tmpdir,
+    minimization_problem_creator,
+    target_values,
+    algorithms_configurations,
+    algorithm_configuration,
 ):
     """Check the histories graph for histories with infeasible items."""
     histories = [
@@ -290,7 +333,9 @@ def test_plot_infeasible_histories(
         paths.append(path)
     results = mock.Mock()
     results.get_paths = mock.Mock(return_value=paths)
-    problem = Problem("problem", creator, target_values=target_values)
+    problem = Problem(
+        "problem", minimization_problem_creator, target_values=target_values
+    )
     pyplot.close("all")
     problem.plot_histories(algorithms_configurations, results, show=False)
     results.get_paths.assert_called_once_with(algorithm_configuration.name, "problem")
@@ -300,10 +345,15 @@ def test_plot_infeasible_histories(
     baseline_images=["histories_plot_all"], remove_text=True, extensions=["png"]
 )
 def test_plot_histories_plot_all(
-    creator, target_values, algorithms_configurations, results, algorithm_configuration
+    minimization_problem_creator,
+    target_values,
+    algorithms_configurations,
+    results,
 ):
     """Check the plotting of all the histories."""
-    problem = Problem("Problem", creator, target_values=target_values)
+    problem = Problem(
+        "Problem", minimization_problem_creator, target_values=target_values
+    )
     pyplot.close("all")
     problem.plot_histories(
         algorithms_configurations, results, show=False, plot_all_histories=True
@@ -314,10 +364,15 @@ def test_plot_histories_plot_all(
     baseline_images=["histories_optimum"], remove_text=True, extensions=["png"]
 )
 def test_plot_histories_optimum(
-    creator, target_values, algorithms_configurations, results, algorithm_configuration
+    minimization_problem_creator,
+    target_values,
+    algorithms_configurations,
+    results,
 ):
     """Check the plotting the histories when the optimum is set."""
-    problem = Problem("Problem", creator, target_values=target_values)
+    problem = Problem(
+        "Problem", minimization_problem_creator, target_values=target_values
+    )
     problem.optimum = 0.0
     pyplot.close("all")
     problem.plot_histories(algorithms_configurations, results, show=False)
@@ -327,10 +382,15 @@ def test_plot_histories_optimum(
     baseline_images=["histories_max_eval_number"], remove_text=True, extensions=["png"]
 )
 def test_plot_histories_max_eval_number(
-    creator, target_values, algorithms_configurations, results, algorithm_configuration
+    minimization_problem_creator,
+    target_values,
+    algorithms_configurations,
+    results,
 ):
     """Check the plotting the histories when the number of evaluations is limited."""
-    problem = Problem("Problem", creator, target_values=target_values)
+    problem = Problem(
+        "Problem", minimization_problem_creator, target_values=target_values
+    )
     problem.optimum = 0.0
     pyplot.close("all")
     problem.plot_histories(
@@ -342,7 +402,10 @@ def test_plot_histories_max_eval_number(
     baseline_images=["logarithmic_histories"], remove_text=True, extensions=["png"]
 )
 def test_use_log_scale(
-    tmpdir, creator, target_values, algorithms_configurations, algorithm_configuration
+    tmpdir,
+    minimization_problem_creator,
+    algorithms_configurations,
+    algorithm_configuration,
 ):
     """Check the use of a logarithmic scale."""
     history = PerformanceHistory([1000, 100, 10, 1])
@@ -350,7 +413,9 @@ def test_use_log_scale(
     history.to_file(path)
     results = mock.Mock()
     results.get_paths = mock.Mock(return_value=[path])
-    problem = Problem("problem", creator, target_values=TargetValues([100, 1]))
+    problem = Problem(
+        "problem", minimization_problem_creator, target_values=TargetValues([100, 1])
+    )
     pyplot.close("all")
     problem.plot_histories(
         algorithms_configurations, results, show=False, use_log_scale=True
@@ -397,9 +462,11 @@ def test_start_points_wrong_dimension(benchmarking_problem):
         benchmarking_problem.start_points = zeros((3, 1))
 
 
-def test_get_start_points(creator):
+def test_get_start_points(minimization_problem_creator):
     """Check the computation of the starting points."""
-    bench_problem = Problem("Problem", creator, doe_algo_name="DiagonalDOE")
+    bench_problem = Problem(
+        "Problem", minimization_problem_creator, doe_algo_name="DiagonalDOE"
+    )
     assert len(bench_problem.start_points) == 2
 
 
@@ -419,6 +486,30 @@ def test_target_values_wrong_type(benchmarking_problem):
         benchmarking_problem.target_values = target_values
 
 
+def test_target_values_maximization_initial(maximization_problem_creator) -> None:
+    """Check the initial target values for a maximization problem."""
+    problem = Problem(
+        "Rosenbrock maximization",
+        maximization_problem_creator,
+        None,
+        TargetValues([1, 2], [3, 4]),
+    )
+    assert problem.target_values.objective_values == [1, 2]
+    assert problem.target_values.infeasibility_measures == [3, 4]
+    assert problem.minimization_target_values.objective_values == [-1, -2]
+    assert problem.minimization_target_values.infeasibility_measures == [3, 4]
+
+
+def test_target_values_maximization_set(maximization_problem_creator) -> None:
+    """Check the set target values for a maximization problem."""
+    problem = Problem("Rosenbrock maximization", maximization_problem_creator)
+    problem.target_values = TargetValues([1, 2], [3, 4])
+    assert problem.target_values.objective_values == [1, 2]
+    assert problem.target_values.infeasibility_measures == [3, 4]
+    assert problem.minimization_target_values.objective_values == [-1, -2]
+    assert problem.minimization_target_values.infeasibility_measures == [3, 4]
+
+
 @pytest.mark.parametrize(
     ("input_description", "description"),
     [
@@ -426,38 +517,52 @@ def test_target_values_wrong_type(benchmarking_problem):
         ("A description of the problem.", "A description of the problem."),
     ],
 )
-def test_default_description(creator, input_description, description):
+def test_default_description(
+    minimization_problem_creator, input_description, description
+):
     """Check the default description of a problem."""
     assert (
-        Problem("problem", creator, description=input_description).description
+        Problem(
+            "problem", minimization_problem_creator, description=input_description
+        ).description
         == description
     )
 
 
-def test_objective_name(benchmarking_problem, creator):
+def test_objective_name(benchmarking_problem, minimization_problem_creator):
     """Check the accessor to the objective name."""
-    assert benchmarking_problem.objective_name == creator().objective.name
+    assert (
+        benchmarking_problem.objective_name
+        == minimization_problem_creator().objective.name
+    )
 
 
-def test_constraints_names(benchmarking_problem, creator):
+def test_constraints_names(benchmarking_problem, minimization_problem_creator):
     """Check the accessor to the constraints names."""
-    assert benchmarking_problem.constraints_names == creator().scalar_constraint_names
+    assert (
+        benchmarking_problem.constraints_names
+        == minimization_problem_creator().scalar_constraint_names
+    )
 
 
-def test_save_start_points(tmp_path, creator):
+def test_save_start_points(tmp_path, minimization_problem_creator):
     """Check the saving of starting points."""
     start_points = numpy.ones((3, 2))
     path = tmp_path / "start_points.npy"
-    Problem("problem", creator, start_points=start_points).save_start_points(path)
+    Problem(
+        "problem", minimization_problem_creator, start_points=start_points
+    ).save_start_points(path)
     assert_equal(numpy.load(path), start_points)
 
 
-def test_load_start_points(tmp_path, creator):
+def test_load_start_points(tmp_path, minimization_problem_creator):
     """Check the loading of starting points."""
     start_points = numpy.ones((3, 2))
     path = tmp_path / "start_points.npy"
     numpy.save(path, start_points)
-    problem = Problem("problem", creator, start_points=start_points)
+    problem = Problem(
+        "problem", minimization_problem_creator, start_points=start_points
+    )
     problem.load_start_point(path)
     assert_equal(problem.start_points, start_points)
 
@@ -467,28 +572,49 @@ def test_dimension(benchmarking_problem):
     assert benchmarking_problem.dimension == 2
 
 
-def test_compute_performance(problem, database):
+def test_compute_performance(minimization_problem, database):
     """Check the extraction of a history from a solved optimization problem."""
-    problem.database = database
-    obj_values, infeas_measures, feas_statuses = Problem.compute_performance(problem)
+    minimization_problem.database = database
+    obj_values, infeas_measures, feas_statuses = Problem.compute_performance(
+        minimization_problem
+    )
     assert obj_values == [2.0]
     assert infeas_measures == [1.0]
     assert feas_statuses == [False]
 
 
-@image_comparison(
-    baseline_images=["data_profiles"], remove_text=True, extensions=["png"]
+@pytest.mark.parametrize(
+    ("baseline_images", "use_evaluation_log_scale"),
+    [
+        (
+            [f"data_profiles[use_evaluation_log_scale={use_evaluation_log_scale}]"],
+            use_evaluation_log_scale,
+        )
+        for use_evaluation_log_scale in [False, True]
+    ],
 )
+@image_comparison(None, ["png"])
 def test_compute_data_profile(
-    creator, target_values, algorithms_configurations, results
+    baseline_images,
+    minimization_problem_creator,
+    target_values,
+    algorithms_configurations,
+    results,
+    use_evaluation_log_scale,
 ):
     """Check the computation of data profiles."""
     target_values.compute_target_hits_history = mock.Mock(
         return_value=[0, 0, 0, 1, 1, 2]
     )
-    bench_problem = Problem("Problem", creator, target_values=target_values)
+    bench_problem = Problem(
+        "Problem", minimization_problem_creator, target_values=target_values
+    )
     pyplot.close("all")
-    bench_problem.compute_data_profile(algorithms_configurations, results)
+    bench_problem.compute_data_profile(
+        algorithms_configurations,
+        results,
+        use_evaluation_log_scale=use_evaluation_log_scale,
+    )
 
 
 @image_comparison(
@@ -497,12 +623,26 @@ def test_compute_data_profile(
     extensions=["png"],
 )
 def test_compute_data_profile_max_eval_number(
-    creator, target_values, algorithms_configurations, results
+    minimization_problem_creator, target_values, algorithms_configurations, results
 ):
     """Check the computation of data profiles when the evaluations number is limited."""
-    bench_problem = Problem("Problem", creator, target_values=target_values)
+    bench_problem = Problem(
+        "Problem", minimization_problem_creator, target_values=target_values
+    )
     target_values.compute_target_hits_history = mock.Mock(return_value=[0, 0, 0, 1])
     pyplot.close("all")
     bench_problem.compute_data_profile(
         algorithms_configurations, results, max_eval_number=4
+    )
+
+
+@pytest.mark.parametrize(
+    ("problem_creator", "minimize_objective"),
+    [("minimization_problem_creator", True), ("maximization_problem_creator", False)],
+)
+def test_minimize_objective(problem_creator, minimize_objective, request) -> None:
+    """Check the minimization flag."""
+    assert (
+        Problem("Problem", request.getfixturevalue(problem_creator)).minimize_objective
+        is minimize_objective
     )

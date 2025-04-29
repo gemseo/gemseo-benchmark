@@ -84,9 +84,12 @@ class Scenario:
         use_threading: bool = False,
         custom_algos_descriptions: Mapping[str, str] | None = None,
         max_eval_number_per_group: dict[str, int] | None = None,
-        plot_all_histories: bool = True,
+        plot_all_histories: bool = False,
         use_log_scale: bool = False,
         log_gemseo_to_file: bool = False,
+        directory_path: Path | None = None,
+        plot_only_median: bool = False,
+        use_evaluation_log_scale: bool = False,
     ) -> Results:
         """Execute the benchmarking scenario.
 
@@ -116,6 +119,11 @@ class Scenario:
             use_log_scale: Whether to use a logarithmic scale on the value axis.
             log_gemseo_to_file: Whether to save the GEMSEO log to a file
                 next to the performance history file.
+            directory_path: The path to the directory where the report
+                will be generated.
+            plot_only_median: Whether to plot only the median and no other centile.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
 
         Returns:
             The performance histories.
@@ -142,6 +150,9 @@ class Scenario:
                 max_eval_number_per_group,
                 plot_all_histories,
                 use_log_scale,
+                directory_path,
+                plot_only_median,
+                use_evaluation_log_scale,
             )
 
         return Results(self._results_path)
@@ -168,17 +179,19 @@ class Scenario:
             log_gemseo_to_file: Whether to save the GEMSEO log to a file
                 next to the performance history file.
         """
+        algorithms_configurations = AlgorithmsConfigurations()
+        for group in self._algorithms_configurations_groups:
+            for algorithm_configuration in group:
+                if algorithm_configuration not in algorithms_configurations:
+                    algorithms_configurations.add(algorithm_configuration)
+
         Benchmarker(
             self._histories_path,
             self._results_path,
             self._get_dir_path(self.__DATABASES_DIRNAME) if save_databases else None,
         ).execute(
             {problem for group in problems_groups for problem in group},
-            AlgorithmsConfigurations(*[
-                algo_config
-                for algos_configs_group in self._algorithms_configurations_groups
-                for algo_config in algos_configs_group
-            ]),
+            algorithms_configurations,
             overwrite_histories,
             number_of_processes,
             use_threading,
@@ -195,12 +208,12 @@ class Scenario:
         Returns:
             The path to the directory.
         """
-        path = self._outputs_path / name
-        if path.is_dir() and overwrite:
-            shutil.rmtree(path)
+        directory_path = self._outputs_path / name
+        if directory_path.is_dir() and overwrite:
+            shutil.rmtree(directory_path)
 
-        path.mkdir(exist_ok=not overwrite)
-        return path
+        directory_path.mkdir(exist_ok=not overwrite)
+        return directory_path
 
     def __generate_report(
         self,
@@ -212,6 +225,9 @@ class Scenario:
         max_eval_number_per_group: dict[str, int],
         plot_all_histories: bool = True,
         use_log_scale: bool = False,
+        directory_path: Path | None = None,
+        plot_only_median: bool = False,
+        use_evaluation_log_scale: bool = False,
     ) -> None:
         """Generate the benchmarking report.
 
@@ -231,9 +247,16 @@ class Scenario:
                 for the group.
             plot_all_histories: Whether to plot all the performance histories.
             use_log_scale: Whether to use a logarithmic scale on the value axis.
+            directory_path: The path to the directory where the report
+                will be generated.
+            plot_only_median: Whether to plot only the median and no other centile.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
         """
         report = Report(
-            self.__get_report_path(),
+            self.__get_report_path()
+            if directory_path is None
+            else directory_path,  # TODO: check existence
             self._algorithms_configurations_groups,
             problems_groups,
             Results(self._results_path),
@@ -246,6 +269,8 @@ class Scenario:
             infeasibility_tolerance,
             plot_all_histories,
             use_log_scale,
+            plot_only_median,
+            use_evaluation_log_scale=use_evaluation_log_scale,
         )
 
     def __get_report_path(self) -> Path:

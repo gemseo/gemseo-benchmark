@@ -30,6 +30,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from collections.abc import Mapping
+from copy import deepcopy
 from typing import TYPE_CHECKING
 from typing import Callable
 from typing import Union
@@ -38,6 +39,7 @@ from gemseo import compute_doe
 from gemseo import execute_algo
 from gemseo.algos.opt.factory import OptimizationLibraryFactory
 from gemseo.algos.optimization_problem import OptimizationProblem
+from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 from gemseo.utils.matplotlib_figure import save_show_figure
 from matplotlib import pyplot as plt
 from matplotlib.ticker import MaxNLocator
@@ -61,6 +63,7 @@ if TYPE_CHECKING:
 
     from gemseo.algos.doe.base_doe_library import DriverLibraryOptionType
 
+    from gemseo_benchmark import ConfigurationPlotOptions
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
     )
@@ -172,16 +175,25 @@ class Problem:
 
         # Set the target values:
         self.__target_values = None
+        self.__minimization_target_values = None
         if target_values is not None:
             self.target_values = target_values
+            self.__set_minimization_target_values()
         elif (
             target_values_algorithms_configurations is not None
             and target_values_number is not None
         ):
-            self.target_values = self.compute_targets(
-                target_values_number,
-                target_values_algorithms_configurations,
+            self.compute_targets(
+                target_values_number, target_values_algorithms_configurations
             )
+
+    def __set_minimization_target_values(self) -> None:
+        """Set the target values for minimization."""
+        if self._problem.minimize_objective:
+            self.__minimization_target_values = self.__target_values
+        else:
+            self.__minimization_target_values = deepcopy(self.__target_values)
+            self.__minimization_target_values.switch_performance_measure_sign()
 
     @property
     def start_points(self) -> list[ndarray]:
@@ -324,6 +336,7 @@ class Problem:
             raise TypeError(msg)
 
         self.__target_values = target_values
+        self.__set_minimization_target_values()
 
     def __iter__(self) -> OptimizationProblem:
         """Iterate on the problem instances with respect to the starting points."""
@@ -421,9 +434,13 @@ class Problem:
             self.optimum,
             best_target_tolerance,
         )
-        self.__target_values = target_values
+        self.__minimization_target_values = target_values
+        self.target_values = deepcopy(target_values)
+        if self._problem.minimize_objective:
+            return self.target_values
 
-        return target_values
+        self.__target_values.switch_performance_measure_sign()
+        return self.target_values
 
     @staticmethod
     def compute_performance(
@@ -534,6 +551,9 @@ class Problem:
         file_path: str | Path | None = None,
         infeasibility_tolerance: float = 0.0,
         max_eval_number: int | None = None,
+        plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        grid_kwargs: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
+        use_evaluation_log_scale: bool = False,
     ) -> None:
         """Generate the data profiles of given algorithms.
 
@@ -546,9 +566,14 @@ class Problem:
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             max_eval_number: The maximum evaluations number to be displayed.
                 If ``None``, this value is inferred from the longest history.
+            plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
+                for each algorithm configuration.
+            grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
         """
         # Initialize the data profile
-        data_profile = DataProfile({self.name: self.target_values})
+        data_profile = DataProfile({self.name: self.__minimization_target_values})
 
         # Generate the performance histories
         for configuration_name in algos_configurations.names:
@@ -566,7 +591,13 @@ class Problem:
                 )
 
         # Plot and/or save the data profile
-        data_profile.plot(show=show, file_path=file_path)
+        data_profile.plot(
+            show=show,
+            file_path=file_path,
+            plot_kwargs=plot_kwargs,
+            grid_kwargs=grid_kwargs,
+            use_evaluation_log_scale=use_evaluation_log_scale,
+        )
 
     def plot_histories(
         self,
@@ -696,9 +727,9 @@ class Problem:
         max_feasible_objective = None
         for configuration_name in algos_configurations.names:
             minima[configuration_name] = PerformanceHistories()
-            for path in results.get_paths(configuration_name, self.name):
+            for file_path in results.get_paths(configuration_name, self.name):
                 # Get the history of the cumulated minimum
-                history = PerformanceHistory.from_file(path)
+                history = PerformanceHistory.from_file(file_path)
                 if max_eval_number is not None:
                     history = history.shorten(max_eval_number)
 
@@ -747,3 +778,13 @@ class Problem:
         return max_feasible_objective + y_relative_margin * (
             max_feasible_objective - self.optimum
         )
+
+    @property
+    def minimization_target_values(self) -> TargetValues:
+        """The target values for minimization."""
+        return self.__minimization_target_values
+
+    @property
+    def minimize_objective(self) -> bool:
+        """Whether the objective function is to be minimized."""
+        return self._problem.minimize_objective

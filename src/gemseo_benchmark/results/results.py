@@ -165,3 +165,18 @@ class Results:
             and problem_name in self.__dict[algo_name]
             and path in self.__dict[algo_name][problem_name]
         )
+
+    def remove_paths(
+        self, algorithm_configuration_name: str, problem_name: str
+    ) -> None:
+        """Remove the paths associated with an algorithm/problem pair.
+
+        Args:
+            algorithm_configuration_name: The name of the algorithm configuration.
+            problem_name: The name of the problem.
+        """
+        if (
+            algorithm_configuration_name in self.__dict
+            and problem_name in self.__dict[algorithm_configuration_name]
+        ):
+            del self.__dict[algorithm_configuration_name][problem_name]

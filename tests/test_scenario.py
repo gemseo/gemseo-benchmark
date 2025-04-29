@@ -16,9 +16,11 @@
 
 from __future__ import annotations
 
+import json
+import os
+
 import pytest
 
-from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.scenario import Scenario
 
 
@@ -38,14 +40,14 @@ def test_inexistent_outputs_path(algorithms_configurations):
 def test_execute(
     algorithms_configurations,
     tmp_path,
-    rosenbrock,
+    problems_group,
     save_databases,
     number_of_processes,
     use_threading,
 ):
     """Check the execution of a benchmarking scenario."""
     Scenario([algorithms_configurations], tmp_path).execute(
-        [ProblemsGroup("Rosenbrock", [rosenbrock])],
+        [problems_group],
         save_databases=save_databases,
         number_of_processes=number_of_processes,
         use_threading=use_threading,
@@ -54,3 +56,28 @@ def test_execute(
     assert (tmp_path / "results.json").is_file()
     assert (tmp_path / "report").is_dir()
     assert (tmp_path / "databases").is_dir() == save_databases
+
+
+def test_report_overwrite(algorithms_configurations, tmp_path, problems_group) -> None:
+    """Check that the report directory can be overwritten."""
+    directory_path = tmp_path / "report"
+    directory_path.mkdir()
+    time = os.path.getmtime(directory_path)
+    Scenario([algorithms_configurations], tmp_path).execute(
+        [problems_group],
+    )
+    assert os.path.getmtime(directory_path) > time
+
+
+def test_overlapping_algorithm_configurations(
+    algorithms_configurations, tmp_path, problems_group, algorithm_configuration
+) -> None:
+    """Check the support of overlapping sets of algorithm configurations."""
+    Scenario([algorithms_configurations, algorithms_configurations], tmp_path).execute(
+        [problems_group], skip_report=True
+    )
+    with (tmp_path / "results.json").open() as file:
+        data = json.load(file)
+
+    # Check that only two result files have been generated.
+    assert len(data[algorithm_configuration.name][problems_group.name]) == 2

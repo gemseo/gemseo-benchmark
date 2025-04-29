@@ -28,11 +28,15 @@ from unittest import mock
 import pytest
 from gemseo.algos.optimization_problem import OptimizationProblem
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
+from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 from numpy import array
 from numpy import ndarray
 
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.problems.problem import Problem
+from gemseo_benchmark.problems.problems_group import ProblemsGroup
+from gemseo_benchmark.results.performance_histories import PerformanceHistories
+from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 design_variables = array([0.0, 1.0])
 
@@ -45,6 +49,7 @@ def design_space() -> mock.Mock:
     design_space.variable_names = ["x"]
     design_space.variable_sizes = {"x": 2}
     design_space.get_current_value = mock.Mock(return_value=design_variables)
+    design_space.has_current_value = mock.Mock(return_value=True)
     design_space.set_current_value = mock.Mock()
     design_space.unnormalize_vect = lambda _: _
     design_space.untransform_vect = lambda x, no_check: x
@@ -122,8 +127,8 @@ def database(hashable_array, functions_values) -> mock.Mock:
 
 
 @pytest.fixture(scope="package")
-def problem(design_space, objective, constraints) -> mock.Mock:
-    """A solved optimization problem."""
+def minimization_problem(design_space, objective, constraints) -> mock.Mock:
+    """A solved minimization problem."""
     problem = mock.Mock(spec=OptimizationProblem)
     problem.tolerances.inequality = 1e-4
     problem.tolerances.equality = 1e-2
@@ -131,6 +136,24 @@ def problem(design_space, objective, constraints) -> mock.Mock:
     problem.design_space.dimension = design_space.dimension
     problem.objective = objective
     problem.minimize_objective = True
+    problem.history = mock.Mock()
+    problem.history.check_design_point_is_feasible = mock.Mock(
+        return_value=(False, 1.0)
+    )
+    problem.constraints = constraints
+    return problem
+
+
+@pytest.fixture(scope="package")
+def maximization_problem(design_space, objective, constraints) -> mock.Mock:
+    """A solved maximization problem."""
+    problem = mock.Mock(spec=OptimizationProblem)
+    problem.tolerances.inequality = 1e-4
+    problem.tolerances.equality = 1e-2
+    problem.design_space = design_space
+    problem.design_space.dimension = design_space.dimension
+    problem.objective = objective
+    problem.minimize_objective = False
     problem.history = mock.Mock()
     problem.history.check_design_point_is_feasible = mock.Mock(
         return_value=(False, 1.0)
@@ -148,6 +171,8 @@ def side_effect(
     infeasibility_tolerance=0.0,
     max_eval_number=None,
     use_log_scale=False,
+    plot_kwargs=READ_ONLY_EMPTY_DICT,
+    grid_kwargs=READ_ONLY_EMPTY_DICT,
 ):
     """Side effect for the computation of a data profile."""
     shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(file_path))
@@ -161,6 +186,8 @@ def problem_a() -> mock.Mock:
     problem.description = "The description of problem A."
     problem.optimum = 1.0
     problem.target_values = TargetValues([problem.optimum])
+    problem.minimization_target_values = TargetValues([problem.optimum])
+    problem.minimize_objective = True
     problem.compute_data_profile = mock.Mock(side_effect=side_effect)
     problem.plot_histories = mock.Mock(side_effect=side_effect)
     return problem
@@ -172,8 +199,10 @@ def problem_b() -> mock.Mock:
     problem = mock.Mock()
     problem.name = "Problem B"
     problem.description = "The description of problem B."
-    problem.optimum = 2.0
-    problem.target_values = TargetValues([problem.optimum])
+    problem.optimum = None
+    problem.target_values = TargetValues([-1.0])
+    problem.minimization_target_values = TargetValues([1.0])
+    problem.minimize_objective = False
     problem.compute_data_profile = mock.Mock(side_effect=side_effect)
     problem.plot_histories = mock.Mock(side_effect=side_effect)
     return problem
@@ -194,6 +223,9 @@ def group(problem_a, problem_b) -> mock.Mock:
         plot_path=None,
         infeasibility_tolerance=0.0,
         max_eval_number=None,
+        plot_kwargs=READ_ONLY_EMPTY_DICT,
+        grid_kwargs=READ_ONLY_EMPTY_DICT,
+        use_evaluation_log_scale=False,
     ):
         shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(plot_path))
 
@@ -272,12 +304,16 @@ def results(
         unknown_algorithm_configuration.name,
     ]
     results.get_problems = mock.Mock(return_value=[problem_a.name, problem_b.name])
-    paths = [Path(__file__).parent / "history.json"]
+    directory = Path(__file__).parent
+    paths = [
+        directory / "history.json",
+        directory / "unfeasible_history.json",
+    ]
     results.get_paths = mock.Mock(return_value=paths)
     return results
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="package")
 def rosenbrock() -> Problem:
     """A benchmarking problem based on the 2-dimensional Rosenbrock function."""
     return Problem(
@@ -289,7 +325,24 @@ def rosenbrock() -> Problem:
     )
 
 
+@pytest.fixture(scope="package")
+def problems_group(rosenbrock) -> ProblemsGroup:
+    """A group of problems."""
+    return ProblemsGroup("Rosenbrock", [rosenbrock])
+
+
 @pytest.fixture(scope="module")
 def results_root(tmp_path_factory) -> Path:
     """The root the L-BFGS-B results file tree."""
     return tmp_path_factory.mktemp("results")
+
+
+@pytest.fixture(scope="package")
+def performance_histories() -> PerformanceHistories:
+    """A collection of performance histories."""
+    return PerformanceHistories(
+        PerformanceHistory([1.0, -1.0, 0.0], [2.0, 0.0, 3.0]),
+        PerformanceHistory([-2.0, -2.0, 2.0], [0.0, 3.0, 0.0]),
+        PerformanceHistory([3.0, -3.0, 3.0], [0.0, 0.0, 0.0]),
+        PerformanceHistory([0.0, -2.0, 4.0], [0.0, 0.0, 0.0]),
+    )

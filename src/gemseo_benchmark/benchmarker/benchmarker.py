@@ -21,11 +21,11 @@
 
 from __future__ import annotations
 
+import logging
 import sys
 from typing import TYPE_CHECKING
 from typing import Final
 
-from gemseo import configure_logger
 from gemseo.algos.opt.factory import OptimizationLibraryFactory
 from gemseo.core.parallel_execution.callable_parallel_execution import (
     CallableParallelExecution,
@@ -49,7 +49,7 @@ if TYPE_CHECKING:
     )
     from gemseo_benchmark.problems.problem import Problem
 
-LOGGER = configure_logger()
+LOGGER = logging.getLogger(__name__)
 
 
 class Benchmarker:
@@ -122,6 +122,11 @@ class Benchmarker:
 
             self.__disable_stopping_criteria(algorithm_configuration)
             for problem in problems:
+                if overwrite_histories:
+                    self._results.remove_paths(
+                        algorithm_configuration.name, problem.name
+                    )
+
                 for problem_instance_index, problem_instance in enumerate(problem):
                     if self.__skip_instance(
                         algorithm_configuration,
@@ -281,11 +286,11 @@ class Benchmarker:
         """
         problem_name = history.problem_name
         algorithm_configuration = history.algorithm_configuration
-        path = self.get_history_path(
+        file_path = self.get_history_path(
             algorithm_configuration, problem_name, index, make_parents=True
         )
-        history.to_file(path)
-        self._results.add_path(algorithm_configuration.name, problem_name, path)
+        history.to_file(file_path)
+        self._results.add_path(algorithm_configuration.name, problem_name, file_path)
 
     def get_history_path(
         self,
@@ -338,16 +343,16 @@ class Benchmarker:
             The path for the file.
         """
         configuration_name = join_substrings(algorithm_configuration.name)
-        path = (
+        file_path = (
             root_dir.resolve()
             / configuration_name
             / join_substrings(problem_name)
             / f"{configuration_name}.{index + 1}.{extension}"
         )
         if make_parents:
-            path.parent.mkdir(parents=True, exist_ok=True)
+            file_path.parent.mkdir(parents=True, exist_ok=True)
 
-        return path
+        return file_path
 
     def __save_database(
         self,

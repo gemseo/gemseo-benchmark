@@ -24,14 +24,18 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
+
 from gemseo_benchmark.data_profiles.data_profile import DataProfile
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from collections.abc import Iterator
+    from collections.abc import Mapping
     from pathlib import Path
 
+    from gemseo_benchmark import ConfigurationPlotOptions
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
     )
@@ -106,7 +110,10 @@ class ProblemsGroup:
         show: bool = True,
         plot_path: str | Path | None = None,
         infeasibility_tolerance: float = 0.0,
-        max_eval_number: int | None = None,
+        max_eval_number: int = 0,
+        plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        grid_kwargs: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
+        use_evaluation_log_scale: bool = False,
     ) -> None:
         """Generate the data profiles of given algorithms relative to the problems.
 
@@ -118,13 +125,18 @@ class ProblemsGroup:
                 By default the plot is not saved.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             max_eval_number: The maximum evaluations number to be displayed.
-                If ``None``, this value is inferred from the longest history.
+                If 0, this value is inferred from the longest history.
+            plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
+                for each algorithm configuration.
+            grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.
+            use_evaluation_log_scale: Whether to use a logarithmic scale
+                for the number of function evaluations axis.
         """
         # Initialize the data profile
-        target_values = {
-            problem.name: problem.target_values for problem in self.__problems
-        }
-        data_profile = DataProfile(target_values)
+        data_profile = DataProfile({
+            problem.name: problem.minimization_target_values
+            for problem in self.__problems
+        })
 
         # Generate the performance histories
         for configuration_name in algos_configurations.names:
@@ -133,7 +145,7 @@ class ProblemsGroup:
                     configuration_name, problem.name
                 ):
                     history = PerformanceHistory.from_file(history_path)
-                    if max_eval_number is not None:
+                    if max_eval_number:
                         history = history.shorten(max_eval_number)
                     history.apply_infeasibility_tolerance(infeasibility_tolerance)
                     data_profile.add_history(
@@ -144,4 +156,13 @@ class ProblemsGroup:
                     )
 
         # Plot and/or save the data profile
-        data_profile.plot(show=show, file_path=plot_path)
+        data_profile.plot(
+            show=show,
+            file_path=plot_path,
+            plot_kwargs=plot_kwargs,
+            grid_kwargs=grid_kwargs,
+            use_evaluation_log_scale=use_evaluation_log_scale,
+        )
+
+    def __len__(self) -> int:
+        return len(self.__problems)

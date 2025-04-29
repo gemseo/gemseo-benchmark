@@ -102,6 +102,8 @@ def _render_credits() -> str:
                 "commitizen",
                 "pre-commit",
                 "ruff",
+                "setuptools",
+                "setuptools-scm",
             ),
         )
     )
