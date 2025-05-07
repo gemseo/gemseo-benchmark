@@ -51,7 +51,9 @@ if TYPE_CHECKING:
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
     )
-    from gemseo_benchmark.problems.problem import Problem
+    from gemseo_benchmark.problems.base_benchmarking_problem import (
+        BaseBenchmarkingProblem,
+    )
     from gemseo_benchmark.problems.problems_group import ProblemsGroup
     from gemseo_benchmark.results.history_item import HistoryItem
     from gemseo_benchmark.results.results import Results
@@ -291,7 +293,7 @@ class Figures:
                             max_feasible_performance,
                         )
 
-            if not problem.minimize_objective:
+            if not problem.minimize_performance_measure:
                 max_feasible_performance = -max_feasible_performance
                 for histories in performance_histories.values():
                     histories.switch_performance_measure_sign()
@@ -313,14 +315,14 @@ class Figures:
                 performance_histories,
                 problem_dir,
                 table_values_format,
-                problem.minimize_objective,
+                problem.minimize_performance_measure,
             )
 
         return problems_to_figures, problems_to_tables
 
     def __get_problem_figures(
         self,
-        problem: Problem,
+        problem: BaseBenchmarkingProblem,
         performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
         directory_path: Path,
         plot_all_histories: bool,
@@ -372,7 +374,7 @@ class Figures:
             use_time_log_scale,
         )
         if problem.constraints_names:
-            performance_measure_is_minimized = problem.minimize_objective
+            performance_measure_is_minimized = problem.minimize_performance_measure
             figures[self._FigureFileName.INFEASIBILITY_MEASURE] = (
                 self.__plot_infeasibility_measure(
                     performance_histories,
@@ -409,7 +411,7 @@ class Figures:
 
     def __plot_data_profiles(
         self,
-        problem: Problem,
+        problem: BaseBenchmarkingProblem,
         directory_path: Path,
         use_evaluation_log_scale: bool,
     ) -> Path:
@@ -448,7 +450,7 @@ class Figures:
 
     def __plot_performance_measure(
         self,
-        problem: Problem,
+        problem: BaseBenchmarkingProblem,
         performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
         directory_path: Path,
         plot_all_histories: bool,
@@ -482,7 +484,7 @@ class Figures:
             for history in histories
             if history[-1].is_feasible
         ]
-        if problem.minimize_objective:
+        if problem.minimize_performance_measure:
             extremal_feasible_performance = max(worst_feasible_performances)
         else:
             extremal_feasible_performance = min(worst_feasible_performances)
@@ -499,7 +501,7 @@ class Figures:
             plot_only_median,
             use_evaluation_log_scale,
             plot_all_histories,
-            problem.minimize_objective,
+            problem.minimize_performance_measure,
         )
         problem.target_values.plot_on_axes(
             axes,
@@ -527,7 +529,7 @@ class Figures:
         ]
         best_performance_measure = min(history_items).objective_value
         worst_performance_measure = max(target_items).objective_value
-        if problem.minimize_objective:
+        if problem.minimize_performance_measure:
             args = (best_performance_measure, worst_performance_measure)
         else:
             args = (-worst_performance_measure, -best_performance_measure)
@@ -790,7 +792,7 @@ class Figures:
 
     def __get_algorithms_plots(
         self,
-        problem: Problem,
+        problem: BaseBenchmarkingProblem,
         performance_histories: Mapping[str, PerformanceHistories],
         max_feasible_performance: float,
         directory_path: Path,
@@ -823,7 +825,7 @@ class Figures:
                 axes,
                 max_feasible_performance,
                 plot_all_histories,
-                problem.minimize_objective,
+                problem.minimize_performance_measure,
             )
             if use_performance_log_scale:
                 axes.set_yscale(self.__MATPLOTLIB_SYMMETRIC_LOG_SCALE)
@@ -853,7 +855,7 @@ class Figures:
             # Focus on the targets qnd save another figure
             performance_axes, targets_axes = figure.axes
             performance_axes.autoscale(enable=True, axis="y", tight=True)
-            if problem.minimize_objective:
+            if problem.minimize_performance_measure:
                 performance_axes.set_ylim(
                     top=max(problem.target_values).objective_value
                 )

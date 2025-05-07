@@ -17,28 +17,10 @@
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
-"""Class to compute data profiles for algorithms comparison.
-
-A data profile is a graphical tool to compare iterative algorithms, e.g. optimization
-algorithms or root-finding algorithms, on reference problems.
-
-Each of the reference problems must be assigned targets, i.e. values of the objective
-function or values of the residual norm, ranging from a first acceptable value to the
-best known value for the problem.
-
-The algorithms will be compared based on the number of targets they reach, cumulated
-over all the reference problems, relative to the number of problems functions
-evaluations they make.
-
-The data profile is the empirical cumulated distribution function of the number of
-functions evaluations made by an algorithm to reach a problem target.
-"""
+"""Class to compute data profiles for algorithms comparison."""
 
 from __future__ import annotations
 
-from collections.abc import Iterable
-from collections.abc import Mapping
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 import matplotlib
@@ -56,6 +38,9 @@ from gemseo_benchmark import _get_configuration_plot_options
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from collections.abc import Mapping
+    from collections.abc import Sequence
     from numbers import Number
     from pathlib import Path
 
@@ -67,9 +52,19 @@ if TYPE_CHECKING:
 class DataProfile:
     """Data profile that compares iterative algorithms on reference problems.
 
-    A data profile is an empirical cumulative distribution function of the number of
-    problems functions evaluations required by an algorithm to reach a reference problem
-    target.
+    A data profile is a graphical tool to compare iterative algorithms,
+    e.g. optimization algorithms or root-finding algorithms, on reference problems.
+
+    Each of the reference problems must be assigned targets,
+    i.e. values of the objective function or values of the residual norm,
+    ranging from a first acceptable value to the best known value for the problem.
+
+    The algorithms will be compared based on the number of targets they reach,
+    cumulated over all the reference problems,
+    relative to the number of problems functions evaluations they make.
+
+    The data profile is the empirical cumulated distribution function of the number of
+    functions evaluations made by an algorithm to reach a problem target.
     """
 
     def __init__(self, target_values: Mapping[str, TargetValues]) -> None:
@@ -91,7 +86,6 @@ class DataProfile:
         algorithm at each iteration.
 
         Raises:
-            TypeError: if the target values are not passed as a dictionary.
             ValueError: If the reference problems have different numbers of target
                 values.
         """
@@ -99,10 +93,6 @@ class DataProfile:
 
     @target_values.setter
     def target_values(self, target_values: Mapping[str, TargetValues]) -> None:
-        if not isinstance(target_values, Mapping):
-            msg = "The target values be must passed as a mapping"
-            raise TypeError(msg)
-
         targets_numbers = {len(pb_targets) for pb_targets in target_values.values()}
         if len(targets_numbers) != 1:
             msg = "The reference problems must have the same number of target values."
@@ -155,7 +145,7 @@ class DataProfile:
         self,
         algo_names: Iterable[str] | None = None,
         show: bool = True,
-        file_path: str | Path | None = None,
+        file_path: str | Path = "",
         markevery: MarkeveryType | None = None,
         plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
         grid_kwargs: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
@@ -168,7 +158,7 @@ class DataProfile:
                 If ``None`` then all the algorithms are considered.
             show: If True, show the plot.
             file_path: The path where to save the plot.
-                If ``None``, the plot is not saved.
+                If empty, the plot is not saved.
             markevery: The sampling parameter for the markers of the plot.
                 Refer to the Matplotlib documentation.
             plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`

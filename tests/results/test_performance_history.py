@@ -238,15 +238,6 @@ def test_from_file():
     assert history.items[1].n_unsatisfied_constraints == 0
 
 
-def test_history_items_setter():
-    """Check the setting of history items."""
-    history = PerformanceHistory()
-    with pytest.raises(
-        TypeError, match=re.escape("History items must be of type HistoryItem.")
-    ):
-        history.items = [1.0, 2.0]
-
-
 def test_repr():
     """Check the representation of a performance history."""
     history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])

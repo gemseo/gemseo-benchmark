@@ -17,11 +17,7 @@
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
-"""Configuration of an algorithm defined by the values of its options.
-
-An algorithm depends on the values of its options. A value set defines a configuration
-of the algorithm.
-"""
+"""Configuration of an algorithm defined by the values of its options."""
 
 from __future__ import annotations
 
@@ -39,7 +35,11 @@ InstanceAlgorithmOptions = MutableMapping[str, Callable[[int], Any]]
 
 
 class AlgorithmConfiguration:
-    """The configuration of an algorithm."""
+    """The configuration of an algorithm.
+
+    An algorithm depends on the values of its options.
+    A value set defines a configuration of the algorithm.
+    """
 
     __ALGORITHM_NAME: Final[str] = "algorithm_name"
     __ALGORITHM_OPTIONS: Final[str] = "algorithm_options"
@@ -49,7 +49,7 @@ class AlgorithmConfiguration:
     def __init__(
         self,
         algorithm_name: str,
-        configuration_name: str | None = None,
+        configuration_name: str = "",
         instance_algorithm_options: InstanceAlgorithmOptions = READ_ONLY_EMPTY_DICT,
         **algorithm_options: Any,
     ) -> None:
@@ -57,7 +57,7 @@ class AlgorithmConfiguration:
         Args:
             algorithm_name: The name of the algorithm.
             configuration_name: The name of the configuration of the algorithm.
-                If ``None``, a name will be generated based on the algorithm name and
+                If empty, a name will be generated based on the algorithm name and
                 its options, based on the pattern
                 ``"algorithm_name[option_name=option_value, ...]"``.
             instance_algorithm_options: The options of the algorithm specific to

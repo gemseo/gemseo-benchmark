@@ -24,7 +24,7 @@ def test_call(algorithm_configuration, rosenbrock) -> None:
     _, problem_instance_index, database, history = Worker()((
         algorithm_configuration,
         rosenbrock,
-        rosenbrock.creator(),
+        rosenbrock.create_problem(),
         0,
         None,
     ))
@@ -43,7 +43,7 @@ def test_gemseo_log_file(algorithm_configuration, rosenbrock, tmp_path) -> None:
     Worker()((
         algorithm_configuration,
         rosenbrock,
-        rosenbrock.creator(),
+        rosenbrock.create_problem(),
         0,
         path,
     ))

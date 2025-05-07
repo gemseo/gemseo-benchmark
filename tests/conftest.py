@@ -33,7 +33,9 @@ from numpy import array
 from numpy import ndarray
 
 from gemseo_benchmark.data_profiles.target_values import TargetValues
-from gemseo_benchmark.problems.problem import Problem
+from gemseo_benchmark.problems.optimization_benchmarking_problem import (
+    OptimizationBenchmarkingProblem,
+)
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.results.performance_histories import PerformanceHistories
 from gemseo_benchmark.results.performance_history import PerformanceHistory
@@ -49,7 +51,7 @@ def design_space() -> mock.Mock:
     design_space.variable_names = ["x"]
     design_space.variable_sizes = {"x": 2}
     design_space.get_current_value = mock.Mock(return_value=design_variables)
-    design_space.has_current_value = mock.Mock(return_value=True)
+    design_space.has_current_value = True
     design_space.set_current_value = mock.Mock()
     design_space.unnormalize_vect = lambda _: _
     design_space.untransform_vect = lambda x, no_check: x
@@ -187,9 +189,8 @@ def problem_a() -> mock.Mock:
     problem.optimum = 1.0
     problem.target_values = TargetValues([problem.optimum])
     problem.minimization_target_values = TargetValues([problem.optimum])
-    problem.minimize_objective = True
+    problem.minimize_performance_measure = True
     problem.compute_data_profile = mock.Mock(side_effect=side_effect)
-    problem.plot_histories = mock.Mock(side_effect=side_effect)
     return problem
 
 
@@ -202,9 +203,8 @@ def problem_b() -> mock.Mock:
     problem.optimum = None
     problem.target_values = TargetValues([-1.0])
     problem.minimization_target_values = TargetValues([1.0])
-    problem.minimize_objective = False
+    problem.minimize_performance_measure = False
     problem.compute_data_profile = mock.Mock(side_effect=side_effect)
-    problem.plot_histories = mock.Mock(side_effect=side_effect)
     return problem
 
 
@@ -314,9 +314,9 @@ def results(
 
 
 @pytest.fixture(scope="package")
-def rosenbrock() -> Problem:
+def rosenbrock() -> OptimizationBenchmarkingProblem:
     """A benchmarking problem based on the 2-dimensional Rosenbrock function."""
-    return Problem(
+    return OptimizationBenchmarkingProblem(
         "Rosenbrock",
         Rosenbrock,
         [array([0.0, 1.0]), array([1.0, 0.0])],

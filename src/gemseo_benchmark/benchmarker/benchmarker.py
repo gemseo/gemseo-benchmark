@@ -47,7 +47,9 @@ if TYPE_CHECKING:
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
     )
-    from gemseo_benchmark.problems.problem import Problem
+    from gemseo_benchmark.problems.optimization_benchmarking_problem import (
+        OptimizationBenchmarkingProblem,
+    )
 
 LOGGER = logging.getLogger(__name__)
 
@@ -85,7 +87,7 @@ class Benchmarker:
 
     def execute(
         self,
-        problems: Iterable[Problem],
+        problems: Iterable[OptimizationBenchmarkingProblem],
         algorithms: AlgorithmsConfigurations,
         overwrite_histories: bool = False,
         number_of_processes: int = 1,
@@ -191,7 +193,7 @@ class Benchmarker:
     def __skip_instance(
         self,
         algorithm_configuration: AlgorithmConfiguration,
-        bench_problem: Problem,
+        bench_problem: OptimizationBenchmarkingProblem,
         index: int,
         overwrite_histories: bool,
     ) -> bool:
@@ -233,7 +235,7 @@ class Benchmarker:
     @staticmethod
     def __set_instance_algorithm_options(
         algorithm_configuration: AlgorithmConfiguration,
-        problem: Problem,
+        problem: OptimizationBenchmarkingProblem,
         index: int,
     ) -> AlgorithmConfiguration:
         """Return the algorithm configuration of an instance of a problem.

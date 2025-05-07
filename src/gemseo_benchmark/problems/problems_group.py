@@ -39,7 +39,9 @@ if TYPE_CHECKING:
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
     )
-    from gemseo_benchmark.problems.problem import Problem
+    from gemseo_benchmark.problems.base_benchmarking_problem import (
+        BaseBenchmarkingProblem,
+    )
     from gemseo_benchmark.results.results import Results
 
 
@@ -58,7 +60,7 @@ class ProblemsGroup:
     def __init__(
         self,
         name: str,
-        problems: Iterable[Problem],
+        problems: Iterable[BaseBenchmarkingProblem],
         description: str = "",
     ) -> None:
         """
@@ -71,7 +73,7 @@ class ProblemsGroup:
         self.__problems = problems
         self.description = description
 
-    def __iter__(self) -> Iterator[Problem]:
+    def __iter__(self) -> Iterator[BaseBenchmarkingProblem]:
         return iter(self.__problems)
 
     def is_algorithm_suited(self, name: str) -> bool:
@@ -108,7 +110,7 @@ class ProblemsGroup:
         algos_configurations: AlgorithmsConfigurations,
         histories_paths: Results,
         show: bool = True,
-        plot_path: str | Path | None = None,
+        plot_path: str | Path = "",
         infeasibility_tolerance: float = 0.0,
         max_eval_number: int = 0,
         plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
@@ -120,9 +122,9 @@ class ProblemsGroup:
         Args:
             algos_configurations: The algorithms configurations.
             histories_paths: The paths to the reference histories for each algorithm.
-            show: If True, show the plot.
+            show: If ``True``, show the plot.
             plot_path: The path where to save the plot.
-                By default the plot is not saved.
+                If empty, the plot is not saved.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             max_eval_number: The maximum evaluations number to be displayed.
                 If 0, this value is inferred from the longest history.
@@ -132,13 +134,11 @@ class ProblemsGroup:
             use_evaluation_log_scale: Whether to use a logarithmic scale
                 for the number of function evaluations axis.
         """
-        # Initialize the data profile
         data_profile = DataProfile({
             problem.name: problem.minimization_target_values
             for problem in self.__problems
         })
 
-        # Generate the performance histories
         for configuration_name in algos_configurations.names:
             for problem in self.__problems:
                 for history_path in histories_paths.get_paths(
@@ -155,7 +155,6 @@ class ProblemsGroup:
                         history.infeasibility_measures,
                     )
 
-        # Plot and/or save the data profile
         data_profile.plot(
             show=show,
             file_path=plot_path,
