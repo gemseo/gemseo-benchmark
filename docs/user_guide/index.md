@@ -95,7 +95,7 @@ The [gemseo_benchmark.problems][gemseo_benchmark.problems]
 sub-package handles the benchmarking problems, on which the performances
 of the algorithms configurations is to be measured.
 
-A [Problem][gemseo_benchmark.problems.problem.Problem] contains the mathematical
+A [OptimizationBenchmarkingProblem][gemseo_benchmark.problems.optimization_benchmarking_problem.OptimizationBenchmarkingProblem] contains the mathematical
 definition of the problem, as an [OptimizationProblem][gemseo.algos.optimization_problem.OptimizationProblem], and requires three other features.
 
 1.  The starting points, from which the algorithms configurations should
@@ -135,7 +135,7 @@ For example, we define below benchmarking problems based on
 presented [further down](#target-values).)
 
 ```python
-rastrigin = Problem(
+rastrigin = OptimizationBenchmarkingProblem(
     "Rastrigin",
     Rastrigin,
     target_values=target_values,
@@ -143,7 +143,7 @@ rastrigin = Problem(
     optimum=0.0,
 )
 
-rosenbrock = Problem(
+rosenbrock = OptimizationBenchmarkingProblem(
     "Rosenbrock",
     Rosenbrock,
     target_values=target_values,
@@ -152,12 +152,12 @@ rosenbrock = Problem(
 )
 ```
 
-Note that the second argument of [Problem][gemseo_benchmark.problems.problem.Problem] must be callable.
+Note that the second argument of [OptimizationBenchmarkingProblem][gemseo_benchmark.problems.optimization_benchmarking_problem.OptimizationBenchmarkingProblem] must be callable.
 For example, a five-variables
 benchmarking problem based on [Rosenbrock][gemseo.problems.optimization.rosenbrock.Rosenbrock] may be defined as follows.
 
 ```python
-rosenbrock_5d = Problem(
+rosenbrock_5d = OptimizationBenchmarkingProblem(
     "Rosenbrock 5D",
     lambda: Rosenbrock(5),
     target_values=target_values,

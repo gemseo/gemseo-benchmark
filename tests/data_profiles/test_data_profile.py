@@ -30,14 +30,6 @@ from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.results.history_item import HistoryItem
 
 
-def test_target_values_as_mapping():
-    """Check the setting of target values as a mapping."""
-    with pytest.raises(
-        TypeError, match="The target values be must passed as a mapping"
-    ):
-        DataProfile([TargetValues([2.0, 1.0])])
-
-
 def test_consistent_target_values():
     """Check the setting of consistent target values."""
     with pytest.raises(

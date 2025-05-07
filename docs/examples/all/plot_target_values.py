@@ -51,20 +51,22 @@ from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfigu
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
-from gemseo_benchmark.problems.problem import Problem
+from gemseo_benchmark.problems.optimization_benchmarking_problem import (
+    OptimizationBenchmarkingProblem,
+)
 
 # %%
 # Let us consider the problem [Power2][gemseo.problems.optimization.power_2.Power2]
 # already implemented in GEMSEO.
-problem = Problem(
-    name="Power2",
-    optimization_problem_creator=Power2,
-    optimum=Power2.get_solution()[1],
+problem = OptimizationBenchmarkingProblem(
+    "Power2", Power2, optimum=Power2.get_solution()[1]
 )
 # %%
 # We define ten starting points by optimized Latin hypercube sampling (LHS).
-design_space = problem.creator().design_space
-problem.start_points = compute_doe(design_space, algo_name="OT_OPT_LHS", n_samples=10)
+design_space = problem.create_problem().design_space
+problem.starting_points = compute_doe(
+    design_space, algo_name="OT_OPT_LHS", n_samples=10
+)
 # %%
 # Let use the optimizer COBYLA to generate performance histories on the problem.
 algorithms_configurations = AlgorithmsConfigurations(
@@ -73,6 +75,10 @@ algorithms_configurations = AlgorithmsConfigurations(
         max_iter=65,
         eq_tolerance=1e-4,
         ineq_tolerance=0.0,
+        xtol_abs=0,
+        xtol_rel=0,
+        ftol_abs=0,
+        ftol_rel=0,
     )
 )
 # %%

@@ -22,7 +22,6 @@
 from __future__ import annotations
 
 import json
-import os
 from typing import TYPE_CHECKING
 
 import pytest
@@ -34,16 +33,20 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
 from gemseo_benchmark.benchmarker.benchmarker import Benchmarker
-from gemseo_benchmark.problems.problem import Problem
+from gemseo_benchmark.problems.optimization_benchmarking_problem import (
+    OptimizationBenchmarkingProblem,
+)
 
 if TYPE_CHECKING:
     from gemseo_benchmark.results.results import Results
 
 
 @pytest.fixture(scope="module")
-def rastrigin() -> Problem:
+def rastrigin() -> OptimizationBenchmarkingProblem:
     """A benchmarking problem based on the 2-dimensional Rastrigin function."""
-    return Problem("Rastrigin", Rastrigin, [array([0.0, 0.1]), array([0.1, 0.0])])
+    return OptimizationBenchmarkingProblem(
+        "Rastrigin", Rastrigin, [array([0.0, 0.1]), array([0.1, 0.0])]
+    )
 
 
 lbfgsb_configuration = AlgorithmConfiguration("L-BFGS-B")
@@ -234,19 +237,19 @@ def test_overwrite_histories_results_update(
     with results_path.open() as results_file:
         assert json.load(results_file) == results_contents
 
-    results_time = os.path.getmtime(results_path)
-    history1_time = os.path.getmtime(history1_path)
-    history2_time = os.path.getmtime(history2_path)
+    results_time = results_path.stat().st_mtime
+    history1_time = history1_path.stat().st_mtime
+    history2_time = history2_path.stat().st_mtime
 
     benchmarker.execute([rosenbrock], algorithms_configurations, overwrite_histories)
     with results_path.open() as results_file:
         assert json.load(results_file) == results_contents
 
     if overwrite_histories:
-        assert os.path.getmtime(results_path) > results_time
-        assert os.path.getmtime(history1_path) > history1_time
-        assert os.path.getmtime(history2_path) > history2_time
+        assert results_path.stat().st_mtime > results_time
+        assert history1_path.stat().st_mtime > history1_time
+        assert history2_path.stat().st_mtime > history2_time
     else:
-        assert os.path.getmtime(results_path) == results_time
-        assert os.path.getmtime(history1_path) == history1_time
-        assert os.path.getmtime(history2_path) == history2_time
+        assert results_path.stat().st_mtime == results_time
+        assert history1_path.stat().st_mtime == history1_time
+        assert history2_path.stat().st_mtime == history2_time

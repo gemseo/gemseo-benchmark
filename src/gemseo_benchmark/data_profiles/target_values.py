@@ -17,15 +17,7 @@
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
-"""Computation of target values out of algorithms performance histories.
-
-Consider a problem to be solved by an iterative algorithm, e.g. an optimization problem
-or a root-finding problem. Targets are values, i.e. values of the objective function or
-values of the residual norm, ranging from a first acceptable value to the best known
-value for the problem. Targets are used to estimate the efficiency (relative to the
-number of problem functions evaluations) of an algorithm to solve a problem (or several)
-and computes its data profile (see :mod:`.data_profiles.data_profile`).
-"""
+"""Computation of target values out of algorithms performance histories."""
 
 from __future__ import annotations
 
@@ -49,7 +41,18 @@ if TYPE_CHECKING:
 
 
 class TargetValues(PerformanceHistory):
-    """Target values of a problem."""
+    """Target values of a problem.
+
+    Consider a problem to be solved by an iterative algorithm,
+    e.g. an optimization problem or a root-finding problem.
+    Targets are values,
+    i.e. values of the objective function or values of the residual norm,
+    ranging from a first acceptable value to the best known value for the problem.
+    Targets are used to estimate the efficiency
+    (relative to the number of problem functions evaluations)
+    of an algorithm to solve a problem (or several)
+    and computes its data profile (see :mod:`.data_profiles.data_profile`).
+    """
 
     def compute_target_hits_history(
         self, values_history: PerformanceHistory
@@ -68,13 +71,13 @@ class TargetValues(PerformanceHistory):
             for minimum in minimum_history
         ]
 
-    def plot(self, show: bool = True, file_path: str | Path | None = None) -> Figure:
+    def plot(self, show: bool = True, file_path: str | Path = "") -> Figure:
         """Plot the target values.
 
         Args:
             show: Whether to show the plot.
             file_path: The path where to save the plot.
-                If ``None``, the plot is not saved.
+                If empty, the plot is not saved.
 
         Returns:
             A figure showing the target values.

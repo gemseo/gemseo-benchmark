@@ -35,7 +35,9 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
 from gemseo_benchmark.data_profiles.target_values import TargetValues
-from gemseo_benchmark.problems.problem import Problem
+from gemseo_benchmark.problems.optimization_benchmarking_problem import (
+    OptimizationBenchmarkingProblem,
+)
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
 
 algorithms_configurations = AlgorithmsConfigurations(AlgorithmConfiguration("L-BFGS-B"))
@@ -44,18 +46,18 @@ algorithms_configurations = AlgorithmsConfigurations(AlgorithmConfiguration("L-B
 def test_is_algorithm_suited():
     """Check the assessment of the suitability of an algorithm to a problems group."""
     # Check a suited algorithm
-    rosenbrock = Problem("Rosenbrock", Rosenbrock, [zeros(2)])
+    rosenbrock = OptimizationBenchmarkingProblem("Rosenbrock", Rosenbrock, [zeros(2)])
     group = ProblemsGroup("group", [rosenbrock])
     assert group.is_algorithm_suited("L-BFGS-B")
     # Check an ill-suited algorithm
-    power2 = Problem("Power2", Power2, [zeros(3)])
+    power2 = OptimizationBenchmarkingProblem("Power2", Power2, [zeros(3)])
     group = ProblemsGroup("another group", [rosenbrock, power2])
     assert not group.is_algorithm_suited("L-BFGS-B")
 
 
 def test_compute_targets():
     """Check the computation of target values."""
-    rosenbrock = Problem("Rosenbrock", Rosenbrock, [zeros(2)])
+    rosenbrock = OptimizationBenchmarkingProblem("Rosenbrock", Rosenbrock, [zeros(2)])
     with pytest.raises(
         ValueError, match=re.escape("The benchmarking problem has no target value.")
     ):

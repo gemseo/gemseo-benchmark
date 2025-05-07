@@ -25,7 +25,9 @@ from gemseo.algos.base_driver_library import LOGGER as DRIVER_LOGGER
 from gemseo.algos.database import Database
 from gemseo.utils.timer import Timer
 
-from gemseo_benchmark.problems.problem import Problem
+from gemseo_benchmark.problems.optimization_benchmarking_problem import (
+    OptimizationBenchmarkingProblem,
+)
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
@@ -37,7 +39,9 @@ if TYPE_CHECKING:
         AlgorithmConfiguration,
     )
 
-WorkerOutputs = tuple[Problem, int, Database, PerformanceHistory]
+WorkerOutputs = tuple[
+    OptimizationBenchmarkingProblem, int, Database, PerformanceHistory
+]
 
 
 class Worker:
@@ -55,7 +59,11 @@ class Worker:
     def __call__(
         self,
         args: tuple[
-            AlgorithmConfiguration, Problem, OptimizationProblem, int, Path | None
+            AlgorithmConfiguration,
+            OptimizationBenchmarkingProblem,
+            OptimizationProblem,
+            int,
+            Path | None,
         ],
     ) -> WorkerOutputs:
         """Run an algorithm on a benchmarking problem for a particular starting point.

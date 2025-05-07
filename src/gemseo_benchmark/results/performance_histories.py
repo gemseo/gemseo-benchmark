@@ -27,13 +27,10 @@ from matplotlib.ticker import MaxNLocator
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
     from collections.abc import Mapping
-    from collections.abc import Sequence
 
     from matplotlib.axes import Axes
 
-    from gemseo_benchmark import MarkeveryType
     from gemseo_benchmark.results.history_item import HistoryItem
 
 
@@ -141,100 +138,6 @@ class PerformanceHistories(collections.abc.MutableSequence):
         return PerformanceHistories(*[
             history.compute_cumulated_minimum() for history in self
         ])
-
-    def plot_algorithm_histories(
-        self,
-        axes: Axes,
-        algorithm_name: str,
-        max_feasible_objective: float,
-        plot_all: bool,
-        color: str,
-        marker: str,
-        alpha: float,
-        markevery: MarkeveryType,
-    ) -> float | None:
-        """Plot the histories associated with an algorithm.
-
-        Args:
-            axes: The axes on which to plot the performance histories.
-            algorithm_name: The name of the algorithm.
-            max_feasible_objective: The ordinate for infeasible history items.
-            plot_all: Whether to plot all the performance histories.
-            color: The color of the plot.
-            marker: The marker type of the plot.
-            alpha: The opacity level for overlapping areas.
-                Refer to the Matplotlib documentation.
-            markevery: The sampling parameter for the markers of the plot.
-                Refer to the Matplotlib documentation.
-
-        Returns:
-            The minimum feasible objective value of the median history
-            or ``None`` if the median history has no feasible item.
-        """
-        # Plot all the performance histories
-        if plot_all:
-            for history in self:
-                history.plot(axes, only_feasible=True, color=color, alpha=alpha)
-
-        # Get the minimum history, starting from its first feasible item
-        abscissas, minimum_items = self.compute_minimum().get_plot_data(feasible=True)
-        minimum_ordinates = [item.objective_value for item in minimum_items]
-
-        # Get the maximum history for the same abscissas as the minimum history
-        maximum_items = self.compute_maximum().items
-        # Replace the infeasible objective values with the maximum value
-        # N.B. Axes.fill_between requires finite values, that is why the infeasible
-        # objective values are replaced with a finite value rather than with infinity.
-        maximum_ordinates = self.__get_penalized_objective_values(
-            maximum_items, abscissas, max_feasible_objective
-        )
-
-        # Plot the area between the minimum and maximum histories.
-        axes.fill_between(abscissas, minimum_ordinates, maximum_ordinates, alpha=alpha)
-        axes.plot(abscissas, minimum_ordinates, color=color, alpha=alpha)
-        # Replace the infeasible objective values with infinity
-        maximum_ordinates = self.__get_penalized_objective_values(
-            maximum_items, abscissas, numpy.inf
-        )
-        axes.plot(abscissas, maximum_ordinates, color=color, alpha=alpha)
-
-        # Plot the median history
-        median = self.compute_median()
-        median.plot(
-            axes,
-            only_feasible=True,
-            label=algorithm_name,
-            color=color,
-            marker=marker,
-            markevery=markevery,
-        )
-
-        # Return the smallest objective value of the median
-        _, history_items = median.get_plot_data(feasible=True)
-        if history_items:
-            return min(history_items).objective_value
-        return None
-
-    @staticmethod
-    def __get_penalized_objective_values(
-        history_items: Sequence[HistoryItem], indexes: Iterable[int], value: float
-    ) -> list[float]:
-        """Return the objectives of history items, replacing the infeasible ones.
-
-        Args:
-            history_items: The history items.
-            indexes: The 1-based indexes of the history items.
-            value: The replacement for infeasible objective values.
-
-        Returns:
-            The objective values.
-        """
-        return [
-            history_items[index - 1].objective_value
-            if history_items[index - 1].is_feasible
-            else value
-            for index in indexes
-        ]
 
     def plot_performance_measure_distribution(
         self,
