@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/problems/problems_group/">
       
       
-        <link rel="prev" href="../problem/">
+        <link rel="prev" href="../optimization_benchmarking_problem/">
       
       
         <link rel="next" href="../../report/">
@@ -1177,6 +1177,8 @@
       
         
       
+        
+      
     
     
     
@@ -1225,12 +1227,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../problem/" class="md-nav__link">
+      <a href="../base_benchmarking_problem/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Problem
+    Base benchmarking problem
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../optimization_benchmarking_problem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Optimization benchmarking problem
     
   </span>
   
@@ -1844,7 +1869,7 @@
 <a href="#gemseo_benchmark.problems.problems_group.ProblemsGroup" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">ProblemsGroup</span><span class="p">(</span>
     <span class="n">name</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span>
-    <span class="n">problems</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            Problem (gemseo_benchmark.problems.problem.Problem)" href="../problem/#gemseo_benchmark.problems.problem.Problem">Problem</a></span><span class="p">],</span>
+    <span class="n">problems</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="            BaseBenchmarkingProblem (gemseo_benchmark.problems.base_benchmarking_problem.BaseBenchmarkingProblem)" href="../base_benchmarking_problem/#gemseo_benchmark.problems.base_benchmarking_problem.BaseBenchmarkingProblem">BaseBenchmarkingProblem</a></span><span class="p">],</span>
     <span class="n">description</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -1884,7 +1909,7 @@
         </li>
         <li class="doc-section-item field-body">
             <b><code>problems</code></b>
-              (<code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-internal" title="            Problem (gemseo_benchmark.problems.problem.Problem)" href="../problem/#gemseo_benchmark.problems.problem.Problem">Problem</a>]</code>)
+              (<code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-internal" title="            BaseBenchmarkingProblem (gemseo_benchmark.problems.base_benchmarking_problem.BaseBenchmarkingProblem)" href="../base_benchmarking_problem/#gemseo_benchmark.problems.base_benchmarking_problem.BaseBenchmarkingProblem">BaseBenchmarkingProblem</a>]</code>)
           –
           <div class="doc-md-description">
             <p>The benchmarking problems of the group.</p>
@@ -1910,9 +1935,7 @@
 
                   <details class="quote">
                     <summary>Source code in <code>src/gemseo_benchmark/problems/problems_group.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">60</span>
 <span class="normal">61</span>
 <span class="normal">62</span>
 <span class="normal">63</span>
@@ -1924,10 +1947,12 @@
 <span class="normal">69</span>
 <span class="normal">70</span>
 <span class="normal">71</span>
-<span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">problems</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Problem</span><span class="p">],</span>
+    <span class="n">problems</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">BaseBenchmarkingProblem</span><span class="p">],</span>
     <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1966,7 +1991,7 @@
     <span class="n">algos_configurations</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            AlgorithmsConfigurations (gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations)" href="../../algorithms/algorithms_configurations/#gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations">AlgorithmsConfigurations</a></span><span class="p">,</span>
     <span class="n">histories_paths</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            Results (gemseo_benchmark.results.results.Results)" href="../../results/results/#gemseo_benchmark.results.results.Results">Results</a></span><span class="p">,</span>
     <span class="n">show</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">plot_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">plot_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">infeasibility_tolerance</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">max_eval_number</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">plot_kwargs</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span>
@@ -2007,18 +2032,18 @@
 )
           –
           <div class="doc-md-description">
-            <p>If True, show the plot.</p>
+            <p>If <code>True</code>, show the plot.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
             <b><code>plot_path</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>, default:
-                  <code>None</code>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>, default:
+                  <code>&#39;&#39;</code>
 )
           –
           <div class="doc-md-description">
             <p>The path where to save the plot.
-By default the plot is not saved.</p>
+If empty, the plot is not saved.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -2079,9 +2104,7 @@ for the number of function evaluations axis.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/problems/problems_group.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">108</span>
 <span class="normal">109</span>
 <span class="normal">110</span>
 <span class="normal">111</span>
@@ -2137,13 +2160,12 @@ for the number of function evaluations axis.</p>
 <span class="normal">161</span>
 <span class="normal">162</span>
 <span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_data_profile</span><span class="p">(</span>
+<span class="normal">164</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_data_profile</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">algos_configurations</span><span class="p">:</span> <span class="n">AlgorithmsConfigurations</span><span class="p">,</span>
     <span class="n">histories_paths</span><span class="p">:</span> <span class="n">Results</span><span class="p">,</span>
     <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">plot_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">plot_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">infeasibility_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">max_eval_number</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">plot_kwargs</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ConfigurationPlotOptions</span><span class="p">]</span> <span class="o">=</span> <span class="n">READ_ONLY_EMPTY_DICT</span><span class="p">,</span>
@@ -2155,9 +2177,9 @@ for the number of function evaluations axis.</p>
 <span class="sd">    Args:</span>
 <span class="sd">        algos_configurations: The algorithms configurations.</span>
 <span class="sd">        histories_paths: The paths to the reference histories for each algorithm.</span>
-<span class="sd">        show: If True, show the plot.</span>
+<span class="sd">        show: If ``True``, show the plot.</span>
 <span class="sd">        plot_path: The path where to save the plot.</span>
-<span class="sd">            By default the plot is not saved.</span>
+<span class="sd">            If empty, the plot is not saved.</span>
 <span class="sd">        infeasibility_tolerance: The tolerance on the infeasibility measure.</span>
 <span class="sd">        max_eval_number: The maximum evaluations number to be displayed.</span>
 <span class="sd">            If 0, this value is inferred from the longest history.</span>
@@ -2167,13 +2189,11 @@ for the number of function evaluations axis.</p>
 <span class="sd">        use_evaluation_log_scale: Whether to use a logarithmic scale</span>
 <span class="sd">            for the number of function evaluations axis.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Initialize the data profile</span>
     <span class="n">data_profile</span> <span class="o">=</span> <span class="n">DataProfile</span><span class="p">({</span>
         <span class="n">problem</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">problem</span><span class="o">.</span><span class="n">minimization_target_values</span>
         <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__problems</span>
     <span class="p">})</span>
 
-    <span class="c1"># Generate the performance histories</span>
     <span class="k">for</span> <span class="n">configuration_name</span> <span class="ow">in</span> <span class="n">algos_configurations</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">problem</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__problems</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">history_path</span> <span class="ow">in</span> <span class="n">histories_paths</span><span class="o">.</span><span class="n">get_paths</span><span class="p">(</span>
@@ -2190,7 +2210,6 @@ for the number of function evaluations axis.</p>
                     <span class="n">history</span><span class="o">.</span><span class="n">infeasibility_measures</span><span class="p">,</span>
                 <span class="p">)</span>
 
-    <span class="c1"># Plot and/or save the data profile</span>
     <span class="n">data_profile</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
         <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">,</span>
         <span class="n">file_path</span><span class="o">=</span><span class="n">plot_path</span><span class="p">,</span>
@@ -2257,9 +2276,7 @@ for the number of function evaluations axis.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/problems/problems_group.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 90</span>
 <span class="normal"> 91</span>
 <span class="normal"> 92</span>
 <span class="normal"> 93</span>
@@ -2273,7 +2290,9 @@ for the number of function evaluations axis.</p>
 <span class="normal">101</span>
 <span class="normal">102</span>
 <span class="normal">103</span>
-<span class="normal">104</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_targets</span><span class="p">(</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_targets</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">targets_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">ref_algos_configurations</span><span class="p">:</span> <span class="n">AlgorithmsConfigurations</span><span class="p">,</span>
@@ -2339,16 +2358,16 @@ for the number of function evaluations axis.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/problems/problems_group.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">79</span>
 <span class="normal">80</span>
 <span class="normal">81</span>
 <span class="normal">82</span>
 <span class="normal">83</span>
 <span class="normal">84</span>
 <span class="normal">85</span>
-<span class="normal">86</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_algorithm_suited</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_algorithm_suited</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check whether an algorithm is suited to all the problems in the group.</span>
 
 <span class="sd">    Args:</span>

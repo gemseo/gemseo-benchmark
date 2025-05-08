@@ -1302,6 +1302,8 @@
       
         
       
+        
+      
     
     
     
@@ -1350,12 +1352,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../../problems/problem/" class="md-nav__link">
+      <a href="../../problems/base_benchmarking_problem/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Problem
+    Base benchmarking problem
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../problems/optimization_benchmarking_problem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Optimization benchmarking problem
     
   </span>
   
@@ -1815,9 +1840,6 @@
     <div class="doc doc-contents first">
 
         <p>Generation of targets for a problem to be solved by an iterative algorithm.</p>
-<p>The targets are generated out of algorithms histories considered to be of reference: the
-median of the reference histories is computed and a uniformly distributed subset (of the
-required size) of this median history is extracted.</p>
 
 
 
@@ -1852,6 +1874,9 @@ required size) of this median history is extracted.</p>
 
 
         <p>Compute the target values for an objective to minimize.</p>
+<p>The targets are generated out of algorithms histories considered to be of reference:
+the median of the reference histories is computed and a uniformly distributed subset
+(of the required size) of this median history is extracted.</p>
 
 
 
@@ -2061,7 +2086,7 @@ passed, or if both are passed.</p>
     <span class="n">budget_min</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">feasible</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">show</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">file_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">file_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">best_target_objective</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">best_target_tolerance</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            TargetValues (gemseo_benchmark.data_profiles.target_values.TargetValues)" href="../target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a></span>
@@ -2119,13 +2144,13 @@ best target value.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>file_path</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>, default:
-                  <code>None</code>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>, default:
+                  <code>&#39;&#39;</code>
 )
           –
           <div class="doc-md-description">
             <p>The file path to save the plot.
-If <code>None</code>, the plot is not saved.</p>
+If empty, the plot is not saved.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -2251,7 +2276,7 @@ feasible.</p>
     <span class="n">budget_min</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">feasible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">best_target_objective</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">best_target_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TargetValues</span><span class="p">:</span>
@@ -2268,7 +2293,7 @@ feasible.</p>
 <span class="sd">        feasible: Whether to generate only feasible targets.</span>
 <span class="sd">        show: Whether to show the plot.</span>
 <span class="sd">        file_path: The file path to save the plot.</span>
-<span class="sd">            If ``None``, the plot is not saved.</span>
+<span class="sd">            If empty, the plot is not saved.</span>
 <span class="sd">        best_target_objective: The objective value of the best target value.</span>
 <span class="sd">            If ``None``, it will be inferred from the performance histories.</span>
 <span class="sd">        best_target_tolerance: The relative tolerance for comparison with the</span>
@@ -2307,7 +2332,7 @@ feasible.</p>
     <span class="n">target_values</span><span class="o">.</span><span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="n">median_history</span><span class="p">[</span><span class="n">item</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">budget_scale</span><span class="p">]</span>
 
     <span class="c1"># Plot the target values</span>
-    <span class="k">if</span> <span class="n">show</span> <span class="ow">or</span> <span class="n">file_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">show</span> <span class="ow">or</span> <span class="n">file_path</span><span class="p">:</span>
         <span class="n">target_values</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">show</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">target_values</span>
@@ -2328,7 +2353,7 @@ feasible.</p>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">plot_histories</span><span class="p">(</span>
     <span class="n">best_target_value</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">show</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">file_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">file_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.figure.Figure" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure">Figure</a></span>
 </code></pre></div>
 
@@ -2363,13 +2388,13 @@ If <code>None</code>, no best target value will be plotted.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>file_path</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>, default:
-                  <code>None</code>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>, default:
+                  <code>&#39;&#39;</code>
 )
           –
           <div class="doc-md-description">
             <p>The path where to save the figure.
-If <code>None</code>, the figure will not be saved.</p>
+If empty, the figure will not be saved.</p>
           </div>
         </li>
     </ul>
@@ -2442,7 +2467,7 @@ If <code>None</code>, the figure will not be saved.</p>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">best_target_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the histories used as a basis to compute the target values.</span>
 
@@ -2452,7 +2477,7 @@ If <code>None</code>, the figure will not be saved.</p>
 <span class="sd">            If ``None``, no best target value will be plotted.</span>
 <span class="sd">        show: Whether to show the figure.</span>
 <span class="sd">        file_path: The path where to save the figure.</span>
-<span class="sd">            If ``None``, the figure will not be saved.</span>
+<span class="sd">            If empty, the figure will not be saved.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The histories figure.</span>

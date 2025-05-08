@@ -1308,6 +1308,8 @@
       
         
       
+        
+      
     
     
     
@@ -1356,12 +1358,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/gemseo_benchmark/problems/problem/" class="md-nav__link">
+      <a href="../reference/gemseo_benchmark/problems/base_benchmarking_problem/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Problem
+    Base benchmarking problem
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/gemseo_benchmark/problems/optimization_benchmarking_problem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Optimization benchmarking problem
     
   </span>
   
@@ -1898,7 +1923,7 @@ treated together in a <a href="#report">benchmarking report</a>.</p>
 <p>The <a class="autorefs autorefs-internal" title="            problems" href="../reference/gemseo_benchmark/problems/#gemseo_benchmark.problems">gemseo_benchmark.problems</a>
 sub-package handles the benchmarking problems, on which the performances
 of the algorithms configurations is to be measured.</p>
-<p>A <a class="autorefs autorefs-internal" title="            Problem" href="../reference/gemseo_benchmark/problems/problem/#gemseo_benchmark.problems.problem.Problem">Problem</a> contains the mathematical
+<p>A <a class="autorefs autorefs-internal" title="            OptimizationBenchmarkingProblem" href="../reference/gemseo_benchmark/problems/optimization_benchmarking_problem/#gemseo_benchmark.problems.optimization_benchmarking_problem.OptimizationBenchmarkingProblem">OptimizationBenchmarkingProblem</a> contains the mathematical
 definition of the problem, as an <a class="autorefs autorefs-external" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.algos.optimization_problem.html#gemseo.algos.optimization_problem.OptimizationProblem">OptimizationProblem</a>, and requires three other features.</p>
 <ol>
 <li>The starting points, from which the algorithms configurations should
@@ -1937,7 +1962,7 @@ definition of the problem, as an <a class="autorefs autorefs-external" href="htt
 </ul>
 <p>(The class <a class="autorefs autorefs-internal" title="            TargetValues" href="../reference/gemseo_benchmark/data_profiles/target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a> will be
 presented <a href="#target-values">further down</a>.)</p>
-<div class="highlight"><pre><span></span><code><span class="n">rastrigin</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">rastrigin</span> <span class="o">=</span> <span class="n">OptimizationBenchmarkingProblem</span><span class="p">(</span>
     <span class="s2">&quot;Rastrigin&quot;</span><span class="p">,</span>
     <span class="n">Rastrigin</span><span class="p">,</span>
     <span class="n">target_values</span><span class="o">=</span><span class="n">target_values</span><span class="p">,</span>
@@ -1945,7 +1970,7 @@ presented <a href="#target-values">further down</a>.)</p>
     <span class="n">optimum</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">rosenbrock</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span>
+<span class="n">rosenbrock</span> <span class="o">=</span> <span class="n">OptimizationBenchmarkingProblem</span><span class="p">(</span>
     <span class="s2">&quot;Rosenbrock&quot;</span><span class="p">,</span>
     <span class="n">Rosenbrock</span><span class="p">,</span>
     <span class="n">target_values</span><span class="o">=</span><span class="n">target_values</span><span class="p">,</span>
@@ -1953,10 +1978,10 @@ presented <a href="#target-values">further down</a>.)</p>
     <span class="n">optimum</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
-<p>Note that the second argument of <a class="autorefs autorefs-internal" title="            Problem" href="../reference/gemseo_benchmark/problems/problem/#gemseo_benchmark.problems.problem.Problem">Problem</a> must be callable.
+<p>Note that the second argument of <a class="autorefs autorefs-internal" title="            OptimizationBenchmarkingProblem" href="../reference/gemseo_benchmark/problems/optimization_benchmarking_problem/#gemseo_benchmark.problems.optimization_benchmarking_problem.OptimizationBenchmarkingProblem">OptimizationBenchmarkingProblem</a> must be callable.
 For example, a five-variables
 benchmarking problem based on <a class="autorefs autorefs-external" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.problems.optimization.rosenbrock.html#gemseo.problems.optimization.rosenbrock.Rosenbrock">Rosenbrock</a> may be defined as follows.</p>
-<div class="highlight"><pre><span></span><code><span class="n">rosenbrock_5d</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">rosenbrock_5d</span> <span class="o">=</span> <span class="n">OptimizationBenchmarkingProblem</span><span class="p">(</span>
     <span class="s2">&quot;Rosenbrock 5D&quot;</span><span class="p">,</span>
     <span class="k">lambda</span><span class="p">:</span> <span class="n">Rosenbrock</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span>
     <span class="n">target_values</span><span class="o">=</span><span class="n">target_values</span><span class="p">,</span>

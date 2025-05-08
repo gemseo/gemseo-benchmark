@@ -1353,6 +1353,8 @@
       
         
       
+        
+      
     
     
     
@@ -1401,12 +1403,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../../problems/problem/" class="md-nav__link">
+      <a href="../../problems/base_benchmarking_problem/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Problem
+    Base benchmarking problem
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../problems/optimization_benchmarking_problem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Optimization benchmarking problem
     
   </span>
   
@@ -1917,8 +1942,6 @@
     <div class="doc doc-contents first">
 
         <p>Configuration of an algorithm defined by the values of its options.</p>
-<p>An algorithm depends on the values of its options. A value set defines a configuration
-of the algorithm.</p>
 
 
 
@@ -1948,7 +1971,7 @@ of the algorithm.</p>
 <a href="#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">AlgorithmConfiguration</span><span class="p">(</span>
     <span class="n">algorithm_name</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span>
-    <span class="n">configuration_name</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">configuration_name</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">instance_algorithm_options</span><span class="p">:</span> <span class="n"><span title="gemseo_benchmark.algorithms.algorithm_configuration.InstanceAlgorithmOptions">InstanceAlgorithmOptions</span></span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.utils.constants.READ_ONLY_EMPTY_DICT" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.utils.constants.html#gemseo.utils.constants.READ_ONLY_EMPTY_DICT">READ_ONLY_EMPTY_DICT</a></span><span class="p">,</span>
     <span class="o">**</span><span class="n">algorithm_options</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></span>
 <span class="p">)</span>
@@ -1958,6 +1981,8 @@ of the algorithm.</p>
 
 
         <p>The configuration of an algorithm.</p>
+<p>An algorithm depends on the values of its options.
+A value set defines a configuration of the algorithm.</p>
 
 
 
@@ -1973,13 +1998,13 @@ of the algorithm.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>configuration_name</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>, default:
-                  <code>None</code>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>, default:
+                  <code>&#39;&#39;</code>
 )
           –
           <div class="doc-md-description">
             <p>The name of the configuration of the algorithm.
-If <code>None</code>, a name will be generated based on the algorithm name and
+If empty, a name will be generated based on the algorithm name and
 its options, based on the pattern
 <code>"algorithm_name[option_name=option_value, ...]"</code>.</p>
           </div>
@@ -2049,7 +2074,7 @@ and returns the value of the option.</p>
 <span class="normal">76</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">configuration_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">configuration_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">instance_algorithm_options</span><span class="p">:</span> <span class="n">InstanceAlgorithmOptions</span> <span class="o">=</span> <span class="n">READ_ONLY_EMPTY_DICT</span><span class="p">,</span>
     <span class="o">**</span><span class="n">algorithm_options</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -2057,7 +2082,7 @@ and returns the value of the option.</p>
 <span class="sd">    Args:</span>
 <span class="sd">        algorithm_name: The name of the algorithm.</span>
 <span class="sd">        configuration_name: The name of the configuration of the algorithm.</span>
-<span class="sd">            If ``None``, a name will be generated based on the algorithm name and</span>
+<span class="sd">            If empty, a name will be generated based on the algorithm name and</span>
 <span class="sd">            its options, based on the pattern</span>
 <span class="sd">            ``&quot;algorithm_name[option_name=option_value, ...]&quot;``.</span>
 <span class="sd">        instance_algorithm_options: The options of the algorithm specific to</span>

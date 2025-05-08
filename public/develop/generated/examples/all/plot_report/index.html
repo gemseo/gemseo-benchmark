@@ -1257,6 +1257,8 @@
       
         
       
+        
+      
     
     
     
@@ -1305,12 +1307,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../reference/gemseo_benchmark/problems/problem/" class="md-nav__link">
+      <a href="../../../../reference/gemseo_benchmark/problems/base_benchmarking_problem/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Problem
+    Base benchmarking problem
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../reference/gemseo_benchmark/problems/optimization_benchmarking_problem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Optimization benchmarking problem
     
   </span>
   
@@ -1728,7 +1753,7 @@ based on the performances of three algorithms configurations
 on three reference problems.</p>
 <h2 id="imports">Imports<a class="headerlink" href="#imports" title="Permanent link">&para;</a></h2>
 <p>We start by making the necessary imports.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 45-64 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 45-66 -->
 
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -1745,11 +1770,13 @@ on three reference problems.</p>
     <span class="n">AlgorithmsConfigurations</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">gemseo_benchmark.data_profiles.target_values</span><span class="w"> </span><span class="kn">import</span> <span class="n">TargetValues</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">gemseo_benchmark.problems.problem</span><span class="w"> </span><span class="kn">import</span> <span class="n">Problem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gemseo_benchmark.problems.optimization_benchmarking_problem</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">OptimizationBenchmarkingProblem</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">gemseo_benchmark.problems.problems_group</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProblemsGroup</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">gemseo_benchmark.scenario</span><span class="w"> </span><span class="kn">import</span> <span class="n">Scenario</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 65-73 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 67-75 -->
 
 <h2 id="set-the-algorithms-configurations">Set the algorithms configurations<a class="headerlink" href="#set-the-algorithms-configurations" title="Permanent link">&para;</a></h2>
 <p>Let us define the algorithms configurations that we want to benchmark.</p>
@@ -1757,7 +1784,7 @@ on three reference problems.</p>
 let us choose a configuration of the L-BFGS-B algorithm
 with a number of Hessian corrections limited to 2.
 (this option is called <code>maxcor</code>.)</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 73-78 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 75-80 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">lbfgsb_2_corrections</span> <span class="o">=</span> <span class="n">AlgorithmConfiguration</span><span class="p">(</span>
     <span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span>
@@ -1765,7 +1792,7 @@ with a number of Hessian corrections limited to 2.
     <span class="n">maxcor</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 79-86 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 81-88 -->
 
 <p>Note:
     The customized name "L-BFGS-B with 2 Hessian corrections"
@@ -1773,7 +1800,7 @@ with a number of Hessian corrections limited to 2.
 <p>To investigate the influence of the <code>maxcor</code> option,
 let us consider a different configuration of L-BFGS-B
 with up to 20 Hessian corrections.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 86-91 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 88-93 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">lbfgsb_20_corrections</span> <span class="o">=</span> <span class="n">AlgorithmConfiguration</span><span class="p">(</span>
     <span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span>
@@ -1781,12 +1808,12 @@ with up to 20 Hessian corrections.</p>
     <span class="n">maxcor</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 92-95 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 94-97 -->
 
 <p>Let us put these two configurations of L-BFGS-B
 in a same group of algorithms configurations
 so that a section of the report will be dedicated to them.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 95-100 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 97-102 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">lbfgsb_configurations</span> <span class="o">=</span> <span class="n">AlgorithmsConfigurations</span><span class="p">(</span>
     <span class="n">lbfgsb_2_corrections</span><span class="p">,</span>
@@ -1794,19 +1821,19 @@ so that a section of the report will be dedicated to them.</p>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B configurations&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 101-106 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 103-108 -->
 
 <p>Additionally,
 let us choose the SLSQP algorithm,
 with all its options set to their default values,
 to compare it against L-BFGS-B.
 Let us put it in a group of its own.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 106-108 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 108-110 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">slsqp_default</span> <span class="o">=</span> <span class="n">AlgorithmConfiguration</span><span class="p">(</span><span class="s2">&quot;SLSQP&quot;</span><span class="p">)</span>
 <span class="n">slsqp_configurations</span> <span class="o">=</span> <span class="n">AlgorithmsConfigurations</span><span class="p">(</span><span class="n">slsqp_default</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;SLSQP&quot;</span><span class="p">)</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 109-118 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 111-120 -->
 
 <h2 id="set-the-reference-problems">Set the reference problems<a class="headerlink" href="#set-the-reference-problems" title="Permanent link">&para;</a></h2>
 <p>Let us choose two problems already implemented in GEMSEO as references
@@ -1815,20 +1842,20 @@ to measure the performances of our selection of algorithms configurations:
 and <a class="autorefs autorefs-external" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.problems.optimization.rosenbrock.html#gemseo.problems.optimization.rosenbrock.Rosenbrock">Rosenbrock</a>.</p>
 <p>We define target values as an exponential scale of values decreasing towards zero,
 the minimum value of both Rastrigin's and Rosenbrock's functions.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 118-120 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 120-122 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">optimum</span> <span class="o">=</span> <span class="mf">0.0</span>
 <span class="n">target_values</span> <span class="o">=</span> <span class="n">TargetValues</span><span class="p">([</span><span class="mi">10</span><span class="o">**-</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="n">optimum</span><span class="p">])</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 121-126 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 123-128 -->
 
 <p>N.B. it could be preferable to customize a different scale of target values
 for each problem,
 although we keep it simple here.</p>
 <p>We now have all the elements to define the benchmarking problems.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 126-142 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 128-144 -->
 
-<div class="highlight"><pre><span></span><code><span class="n">rastrigin_2d</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">rastrigin_2d</span> <span class="o">=</span> <span class="n">OptimizationBenchmarkingProblem</span><span class="p">(</span>
     <span class="s2">&quot;Rastrigin&quot;</span><span class="p">,</span>
     <span class="n">Rastrigin</span><span class="p">,</span>
     <span class="n">optimum</span><span class="o">=</span><span class="n">optimum</span><span class="p">,</span>
@@ -1836,7 +1863,7 @@ although we keep it simple here.</p>
     <span class="n">doe_algo_name</span><span class="o">=</span><span class="s2">&quot;OT_OPT_LHS&quot;</span><span class="p">,</span>
     <span class="n">target_values</span><span class="o">=</span><span class="n">target_values</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">rosenbrock_2d</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span>
+<span class="n">rosenbrock_2d</span> <span class="o">=</span> <span class="n">OptimizationBenchmarkingProblem</span><span class="p">(</span>
     <span class="s2">&quot;Rosenbrock&quot;</span><span class="p">,</span>
     <span class="n">Rosenbrock</span><span class="p">,</span>
     <span class="n">optimum</span><span class="o">=</span><span class="n">optimum</span><span class="p">,</span>
@@ -1845,24 +1872,24 @@ although we keep it simple here.</p>
     <span class="n">target_values</span><span class="o">=</span><span class="n">target_values</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 143-148 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 145-150 -->
 
 <p>Here we configure a design of experiments (DOE)
 to generate five starting points by optimized Latin hypercube sampling (LHS).</p>
 <p>Let us gather these two two-variables problems in a group
 so that they will be treated together.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 148-149 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 150-151 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">problems_2d</span> <span class="o">=</span> <span class="n">ProblemsGroup</span><span class="p">(</span><span class="s2">&quot;2D problems&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">rastrigin_2d</span><span class="p">,</span> <span class="n">rosenbrock_2d</span><span class="p">])</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 150-153 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 152-155 -->
 
 <p>We add a five-variables problem, also based on Rosenbrock's function,
 to compare the algorithms configurations in higher dimension.
 Let us put it in a group of its own.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 153-162 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 155-164 -->
 
-<div class="highlight"><pre><span></span><code><span class="n">rosenbrock_5d</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="n">rosenbrock_5d</span> <span class="o">=</span> <span class="n">OptimizationBenchmarkingProblem</span><span class="p">(</span>
     <span class="s2">&quot;Rosenbrock 5D&quot;</span><span class="p">,</span>
     <span class="k">lambda</span><span class="p">:</span> <span class="n">Rosenbrock</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span>
     <span class="n">target_values</span><span class="o">=</span><span class="n">target_values</span><span class="p">,</span>
@@ -1872,7 +1899,7 @@ Let us put it in a group of its own.</p>
 <span class="p">)</span>
 <span class="n">problems_5d</span> <span class="o">=</span> <span class="n">ProblemsGroup</span><span class="p">(</span><span class="s2">&quot;5D problems&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">rosenbrock_5d</span><span class="p">])</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 163-171 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 165-173 -->
 
 <h2 id="generate-the-benchmarking-results">Generate the benchmarking results<a class="headerlink" href="#generate-the-benchmarking-results" title="Permanent link">&para;</a></h2>
 <p>Now that the algorithms configurations and the reference problems are properly set,
@@ -1880,16 +1907,16 @@ we can measure the performances of the former on the latter.</p>
 <p>We set up a <a class="autorefs autorefs-internal" title="            Scenario" href="../../../../reference/gemseo_benchmark/scenario/#gemseo_benchmark.scenario.Scenario">Scenario</a> with
 our two groups of algorithms configurations
 and a path to a directory where to save the performance histories and the report.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 171-173 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 173-175 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">scenario_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">())</span>
 <span class="n">scenario</span> <span class="o">=</span> <span class="n">Scenario</span><span class="p">([</span><span class="n">lbfgsb_configurations</span><span class="p">,</span> <span class="n">slsqp_configurations</span><span class="p">],</span> <span class="n">scenario_dir</span><span class="p">)</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 174-176 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 176-178 -->
 
 <p>Here we choose to deactivate the functions counters, progress bars and bounds check
 of GEMSEO to accelerate the script.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 176-181 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 178-183 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">configure</span><span class="p">(</span>
     <span class="n">enable_function_statistics</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -1897,47 +1924,47 @@ of GEMSEO to accelerate the script.</p>
     <span class="n">check_desvars_bounds</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 182-183 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 184-185 -->
 
 <p>Let us execute the benchmarking scenario on our two groups of reference problems.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 183-184 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 185-186 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">scenario</span><span class="o">.</span><span class="n">execute</span><span class="p">([</span><span class="n">problems_2d</span><span class="p">,</span> <span class="n">problems_5d</span><span class="p">])</span>
 </code></pre></div>
 <p class="mkd-glr-script-out">Out:</p>
-<div class="mkd-glr-script-out-disp highlight"><pre><span></span><code>/builds/gemseo/dev/gemseo-benchmark/src/gemseo_benchmark/report/_figures.py:754:<span class="w"> </span>MatplotlibDeprecationWarning:<span class="w"> </span>The<span class="w"> </span><span class="s1">&#39;labels&#39;</span><span class="w"> </span>parameter<span class="w"> </span>of<span class="w"> </span>boxplot<span class="o">()</span><span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>renamed<span class="w"> </span><span class="s1">&#39;tick_labels&#39;</span><span class="w"> </span>since<span class="w"> </span>Matplotlib<span class="w"> </span><span class="m">3</span>.9<span class="p">;</span><span class="w"> </span>support<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>old<span class="w"> </span>name<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>dropped<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">3</span>.11.
+<div class="mkd-glr-script-out-disp highlight"><pre><span></span><code>/builds/gemseo/dev/gemseo-benchmark/src/gemseo_benchmark/report/_figures.py:756:<span class="w"> </span>MatplotlibDeprecationWarning:<span class="w"> </span>The<span class="w"> </span><span class="s1">&#39;labels&#39;</span><span class="w"> </span>parameter<span class="w"> </span>of<span class="w"> </span>boxplot<span class="o">()</span><span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>renamed<span class="w"> </span><span class="s1">&#39;tick_labels&#39;</span><span class="w"> </span>since<span class="w"> </span>Matplotlib<span class="w"> </span><span class="m">3</span>.9<span class="p">;</span><span class="w"> </span>support<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>old<span class="w"> </span>name<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>dropped<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">3</span>.11.
 <span class="w">  </span><span class="nv">artists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>axes.boxplot<span class="o">(</span>data,<span class="w"> </span><span class="nv">whis</span><span class="o">=(</span><span class="m">0</span>,<span class="w"> </span><span class="m">100</span><span class="o">)</span>,<span class="w"> </span><span class="nv">patch_artist</span><span class="o">=</span>True,<span class="w"> </span><span class="nv">labels</span><span class="o">=</span>labels<span class="o">)</span>
-/builds/gemseo/dev/gemseo-benchmark/src/gemseo_benchmark/report/_figures.py:754:<span class="w"> </span>MatplotlibDeprecationWarning:<span class="w"> </span>The<span class="w"> </span><span class="s1">&#39;labels&#39;</span><span class="w"> </span>parameter<span class="w"> </span>of<span class="w"> </span>boxplot<span class="o">()</span><span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>renamed<span class="w"> </span><span class="s1">&#39;tick_labels&#39;</span><span class="w"> </span>since<span class="w"> </span>Matplotlib<span class="w"> </span><span class="m">3</span>.9<span class="p">;</span><span class="w"> </span>support<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>old<span class="w"> </span>name<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>dropped<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">3</span>.11.
+/builds/gemseo/dev/gemseo-benchmark/src/gemseo_benchmark/report/_figures.py:756:<span class="w"> </span>MatplotlibDeprecationWarning:<span class="w"> </span>The<span class="w"> </span><span class="s1">&#39;labels&#39;</span><span class="w"> </span>parameter<span class="w"> </span>of<span class="w"> </span>boxplot<span class="o">()</span><span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>renamed<span class="w"> </span><span class="s1">&#39;tick_labels&#39;</span><span class="w"> </span>since<span class="w"> </span>Matplotlib<span class="w"> </span><span class="m">3</span>.9<span class="p">;</span><span class="w"> </span>support<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>old<span class="w"> </span>name<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>dropped<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">3</span>.11.
 <span class="w">  </span><span class="nv">artists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>axes.boxplot<span class="o">(</span>data,<span class="w"> </span><span class="nv">whis</span><span class="o">=(</span><span class="m">0</span>,<span class="w"> </span><span class="m">100</span><span class="o">)</span>,<span class="w"> </span><span class="nv">patch_artist</span><span class="o">=</span>True,<span class="w"> </span><span class="nv">labels</span><span class="o">=</span>labels<span class="o">)</span>
-/builds/gemseo/dev/gemseo-benchmark/src/gemseo_benchmark/report/_figures.py:754:<span class="w"> </span>MatplotlibDeprecationWarning:<span class="w"> </span>The<span class="w"> </span><span class="s1">&#39;labels&#39;</span><span class="w"> </span>parameter<span class="w"> </span>of<span class="w"> </span>boxplot<span class="o">()</span><span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>renamed<span class="w"> </span><span class="s1">&#39;tick_labels&#39;</span><span class="w"> </span>since<span class="w"> </span>Matplotlib<span class="w"> </span><span class="m">3</span>.9<span class="p">;</span><span class="w"> </span>support<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>old<span class="w"> </span>name<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>dropped<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">3</span>.11.
+/builds/gemseo/dev/gemseo-benchmark/src/gemseo_benchmark/report/_figures.py:756:<span class="w"> </span>MatplotlibDeprecationWarning:<span class="w"> </span>The<span class="w"> </span><span class="s1">&#39;labels&#39;</span><span class="w"> </span>parameter<span class="w"> </span>of<span class="w"> </span>boxplot<span class="o">()</span><span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>renamed<span class="w"> </span><span class="s1">&#39;tick_labels&#39;</span><span class="w"> </span>since<span class="w"> </span>Matplotlib<span class="w"> </span><span class="m">3</span>.9<span class="p">;</span><span class="w"> </span>support<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>old<span class="w"> </span>name<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>dropped<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">3</span>.11.
 <span class="w">  </span><span class="nv">artists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>axes.boxplot<span class="o">(</span>data,<span class="w"> </span><span class="nv">whis</span><span class="o">=(</span><span class="m">0</span>,<span class="w"> </span><span class="m">100</span><span class="o">)</span>,<span class="w"> </span><span class="nv">patch_artist</span><span class="o">=</span>True,<span class="w"> </span><span class="nv">labels</span><span class="o">=</span>labels<span class="o">)</span>
-/builds/gemseo/dev/gemseo-benchmark/src/gemseo_benchmark/report/_figures.py:754:<span class="w"> </span>MatplotlibDeprecationWarning:<span class="w"> </span>The<span class="w"> </span><span class="s1">&#39;labels&#39;</span><span class="w"> </span>parameter<span class="w"> </span>of<span class="w"> </span>boxplot<span class="o">()</span><span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>renamed<span class="w"> </span><span class="s1">&#39;tick_labels&#39;</span><span class="w"> </span>since<span class="w"> </span>Matplotlib<span class="w"> </span><span class="m">3</span>.9<span class="p">;</span><span class="w"> </span>support<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>old<span class="w"> </span>name<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>dropped<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">3</span>.11.
+/builds/gemseo/dev/gemseo-benchmark/src/gemseo_benchmark/report/_figures.py:756:<span class="w"> </span>MatplotlibDeprecationWarning:<span class="w"> </span>The<span class="w"> </span><span class="s1">&#39;labels&#39;</span><span class="w"> </span>parameter<span class="w"> </span>of<span class="w"> </span>boxplot<span class="o">()</span><span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>renamed<span class="w"> </span><span class="s1">&#39;tick_labels&#39;</span><span class="w"> </span>since<span class="w"> </span>Matplotlib<span class="w"> </span><span class="m">3</span>.9<span class="p">;</span><span class="w"> </span>support<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>old<span class="w"> </span>name<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>dropped<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">3</span>.11.
 <span class="w">  </span><span class="nv">artists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>axes.boxplot<span class="o">(</span>data,<span class="w"> </span><span class="nv">whis</span><span class="o">=(</span><span class="m">0</span>,<span class="w"> </span><span class="m">100</span><span class="o">)</span>,<span class="w"> </span><span class="nv">patch_artist</span><span class="o">=</span>True,<span class="w"> </span><span class="nv">labels</span><span class="o">=</span>labels<span class="o">)</span>
-/builds/gemseo/dev/gemseo-benchmark/src/gemseo_benchmark/report/_figures.py:754:<span class="w"> </span>MatplotlibDeprecationWarning:<span class="w"> </span>The<span class="w"> </span><span class="s1">&#39;labels&#39;</span><span class="w"> </span>parameter<span class="w"> </span>of<span class="w"> </span>boxplot<span class="o">()</span><span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>renamed<span class="w"> </span><span class="s1">&#39;tick_labels&#39;</span><span class="w"> </span>since<span class="w"> </span>Matplotlib<span class="w"> </span><span class="m">3</span>.9<span class="p">;</span><span class="w"> </span>support<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>old<span class="w"> </span>name<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>dropped<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">3</span>.11.
+/builds/gemseo/dev/gemseo-benchmark/src/gemseo_benchmark/report/_figures.py:756:<span class="w"> </span>MatplotlibDeprecationWarning:<span class="w"> </span>The<span class="w"> </span><span class="s1">&#39;labels&#39;</span><span class="w"> </span>parameter<span class="w"> </span>of<span class="w"> </span>boxplot<span class="o">()</span><span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>renamed<span class="w"> </span><span class="s1">&#39;tick_labels&#39;</span><span class="w"> </span>since<span class="w"> </span>Matplotlib<span class="w"> </span><span class="m">3</span>.9<span class="p">;</span><span class="w"> </span>support<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>old<span class="w"> </span>name<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>dropped<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">3</span>.11.
 <span class="w">  </span><span class="nv">artists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>axes.boxplot<span class="o">(</span>data,<span class="w"> </span><span class="nv">whis</span><span class="o">=(</span><span class="m">0</span>,<span class="w"> </span><span class="m">100</span><span class="o">)</span>,<span class="w"> </span><span class="nv">patch_artist</span><span class="o">=</span>True,<span class="w"> </span><span class="nv">labels</span><span class="o">=</span>labels<span class="o">)</span>
-/builds/gemseo/dev/gemseo-benchmark/src/gemseo_benchmark/report/_figures.py:754:<span class="w"> </span>MatplotlibDeprecationWarning:<span class="w"> </span>The<span class="w"> </span><span class="s1">&#39;labels&#39;</span><span class="w"> </span>parameter<span class="w"> </span>of<span class="w"> </span>boxplot<span class="o">()</span><span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>renamed<span class="w"> </span><span class="s1">&#39;tick_labels&#39;</span><span class="w"> </span>since<span class="w"> </span>Matplotlib<span class="w"> </span><span class="m">3</span>.9<span class="p">;</span><span class="w"> </span>support<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>old<span class="w"> </span>name<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>dropped<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">3</span>.11.
+/builds/gemseo/dev/gemseo-benchmark/src/gemseo_benchmark/report/_figures.py:756:<span class="w"> </span>MatplotlibDeprecationWarning:<span class="w"> </span>The<span class="w"> </span><span class="s1">&#39;labels&#39;</span><span class="w"> </span>parameter<span class="w"> </span>of<span class="w"> </span>boxplot<span class="o">()</span><span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>renamed<span class="w"> </span><span class="s1">&#39;tick_labels&#39;</span><span class="w"> </span>since<span class="w"> </span>Matplotlib<span class="w"> </span><span class="m">3</span>.9<span class="p">;</span><span class="w"> </span>support<span class="w"> </span><span class="k">for</span><span class="w"> </span>the<span class="w"> </span>old<span class="w"> </span>name<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>dropped<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">3</span>.11.
 <span class="w">  </span><span class="nv">artists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>axes.boxplot<span class="o">(</span>data,<span class="w"> </span><span class="nv">whis</span><span class="o">=(</span><span class="m">0</span>,<span class="w"> </span><span class="m">100</span><span class="o">)</span>,<span class="w"> </span><span class="nv">patch_artist</span><span class="o">=</span>True,<span class="w"> </span><span class="nv">labels</span><span class="o">=</span>labels<span class="o">)</span>
 
-&lt;gemseo_benchmark.results.results.Results<span class="w"> </span>object<span class="w"> </span>at<span class="w"> </span>0x79786301bee0&gt;
+&lt;gemseo_benchmark.results.results.Results<span class="w"> </span>object<span class="w"> </span>at<span class="w"> </span>0x7dd6bfb0cee0&gt;
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 185-186 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 187-188 -->
 
 <p>The root the HTML report is the following.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 186-187 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 188-189 -->
 
 <div class="highlight"><pre><span></span><code><span class="nb">str</span><span class="p">((</span><span class="n">scenario_dir</span> <span class="o">/</span> <span class="s2">&quot;report&quot;</span> <span class="o">/</span> <span class="s2">&quot;_build&quot;</span> <span class="o">/</span> <span class="s2">&quot;html&quot;</span> <span class="o">/</span> <span class="s2">&quot;index.html&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">absolute</span><span class="p">())</span>
 </code></pre></div>
 <p class="mkd-glr-script-out">Out:</p>
-<div class="mkd-glr-script-out-disp highlight"><pre><span></span><code><span class="s1">&#39;/tmp/tmp33z6i8mh/report/_build/html/index.html&#39;</span>
+<div class="mkd-glr-script-out-disp highlight"><pre><span></span><code><span class="s1">&#39;/tmp/tmpvastevgd/report/_build/html/index.html&#39;</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 188-189 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 190-191 -->
 
 <p>Here we remove the data as we do not intend to keep it.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 189-190 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 191-192 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">scenario_dir</span><span class="p">)</span>
 </code></pre></div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  13.783 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  14.238 seconds)</p>
 <div id="download_links"></div>
 
 <p><a class="md-button center" href="../plot_report.py"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32v242.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64h384c35.3 0 64-28.7 64-64v-32c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48"/></svg></span> Download Python source code: plot_report.py</a></p>
