@@ -17,7 +17,7 @@
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
-"""Tests for optimization benchmarking problems."""
+"""Tests for optimization problem configurations."""
 
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ from numpy.testing import assert_allclose
 from numpy.testing import assert_equal
 
 from gemseo_benchmark.data_profiles.target_values import TargetValues
-from gemseo_benchmark.problems.optimization_benchmarking_problem import (
+from gemseo_benchmark.problems.optimization_problem_configuration import (
     OptimizationBenchmarkingProblem,
 )
 
@@ -63,7 +63,7 @@ def maximization_problem_creator(
 
 @pytest.fixture(scope="module")
 def benchmarking_problem(minimization_problem_creator):
-    """A benchmarking problem."""
+    """A problem configuration."""
     return OptimizationBenchmarkingProblem("Problem", minimization_problem_creator)
 
 
@@ -90,7 +90,7 @@ def test_inconsistent_starting_points(minimization_problem_creator):
 
 
 def test_starting_points_iteration(minimization_problem_creator):
-    """Check the iteration on start points."""
+    """Check the iteration on starting points."""
     starting_points = [zeros(2), ones(2)]
     problem = OptimizationBenchmarkingProblem(
         "problem", minimization_problem_creator, starting_points
@@ -113,7 +113,7 @@ def test_undefined_targets(minimization_problem_creator):
         "problem", minimization_problem_creator, [zeros(2)]
     )
     with pytest.raises(
-        ValueError, match=re.escape("The benchmarking problem has no target value.")
+        ValueError, match=re.escape("The problem configuration has no target value.")
     ):
         _ = problem.target_values
 
@@ -132,7 +132,7 @@ def test_undefined_starting_points(minimization_problem_creator):
     opt_problem.design_space.has_current_value = False
     problem = OptimizationBenchmarkingProblem("problem", lambda: opt_problem)
     with pytest.raises(
-        ValueError, match=re.escape("The benchmarking problem has no starting point.")
+        ValueError, match=re.escape("The problem configuration has no starting point.")
     ):
         _ = problem.starting_points
 

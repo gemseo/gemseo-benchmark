@@ -1,5 +1,5 @@
-Benchmarking problems
-=====================
+Problem configurations
+======================
 
 .. toctree::
    :maxdepth: 1

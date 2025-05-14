@@ -54,9 +54,27 @@ and this project adheres to
 
 ## Changed
 
+* The phrasing "problem configuration" is now used instead of "benchmarking problem".
+  Thus the two main types of inputs to be defined by the user
+  are *algorithm* configurations and *problem* configurations.
+
 #### Problems
 
-* The class to implement optimization benchmarking problems is now called ``OptimizationBenchmarkingProblem`` (rather than ``Problem`` formerly).
+* The class to implement optimization benchmarking problems is now called
+  ``OptimizationBenchmarkingProblem`` (rather than ``Problem`` formerly).
+
+#### Benchmarker
+
+* Argument ``databases_path`` of ``Benchmarker.__init__`` is renamed into ``hdf_path``
+  as the saved files could represent caches rather than databases.
+* Arguments ``problems`` and ``algorithm`` of ``Benchmarker.execute`` are renamed into
+  ``problem_configurations`` and ``algorithm_configurations``
+  to avoid confusion with optimization problems and algorithm names respectively.
+* Argument ``number_of_processes`` of ``Benchmarker.execute`` is renamed into
+  ``n_processes`` for consistency with GEMSEO.
+* The stopping criteria of the algorithms are no longer automatically disabled.
+  The user is now free to disable (or not) the stopping criteria of their choice
+  in the options of the algorithm configurations.
 
 #### Report
 
@@ -66,6 +84,11 @@ and this project adheres to
 - The performance histories returned by ``PerformanceHistory.compute_cumulated_minimum``
   and ``PerformanceHistory.extend`` now contain copies of history items
   rather than replications of the same objects.
+
+### Scenario
+
+* Argument ``number_of_processes`` of ``Scenario.execute`` is renamed into
+  ``n_processes`` for consistency with GEMSEO.
 
 ## Fixed
 
@@ -85,6 +108,8 @@ and this project adheres to
 
 - When overwriting histories,
   the paths already in the ``Results`` are now effectively removed.
+- When threading, a log file is written in the performance history directory.
+- When multiprocessing, a log file is written next to each performance history.
 
 #### Scenario
 
@@ -280,4 +305,3 @@ and this project adheres to
 ## Version 1.0.0 (June 2023)
 
 First version.
->>>>>>> f796f1a6 (docs: update changelog)

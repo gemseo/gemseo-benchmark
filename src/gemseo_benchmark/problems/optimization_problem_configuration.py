@@ -17,7 +17,7 @@
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
-"""Reference problem for benchmarking."""
+"""Problem configuration for optimization."""
 
 from __future__ import annotations
 
@@ -29,8 +29,10 @@ from gemseo.algos.opt.factory import OptimizationLibraryFactory
 from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
-from gemseo_benchmark.problems.base_benchmarking_problem import BaseBenchmarkingProblem
-from gemseo_benchmark.problems.base_benchmarking_problem import InputStartingPointsType
+from gemseo_benchmark.problems.base_problem_configuration import (
+    BaseProblemConfiguration,
+)
+from gemseo_benchmark.problems.base_problem_configuration import InputStartingPointsType
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
@@ -45,22 +47,22 @@ if TYPE_CHECKING:
     from gemseo_benchmark.data_profiles.target_values import TargetValues
 
 
-class OptimizationBenchmarkingProblem(BaseBenchmarkingProblem):
-    """An optimization benchmarking problem.
+class OptimizationBenchmarkingProblem(BaseProblemConfiguration):
+    """Problem configuration for optimization.
 
-    A benchmarking problem is a problem class to be solved by iterative algorithms for
-    comparison purposes.
-    A benchmarking problem is characterized by its functions
-    (e.g. objective and constraints for an optimization problem),
-    its starting points (each defining an instance of the problem)
-    and its targets (refer to :mod:`.data_profiles.target_values`).
+    An *optimization* problem configuration is a problem of reference
+    to be solved by optimization algorithms for comparison purposes.
+    An optimization problem configuration is characterized by
+    its objective and constraint functions,
+    its starting points (the optimization trajectories will start from each of them),
+    and its target values (refer to :mod:`.data_profiles.target_values`).
     """
 
     __optimization_problem: OptimizationProblem
-    """An instance of the optimization benchmarking problem."""
+    """A problem of the configuration."""
 
     __targets_generator: TargetsGenerator | None
-    """The generator of target values for the optimization benchmarking problem."""
+    """The generator of target values for the optimization problem configuration."""
 
     def __init__(
         self,
@@ -84,7 +86,7 @@ class OptimizationBenchmarkingProblem(BaseBenchmarkingProblem):
             target_values_number: The number of target values to compute.
                 If ``None``, the target values will not be computed.
                 N.B. the number of target values shall be the same for all the
-                benchmarking problems of a same group.
+                problem configurations of a same group.
         """  # noqa: D205, D212, D415
         self.__optimization_problem = create_problem()
         super().__init__(
@@ -105,7 +107,7 @@ class OptimizationBenchmarkingProblem(BaseBenchmarkingProblem):
             and target_values_algorithms_configurations is not None
             and target_values_number is not None
         ):
-            self.compute_targets(
+            self.compute_target_values(
                 target_values_number, target_values_algorithms_configurations
             )
 
@@ -147,23 +149,24 @@ class OptimizationBenchmarkingProblem(BaseBenchmarkingProblem):
             library.ALGORITHM_INFOS[name], self.__optimization_problem
         )
 
-    def compute_targets(
+    def compute_target_values(
         self,
         targets_number: int,
-        ref_algo_configurations: AlgorithmsConfigurations,
+        algorithm_configurations: AlgorithmsConfigurations,
         only_feasible: bool = True,
         budget_min: int = 1,
         show: bool = False,
         file_path: str = "",
         best_target_tolerance: float = 0.0,
     ) -> TargetValues:
-        """Compute targets based on reference algorithms.
+        """Compute target values based on algorithm configurations.
 
         Args:
-            targets_number: The number of targets to generate.
-            ref_algo_configurations: The configurations of the reference algorithms.
-            only_feasible: Whether to generate only feasible targets.
-            budget_min: The evaluation budget to be used to define the easiest target.
+            targets_number: The number of target values to generate.
+            algorithm_configurations: The algorithm configurations.
+            only_feasible: Whether to generate only feasible target values.
+            budget_min: The evaluation budget to be used to define
+                the easiest target value.
             show: Whether to show the plot.
             file_path: The path where to save the plot.
                 If empty, the plot is not saved.
@@ -171,10 +174,10 @@ class OptimizationBenchmarkingProblem(BaseBenchmarkingProblem):
                 best target value.
 
         Returns:
-            The generated targets.
+            The generated target values.
         """
         self.__targets_generator = TargetsGenerator()
-        for configuration in ref_algo_configurations:
+        for configuration in algorithm_configurations:
             for instance in self:
                 execute_algo(
                     instance,

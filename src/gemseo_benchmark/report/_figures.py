@@ -13,7 +13,7 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-"""The figures dedicated to a group of benchmarking problems."""
+"""The figures dedicated to a group of problem configurations."""
 
 from __future__ import annotations
 
@@ -51,8 +51,8 @@ if TYPE_CHECKING:
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
     )
-    from gemseo_benchmark.problems.base_benchmarking_problem import (
-        BaseBenchmarkingProblem,
+    from gemseo_benchmark.problems.base_problem_configuration import (
+        BaseProblemConfiguration,
     )
     from gemseo_benchmark.problems.problems_group import ProblemsGroup
     from gemseo_benchmark.results.history_item import HistoryItem
@@ -62,7 +62,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class Figures:
-    """The figures dedicated to a group of benchmarking problems."""
+    """The figures dedicated to a group of problem configurations."""
 
     __algorithm_configurations: AlgorithmsConfigurations
     """The algorithm configurations."""
@@ -322,7 +322,7 @@ class Figures:
 
     def __get_problem_figures(
         self,
-        problem: BaseBenchmarkingProblem,
+        problem: BaseProblemConfiguration,
         performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
         directory_path: Path,
         plot_all_histories: bool,
@@ -411,7 +411,7 @@ class Figures:
 
     def __plot_data_profiles(
         self,
-        problem: BaseBenchmarkingProblem,
+        problem: BaseProblemConfiguration,
         directory_path: Path,
         use_evaluation_log_scale: bool,
     ) -> Path:
@@ -450,7 +450,7 @@ class Figures:
 
     def __plot_performance_measure(
         self,
-        problem: BaseBenchmarkingProblem,
+        problem: BaseProblemConfiguration,
         performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
         directory_path: Path,
         plot_all_histories: bool,
@@ -753,7 +753,9 @@ class Figures:
             for histories in performance_histories.values()
         ]
         labels = [algo_config.name for algo_config in performance_histories]
-        artists = axes.boxplot(data, whis=(0, 100), patch_artist=True, labels=labels)
+        artists = axes.boxplot(
+            data, whis=(0, 100), patch_artist=True, tick_labels=labels
+        )
         for index, (box, median) in enumerate(
             zip(artists["boxes"], artists["medians"])
         ):
@@ -792,7 +794,7 @@ class Figures:
 
     def __get_algorithms_plots(
         self,
-        problem: BaseBenchmarkingProblem,
+        problem: BaseProblemConfiguration,
         performance_histories: Mapping[str, PerformanceHistories],
         max_feasible_performance: float,
         directory_path: Path,

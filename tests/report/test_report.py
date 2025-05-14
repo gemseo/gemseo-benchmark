@@ -160,7 +160,7 @@ def test_figures(
 
 @pytest.fixture(scope="package")
 def incomplete_problem():
-    """An incomplete benchmarking problem."""
+    """An incomplete problem configuration."""
     problem = mock.Mock()
     problem.optimum = None
     return problem
@@ -168,7 +168,7 @@ def incomplete_problem():
 
 @pytest.fixture(scope="package")
 def incomplete_group(incomplete_problem):
-    """A group with an incomplete benchmarking problem."""
+    """A group with an incomplete problem configuration."""
     group = mock.MagicMock()
     group.__iter__.return_value = [incomplete_problem]
     return group

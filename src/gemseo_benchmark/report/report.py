@@ -47,7 +47,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
 
     from gemseo_benchmark import ConfigurationPlotOptions
-    from gemseo_benchmark.problems.optimization_benchmarking_problem import (
+    from gemseo_benchmark.problems.optimization_problem_configuration import (
         OptimizationBenchmarkingProblem,
     )
     from gemseo_benchmark.problems.problems_group import ProblemsGroup
@@ -216,7 +216,7 @@ class Report:
         )
 
     def __create_problems_files(self) -> None:
-        """Create the files describing the benchmarking problems."""
+        """Create the files describing the problem configurations."""
         problems_dir = self.__root_directory / DirectoryName.PROBLEMS.value
         problems_dir.mkdir()
 

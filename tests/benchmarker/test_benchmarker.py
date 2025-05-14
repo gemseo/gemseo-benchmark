@@ -22,10 +22,13 @@
 from __future__ import annotations
 
 import json
+import logging
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
 from gemseo.problems.optimization.rastrigin import Rastrigin
+from gemseo.utils.platform import PLATFORM_IS_WINDOWS
 from numpy import array
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -33,7 +36,7 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
 from gemseo_benchmark.benchmarker.benchmarker import Benchmarker
-from gemseo_benchmark.problems.optimization_benchmarking_problem import (
+from gemseo_benchmark.problems.optimization_problem_configuration import (
     OptimizationBenchmarkingProblem,
 )
 
@@ -43,7 +46,7 @@ if TYPE_CHECKING:
 
 @pytest.fixture(scope="module")
 def rastrigin() -> OptimizationBenchmarkingProblem:
-    """A benchmarking problem based on the 2-dimensional Rastrigin function."""
+    """A problem configuration based on the 2-dimensional Rastrigin function."""
     return OptimizationBenchmarkingProblem(
         "Rastrigin", Rastrigin, [array([0.0, 0.1]), array([0.1, 0.0])]
     )
@@ -70,8 +73,9 @@ def test_save_history(results_root, rosenbrock, lbfgsb_results, index):
         lbfgsb_configuration.algorithm_name, rosenbrock.name, path
     )
     assert (
-        f"Solving instance {index} of problem {rosenbrock.name} with algorithm "
-        f"configuration {lbfgsb_configuration.name}."
+        f"Solving problem {index} "
+        f"of problem configuration {rosenbrock.name} "
+        f"with algorithm configuration {lbfgsb_configuration.name}."
     )
 
 
@@ -95,45 +99,47 @@ def test_unavailable_algorithm(
     """Check the handling of an unavailable algorithm."""
     with pytest.raises(
         ValueError,
-        match="The algorithm is not available: "
-        f"{unknown_algorithm_configuration.algorithm_name}.",
+        match=(
+            f"The algorithm '{unknown_algorithm_configuration.algorithm_name}' "
+            "is not available."
+        ),
     ):
         Benchmarker(tmp_path, tmp_path / "results.json").execute(
             [rosenbrock], unknown_algorithms_configurations
         )
 
 
-def test___skip_instance(tmp_path, rosenbrock, rastrigin, caplog):
-    """Check the skipping of an optimization."""
+def test_is_problem_unsolved(tmp_path, rosenbrock, rastrigin, caplog):
+    """Check the skipping of a problem."""
     results_path = tmp_path / "results.json"
     algo_config = AlgorithmConfiguration("L-BFGS-B")
-    # Run the algorithm on the Rosenbrock problem
+    # Run the algorithm on the Rosenbrock problem configuration
     Benchmarker(tmp_path, results_path).execute(
         [rosenbrock], AlgorithmsConfigurations(algo_config)
     )
-    # Run the algorithm on the Rastrigin problem
+    # Run the algorithm on the Rastrigin problem configuration
     Benchmarker(tmp_path, results_path).execute(
         [rosenbrock, rastrigin], AlgorithmsConfigurations(algo_config)
     )
     assert (
-        f"Skipping instance 1 of problem {rosenbrock.name} for algorithm "
+        f"Skipping problem 1 of problem configuration {rosenbrock.name} for algorithm "
         f"configuration {algo_config.name}." in caplog.text
     )
     assert (
-        f"Skipping instance 2 of problem {rosenbrock.name} for algorithm "
+        f"Skipping problem 2 of problem configuration {rosenbrock.name} for algorithm "
         f"configuration {algo_config.name}." in caplog.text
     )
 
 
 @pytest.mark.parametrize(
-    ("number_of_processes", "use_threading"), [(1, False), (2, False), (2, True)]
+    ("n_processes", "use_threading"), [(1, False), (2, False), (2, True)]
 )
-def test_execution(results_root, rosenbrock, number_of_processes, use_threading):
+def test_execution(results_root, rosenbrock, n_processes, use_threading):
     """Check the execution of the benchmarker."""
     results = Benchmarker(results_root).execute(
         [rosenbrock],
         AlgorithmsConfigurations(lbfgsb_configuration),
-        number_of_processes=number_of_processes,
+        n_processes=n_processes,
         use_threading=use_threading,
     )
     algo_pb_dir = results_root / lbfgsb_configuration.name / rosenbrock.name
@@ -145,15 +151,16 @@ def test_execution(results_root, rosenbrock, number_of_processes, use_threading)
     assert results.contains(lbfgsb_configuration.algorithm_name, rosenbrock.name, path)
 
 
-def test_instance_specific_algorithm_options(results_root, rosenbrock):
-    """Check instance-specific algorithm options."""
+def test_problem_specific_algorithm_options(results_root, rosenbrock):
+    """Check problem-specific algorithm options."""
     Benchmarker(results_root).execute(
         [rosenbrock],
         AlgorithmsConfigurations(
             AlgorithmConfiguration(
                 "L-BFGS-B",
                 instance_algorithm_options={
-                    "max_iter": lambda problem, index: problem.dimension + index
+                    "max_iter": lambda problem_configuration,
+                    index: problem_configuration.dimension + index
                 },
             )
         ),
@@ -181,44 +188,58 @@ def test_instance_specific_algorithm_options(results_root, rosenbrock):
         )
 
 
+@pytest.mark.parametrize("n_processes", [1, 2])
+@pytest.mark.parametrize("use_threading", [False, True])
 def test_log_to_file(
-    algorithms_configurations, algorithm_configuration, rosenbrock, tmp_path
+    algorithms_configurations,
+    algorithm_configuration,
+    rosenbrock,
+    n_processes,
+    use_threading,
+    tmp_path,
 ) -> None:
     """Check the logging of algorithms."""
     Benchmarker(tmp_path).execute(
-        [rosenbrock], algorithms_configurations, log_gemseo_to_file=True
+        [rosenbrock],
+        algorithms_configurations,
+        n_processes=n_processes,
+        use_threading=use_threading,
+        save_log=True,
     )
-    path_stem = (
-        tmp_path
-        / algorithm_configuration.name
-        / rosenbrock.name
-        / f"{algorithm_configuration.name}"
-    )
-    with path_stem.with_suffix(".1.log").open("r") as file1:
-        assert """Optimization problem:
-   minimize rosen(x) = sum( 100*(x[1:] - x[:-1]**2)**2 + (1 - x[:-1])**2 )
-   with respect to x
-   over the design space:
-      +------+-------------+-------+-------------+-------+
-      | Name | Lower bound | Value | Upper bound | Type  |
-      +------+-------------+-------+-------------+-------+
-      | x[0] |      -2     |   0   |      2      | float |
-      | x[1] |      -2     |   1   |      2      | float |
-      +------+-------------+-------+-------------+-------+
-Solving optimization problem with algorithm SLSQP:""" in file1.read()
+    if use_threading:
+        with (
+            (tmp_path / "gemseo.log").open("r") as file,
+            (Path(__file__).parent / "1.log").open("r") as reference1,
+            (Path(__file__).parent / "2.log").open("r") as reference2,
+        ):
+            file_contents = file.read()
+            for line in reference1.read().split("\n"):
+                assert line in file_contents
 
-    with path_stem.with_suffix(".2.log").open("r") as file2:
-        assert """Optimization problem:
-   minimize rosen(x) = sum( 100*(x[1:] - x[:-1]**2)**2 + (1 - x[:-1])**2 )
-   with respect to x
-   over the design space:
-      +------+-------------+-------+-------------+-------+
-      | Name | Lower bound | Value | Upper bound | Type  |
-      +------+-------------+-------+-------------+-------+
-      | x[0] |      -2     |   1   |      2      | float |
-      | x[1] |      -2     |   0   |      2      | float |
-      +------+-------------+-------+-------------+-------+
-Solving optimization problem with algorithm SLSQP:""" in file2.read()
+            for line in reference2.read().split("\n"):
+                assert line in file_contents
+    else:
+        if PLATFORM_IS_WINDOWS:
+            # FIXME: Support logging to file when multiprocessing on Windows.
+            return
+
+        path_stem = (
+            tmp_path
+            / algorithm_configuration.name
+            / rosenbrock.name
+            / f"{algorithm_configuration.name}"
+        )
+        with (
+            path_stem.with_suffix(".1.log").open("r") as file1,
+            (Path(__file__).parent / "1.log").open("r") as reference1,
+        ):
+            assert reference1.read() in file1.read()
+
+        with (
+            path_stem.with_suffix(".2.log").open("r") as file2,
+            (Path(__file__).parent / "2.log").open("r") as reference2,
+        ):
+            assert reference2.read() in file2.read()
 
 
 @pytest.mark.parametrize("overwrite_histories", [False, True])
@@ -231,11 +252,14 @@ def test_overwrite_histories_results_update(
     history2_path = tmp_path / "SLSQP" / "Rosenbrock" / "SLSQP.2.json"
     benchmarker = Benchmarker(tmp_path, results_path)
     benchmarker.execute([rosenbrock], algorithms_configurations)
-    results_contents = {
-        "SLSQP": {"Rosenbrock": [str(history1_path), str(history2_path)]}
-    }
     with results_path.open() as results_file:
-        assert json.load(results_file) == results_contents
+        data = json.load(results_file)
+        assert data.keys() == {"SLSQP"}
+        assert data["SLSQP"].keys() == {"Rosenbrock"}
+        assert set(data["SLSQP"]["Rosenbrock"]) == {
+            str(history1_path),
+            str(history2_path),
+        }
 
     results_time = results_path.stat().st_mtime
     history1_time = history1_path.stat().st_mtime
@@ -243,7 +267,13 @@ def test_overwrite_histories_results_update(
 
     benchmarker.execute([rosenbrock], algorithms_configurations, overwrite_histories)
     with results_path.open() as results_file:
-        assert json.load(results_file) == results_contents
+        data = json.load(results_file)
+        assert data.keys() == {"SLSQP"}
+        assert data["SLSQP"].keys() == {"Rosenbrock"}
+        assert set(data["SLSQP"]["Rosenbrock"]) == {
+            str(history1_path),
+            str(history2_path),
+        }
 
     if overwrite_histories:
         assert results_path.stat().st_mtime > results_time
@@ -253,3 +283,33 @@ def test_overwrite_histories_results_update(
         assert results_path.stat().st_mtime == results_time
         assert history1_path.stat().st_mtime == history1_time
         assert history2_path.stat().st_mtime == history2_time
+
+
+def test_worker_raised_exception(
+    tmp_path, rosenbrock, algorithm_configuration, caplog
+) -> None:
+    """Check the case where a worker raised an exception."""
+    problem = OptimizationBenchmarkingProblem(
+        "Problem configuration", lambda: rosenbrock.create_problem()
+    )
+    Benchmarker(tmp_path).execute(
+        [problem],
+        AlgorithmsConfigurations(algorithm_configuration, name="Configuration"),
+    )
+    ((module, level, message),) = caplog.record_tuples
+    assert module == "gemseo_benchmark.benchmarker.benchmarker"
+    assert level == logging.WARNING
+    assert message in {
+        (
+            "Solving problem 1 of problem configuration Problem configuration "
+            f"for algorithm configuration {algorithm_configuration.name} "
+            "raised: Can't pickle local object "
+            "'test_worker_raised_exception.<locals>.<lambda>'"
+        ),
+        (
+            "Solving problem 1 of problem configuration Problem configuration "
+            f"for algorithm configuration {algorithm_configuration.name} "
+            "raised: Can't get local object "
+            "'test_worker_raised_exception.<locals>.<lambda>'"
+        ),
+    }
