@@ -18,7 +18,7 @@
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
-"""Grouping of reference problems for benchmarking."""
+"""Grouping of problem configurations."""
 
 from __future__ import annotations
 
@@ -39,45 +39,45 @@ if TYPE_CHECKING:
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
     )
-    from gemseo_benchmark.problems.base_benchmarking_problem import (
-        BaseBenchmarkingProblem,
+    from gemseo_benchmark.problems.base_problem_configuration import (
+        BaseProblemConfiguration,
     )
     from gemseo_benchmark.results.results import Results
 
 
 class ProblemsGroup:
-    """A group of reference problems for benchmarking.
+    """A group of problem configurations.
 
-    .. note::
+    !!! note
 
-       Reference problems should be grouped based on common characteristics such as
-       functions smoothness and constraint set geometry.
-
-    Attributes:
-        name (str): The name of the group of problems.
+        Problem configurations should be grouped based on common characteristics such as
+        functions smoothness and constraint set geometry.
     """
+
+    name: str
+    """The name of the group of problem configurations."""
 
     def __init__(
         self,
         name: str,
-        problems: Iterable[BaseBenchmarkingProblem],
+        problems: Iterable[BaseProblemConfiguration],
         description: str = "",
     ) -> None:
         """
         Args:
-            name: The name of the group of problems.
-            problems: The benchmarking problems of the group.
-            description: The description of the group of problems.
+            name: The name of the group of problem configurations.
+            problems: The problem configurations of the group.
+            description: The description of the group of problem configurations.
         """  # noqa: D205, D212, D415
         self.name = name
         self.__problems = problems
         self.description = description
 
-    def __iter__(self) -> Iterator[BaseBenchmarkingProblem]:
+    def __iter__(self) -> Iterator[BaseProblemConfiguration]:
         return iter(self.__problems)
 
     def is_algorithm_suited(self, name: str) -> bool:
-        """Check whether an algorithm is suited to all the problems in the group.
+        """Check whether an algorithm is suited to the group of problem configurations.
 
         Args:
             name: The name of the algorithm.
@@ -87,22 +87,23 @@ class ProblemsGroup:
         """
         return all(problem.is_algorithm_suited(name) for problem in self.__problems)
 
-    def compute_targets(
+    # FIXME: Not suited to MDO and MDA?
+    def compute_target_values(
         self,
         targets_number: int,
-        ref_algos_configurations: AlgorithmsConfigurations,
+        algorithm_configurations: AlgorithmsConfigurations,
         only_feasible: bool = True,
     ) -> None:
-        """Generate targets for all the problems based on given reference algorithms.
+        """Compute target values based on algorithm configurations.
 
         Args:
-            targets_number: The number of targets to generate.
-            ref_algos_configurations: The configurations of the reference algorithms.
-            only_feasible: Whether to generate only feasible targets.
+            targets_number: The number of target values to generate.
+            algorithm_configurations: The algorithm configurations.
+            only_feasible: Whether to generate only feasible target values.
         """
         for problem in self.__problems:
-            problem.compute_targets(
-                targets_number, ref_algos_configurations, only_feasible
+            problem.compute_target_values(
+                targets_number, algorithm_configurations, only_feasible
             )
 
     def compute_data_profile(

@@ -34,7 +34,7 @@ def test_inexistent_outputs_path(algorithms_configurations):
         Scenario([algorithms_configurations], outputs_path)
 
 
-@pytest.mark.parametrize("number_of_processes", [1, 2])
+@pytest.mark.parametrize("n_processes", [1, 2])
 @pytest.mark.parametrize("use_threading", [False, True])
 @pytest.mark.parametrize("save_databases", [False, True])
 def test_execute(
@@ -42,14 +42,14 @@ def test_execute(
     tmp_path,
     problems_group,
     save_databases,
-    number_of_processes,
+    n_processes,
     use_threading,
 ):
     """Check the execution of a benchmarking scenario."""
     Scenario([algorithms_configurations], tmp_path).execute(
         [problems_group],
         save_databases=save_databases,
-        number_of_processes=number_of_processes,
+        n_processes=n_processes,
         use_threading=use_threading,
     )
     assert (tmp_path / "histories").is_dir()

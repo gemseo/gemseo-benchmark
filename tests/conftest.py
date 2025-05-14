@@ -33,7 +33,7 @@ from numpy import array
 from numpy import ndarray
 
 from gemseo_benchmark.data_profiles.target_values import TargetValues
-from gemseo_benchmark.problems.optimization_benchmarking_problem import (
+from gemseo_benchmark.problems.optimization_problem_configuration import (
     OptimizationBenchmarkingProblem,
 )
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
@@ -242,6 +242,13 @@ def algorithm_configuration() -> mock.Mock:
     algo_config.name = "SLSQP"
     algo_config.instance_algorithm_options = {}
     algo_config.copy = mock.Mock(return_value=algo_config)
+    algo_config.to_dict = mock.Mock(
+        return_value={
+            "configuration_name": "SLSQP",
+            "algorithm_name": "SLSQP",
+            "algorithm_options": {"normalize_design_space": False, "max_iter": 3},
+        }
+    )
     return algo_config
 
 
@@ -315,7 +322,7 @@ def results(
 
 @pytest.fixture(scope="package")
 def rosenbrock() -> OptimizationBenchmarkingProblem:
-    """A benchmarking problem based on the 2-dimensional Rosenbrock function."""
+    """A problem configuration based on the 2-dimensional Rosenbrock function."""
     return OptimizationBenchmarkingProblem(
         "Rosenbrock",
         Rosenbrock,

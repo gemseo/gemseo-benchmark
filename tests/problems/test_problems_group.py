@@ -35,7 +35,7 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
 from gemseo_benchmark.data_profiles.target_values import TargetValues
-from gemseo_benchmark.problems.optimization_benchmarking_problem import (
+from gemseo_benchmark.problems.optimization_problem_configuration import (
     OptimizationBenchmarkingProblem,
 )
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
@@ -55,14 +55,16 @@ def test_is_algorithm_suited():
     assert not group.is_algorithm_suited("L-BFGS-B")
 
 
-def test_compute_targets():
+def test_compute_target_values():
     """Check the computation of target values."""
     rosenbrock = OptimizationBenchmarkingProblem("Rosenbrock", Rosenbrock, [zeros(2)])
     with pytest.raises(
-        ValueError, match=re.escape("The benchmarking problem has no target value.")
+        ValueError, match=re.escape("The problem configuration has no target value.")
     ):
         _ = rosenbrock.target_values
-    ProblemsGroup("group", [rosenbrock]).compute_targets(2, algorithms_configurations)
+    ProblemsGroup("group", [rosenbrock]).compute_target_values(
+        2, algorithms_configurations
+    )
     assert isinstance(rosenbrock.target_values, TargetValues)
 
 

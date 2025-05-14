@@ -12,7 +12,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-"""The interface for benchmarking problems."""
+"""The interface for problem configurations."""
 
 from __future__ import annotations
 
@@ -53,35 +53,38 @@ if TYPE_CHECKING:
 InputStartingPointsType = Union[ndarray, Iterable[ndarray]]
 
 
-class BaseBenchmarkingProblem(metaclass=ABCGoogleDocstringInheritanceMeta):
-    """The interface for benchmarking problems.
+class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
+    """Base class for problem configurations.
 
-    A *benchmarking problem* is a problem of reference
+    A *problem configuration* is a problem of reference
     to be solved by iterative algorithms for comparison purposes.
-    A benchmarking problem is characterized by the function that evaluates
+    A problem configuration is characterized by the function that evaluates
     its *performance measure*
     (ex: the objective function of an optimization problem,
-    or the residual for a system of nonlinear equations),
+    or the residual for a multidisciplinary analysis),
     its *starting points*
-    (each of them defines an instance of the benchmarking problem),
+    (an algorithm trajectory will start from each of them),
     and its *target values*
     (refer to the [target_values module][gemseo_benchmark.data_profiles.target_values]).
     """
 
     __create_problem: Callable[[], Any]
-    """"A function to create an instance of the problem (ex: OptimizationProblem)."""
+    """The function to create a problem of the configuration.
+    (ex:
+    an [OptimizationProblem][gemseo.algos.optimization_problem.OptimizationProblem],
+    a [BaseMDA][gemseo.mda.base_mda])."""
 
     __description: str
-    """The description of the benchmarking problem."""
+    """The description of the problem configuration."""
 
     __minimization_target_values: TargetValues | None
     """The target values for minimization."""
 
     __name: str
-    """The name of the benchmarking problem."""
+    """The name of the problem configuration."""
 
     __optimum: float | None
-    """"The best performance value known for the benchmarking problem."""
+    """"The best performance measure known for the problem configuration."""
 
     __starting_points: list[RealArray]
     """The starting points to pass to the algorithm configurations."""
@@ -90,7 +93,7 @@ class BaseBenchmarkingProblem(metaclass=ABCGoogleDocstringInheritanceMeta):
     """"The target values to compute data profiles."""
 
     __variable_space: DesignSpace | None
-    """The space of the variables of the benchmarking problem."""
+    """The space of the variables of the problem configuration."""
 
     def __init__(
         self,
@@ -107,10 +110,14 @@ class BaseBenchmarkingProblem(metaclass=ABCGoogleDocstringInheritanceMeta):
     ) -> None:
         """
         Args:
-            name: The name of the benchmarking problem.
-            create_problem: A function to create instances of the problem.
-            target_values: The target values of the benchmarking problem.
-            starting_points: The starting points of the benchmarking problem.
+            name: The name of the problem configuration.
+            create_problem: A function to create a problem of the configuration.
+                !!! warning
+                    If multiprocessing is intended when executing
+                    algorithm configurations on the problem,
+                    ``create_problem`` has to be pickable.
+            target_values: The target values of the problem configuration.
+            starting_points: The starting points of the problem configuration.
                 If empty:
                 if ``doe_algo_name`` is not empty
                 then the starting points will be generated as a DOE;
@@ -126,8 +133,9 @@ class BaseBenchmarkingProblem(metaclass=ABCGoogleDocstringInheritanceMeta):
                 If ``None``,
                 this number is set as the problem dimension or 10 if bigger.
             doe_options: The options of the DOE algorithm.
-            description: The description of the problem (to appear in a report).
-            optimum: The best feasible objective value of the problem.
+            description: The description of the problem configuration
+                (to appear in a benchmarking report).
+            optimum: The best feasible performance measure of the problem configuration.
                 If ``None``, it will not be set.
         """  # noqa: D205, D212, D415
         self.__create_problem = create_problem
@@ -157,26 +165,29 @@ class BaseBenchmarkingProblem(metaclass=ABCGoogleDocstringInheritanceMeta):
 
     @property
     def create_problem(self) -> Callable[[], Any]:
-        """The function to create instances of the problem.
+        """The function to create a problem of the configuration.
 
         The return type of this function depends on the type of the underlying
-        |g| object (ex: OptimizationProblem).
+        |g| object (ex:
+        [OptimizationProblem][gemseo.algos.optimization_problem.OptimizationProblem],
+        [BaseMDA][gemseo.mda.base_mda]
+        ).
         """
         return self.__create_problem
 
     @property
     def description(self) -> str:
-        """The description of the benchmarking problem."""
+        """The description of the problem configuration."""
         return self.__description
 
     @property
     def name(self) -> str:
-        """The name of the benchmarking problem."""
+        """The name of the problem configuration."""
         return self.__name
 
     @property
     def optimum(self) -> float:
-        """The best performance value known for the benchmarking problem."""
+        """The best feasible performance measure known for the problem configuration."""
         return self.__optimum
 
     @property
@@ -193,7 +204,7 @@ class BaseBenchmarkingProblem(metaclass=ABCGoogleDocstringInheritanceMeta):
                 as the problem.
         """
         if not self.__starting_points:
-            msg = "The benchmarking problem has no starting point."
+            msg = "The problem configuration has no starting point."
             raise ValueError(msg)
 
         return self.__starting_points
@@ -264,7 +275,7 @@ class BaseBenchmarkingProblem(metaclass=ABCGoogleDocstringInheritanceMeta):
         doe_size: int | None,
         doe_options: Mapping[str, DriverLibraryOptionType],
     ) -> ndarray:
-        """Return the starting points of the benchmarking problem.
+        """Return the starting points of the problem configuration.
 
         Args:
             doe_algo_name: The name of the DOE algorithm.
@@ -290,7 +301,7 @@ class BaseBenchmarkingProblem(metaclass=ABCGoogleDocstringInheritanceMeta):
         )
 
     def _get_default_starting_point(self) -> RealArray | None:
-        """Return the default starting point of the benchmarking problem.
+        """Return the default starting point of the problem configuration.
 
         Return:
             The current value of the design space if it has one,
@@ -303,13 +314,13 @@ class BaseBenchmarkingProblem(metaclass=ABCGoogleDocstringInheritanceMeta):
 
     @property
     def target_values(self) -> TargetValues:
-        """The target values of the benchmarking problem.
+        """The target values of the problem configuration.
 
         Raises:
-            ValueError: If the benchmarking problem has no target value.
+            ValueError: If the problem configuration has no target value.
         """
         if self.__target_values is None:
-            msg = "The benchmarking problem has no target value."
+            msg = "The problem configuration has no target value."
             raise ValueError(msg)
 
         return self.__target_values
@@ -337,7 +348,7 @@ class BaseBenchmarkingProblem(metaclass=ABCGoogleDocstringInheritanceMeta):
 
     @property
     def dimension(self) -> int:
-        """The dimension of the benchmarking problem."""
+        """The dimension of the problem configuration."""
         return self.__variable_space.dimension
 
     def compute_data_profile(
