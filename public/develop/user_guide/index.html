@@ -574,9 +574,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#benchmarking-problems" class="md-nav__link">
+  <a href="#problem-configurations" class="md-nav__link">
     <span class="md-ellipsis">
-      Benchmarking problems
+      Problem configurations
     </span>
   </a>
   
@@ -1067,6 +1067,8 @@
       
         
       
+        
+      
     
     
     
@@ -1115,6 +1117,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../reference/gemseo_benchmark/benchmarker/base_worker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Base worker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../reference/gemseo_benchmark/benchmarker/benchmarker/" class="md-nav__link">
         
   
@@ -1138,12 +1163,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/gemseo_benchmark/benchmarker/worker/" class="md-nav__link">
+      <a href="../reference/gemseo_benchmark/benchmarker/optimization_worker/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Worker
+    Optimization worker
     
   </span>
   
@@ -1358,12 +1383,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/gemseo_benchmark/problems/base_benchmarking_problem/" class="md-nav__link">
+      <a href="../reference/gemseo_benchmark/problems/base_problem_configuration/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Base benchmarking problem
+    Base problem configuration
     
   </span>
   
@@ -1381,12 +1406,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/gemseo_benchmark/problems/optimization_benchmarking_problem/" class="md-nav__link">
+      <a href="../reference/gemseo_benchmark/problems/optimization_problem_configuration/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Optimization benchmarking problem
+    Optimization problem configuration
     
   </span>
   
@@ -1737,9 +1762,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#benchmarking-problems" class="md-nav__link">
+  <a href="#problem-configurations" class="md-nav__link">
     <span class="md-ellipsis">
-      Benchmarking problems
+      Problem configurations
     </span>
   </a>
   
@@ -1860,11 +1885,11 @@ measure and compare their performances.</p>
 <li>define the
     <a href="#algorithms-configurations">algorithms configurations</a> to be compared,</li>
 <li>define the
-    <a href="#benchmarking-problems">benchmarking problems</a>
+    <a href="#benchmarking-problems">problem configurations</a>
     that will serve as landmarks for the analysis,</li>
 <li>execute a <a href="#scenario">benchmarking scenario</a> to produce<ol>
 <li>the <a href="#results">results</a> of the
-    algorithms configurations on the benchmarking problems,</li>
+    algorithms configurations on the problem configurations,</li>
 <li>a benchmarking <a href="#report">report</a>
     in HTML or PDF format illustrated with
     <a href="#data-profiles">data profiles</a>.</li>
@@ -1919,11 +1944,11 @@ treated together in a <a href="#report">benchmarking report</a>.</p>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B configurations&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
-<h2 id="benchmarking-problems">Benchmarking problems<a class="headerlink" href="#benchmarking-problems" title="Permanent link">&para;</a></h2>
+<h2 id="problem-configurations">Problem configurations<a class="headerlink" href="#problem-configurations" title="Permanent link">&para;</a></h2>
 <p>The <a class="autorefs autorefs-internal" title="            problems" href="../reference/gemseo_benchmark/problems/#gemseo_benchmark.problems">gemseo_benchmark.problems</a>
-sub-package handles the benchmarking problems, on which the performances
+sub-package handles the problem configurations, on which the performances
 of the algorithms configurations is to be measured.</p>
-<p>A <a class="autorefs autorefs-internal" title="            OptimizationBenchmarkingProblem" href="../reference/gemseo_benchmark/problems/optimization_benchmarking_problem/#gemseo_benchmark.problems.optimization_benchmarking_problem.OptimizationBenchmarkingProblem">OptimizationBenchmarkingProblem</a> contains the mathematical
+<p>A [OptimizationBenchmarkingProblem][gemseo_benchmark.problems.optimization_benchmarking_problem.OptimizationBenchmarkingProblem] contains the mathematical
 definition of the problem, as an <a class="autorefs autorefs-external" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.algos.optimization_problem.html#gemseo.algos.optimization_problem.OptimizationProblem">OptimizationProblem</a>, and requires three other features.</p>
 <ol>
 <li>The starting points, from which the algorithms configurations should
@@ -1944,7 +1969,7 @@ definition of the problem, as an <a class="autorefs autorefs-external" href="htt
     Similarly to starting points, the target values can be either passed
     directly, or their generation can be configured.</li>
 </ol>
-<p>For example, we define below benchmarking problems based on
+<p>For example, we define below problem configurations based on
 <a class="autorefs autorefs-external" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.problems.optimization.rastrigin.html#gemseo.problems.optimization.rastrigin.Rastrigin">Rastrigin</a> and
 <a class="autorefs autorefs-external" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.problems.optimization.rosenbrock.html#gemseo.problems.optimization.rosenbrock.Rosenbrock">Rosenbrock</a> respectively, where</p>
 <ul>
@@ -1978,9 +2003,9 @@ presented <a href="#target-values">further down</a>.)</p>
     <span class="n">optimum</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
-<p>Note that the second argument of <a class="autorefs autorefs-internal" title="            OptimizationBenchmarkingProblem" href="../reference/gemseo_benchmark/problems/optimization_benchmarking_problem/#gemseo_benchmark.problems.optimization_benchmarking_problem.OptimizationBenchmarkingProblem">OptimizationBenchmarkingProblem</a> must be callable.
+<p>Note that the second argument of [OptimizationBenchmarkingProblem][gemseo_benchmark.problems.optimization_benchmarking_problem.OptimizationBenchmarkingProblem] must be callable.
 For example, a five-variables
-benchmarking problem based on <a class="autorefs autorefs-external" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.problems.optimization.rosenbrock.html#gemseo.problems.optimization.rosenbrock.Rosenbrock">Rosenbrock</a> may be defined as follows.</p>
+problem configuration based on <a class="autorefs autorefs-external" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.problems.optimization.rosenbrock.html#gemseo.problems.optimization.rosenbrock.Rosenbrock">Rosenbrock</a> may be defined as follows.</p>
 <div class="highlight"><pre><span></span><code><span class="n">rosenbrock_5d</span> <span class="o">=</span> <span class="n">OptimizationBenchmarkingProblem</span><span class="p">(</span>
     <span class="s2">&quot;Rosenbrock 5D&quot;</span><span class="p">,</span>
     <span class="k">lambda</span><span class="p">:</span> <span class="n">Rosenbrock</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span>
@@ -2001,9 +2026,9 @@ a <a href="#report">benchmarking report</a>.</p>
 <h2 id="results">Results<a class="headerlink" href="#results" title="Permanent link">&para;</a></h2>
 <p>The <a class="autorefs autorefs-internal" title="            results" href="../reference/gemseo_benchmark/results/#gemseo_benchmark.results">gemseo_benchmark.results</a>
 sub-package manages the results produced by the algorithms
-configurations on the benchmarking problems.</p>
+configurations on the problem configurations.</p>
 <p>The history of the data produced by an algorithm configuration on a
-benchmarking problem is stored in a
+problem configuration is stored in a
 <a class="autorefs autorefs-internal" title="            PerformanceHistory" href="../reference/gemseo_benchmark/results/performance_history/#gemseo_benchmark.results.performance_history.PerformanceHistory">PerformanceHistory</a>.
 More precisely:</p>
 <ul>
@@ -2049,7 +2074,7 @@ of functions evaluations.
 To
 <a href="#data-profile">clarify this definition</a> we need to introduce target values.</p>
 <h3 id="target-values">Target values<a class="headerlink" href="#target-values" title="Permanent link">&para;</a></h3>
-<p>The difficulty of a benchmarking problem is represented by a scale of
+<p>The difficulty of a problem configuration is represented by a scale of
 performance values, called <em>target values</em>, ranging from a relatively
 easily achievable value to the best value known. The most telling
 example of target value is the optimal value of the objective function.
@@ -2080,8 +2105,8 @@ algorithms chosen as references.</p>
     history: these are the target values.</li>
 </ol>
 <h3 id="data-profile">Data profile<a class="headerlink" href="#data-profile" title="Permanent link">&para;</a></h3>
-<p>The <em>data profile</em> of an algorithm relative to a benchmarking problem
-(or a group of benchmarking problems) is the graph representing the
+<p>The <em>data profile</em> of an algorithm relative to a problem configuration
+(or a group of problem configurations) is the graph representing the
 ratio of target values reached by the algorithm relative to the number
 functions evaluations performed by the algorithm.</p>
 <p><img alt="images/data_profiles.png" src="images/data_profiles.png" /></p>
@@ -2091,7 +2116,7 @@ manages the automatic generation of a benchmarking report in PDF or HTML
 format describing:</p>
 <ul>
 <li>the algorithms configurations,</li>
-<li>the benchmarking problems,</li>
+<li>the problem configurations,</li>
 <li>the results generated by the algorithms on the problems, especially
     in the form of data profiles.</li>
 </ul>

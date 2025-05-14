@@ -944,6 +944,8 @@
       
         
       
+        
+      
     
     
     
@@ -992,6 +994,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../reference/gemseo_benchmark/benchmarker/base_worker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Base worker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../reference/gemseo_benchmark/benchmarker/benchmarker/" class="md-nav__link">
         
   
@@ -1015,12 +1040,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/gemseo_benchmark/benchmarker/worker/" class="md-nav__link">
+      <a href="../reference/gemseo_benchmark/benchmarker/optimization_worker/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Worker
+    Optimization worker
     
   </span>
   
@@ -1235,12 +1260,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/gemseo_benchmark/problems/base_benchmarking_problem/" class="md-nav__link">
+      <a href="../reference/gemseo_benchmark/problems/base_problem_configuration/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Base benchmarking problem
+    Base problem configuration
     
   </span>
   
@@ -1258,12 +1283,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/gemseo_benchmark/problems/optimization_benchmarking_problem/" class="md-nav__link">
+      <a href="../reference/gemseo_benchmark/problems/optimization_problem_configuration/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Optimization benchmarking problem
+    Optimization problem configuration
     
   </span>
   
@@ -1673,9 +1698,28 @@ and this project adheres to
   can now be made logarithmic.</li>
 </ul>
 <h2 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h2>
+<ul>
+<li>The phrasing "problem configuration" is now used instead of "benchmarking problem".
+  Thus the two main types of inputs to be defined by the user
+  are <em>algorithm</em> configurations and <em>problem</em> configurations.</li>
+</ul>
 <h4 id="problems">Problems<a class="headerlink" href="#problems" title="Permanent link">&para;</a></h4>
 <ul>
-<li>The class to implement optimization benchmarking problems is now called <code>OptimizationBenchmarkingProblem</code> (rather than <code>Problem</code> formerly).</li>
+<li>The class to implement optimization benchmarking problems is now called
+  <code>OptimizationBenchmarkingProblem</code> (rather than <code>Problem</code> formerly).</li>
+</ul>
+<h4 id="benchmarker">Benchmarker<a class="headerlink" href="#benchmarker" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Argument <code>databases_path</code> of <code>Benchmarker.__init__</code> is renamed into <code>hdf_path</code>
+  as the saved files could represent caches rather than databases.</li>
+<li>Arguments <code>problems</code> and <code>algorithm</code> of <code>Benchmarker.execute</code> are renamed into
+  <code>problem_configurations</code> and <code>algorithm_configurations</code>
+  to avoid confusion with optimization problems and algorithm names respectively.</li>
+<li>Argument <code>number_of_processes</code> of <code>Benchmarker.execute</code> is renamed into
+  <code>n_processes</code> for consistency with GEMSEO.</li>
+<li>The stopping criteria of the algorithms are no longer automatically disabled.
+  The user is now free to disable (or not) the stopping criteria of their choice
+  in the options of the algorithm configurations.</li>
 </ul>
 <h4 id="report_1">Report<a class="headerlink" href="#report_1" title="Permanent link">&para;</a></h4>
 <ul>
@@ -1685,6 +1729,11 @@ and this project adheres to
 <li>The performance histories returned by <code>PerformanceHistory.compute_cumulated_minimum</code>
   and <code>PerformanceHistory.extend</code> now contain copies of history items
   rather than replications of the same objects.</li>
+</ul>
+<h3 id="scenario">Scenario<a class="headerlink" href="#scenario" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Argument <code>number_of_processes</code> of <code>Scenario.execute</code> is renamed into
+  <code>n_processes</code> for consistency with GEMSEO.</li>
 </ul>
 <h2 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h2>
 <h4 id="results">Results<a class="headerlink" href="#results" title="Permanent link">&para;</a></h4>
@@ -1699,12 +1748,14 @@ and this project adheres to
   are now correctly displayed instead of being treated as minimization data.</li>
 <li>Negative performance measures are now properly represented on logarithmic scales.</li>
 </ul>
-<h4 id="benchmarker">Benchmarker<a class="headerlink" href="#benchmarker" title="Permanent link">&para;</a></h4>
+<h4 id="benchmarker_1">Benchmarker<a class="headerlink" href="#benchmarker_1" title="Permanent link">&para;</a></h4>
 <ul>
 <li>When overwriting histories,
   the paths already in the <code>Results</code> are now effectively removed.</li>
+<li>When threading, a log file is written in the performance history directory.</li>
+<li>When multiprocessing, a log file is written next to each performance history.</li>
 </ul>
-<h4 id="scenario">Scenario<a class="headerlink" href="#scenario" title="Permanent link">&para;</a></h4>
+<h4 id="scenario_1">Scenario<a class="headerlink" href="#scenario_1" title="Permanent link">&para;</a></h4>
 <ul>
 <li>An algorithm configuration can now belong to several groups
   of algorithm configurations.</li>
@@ -1790,7 +1841,7 @@ and this project adheres to
 </ul>
 <h2 id="version-300-november-2024">Version 3.0.0 (November 2024)<a class="headerlink" href="#version-300-november-2024" title="Permanent link">&para;</a></h2>
 <h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
-<h4 id="benchmarker_1">Benchmarker<a class="headerlink" href="#benchmarker_1" title="Permanent link">&para;</a></h4>
+<h4 id="benchmarker_2">Benchmarker<a class="headerlink" href="#benchmarker_2" title="Permanent link">&para;</a></h4>
 <ul>
 <li>The option <code>log_gemseo_to_file</code> has been added to <code>Benchmarker.execute</code>
   and <code>Scenario.execute</code> to save the GEMSEO log of each algorithm execution
@@ -1821,7 +1872,7 @@ and this project adheres to
 </ul>
 <h2 id="version-200-december-2023">Version 2.0.0 (December 2023)<a class="headerlink" href="#version-200-december-2023" title="Permanent link">&para;</a></h2>
 <h3 id="changed_2">Changed<a class="headerlink" href="#changed_2" title="Permanent link">&para;</a></h3>
-<h4 id="benchmarker_2">Benchmarker<a class="headerlink" href="#benchmarker_2" title="Permanent link">&para;</a></h4>
+<h4 id="benchmarker_3">Benchmarker<a class="headerlink" href="#benchmarker_3" title="Permanent link">&para;</a></h4>
 <ul>
 <li>The option to automatically save the logs of pSeven has been removed
   from classes <code>Scenario</code> and <code>Benchmarker</code>.
@@ -1850,7 +1901,7 @@ and this project adheres to
 <li>Algorithm options specific to problem instances (e.g. paths for output files)
   can be passed to <code>AlgorithmConfiguration</code> in the new argument <code>instance_algorithm_options</code>.</li>
 </ul>
-<h4 id="benchmarker_3">Benchmarker<a class="headerlink" href="#benchmarker_3" title="Permanent link">&para;</a></h4>
+<h4 id="benchmarker_4">Benchmarker<a class="headerlink" href="#benchmarker_4" title="Permanent link">&para;</a></h4>
 <ul>
 <li>One can get the path to a performance history file with <code>Benchmarker.get_history_path</code>.</li>
 </ul>
@@ -1869,7 +1920,7 @@ and this project adheres to
 <ul>
 <li>The optimization histories can be displayed on a logarithmic scale.</li>
 </ul>
-<h4 id="scenario_1">Scenario<a class="headerlink" href="#scenario_1" title="Permanent link">&para;</a></h4>
+<h4 id="scenario_2">Scenario<a class="headerlink" href="#scenario_2" title="Permanent link">&para;</a></h4>
 <ul>
 <li>The options <code>custom_algos_descriptions</code> and
     <code>max_eval_number_per_group</code> of <code>Report</code>{.interpreted-text
@@ -1885,21 +1936,6 @@ and this project adheres to
 </ul>
 <h2 id="version-100-june-2023">Version 1.0.0 (June 2023)<a class="headerlink" href="#version-100-june-2023" title="Permanent link">&para;</a></h2>
 <p>First version.</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>f796f1a6 (docs: update changelog)</p>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
 
 
 

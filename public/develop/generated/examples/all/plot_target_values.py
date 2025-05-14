@@ -35,7 +35,7 @@ Generate target values
 
 # %%
 # In this example,
-# we generate **target values** for a problem
+# we generate **target values** for an optimization problem configuration
 # based on the performances of an algorithm configuration.
 #
 # Imports
@@ -51,12 +51,13 @@ from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfigu
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
-from gemseo_benchmark.problems.optimization_benchmarking_problem import (
+from gemseo_benchmark.problems.optimization_problem_configuration import (
     OptimizationBenchmarkingProblem,
 )
 
 # %%
-# Let us consider the problem [Power2][gemseo.problems.optimization.power_2.Power2]
+# Let us consider the optimization problem
+# [Power2][gemseo.problems.optimization.power_2.Power2]
 # already implemented in GEMSEO.
 problem = OptimizationBenchmarkingProblem(
     "Power2", Power2, optimum=Power2.get_solution()[1]
@@ -93,13 +94,14 @@ configure(
 # Let us compute five target values for the problem.
 # This automatic procedure has two stages:
 #
-# 1. execution of the specified algorithms once for each of the starting points,
-# 2. automatic selection of target values based on the algorithms histories.
+# 1. execution of the specified algorithm configurations
+#    once for each of the starting points,
+# 2. automatic selection of target values based on the performance histories.
 #
-# These targets represent the milestones of the problem resolution.
-problem.compute_targets(5, algorithms_configurations, best_target_tolerance=1e-5)
+# These target values represent the milestones of the problem resolution.
+problem.compute_target_values(5, algorithms_configurations, best_target_tolerance=1e-5)
 # %%
-# We can plot the algorithms histories used as reference
+# We can plot the performace histories used as reference
 # for the computation of the target values,
 # with the objective value on the vertical axis
 # and the number of functions evaluations on the horizontal axis.

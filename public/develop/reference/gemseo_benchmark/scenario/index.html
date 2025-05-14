@@ -1041,6 +1041,8 @@
       
         
       
+        
+      
     
     
     
@@ -1089,6 +1091,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../benchmarker/base_worker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Base worker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../benchmarker/benchmarker/" class="md-nav__link">
         
   
@@ -1112,12 +1137,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../benchmarker/worker/" class="md-nav__link">
+      <a href="../benchmarker/optimization_worker/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Worker
+    Optimization worker
     
   </span>
   
@@ -1332,12 +1357,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../problems/base_benchmarking_problem/" class="md-nav__link">
+      <a href="../problems/base_problem_configuration/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Base benchmarking problem
+    Base problem configuration
     
   </span>
   
@@ -1355,12 +1380,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../problems/optimization_benchmarking_problem/" class="md-nav__link">
+      <a href="../problems/optimization_problem_configuration/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Optimization benchmarking problem
+    Optimization problem configuration
     
   </span>
   
@@ -1963,7 +1988,7 @@ to be benchmarked.</p>
     <span class="n">generate_pdf_report</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">infeasibility_tolerance</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">save_databases</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">number_of_processes</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">n_processes</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">use_threading</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">custom_algos_descriptions</span><span class="p">:</span> <span class="p">(</span>
         <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
@@ -1990,7 +2015,7 @@ to be benchmarked.</p>
               (<code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-internal" title="            ProblemsGroup (gemseo_benchmark.problems.problems_group.ProblemsGroup)" href="../problems/problems_group/#gemseo_benchmark.problems.problems_group.ProblemsGroup">ProblemsGroup</a>]</code>)
           –
           <div class="doc-md-description">
-            <p>The groups of benchmarking problems.</p>
+            <p>The groups of problem configurations.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -2064,14 +2089,14 @@ to be benchmarked.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>number_of_processes</code></b>
+            <b><code>n_processes</code></b>
               (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>, default:
                   <code>1</code>
 )
           –
           <div class="doc-md-description">
-            <p>The maximum number of simultaneous threads or
-processes used to parallelize the execution.</p>
+            <p>The maximum number of simultaneous threads or processes
+used to parallelize the execution.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -2287,7 +2312,7 @@ for the number of function evaluations axis.</p>
     <span class="n">generate_pdf_report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">infeasibility_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">save_databases</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">number_of_processes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">n_processes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">use_threading</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">custom_algos_descriptions</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">max_eval_number_per_group</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2301,7 +2326,7 @@ for the number of function evaluations axis.</p>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute the benchmarking scenario.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        problems_groups: The groups of benchmarking problems.</span>
+<span class="sd">        problems_groups: The groups of problem configurations.</span>
 <span class="sd">        overwrite_histories: Whether to overwrite the performance histories.</span>
 <span class="sd">        skip_solvers: Whether to skip the running of solvers.</span>
 <span class="sd">        skip_report: Whether to skip the generation of the report.</span>
@@ -2309,8 +2334,8 @@ for the number of function evaluations axis.</p>
 <span class="sd">        generate_pdf_report: Whether to generate the report in PDF format.</span>
 <span class="sd">        infeasibility_tolerance: The tolerance on the infeasibility measure.</span>
 <span class="sd">        save_databases: Whether to save the databases of the optimizations.</span>
-<span class="sd">        number_of_processes: The maximum number of simultaneous threads or</span>
-<span class="sd">            processes used to parallelize the execution.</span>
+<span class="sd">        n_processes: The maximum number of simultaneous threads or processes</span>
+<span class="sd">            used to parallelize the execution.</span>
 <span class="sd">        use_threading: Whether to use threads instead of processes</span>
 <span class="sd">            to parallelize the execution.</span>
 <span class="sd">        custom_algos_descriptions: Custom descriptions of the algorithms,</span>
@@ -2336,12 +2361,12 @@ for the number of function evaluations axis.</p>
 <span class="sd">        The performance histories.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_solvers</span><span class="p">:</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Run the solvers on the benchmarking problems&quot;</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Run the solvers on the problem configurations&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_run_solvers</span><span class="p">(</span>
             <span class="n">problems_groups</span><span class="p">,</span>
             <span class="n">overwrite_histories</span><span class="p">,</span>
             <span class="n">save_databases</span><span class="p">,</span>
-            <span class="n">number_of_processes</span><span class="p">,</span>
+            <span class="n">n_processes</span><span class="p">,</span>
             <span class="n">use_threading</span><span class="p">,</span>
             <span class="n">log_gemseo_to_file</span><span class="p">,</span>
         <span class="p">)</span>

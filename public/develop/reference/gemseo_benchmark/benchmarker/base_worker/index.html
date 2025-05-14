@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/benchmarker/worker/">
+        <link rel="canonical" href="https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/benchmarker/base_worker/">
       
       
-        <link rel="prev" href="../benchmarker/">
+        <link rel="prev" href="../">
       
       
-        <link rel="next" href="../../data_profiles/">
+        <link rel="next" href="../benchmarker/">
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
@@ -22,7 +22,7 @@
     
     
       
-        <title>Worker - gemseo-benchmark</title>
+        <title>Base worker - gemseo-benchmark</title>
       
     
     
@@ -88,7 +88,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#gemseo_benchmark.benchmarker.worker" class="md-skip">
+        <a href="#gemseo_benchmark.benchmarker.base_worker" class="md-skip">
           Skip to content
         </a>
       
@@ -126,7 +126,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Worker
+              Base worker
             
           </span>
         </div>
@@ -936,6 +936,8 @@
       
         
       
+        
+      
     
     
     
@@ -981,6 +983,160 @@
                 
   
   
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Base worker
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Base worker
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.base_worker" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;base_worker
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" base_worker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.base_worker-attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attributes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Attributes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.base_worker.ProblemType" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;ProblemType
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.base_worker-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Classes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.base_worker.BaseWorker" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;BaseWorker
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" BaseWorker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.base_worker.BaseWorker-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.base_worker.BaseWorker.check_algorithm_availability" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;check_algorithm_availability
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
   
   
     <li class="md-nav__item">
@@ -1004,97 +1160,20 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    Worker
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../optimization_worker/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Worker
+    Optimization worker
     
   </span>
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#gemseo_benchmark.benchmarker.worker" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;worker
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label=" worker">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#gemseo_benchmark.benchmarker.worker-classes" class="md-nav__link">
-    <span class="md-ellipsis">
-      Classes
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Classes">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#gemseo_benchmark.benchmarker.worker.Worker" class="md-nav__link">
-    <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;Worker
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1304,12 +1383,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../problems/base_benchmarking_problem/" class="md-nav__link">
+      <a href="../../problems/base_problem_configuration/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Base benchmarking problem
+    Base problem configuration
     
   </span>
   
@@ -1327,12 +1406,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../problems/optimization_benchmarking_problem/" class="md-nav__link">
+      <a href="../../problems/optimization_problem_configuration/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Optimization benchmarking problem
+    Optimization problem configuration
     
   </span>
   
@@ -1672,17 +1751,41 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#gemseo_benchmark.benchmarker.worker" class="md-nav__link">
+  <a href="#gemseo_benchmark.benchmarker.base_worker" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;worker
+      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;base_worker
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" worker">
+    <nav class="md-nav" aria-label=" base_worker">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#gemseo_benchmark.benchmarker.worker-classes" class="md-nav__link">
+  <a href="#gemseo_benchmark.benchmarker.base_worker-attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attributes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Attributes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.base_worker.ProblemType" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;ProblemType
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.base_worker-classes" class="md-nav__link">
     <span class="md-ellipsis">
       Classes
     </span>
@@ -1692,11 +1795,41 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#gemseo_benchmark.benchmarker.worker.Worker" class="md-nav__link">
+  <a href="#gemseo_benchmark.benchmarker.base_worker.BaseWorker" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;Worker
+      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;BaseWorker
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label=" BaseWorker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.base_worker.BaseWorker-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.base_worker.BaseWorker.check_algorithm_availability" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;check_algorithm_availability
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1729,21 +1862,26 @@
   
 
 
-  <h1>Worker</h1>
+  <h1>Base worker</h1>
 
 <div class="doc doc-object doc-module">
 
 
 
-<h2 id="gemseo_benchmark.benchmarker.worker" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">worker</span>
+<h2 id="gemseo_benchmark.benchmarker.base_worker" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">base_worker</span>
 
 
-<a href="#gemseo_benchmark.benchmarker.worker" class="headerlink" title="Permanent link">&para;</a></h2>
+<a href="#gemseo_benchmark.benchmarker.base_worker" class="headerlink" title="Permanent link">&para;</a></h2>
 
     <div class="doc doc-contents first">
 
-        <p>A class to implement a benchmarking worker.</p>
+        <p>The interface for benchmarking workers.</p>
+<p>A benchmarking worker is responsible for:</p>
+<ol>
+<li>the execution of algorithm configurations on problem configurations,</li>
+<li>the creation of the associated performance histories.</li>
+</ol>
 
 
 
@@ -1759,45 +1897,48 @@
 
 
 
+<h3 id="gemseo_benchmark.benchmarker.base_worker-attributes">Attributes<a href="#gemseo_benchmark.benchmarker.base_worker-attributes" class="headerlink" title="Permanent link">&para;</a></h3>
 
-<h3 id="gemseo_benchmark.benchmarker.worker-classes">Classes<a href="#gemseo_benchmark.benchmarker.worker-classes" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="gemseo_benchmark.benchmarker.base_worker.ProblemType" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ProblemType</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+<a href="#gemseo_benchmark.benchmarker.base_worker.ProblemType" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">ProblemType</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The type of problem.</p>
+
+    </div>
+
+</div>
+<h3 id="gemseo_benchmark.benchmarker.base_worker-classes">Classes<a href="#gemseo_benchmark.benchmarker.base_worker-classes" class="headerlink" title="Permanent link">&para;</a></h3>
 
 <div class="doc doc-object doc-class">
 
 
 
-<h4 id="gemseo_benchmark.benchmarker.worker.Worker" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">Worker</span>
+<h4 id="gemseo_benchmark.benchmarker.base_worker.BaseWorker" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">BaseWorker</span>
 
 
-<a href="#gemseo_benchmark.benchmarker.worker.Worker" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">Worker</span><span class="p">(</span>
-    <span class="n">history_class</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#type">type</a></span><span class="p">[</span>
-        <span class="n"><a class="autorefs autorefs-internal" title="            PerformanceHistory (gemseo_benchmark.results.performance_history.PerformanceHistory)" href="../../results/performance_history/#gemseo_benchmark.results.performance_history.PerformanceHistory">PerformanceHistory</a></span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-internal" title="            PerformanceHistory (gemseo_benchmark.results.performance_history.PerformanceHistory)" href="../../results/performance_history/#gemseo_benchmark.results.performance_history.PerformanceHistory">PerformanceHistory</a></span><span class="p">,</span>
-<span class="p">)</span>
-</code></pre></div>
+<a href="#gemseo_benchmark.benchmarker.base_worker.BaseWorker" class="headerlink" title="Permanent link">&para;</a></h4>
+
 
     <div class="doc doc-contents ">
 
 
-        <p>A benchmarking worker.</p>
-
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>history_class</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#type">type</a>[<a class="autorefs autorefs-internal" title="            PerformanceHistory (gemseo_benchmark.results.performance_history.PerformanceHistory)" href="../../results/performance_history/#gemseo_benchmark.results.performance_history.PerformanceHistory">PerformanceHistory</a>]</code>, default:
-                  <code><a class="autorefs autorefs-internal" title="            PerformanceHistory (gemseo_benchmark.results.performance_history.PerformanceHistory)" href="../../results/performance_history/#gemseo_benchmark.results.performance_history.PerformanceHistory">PerformanceHistory</a></code>
-)
-          –
-          <div class="doc-md-description">
-            <p>The class of performance history.</p>
-          </div>
-        </li>
-    </ul>
+        <p>Base class for benchmarking workers.</p>
 
 
 
@@ -1805,25 +1946,6 @@
 
 
 
-                  <details class="quote">
-                    <summary>Source code in <code>src/gemseo_benchmark/benchmarker/worker.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">history_class</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">PerformanceHistory</span><span class="p">]</span> <span class="o">=</span> <span class="n">PerformanceHistory</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Args:</span>
-<span class="sd">        history_class: The class of performance history.</span>
-<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D205, D212, D415</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">__history_class</span> <span class="o">=</span> <span class="n">history_class</span>
-</code></pre></div></td></tr></table></div>
-                  </details>
 
 
 
@@ -1835,7 +1957,85 @@
 
 
 
+<h5 id="gemseo_benchmark.benchmarker.base_worker.BaseWorker-functions">Functions<a href="#gemseo_benchmark.benchmarker.base_worker.BaseWorker-functions" class="headerlink" title="Permanent link">&para;</a></h5>
 
+<div class="doc doc-object doc-function">
+
+
+<h6 id="gemseo_benchmark.benchmarker.base_worker.BaseWorker.check_algorithm_availability" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">check_algorithm_availability</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#gemseo_benchmark.benchmarker.base_worker.BaseWorker.check_algorithm_availability" class="headerlink" title="Permanent link">&para;</a></h6>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">check_algorithm_availability</span><span class="p">(</span><span class="n">algorithm_name</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Check whether an algorithm is available.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>algorithm_name</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The name of the algorithm.</p>
+          </div>
+        </li>
+    </ul>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+              <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+            –
+          <div class="doc-md-description">
+            <p>If the algorithm is not available.</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/gemseo_benchmark/benchmarker/base_worker.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_algorithm_availability</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check whether an algorithm is available.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        algorithm_name: The name of the algorithm.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the algorithm is not available.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_algorithm_factory</span><span class="o">.</span><span class="n">is_available</span><span class="p">(</span><span class="n">algorithm_name</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;The algorithm </span><span class="si">{</span><span class="n">algorithm_name</span><span class="si">!r}</span><span class="s2"> is not available.&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
 
 
 
