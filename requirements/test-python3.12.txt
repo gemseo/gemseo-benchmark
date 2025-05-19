@@ -32,9 +32,9 @@ execnet==2.1.1
     # via pytest-xdist
 fastjsonschema==2.21.1
     # via gemseo
-fonttools==4.57.0
+fonttools==4.58.0
     # via matplotlib
-gemseo @ git+https://gitlab.com/gemseo/dev/gemseo.git@208feec768a3e3f8048a59c4df8ff10f4bd3d2dc
+gemseo @ git+https://gitlab.com/gemseo/dev/gemseo.git@4461ca2eaf8d4c1bebb29541d7435d6afba88b3b
     # via
     #   -c requirements/test-constraints.in
     #   gemseo-benchmark (pyproject.toml)
@@ -102,7 +102,7 @@ pillow==11.1.0
     #   matplotlib
 plotly==5.24.1
     # via gemseo
-pluggy==1.5.0
+pluggy==1.6.0
     # via pytest
 prettytable==3.15.1
     # via gemseo
@@ -148,7 +148,7 @@ scipy==1.15.2
     #   scikit-learn
 six==1.17.0
     # via python-dateutil
-snowballstemmer==2.2.0
+snowballstemmer==3.0.1
     # via sphinx
 sphinx==7.4.7
     # via gemseo-benchmark (pyproject.toml)
