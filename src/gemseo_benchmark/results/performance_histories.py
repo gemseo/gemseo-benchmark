@@ -142,9 +142,8 @@ class PerformanceHistories(collections.abc.MutableSequence):
     def plot_performance_measure_distribution(
         self,
         axes: Axes,
-        # TODO: API BREAK: Rename argument 'max_feasible_objective'
-        # into 'extremal_feasible_performance'.
-        max_feasible_objective: float | None = None,
+        extremal_feasible_performance: float | None,
+        infeasible_performance_measure: float,
         plot_all_histories: bool = False,
         performance_measure_is_minimized: bool = True,
     ) -> None:
@@ -152,29 +151,19 @@ class PerformanceHistories(collections.abc.MutableSequence):
 
         Args:
             axes: The axes of the plot.
-            max_feasible_objective: The extremal feasible performance measure.
+            extremal_feasible_performance: The extremal feasible performance measure.
+            infeasible_performance_measure: The value to replace the performance measure
+                of infeasible history items when computing statistics.
             plot_all_histories: Whether to plot all the performance histories.
             performance_measure_is_minimized: Whether the performance measure
                 is minimized (rather than maximized).
         """
-        if max_feasible_objective is None:
-            feasible_performances = [
-                item.objective_value
-                for history in self
-                for item in history
-                if item.is_feasible
-            ]
-            if performance_measure_is_minimized:
-                extremal_feasible_performance = max(feasible_performances)
-            else:
-                extremal_feasible_performance = min(feasible_performances)
-        else:
-            extremal_feasible_performance = max_feasible_objective
-
         self.__plot_distribution(
             numpy.array([
                 [
-                    item.objective_value if item.is_feasible else numpy.nan
+                    item.objective_value
+                    if item.is_feasible
+                    else infeasible_performance_measure
                     for item in history
                 ]
                 for history in self.get_equal_size_histories()

@@ -283,18 +283,7 @@ class Figures:
                 else:
                     raise ValueError(message)
 
-            max_feasible_performance = -float("inf")
-            for histories in performance_histories.values():
-                for history in histories:
-                    feasible_history = history.remove_leading_infeasible()
-                    if len(feasible_history) > 0:
-                        max_feasible_performance = max(
-                            feasible_history[0].objective_value,
-                            max_feasible_performance,
-                        )
-
             if not problem.minimize_performance_measure:
-                max_feasible_performance = -max_feasible_performance
                 for histories in performance_histories.values():
                     histories.switch_performance_measure_sign()
 
@@ -306,7 +295,6 @@ class Figures:
                 plot_all_histories,
                 use_performance_log_scale,
                 plot_only_median,
-                max_feasible_performance,
                 use_time_log_scale,
                 use_evaluation_log_scale,
             )
@@ -328,7 +316,6 @@ class Figures:
         plot_all_histories: bool,
         use_performance_log_scale: bool,
         plot_only_median: bool,
-        max_feasible_performance: float,
         use_time_log_scale: bool,
         use_evaluation_log_scale: bool,
     ) -> ProblemFigurePaths:
@@ -351,6 +338,27 @@ class Figures:
         Returns:
             The paths to the figures dedicated to the problem.
         """
+        # Find the extremal feasible performance measure.
+        worst_feasible_performances = [
+            history.remove_leading_infeasible()[0].objective_value
+            for histories in performance_histories.values()
+            for history in histories
+            if history[-1].is_feasible
+        ]
+        infeasible_performance_measure = float("nan")
+        if problem.minimize_performance_measure:
+            extremal_feasible_performance = max(
+                worst_feasible_performances, default=None
+            )
+            if extremal_feasible_performance is None:
+                infeasible_performance_measure = float("inf")
+        else:
+            extremal_feasible_performance = min(
+                worst_feasible_performances, default=None
+            )
+            if extremal_feasible_performance is None:
+                infeasible_performance_measure = -float("inf")
+
         figures = {
             self._FigureFileName.DATA_PROFILE: self.__plot_data_profiles(
                 problem, directory_path, use_evaluation_log_scale
@@ -363,6 +371,8 @@ class Figures:
             problem,
             performance_histories,
             directory_path,
+            extremal_feasible_performance,
+            infeasible_performance_measure,
             plot_all_histories,
             use_performance_log_scale,
             plot_only_median,
@@ -400,7 +410,8 @@ class Figures:
             self.__get_algorithms_plots(
                 problem,
                 performance_histories,
-                max_feasible_performance,
+                extremal_feasible_performance,
+                infeasible_performance_measure,
                 directory_path,
                 use_evaluation_log_scale,
                 use_performance_log_scale,
@@ -453,6 +464,8 @@ class Figures:
         problem: BaseProblemConfiguration,
         performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
         directory_path: Path,
+        extremal_feasible_performance: float | None,
+        infeasible_performance_measure: float,
         plot_all_histories: bool,
         use_performance_log_scale: bool,
         plot_only_median: bool,
@@ -464,6 +477,9 @@ class Figures:
             problem: The problem.
             performance_histories: The performance histories for the problem.
             directory_path: The path to the root directory for the figures.
+            extremal_feasible_performance: The extremal feasible performance measure.
+            infeasible_performance_measure: The value to replace the performance measure
+                of infeasible history items when computing statistics.
             plot_all_histories: Whether to plot all the performance histories.
             use_performance_log_scale: Whether to use a logarithmic scale
                 for the performance measure axis.
@@ -477,24 +493,12 @@ class Figures:
         """
         figure = matplotlib.pyplot.figure()
         axes = figure.gca()
-        # Find the extremal feasible performance measure.
-        worst_feasible_performances = [
-            history.remove_leading_infeasible()[0].objective_value
-            for histories in performance_histories.values()
-            for history in histories
-            if history[-1].is_feasible
-        ]
-        if problem.minimize_performance_measure:
-            extremal_feasible_performance = max(worst_feasible_performances)
-        else:
-            extremal_feasible_performance = min(worst_feasible_performances)
-
         self.__plot_range(
             axes,
             performance_histories,
             functools.partial(
                 self.__get_performance_measure,
-                infeasible_performance_measure=float("nan"),
+                infeasible_performance_measure=infeasible_performance_measure,
             ),
             "Performance measure",
             extremal_feasible_performance,
@@ -665,7 +669,7 @@ class Figures:
         performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
         data_getter: callable[[HistoryItem], int | float],
         y_label: str,
-        max_feasible_objective: float,
+        extremal_feasible_performance: float,
         plot_only_median: bool,
         use_evaluation_log_scale: bool,
         plot_all_histories: bool,
@@ -680,8 +684,7 @@ class Figures:
             data_getter: A function that gets the data of interest
                 from an item of a performance history.
             y_label: The label of the vertical axis.
-            max_feasible_objective: The maximum feasible value
-                of the objective function.
+            extremal_feasible_performance: The extremal feasible performance measure.
             plot_only_median: Whether to plot only the median and no other centile.
             use_evaluation_log_scale: Whether to use a logarithmic scale
                 for the number of function evaluations axis.
@@ -708,7 +711,7 @@ class Figures:
                     axes,
                     (0, 100),
                     {"alpha": self.__ALPHA, "color": self.__plot_kwargs[name]["color"]},
-                    max_feasible_objective,
+                    extremal_feasible_performance,
                     performance_measure_is_minimized,
                 )
 
@@ -796,7 +799,8 @@ class Figures:
         self,
         problem: BaseProblemConfiguration,
         performance_histories: Mapping[str, PerformanceHistories],
-        max_feasible_performance: float,
+        extremal_feasible_performance: float | None,
+        infeasible_performance_measure: float,
         directory_path: Path,
         use_evaluation_log_scale: bool,
         use_performance_log_scale: bool,
@@ -807,7 +811,9 @@ class Figures:
         Args:
             problem: The problem.
             performance_histories: The performance histories for the problem.
-            max_feasible_performance: The maximum feasible performance value.
+            extremal_feasible_performance: The extremal feasible performance measure.
+            infeasible_performance_measure: The value to replace the performance measure
+                of infeasible history items when computing statistics.
             directory_path: The path to the directory where to save the figures.
             use_evaluation_log_scale: Whether to use a logarithmic scale
                 for the number of function evaluations axis.
@@ -825,7 +831,8 @@ class Figures:
             figure, axes = matplotlib.pyplot.subplots()
             performance_histories[configuration].plot_performance_measure_distribution(
                 axes,
-                max_feasible_performance,
+                extremal_feasible_performance,
+                infeasible_performance_measure,
                 plot_all_histories,
                 problem.minimize_performance_measure,
             )

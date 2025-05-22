@@ -134,13 +134,9 @@ def five_performance_histories() -> PerformanceHistories:
             extremal_feasible_performance,
             performance_measure_is_minimized,
         ) in [
-            (False, None, False),
             (False, -6, False),
-            (True, None, False),
             (True, -6, False),
-            (False, None, True),
             (False, -1, True),
-            (True, None, True),
             (True, -1, True),
         ]
     ],
@@ -158,6 +154,7 @@ def test_plot_performance_measure_distribution(
     five_performance_histories.plot_performance_measure_distribution(
         matplotlib.pyplot.figure().gca(),
         extremal_feasible_performance,
+        float("nan"),
         plot_all_histories,
         performance_measure_is_minimized,
     )
@@ -173,7 +170,9 @@ def test_plot_performance_measure_distribution_infeasible_centile():
         PerformanceHistory([4, 3, 2], [1, 1, 1]),
         PerformanceHistory([3, 2, 1], [1, 1, 1]),
         PerformanceHistory([2, 1, 0], [1, 0, 0]),
-    ).plot_performance_measure_distribution(matplotlib.pyplot.figure().gca())
+    ).plot_performance_measure_distribution(
+        matplotlib.pyplot.figure().gca(), 1, float("nan")
+    )
 
 
 @image_comparison(["infeasibility_measure_distribution"], ["png"])
