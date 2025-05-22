@@ -2648,7 +2648,7 @@ as the problem.</p>
     <span class="n">show</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">file_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">infeasibility_tolerance</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-    <span class="n">max_iteration_number</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_iteration_number</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">plot_kwargs</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span>
         <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><span title="gemseo_benchmark.ConfigurationPlotOptions">ConfigurationPlotOptions</span></span>
     <span class="p">]</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.utils.constants.READ_ONLY_EMPTY_DICT" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.utils.constants.html#gemseo.utils.constants.READ_ONLY_EMPTY_DICT">READ_ONLY_EMPTY_DICT</a></span><span class="p">,</span>
@@ -2713,13 +2713,13 @@ If empty, the plot is not saved.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>max_iteration_number</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | None</code>, default:
-                  <code>None</code>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>, default:
+                  <code>0</code>
 )
           –
           <div class="doc-md-description">
             <p>The maximum number of iterations to plot.
-If <code>None</code>, this value is inferred from the longest history.</p>
+If <code>0</code>, this value is inferred from the longest history.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -2816,7 +2816,7 @@ for the number of iterations axis.</p>
     <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">infeasibility_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-    <span class="n">max_iteration_number</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_iteration_number</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">plot_kwargs</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ConfigurationPlotOptions</span><span class="p">]</span> <span class="o">=</span> <span class="n">READ_ONLY_EMPTY_DICT</span><span class="p">,</span>
     <span class="n">grid_kwargs</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">READ_ONLY_EMPTY_DICT</span><span class="p">,</span>
     <span class="n">use_iteration_log_scale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -2831,7 +2831,7 @@ for the number of iterations axis.</p>
 <span class="sd">            If empty, the plot is not saved.</span>
 <span class="sd">        infeasibility_tolerance: The tolerance on the infeasibility measure.</span>
 <span class="sd">        max_iteration_number: The maximum number of iterations to plot.</span>
-<span class="sd">            If ``None``, this value is inferred from the longest history.</span>
+<span class="sd">            If ``0``, this value is inferred from the longest history.</span>
 <span class="sd">        plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`</span>
 <span class="sd">            for each algorithm configuration.</span>
 <span class="sd">        grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.</span>
@@ -2842,7 +2842,7 @@ for the number of iterations axis.</p>
     <span class="k">for</span> <span class="n">configuration_name</span> <span class="ow">in</span> <span class="n">algos_configurations</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">history_path</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">get_paths</span><span class="p">(</span><span class="n">configuration_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
             <span class="n">history</span> <span class="o">=</span> <span class="n">PerformanceHistory</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">history_path</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">max_iteration_number</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">max_iteration_number</span><span class="p">:</span>
                 <span class="n">history</span> <span class="o">=</span> <span class="n">history</span><span class="o">.</span><span class="n">shorten</span><span class="p">(</span><span class="n">max_iteration_number</span><span class="p">)</span>
 
             <span class="n">history</span><span class="o">.</span><span class="n">apply_infeasibility_tolerance</span><span class="p">(</span><span class="n">infeasibility_tolerance</span><span class="p">)</span>
