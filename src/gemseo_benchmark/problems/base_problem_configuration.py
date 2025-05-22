@@ -358,7 +358,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
         show: bool = False,
         file_path: str | Path = "",
         infeasibility_tolerance: float = 0.0,
-        max_iteration_number: int | None = None,
+        max_iteration_number: int = 0,
         plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
         grid_kwargs: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
         use_iteration_log_scale: bool = False,
@@ -373,7 +373,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
                 If empty, the plot is not saved.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             max_iteration_number: The maximum number of iterations to plot.
-                If ``None``, this value is inferred from the longest history.
+                If ``0``, this value is inferred from the longest history.
             plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
             grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.
@@ -384,7 +384,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
         for configuration_name in algos_configurations.names:
             for history_path in results.get_paths(configuration_name, self.name):
                 history = PerformanceHistory.from_file(history_path)
-                if max_iteration_number is not None:
+                if max_iteration_number:
                     history = history.shorten(max_iteration_number)
 
                 history.apply_infeasibility_tolerance(infeasibility_tolerance)
