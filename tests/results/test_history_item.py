@@ -102,6 +102,6 @@ def test_switch_performance_measure_sign() -> None:
     """Check the switch of sign of the performance measure."""
     item = HistoryItem(1, 2, 3)
     item.switch_performance_measure_sign()
-    assert item.objective_value == -1
+    assert item.performance_measure == -1
     assert item.infeasibility_measure == 2
     assert item.n_unsatisfied_constraints == 3

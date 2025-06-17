@@ -93,12 +93,12 @@ class TargetValues(PerformanceHistory):
         indexes, history_items = self.get_plot_data()
 
         # Plot the feasible target values
-        objective_values = [item.objective_value for item in history_items]
+        performance_measures = [item.performance_measure for item in history_items]
         is_feasible = array([item.is_feasible for item in history_items])
         if is_feasible.any():
             axes.plot(
                 array(indexes)[is_feasible],
-                array(objective_values)[is_feasible],
+                array(performance_measures)[is_feasible],
                 color="black",
                 marker="o",
                 linestyle="",
@@ -110,7 +110,7 @@ class TargetValues(PerformanceHistory):
         if is_infeasible.any():
             axes.plot(
                 array(indexes)[is_infeasible],
-                array(objective_values)[is_infeasible],
+                array(performance_measures)[is_infeasible],
                 color="red",
                 marker="x",
                 linestyle="",
@@ -147,7 +147,7 @@ class TargetValues(PerformanceHistory):
                 for ``matplotlib.axes.Axes.set_ylabel``.
         """
         twin_axes = axes.twinx()
-        values = [target.objective_value for target in self if target.is_feasible]
+        values = [target.performance_measure for target in self if target.is_feasible]
         for value in values:
             axes.axhline(value, **axhline_kwargs)
 

@@ -161,7 +161,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         self.__plot_distribution(
             numpy.array([
                 [
-                    item.objective_value
+                    item.performance_measure
                     if item.is_feasible
                     else infeasible_performance_measure
                     for item in history

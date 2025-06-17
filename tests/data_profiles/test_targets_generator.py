@@ -42,7 +42,7 @@ def test_add_inconsistent_histories():
 
 
 @pytest.mark.parametrize(
-    ("objective_values", "history", "message"),
+    ("performance_measures", "history", "message"),
     [
         (
             (3.0, 2.0),
@@ -56,11 +56,11 @@ def test_add_inconsistent_histories():
         ),
     ],
 )
-def test_add_history_redundant_arguments(objective_values, history, message):
+def test_add_history_redundant_arguments(performance_measures, history, message):
     """Check the addition of a performance history with redundant arguments."""
     generator = TargetsGenerator()
     with pytest.raises(ValueError, match=message):
-        generator.add_history(objective_values, history=history)
+        generator.add_history(performance_measures, history=history)
 
 
 def test_negative_infeasibility_measures():

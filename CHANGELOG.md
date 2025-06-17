@@ -30,6 +30,12 @@ and this project adheres to
 
 ## Added
 
+
+### Problems
+
+- Multidisciplinary analysis problem configurations
+  can now be implemented with ``MDAProblemConfiguration``.
+
 #### Report
 
 - The color and marker for each algorithm configuration can now be customized

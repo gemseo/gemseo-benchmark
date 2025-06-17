@@ -105,7 +105,7 @@ class DataProfile:
         self,
         problem_name: str,
         algorithm_configuration_name: str,
-        objective_values: Sequence[float],
+        performance_measures: Sequence[float],
         infeasibility_measures: Sequence[float] | None = None,
         feasibility_statuses: Sequence[bool] | None = None,
     ) -> None:
@@ -114,7 +114,7 @@ class DataProfile:
         Args:
             problem_name: The name of the problem.
             algorithm_configuration_name: The name of the algorithm configuration.
-            objective_values: A history of objective values.
+            performance_measures: A history of performance measures.
                 N.B. the value at index ``i`` is assumed to have been obtained with
                 ``i+1`` evaluations.
             infeasibility_measures: A history of infeasibility measures.
@@ -134,7 +134,7 @@ class DataProfile:
                 pb_name: [] for pb_name in self.__target_values
             }
         history = PerformanceHistory(
-            objective_values, infeasibility_measures, feasibility_statuses
+            performance_measures, infeasibility_measures, feasibility_statuses
         )
         self.__values_histories[algorithm_configuration_name][problem_name].append(
             history

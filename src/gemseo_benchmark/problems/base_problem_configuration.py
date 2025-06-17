@@ -42,6 +42,7 @@ if TYPE_CHECKING:
     from gemseo.algos.design_space import DesignSpace
     from gemseo.algos.doe.base_doe_library import DriverLibraryOptionType
     from gemseo.typing import RealArray
+    from sandbox.tmp_classattribute import BaseWorker
 
     from gemseo_benchmark import ConfigurationPlotOptions
     from gemseo_benchmark.algorithms.algorithms_configurations import (
@@ -101,7 +102,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
         create_problem: Callable[[], Any],
         target_values: TargetValues | None,
         starting_points: InputStartingPointsType,
-        variable_space: DesignSpace | None,
+        variable_space: DesignSpace,
         doe_algo_name: str,
         doe_size: int | None,
         doe_options: Mapping[str, Any],
@@ -123,8 +124,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
                 then the starting points will be generated as a DOE;
                 otherwise the current value of the optimization problem
                 will be set as the single starting point.
-            variable_space: The space of the variables.
-                This argument is mandatory to generate starting points as a DOE.
+            variable_space: The space of the problem variables.
             doe_algo_name: The name of the DOE algorithm.
                 If empty and ``starting_points`` is empty,
                 the current point of the variable space
@@ -290,9 +290,6 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
         if doe_size is None:
             doe_size = min([self.dimension, 10])
 
-        if doe_options is None:
-            doe_options = {}
-
         return compute_doe(
             self.__variable_space,
             algo_name=doe_algo_name,
@@ -391,7 +388,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
                 data_profile.add_history(
                     self.name,
                     configuration_name,
-                    history.objective_values,
+                    history.performance_measures,
                     history.infeasibility_measures,
                 )
 
@@ -420,3 +417,13 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
         else:
             self.__minimization_target_values = deepcopy(self.__target_values)
             self.__minimization_target_values.switch_performance_measure_sign()
+
+    @property
+    def variable_space(self) -> DesignSpace:
+        """The space of the problem variables."""
+        return self.__variable_space
+
+    @property
+    @abstractmethod
+    def worker() -> type[BaseWorker]:
+        """The type of benchmarking worker."""

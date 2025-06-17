@@ -26,15 +26,21 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
+from gemseo import create_mda
+from gemseo.algos.design_space import DesignSpace
 from gemseo.algos.optimization_problem import OptimizationProblem
+from gemseo.disciplines.analytic import AnalyticDiscipline
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
 from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 from numpy import array
 from numpy import ndarray
 
+from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.data_profiles.target_values import TargetValues
+from gemseo_benchmark.problems.mda_problem_configuration import MDAProblemConfiguration
+from gemseo_benchmark.problems.mda_problem_configuration import MDAProblemType
 from gemseo_benchmark.problems.optimization_problem_configuration import (
-    OptimizationBenchmarkingProblem,
+    OptimizationProblemConfiguration,
 )
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.results.performance_histories import PerformanceHistories
@@ -321,9 +327,9 @@ def results(
 
 
 @pytest.fixture(scope="package")
-def rosenbrock() -> OptimizationBenchmarkingProblem:
+def rosenbrock() -> OptimizationProblemConfiguration:
     """A problem configuration based on the 2-dimensional Rosenbrock function."""
-    return OptimizationBenchmarkingProblem(
+    return OptimizationProblemConfiguration(
         "Rosenbrock",
         Rosenbrock,
         [array([0.0, 1.0]), array([1.0, 0.0])],
@@ -353,3 +359,44 @@ def performance_histories() -> PerformanceHistories:
         PerformanceHistory([3.0, -3.0, 3.0], [0.0, 0.0, 0.0]),
         PerformanceHistory([0.0, -2.0, 4.0], [0.0, 0.0, 0.0]),
     )
+
+
+def mda_create_problem(
+    algorithm_configuration: AlgorithmConfiguration,
+) -> MDAProblemType:
+    """Create an MDA problem."""
+    disciplines = (
+        AnalyticDiscipline({"y1": "x1 + y2"}),
+        AnalyticDiscipline({"y2": "x2 - y1"}),
+    )
+    return create_mda(
+        algorithm_configuration.algorithm_name,
+        disciplines,
+        **algorithm_configuration.algorithm_options,
+    ), disciplines
+
+
+@pytest.fixture(scope="module")
+def mda_variable_space() -> DesignSpace:
+    """The variable space of the MDA problem configuration."""
+    variable_space = DesignSpace()
+    variable_space.add_variable("y1", lower_bound=0, upper_bound=1, value=0.5)
+    variable_space.add_variable("y2", lower_bound=0, upper_bound=1, value=0.5)
+    return variable_space
+
+
+@pytest.fixture(scope="module")
+def mda_problem_configuration(mda_variable_space) -> MDAProblemConfiguration:
+    """A problem configuration for multidisciplinary analysis."""
+    return MDAProblemConfiguration(
+        "Linear MDA",
+        mda_create_problem,
+        mda_variable_space,
+        starting_points=[array([0, 1]), array([1, 0])],
+    )
+
+
+@pytest.fixture(scope="module")
+def mda_algorithm_configuration() -> AlgorithmConfiguration:
+    """An algorithm configuration for multidisciplinary analysis."""
+    return AlgorithmConfiguration("MDAJacobi")

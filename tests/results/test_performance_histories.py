@@ -203,7 +203,7 @@ def test_switch_performance_measure_sign() -> None:
         PerformanceHistory([1, 2], [3, 4]), PerformanceHistory([5, 6], [7, 8])
     )
     histories.switch_performance_measure_sign()
-    assert histories[0].objective_values == [-1, -2]
+    assert histories[0].performance_measures == [-1, -2]
     assert histories[0].infeasibility_measures == [3, 4]
-    assert histories[1].objective_values == [-5, -6]
+    assert histories[1].performance_measures == [-5, -6]
     assert histories[1].infeasibility_measures == [7, 8]

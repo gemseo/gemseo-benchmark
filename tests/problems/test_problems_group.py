@@ -24,7 +24,6 @@ from __future__ import annotations
 import re
 
 import pytest
-from gemseo.problems.optimization.power_2 import Power2
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
 from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
@@ -36,28 +35,16 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
 )
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.problems.optimization_problem_configuration import (
-    OptimizationBenchmarkingProblem,
+    OptimizationProblemConfiguration,
 )
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
 
 algorithms_configurations = AlgorithmsConfigurations(AlgorithmConfiguration("L-BFGS-B"))
 
 
-def test_is_algorithm_suited():
-    """Check the assessment of the suitability of an algorithm to a problems group."""
-    # Check a suited algorithm
-    rosenbrock = OptimizationBenchmarkingProblem("Rosenbrock", Rosenbrock, [zeros(2)])
-    group = ProblemsGroup("group", [rosenbrock])
-    assert group.is_algorithm_suited("L-BFGS-B")
-    # Check an ill-suited algorithm
-    power2 = OptimizationBenchmarkingProblem("Power2", Power2, [zeros(3)])
-    group = ProblemsGroup("another group", [rosenbrock, power2])
-    assert not group.is_algorithm_suited("L-BFGS-B")
-
-
 def test_compute_target_values():
     """Check the computation of target values."""
-    rosenbrock = OptimizationBenchmarkingProblem("Rosenbrock", Rosenbrock, [zeros(2)])
+    rosenbrock = OptimizationProblemConfiguration("Rosenbrock", Rosenbrock, [zeros(2)])
     with pytest.raises(
         ValueError, match=re.escape("The problem configuration has no target value.")
     ):

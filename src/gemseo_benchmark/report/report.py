@@ -48,7 +48,7 @@ if TYPE_CHECKING:
 
     from gemseo_benchmark import ConfigurationPlotOptions
     from gemseo_benchmark.problems.optimization_problem_configuration import (
-        OptimizationBenchmarkingProblem,
+        OptimizationProblemConfiguration,
     )
     from gemseo_benchmark.problems.problems_group import ProblemsGroup
     from gemseo_benchmark.results.results import Results
@@ -248,7 +248,7 @@ class Report:
             problems_paths=problems_paths,
         )
 
-    def __get_problem_path(self, problem: OptimizationBenchmarkingProblem) -> Path:
+    def __get_problem_path(self, problem: OptimizationProblemConfiguration) -> Path:
         """Return the path to a problem file.
 
         Args:
@@ -461,7 +461,7 @@ class Report:
 
     def __create_problem_results_files(
         self,
-        problem: OptimizationBenchmarkingProblem,
+        problem: OptimizationProblemConfiguration,
         algorithm_configurations: AlgorithmsConfigurations,
         figures: Figures.ProblemFigurePaths,
         directory_path: Path,

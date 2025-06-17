@@ -201,7 +201,7 @@ Optimal feasible objective value: {optimum}.
 
 Target values
 -------------
-* {problem.target_values[0].objective_value} (feasible)
+* {problem.target_values[0].performance_measure} (feasible)
 """
         )
 

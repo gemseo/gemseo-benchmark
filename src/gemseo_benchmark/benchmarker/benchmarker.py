@@ -33,7 +33,6 @@ from gemseo import LOGGER as GEMSEO_LOGGER
 
 from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
-from gemseo_benchmark.benchmarker.optimization_worker import OptimizationWorker
 from gemseo_benchmark.results.results import Results
 
 if TYPE_CHECKING:
@@ -131,16 +130,15 @@ class Benchmarker:
                 logger.addHandler(file_handler)
 
         executor_class = ThreadPoolExecutor if use_threading else ProcessPoolExecutor
-        worker = OptimizationWorker()
         with executor_class(max_workers=n_processes) as executor:
             future_to_path = {}
             for original_algorithm_configuration in algorithm_configurations:
                 algorithm_configuration = original_algorithm_configuration.copy()
-                # TODO: Get the worker associated with the problem configuration.
-                worker.check_algorithm_availability(
-                    algorithm_configuration.algorithm_name
-                )
                 for problem_configuration in problem_configurations:
+                    worker = problem_configuration.worker
+                    worker.check_algorithm_availability(
+                        algorithm_configuration.algorithm_name
+                    )
                     future_to_path.update(
                         self.__execute(
                             executor,
@@ -246,7 +244,7 @@ class Benchmarker:
 
             future_to_path[
                 executor.submit(
-                    worker,
+                    worker.execute,
                     self.__set_problem_algorithm_options(
                         algorithm_configuration,
                         problem_configuration,

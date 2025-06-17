@@ -76,17 +76,6 @@ class ProblemsGroup:
     def __iter__(self) -> Iterator[BaseProblemConfiguration]:
         return iter(self.__problems)
 
-    def is_algorithm_suited(self, name: str) -> bool:
-        """Check whether an algorithm is suited to the group of problem configurations.
-
-        Args:
-            name: The name of the algorithm.
-
-        Returns:
-            True if the algorithm is suited.
-        """
-        return all(problem.is_algorithm_suited(name) for problem in self.__problems)
-
     # FIXME: Not suited to MDO and MDA?
     def compute_target_values(
         self,
@@ -152,7 +141,7 @@ class ProblemsGroup:
                     data_profile.add_history(
                         problem.name,
                         configuration_name,
-                        history.objective_values,
+                        history.performance_measures,
                         history.infeasibility_measures,
                     )
 
