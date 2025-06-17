@@ -73,6 +73,10 @@
          <lastmod>2025-06-17</lastmod>
     </url>
     <url>
+         <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/benchmarker/mda_worker/</loc>
+         <lastmod>2025-06-17</lastmod>
+    </url>
+    <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/benchmarker/optimization_worker/</loc>
          <lastmod>2025-06-17</lastmod>
     </url>
@@ -98,6 +102,10 @@
     </url>
     <url>
          <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/problems/base_problem_configuration/</loc>
+         <lastmod>2025-06-17</lastmod>
+    </url>
+    <url>
+         <loc>https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/problems/mda_problem_configuration/</loc>
          <lastmod>2025-06-17</lastmod>
     </url>
     <url>

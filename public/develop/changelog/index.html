@@ -946,6 +946,8 @@
       
         
       
+        
+      
     
     
     
@@ -1023,6 +1025,29 @@
   
   <span class="md-ellipsis">
     Benchmarker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/gemseo_benchmark/benchmarker/mda_worker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Mda worker
     
   </span>
   
@@ -1212,6 +1237,8 @@
       
         
       
+        
+      
     
     
     
@@ -1266,6 +1293,29 @@
   
   <span class="md-ellipsis">
     Base problem configuration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/gemseo_benchmark/problems/mda_problem_configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Mda problem configuration
     
   </span>
   
@@ -1675,6 +1725,11 @@ and this project adheres to
 <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 <h1 id="version-4xx-date">Version 4.X.X (date)<a class="headerlink" href="#version-4xx-date" title="Permanent link">&para;</a></h1>
 <h2 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h2>
+<h3 id="problems">Problems<a class="headerlink" href="#problems" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Multidisciplinary analysis problem configurations
+  can now be implemented with <code>MDAProblemConfiguration</code>.</li>
+</ul>
 <h4 id="report">Report<a class="headerlink" href="#report" title="Permanent link">&para;</a></h4>
 <ul>
 <li>The color and marker for each algorithm configuration can now be customized
@@ -1703,7 +1758,7 @@ and this project adheres to
   Thus the two main types of inputs to be defined by the user
   are <em>algorithm</em> configurations and <em>problem</em> configurations.</li>
 </ul>
-<h4 id="problems">Problems<a class="headerlink" href="#problems" title="Permanent link">&para;</a></h4>
+<h4 id="problems_1">Problems<a class="headerlink" href="#problems_1" title="Permanent link">&para;</a></h4>
 <ul>
 <li>The class to implement optimization benchmarking problems is now called
   <code>OptimizationBenchmarkingProblem</code> (rather than <code>Problem</code> formerly).</li>
@@ -1761,7 +1816,7 @@ and this project adheres to
   of algorithm configurations.</li>
 </ul>
 <h3 id="removed">Removed<a class="headerlink" href="#removed" title="Permanent link">&para;</a></h3>
-<h4 id="problems_1">Problems<a class="headerlink" href="#problems_1" title="Permanent link">&para;</a></h4>
+<h4 id="problems_2">Problems<a class="headerlink" href="#problems_2" title="Permanent link">&para;</a></h4>
 <ul>
 <li>
 <p>Method <code>Problem.plot_histories</code> was removed as it was redundant with <code>Figures.plot</code>.

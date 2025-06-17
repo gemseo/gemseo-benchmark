@@ -14,7 +14,7 @@
         <link rel="prev" href="../">
       
       
-        <link rel="next" href="../optimization_problem_configuration/">
+        <link rel="next" href="../mda_problem_configuration/">
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
@@ -936,6 +936,8 @@
       
         
       
+        
+      
     
     
     
@@ -1013,6 +1015,29 @@
   
   <span class="md-ellipsis">
     Benchmarker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarker/mda_worker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Mda worker
     
   </span>
   
@@ -1197,6 +1222,8 @@
   
     
     
+      
+        
       
         
       
@@ -1418,6 +1445,24 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.problems.base_problem_configuration.BaseProblemConfiguration.variable_space" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;variable_space
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.problems.base_problem_configuration.BaseProblemConfiguration.worker" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;worker
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1484,6 +1529,29 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mda_problem_configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Mda problem configuration
+    
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -1961,6 +2029,24 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.problems.base_problem_configuration.BaseProblemConfiguration.variable_space" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;variable_space
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.problems.base_problem_configuration.BaseProblemConfiguration.worker" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;worker
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2089,7 +2175,7 @@
     <span class="n">create_problem</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Callable" href="https://docs.python.org/3/library/typing.html#typing.Callable">Callable</a></span><span class="p">[[],</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></span><span class="p">],</span>
     <span class="n">target_values</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            TargetValues (gemseo_benchmark.data_profiles.target_values.TargetValues)" href="../../data_profiles/target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">starting_points</span><span class="p">:</span> <span class="n"><span title="gemseo_benchmark.problems.base_problem_configuration.InputStartingPointsType">InputStartingPointsType</span></span><span class="p">,</span>
-    <span class="n">variable_space</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.algos.design_space.DesignSpace" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.algos.design_space.html#gemseo.algos.design_space.DesignSpace">DesignSpace</a></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">variable_space</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.algos.design_space.DesignSpace" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.algos.design_space.html#gemseo.algos.design_space.DesignSpace">DesignSpace</a></span><span class="p">,</span>
     <span class="n">doe_algo_name</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span>
     <span class="n">doe_size</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">doe_options</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></span><span class="p">],</span>
@@ -2162,11 +2248,10 @@ will be set as the single starting point.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>variable_space</code></b>
-              (<code><a class="autorefs autorefs-external" title="gemseo.algos.design_space.DesignSpace" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.algos.design_space.html#gemseo.algos.design_space.DesignSpace">DesignSpace</a> | None</code>)
+              (<code><a class="autorefs autorefs-external" title="gemseo.algos.design_space.DesignSpace" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.algos.design_space.html#gemseo.algos.design_space.DesignSpace">DesignSpace</a></code>)
           –
           <div class="doc-md-description">
-            <p>The space of the variables.
-This argument is mandatory to generate starting points as a DOE.</p>
+            <p>The space of the problem variables.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -2226,8 +2311,7 @@ If <code>None</code>, it will not be set.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>src/gemseo_benchmark/problems/base_problem_configuration.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 98</span>
-<span class="normal"> 99</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 99</span>
 <span class="normal">100</span>
 <span class="normal">101</span>
 <span class="normal">102</span>
@@ -2298,7 +2382,7 @@ If <code>None</code>, it will not be set.</p>
     <span class="n">create_problem</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">target_values</span><span class="p">:</span> <span class="n">TargetValues</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">starting_points</span><span class="p">:</span> <span class="n">InputStartingPointsType</span><span class="p">,</span>
-    <span class="n">variable_space</span><span class="p">:</span> <span class="n">DesignSpace</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">variable_space</span><span class="p">:</span> <span class="n">DesignSpace</span><span class="p">,</span>
     <span class="n">doe_algo_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">doe_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">doe_options</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
@@ -2320,8 +2404,7 @@ If <code>None</code>, it will not be set.</p>
 <span class="sd">            then the starting points will be generated as a DOE;</span>
 <span class="sd">            otherwise the current value of the optimization problem</span>
 <span class="sd">            will be set as the single starting point.</span>
-<span class="sd">        variable_space: The space of the variables.</span>
-<span class="sd">            This argument is mandatory to generate starting points as a DOE.</span>
+<span class="sd">        variable_space: The space of the problem variables.</span>
 <span class="sd">        doe_algo_name: The name of the DOE algorithm.</span>
 <span class="sd">            If empty and ``starting_points`` is empty,</span>
 <span class="sd">            the current point of the variable space</span>
@@ -2632,6 +2715,55 @@ as the problem.</p>
 
 </div>
 
+<div class="doc doc-object doc-attribute">
+
+
+
+<h6 id="gemseo_benchmark.problems.base_problem_configuration.BaseProblemConfiguration.variable_space" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">variable_space</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#gemseo_benchmark.problems.base_problem_configuration.BaseProblemConfiguration.variable_space" class="headerlink" title="Permanent link">&para;</a></h6>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">variable_space</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.algos.design_space.DesignSpace" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.algos.design_space.html#gemseo.algos.design_space.DesignSpace">DesignSpace</a></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The space of the problem variables.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h6 id="gemseo_benchmark.problems.base_problem_configuration.BaseProblemConfiguration.worker" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">worker</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#gemseo_benchmark.problems.base_problem_configuration.BaseProblemConfiguration.worker" class="headerlink" title="Permanent link">&para;</a></h6>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">worker</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#type">type</a></span><span class="p">[</span><span class="n"><span title="sandbox.tmp_classattribute.BaseWorker">BaseWorker</span></span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The type of benchmarking worker.</p>
+
+    </div>
+
+</div>
+
 <h5 id="gemseo_benchmark.problems.base_problem_configuration.BaseProblemConfiguration-functions">Functions<a href="#gemseo_benchmark.problems.base_problem_configuration.BaseProblemConfiguration-functions" class="headerlink" title="Permanent link">&para;</a></h5>
 
 <div class="doc doc-object doc-function">
@@ -2759,7 +2891,10 @@ for the number of iterations axis.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/problems/base_problem_configuration.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">354</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
 <span class="normal">355</span>
 <span class="normal">356</span>
 <span class="normal">357</span>
@@ -2806,10 +2941,7 @@ for the number of iterations axis.</p>
 <span class="normal">398</span>
 <span class="normal">399</span>
 <span class="normal">400</span>
-<span class="normal">401</span>
-<span class="normal">402</span>
-<span class="normal">403</span>
-<span class="normal">404</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_data_profile</span><span class="p">(</span>
+<span class="normal">401</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_data_profile</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">algos_configurations</span><span class="p">:</span> <span class="n">AlgorithmsConfigurations</span><span class="p">,</span>
     <span class="n">results</span><span class="p">:</span> <span class="n">Results</span><span class="p">,</span>
@@ -2849,7 +2981,7 @@ for the number of iterations axis.</p>
             <span class="n">data_profile</span><span class="o">.</span><span class="n">add_history</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
                 <span class="n">configuration_name</span><span class="p">,</span>
-                <span class="n">history</span><span class="o">.</span><span class="n">objective_values</span><span class="p">,</span>
+                <span class="n">history</span><span class="o">.</span><span class="n">performance_measures</span><span class="p">,</span>
                 <span class="n">history</span><span class="o">.</span><span class="n">infeasibility_measures</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -2897,13 +3029,13 @@ for the number of iterations axis.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/problems/base_problem_configuration.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">341</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
 <span class="normal">342</span>
 <span class="normal">343</span>
-<span class="normal">344</span>
-<span class="normal">345</span>
-<span class="normal">346</span>
-<span class="normal">347</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_starting_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">344</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_starting_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load the starting points from a NumPy binary.</span>
 
 <span class="sd">    Args:</span>
@@ -2947,13 +3079,13 @@ for the number of iterations axis.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/problems/base_problem_configuration.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">333</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
 <span class="normal">334</span>
 <span class="normal">335</span>
-<span class="normal">336</span>
-<span class="normal">337</span>
-<span class="normal">338</span>
-<span class="normal">339</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">save_starting_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">336</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">save_starting_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Save the starting points as a NumPy binary.</span>
 
 <span class="sd">    Args:</span>

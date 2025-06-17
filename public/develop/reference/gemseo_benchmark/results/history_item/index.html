@@ -936,6 +936,8 @@
       
         
       
+        
+      
     
     
     
@@ -1013,6 +1015,29 @@
   
   <span class="md-ellipsis">
     Benchmarker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarker/mda_worker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Mda worker
     
   </span>
   
@@ -1202,6 +1227,8 @@
       
         
       
+        
+      
     
     
     
@@ -1256,6 +1283,29 @@
   
   <span class="md-ellipsis">
     Base problem configuration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../problems/mda_problem_configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Mda problem configuration
     
   </span>
   
@@ -1608,9 +1658,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gemseo_benchmark.results.history_item.HistoryItem.objective_value" class="md-nav__link">
+  <a href="#gemseo_benchmark.results.history_item.HistoryItem.performance_measure" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;objective_value
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;performance_measure
     </span>
   </a>
   
@@ -1863,9 +1913,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gemseo_benchmark.results.history_item.HistoryItem.objective_value" class="md-nav__link">
+  <a href="#gemseo_benchmark.results.history_item.HistoryItem.performance_measure" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;objective_value
+      <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;performance_measure
     </span>
   </a>
   
@@ -1995,7 +2045,7 @@
 
 <a href="#gemseo_benchmark.results.history_item.HistoryItem" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">HistoryItem</span><span class="p">(</span>
-    <span class="n">objective_value</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">,</span>
+    <span class="n">performance_measure</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">,</span>
     <span class="n">infeasibility_measure</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">,</span>
     <span class="n">n_unsatisfied_constraints</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span>
@@ -2011,7 +2061,7 @@
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>objective_value</code></b>
+            <b><code>performance_measure</code></b>
               (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>)
           –
           <div class="doc-md-description">
@@ -2070,24 +2120,22 @@ and if the infeasibility measure is positive it will be set to None.</p>
 <span class="normal">46</span>
 <span class="normal">47</span>
 <span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
-    <span class="c1"># TODO: API BREAK: rename argument &#39;objective_value&#39; into &#39;performance_measure&#39;.</span>
-    <span class="n">objective_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">performance_measure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">infeasibility_measure</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">n_unsatisfied_constraints</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
-<span class="sd">        objective_value: The performance measure of the item.</span>
+<span class="sd">        performance_measure: The performance measure of the item.</span>
 <span class="sd">        infeasibility_measure: The infeasibility measure of the item.</span>
 <span class="sd">        n_unsatisfied_constraints: The number of unsatisfied constraints of the</span>
 <span class="sd">            item.</span>
 <span class="sd">            If ``None``, it will be set to 0 if the infeasibility measure is zero,</span>
 <span class="sd">            and if the infeasibility measure is positive it will be set to None.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D205, D212, D415</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">__performance_measure</span> <span class="o">=</span> <span class="n">objective_value</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">__performance_measure</span> <span class="o">=</span> <span class="n">performance_measure</span>
     <span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__infeas_measure</span><span class="p">,</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_unsatisfied_constraints</span><span class="p">,</span>
@@ -2195,16 +2243,16 @@ and if the infeasibility measure is positive it will be set to None.</p>
 
 
 
-<h6 id="gemseo_benchmark.results.history_item.HistoryItem.objective_value" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">objective_value</span>
+<h6 id="gemseo_benchmark.results.history_item.HistoryItem.performance_measure" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">performance_measure</span>
 
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
-<a href="#gemseo_benchmark.results.history_item.HistoryItem.objective_value" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">objective_value</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span>
+<a href="#gemseo_benchmark.results.history_item.HistoryItem.performance_measure" class="headerlink" title="Permanent link">&para;</a></h6>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">performance_measure</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2252,7 +2300,9 @@ tolerance.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/results/history_item.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">166</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
 <span class="normal">167</span>
 <span class="normal">168</span>
 <span class="normal">169</span>
@@ -2261,9 +2311,7 @@ tolerance.</p>
 <span class="normal">172</span>
 <span class="normal">173</span>
 <span class="normal">174</span>
-<span class="normal">175</span>
-<span class="normal">176</span>
-<span class="normal">177</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_infeasibility_tolerance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infeasibility_tolerance</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">175</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">apply_infeasibility_tolerance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infeasibility_tolerance</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply a tolerance on the infeasibility measure.</span>
 
 <span class="sd">    Mark the history item as feasible if its infeasibility measure is below the</span>
@@ -2299,13 +2347,13 @@ tolerance.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/results/history_item.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">179</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
 <span class="normal">180</span>
 <span class="normal">181</span>
 <span class="normal">182</span>
-<span class="normal">183</span>
-<span class="normal">184</span>
-<span class="normal">185</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HistoryItem</span><span class="p">:</span>
+<span class="normal">183</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HistoryItem</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a deep copy of the history item.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">HistoryItem</span><span class="p">(</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__performance_measure</span><span class="p">,</span>
@@ -2336,9 +2384,9 @@ tolerance.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/results/history_item.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">switch_performance_measure_sign</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">switch_performance_measure_sign</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Switch the sign of the performance measure.&quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__performance_measure</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">__performance_measure</span>
 </code></pre></div></td></tr></table></div>

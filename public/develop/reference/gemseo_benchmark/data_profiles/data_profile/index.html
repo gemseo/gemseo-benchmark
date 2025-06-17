@@ -936,6 +936,8 @@
       
         
       
+        
+      
     
     
     
@@ -1013,6 +1015,29 @@
   
   <span class="md-ellipsis">
     Benchmarker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarker/mda_worker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Mda worker
     
   </span>
   
@@ -1353,6 +1378,8 @@
       
         
       
+        
+      
     
     
     
@@ -1407,6 +1434,29 @@
   
   <span class="md-ellipsis">
     Base problem configuration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../problems/mda_problem_configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Mda problem configuration
     
   </span>
   
@@ -2063,7 +2113,7 @@ values.</p>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">add_history</span><span class="p">(</span>
     <span class="n">problem_name</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span>
     <span class="n">algorithm_configuration_name</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span>
-    <span class="n">objective_values</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">],</span>
+    <span class="n">performance_measures</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">],</span>
     <span class="n">infeasibility_measures</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">feasibility_statuses</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
@@ -2093,11 +2143,11 @@ values.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>objective_values</code></b>
+            <b><code>performance_measures</code></b>
               (<code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]</code>)
           –
           <div class="doc-md-description">
-            <p>A history of objective values.
+            <p>A history of performance measures.
 N.B. the value at index <code>i</code> is assumed to have been obtained with
 <code>i+1</code> evaluations.</p>
           </div>
@@ -2183,7 +2233,7 @@ If <code>None</code> then feasibility is always assumed.</p>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">problem_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">algorithm_configuration_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">objective_values</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">performance_measures</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
     <span class="n">infeasibility_measures</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">feasibility_statuses</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -2192,7 +2242,7 @@ If <code>None</code> then feasibility is always assumed.</p>
 <span class="sd">    Args:</span>
 <span class="sd">        problem_name: The name of the problem.</span>
 <span class="sd">        algorithm_configuration_name: The name of the algorithm configuration.</span>
-<span class="sd">        objective_values: A history of objective values.</span>
+<span class="sd">        performance_measures: A history of performance measures.</span>
 <span class="sd">            N.B. the value at index ``i`` is assumed to have been obtained with</span>
 <span class="sd">            ``i+1`` evaluations.</span>
 <span class="sd">        infeasibility_measures: A history of infeasibility measures.</span>
@@ -2212,7 +2262,7 @@ If <code>None</code> then feasibility is always assumed.</p>
             <span class="n">pb_name</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">pb_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__target_values</span>
         <span class="p">}</span>
     <span class="n">history</span> <span class="o">=</span> <span class="n">PerformanceHistory</span><span class="p">(</span>
-        <span class="n">objective_values</span><span class="p">,</span> <span class="n">infeasibility_measures</span><span class="p">,</span> <span class="n">feasibility_statuses</span>
+        <span class="n">performance_measures</span><span class="p">,</span> <span class="n">infeasibility_measures</span><span class="p">,</span> <span class="n">feasibility_statuses</span>
     <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__values_histories</span><span class="p">[</span><span class="n">algorithm_configuration_name</span><span class="p">][</span><span class="n">problem_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
         <span class="n">history</span>
