@@ -58,7 +58,7 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
 )
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.problems.optimization_problem_configuration import (
-    OptimizationBenchmarkingProblem,
+    OptimizationProblemConfiguration,
 )
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.scenario import Scenario
@@ -125,7 +125,7 @@ target_values = TargetValues([10**-i for i in range(4, 7)] + [optimum])
 # although we keep it simple here.
 #
 # We now have all the elements to define the problem configurations.
-rastrigin_2d = OptimizationBenchmarkingProblem(
+rastrigin_2d = OptimizationProblemConfiguration(
     "Rastrigin",
     Rastrigin,
     optimum=optimum,
@@ -133,7 +133,7 @@ rastrigin_2d = OptimizationBenchmarkingProblem(
     doe_algo_name="OT_OPT_LHS",
     target_values=target_values,
 )
-rosenbrock_2d = OptimizationBenchmarkingProblem(
+rosenbrock_2d = OptimizationProblemConfiguration(
     "Rosenbrock",
     Rosenbrock,
     optimum=optimum,
@@ -158,7 +158,7 @@ def create_problem():
     return Rosenbrock(5)
 
 
-rosenbrock_5d = OptimizationBenchmarkingProblem(
+rosenbrock_5d = OptimizationProblemConfiguration(
     "Rosenbrock 5D",
     create_problem,
     target_values=target_values,

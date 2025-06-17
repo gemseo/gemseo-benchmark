@@ -79,9 +79,7 @@ class PerformanceHistory(collections.abc.Sequence):
 
     def __init__(
         self,
-        # TODO: API BREAK:
-        # rename argument 'objective_values' into 'performance_measures'.
-        objective_values: Sequence[float] | None = None,
+        performance_measures: Sequence[float] | None = None,
         infeasibility_measures: Sequence[float] | None = None,
         feasibility_statuses: Sequence[bool] | None = None,
         n_unsatisfied_constraints: Sequence[int] | None = None,
@@ -95,7 +93,7 @@ class PerformanceHistory(collections.abc.Sequence):
     ) -> None:
         """
         Args:
-            objective_values: The history of performance measures.
+            performance_measures: The history of performance measures.
                 If ``None``, will be considered empty.
             infeasibility_measures: The history of infeasibility measures.
                 An infeasibility measure is a non-negative real number representing
@@ -142,7 +140,7 @@ class PerformanceHistory(collections.abc.Sequence):
         self.algorithm_configuration = algorithm_configuration
         self.doe_size = doe_size
         self.items = self.__get_history_items(
-            objective_values,
+            performance_measures,
             infeasibility_measures,
             feasibility_statuses,
             n_unsatisfied_constraints,
@@ -151,11 +149,10 @@ class PerformanceHistory(collections.abc.Sequence):
         self._number_of_variables = number_of_variables
         self.total_time = total_time
 
-    # TODO: API BREAK: rename property 'objective_values' into 'performance_measures'.
     @property
-    def objective_values(self) -> list[float]:
+    def performance_measures(self) -> list[float]:
         """The performance measures."""
-        return [item.objective_value for item in self.items]
+        return [item.performance_measure for item in self.items]
 
     @property
     def infeasibility_measures(self) -> list[float]:
@@ -364,7 +361,7 @@ class PerformanceHistory(collections.abc.Sequence):
         # Add each history item in dictionary format
         for item in self.items:
             data_item = {
-                PerformanceHistory.__PERFORMANCE: item.objective_value,
+                PerformanceHistory.__PERFORMANCE: item.performance_measure,
                 PerformanceHistory.__INFEASIBILITY: item.infeasibility_measure,
             }
             if item.n_unsatisfied_constraints is not None:
@@ -493,7 +490,7 @@ class PerformanceHistory(collections.abc.Sequence):
         Args:
             feasible: Whether to get only feasible values.
             minimum_history: Whether to get the history of the cumulated minimum
-                instead of the history of the objective value.
+                instead of the history of the performance measure.
 
         Returns:
             The abscissas and the ordinates of the plot.

@@ -230,10 +230,10 @@ def test_from_file():
     }
     assert history.doe_size == 7
     assert history.total_time == 123.45
-    assert history.items[0].objective_value == -2.0
+    assert history.items[0].performance_measure == -2.0
     assert history.items[0].infeasibility_measure == 1.0
     assert history.items[0].n_unsatisfied_constraints == 1
-    assert history.items[1].objective_value == -3.0
+    assert history.items[1].performance_measure == -3.0
     assert history.items[1].infeasibility_measure == 0.0
     assert history.items[1].n_unsatisfied_constraints == 0
 
@@ -248,7 +248,7 @@ def test_from_problem(minimization_problem, database):
     """Check the creation of a performance history out of a solved problem."""
     minimization_problem.database = database
     history = PerformanceHistory.from_problem(minimization_problem, "problem")
-    assert history.objective_values == [2.0]
+    assert history.performance_measures == [2.0]
     assert history.infeasibility_measures == [1.0]
     assert history.n_unsatisfied_constraints == [1]
 
@@ -316,5 +316,5 @@ def test_switch_performance_measure_sign() -> None:
     """Check the switch of sign of the performance measure."""
     history = PerformanceHistory([1, 2], [3, 4])
     history.switch_performance_measure_sign()
-    assert history.objective_values == [-1, -2]
+    assert history.performance_measures == [-1, -2]
     assert history.infeasibility_measures == [3, 4]

@@ -1,0 +1,421 @@
+# Copyright 2021 IRT Saint Exupéry, https://www.irt-saintexupery.com
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License version 3 as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this program; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+from __future__ import annotations
+
+import re
+from typing import TYPE_CHECKING
+from typing import Any
+from typing import Callable
+from unittest import mock
+
+import matplotlib.pyplot
+import numpy
+import pytest
+from numpy import zeros
+from numpy.testing import assert_equal
+
+from gemseo_benchmark.data_profiles.target_values import TargetValues
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from gemseo.algos.design_space import DesignSpace
+    from gemseo_benchmark.problems.base_benchmarking_problem import (
+        BaseBenchmarkingProblem,
+    )
+
+    from gemseo_benchmark.algorithms.algorithms_configurations import (
+        AlgorithmsConfigurations,
+    )
+    from gemseo_benchmark.benchmarker.base_worker import BaseWorker
+    from gemseo_benchmark.results.results import Results
+
+
+def check_no_starting_point(
+    benchmarking_problem: BaseBenchmarkingProblem,
+) -> None:
+    """Check that there is no starting point.
+
+    Args:
+        benchmarking_problem: The benchmarking problem.
+    """
+    with pytest.raises(
+        ValueError, match=re.escape("The problem configuration has no starting point.")
+    ):
+        benchmarking_problem.starting_points  # noqa: B018
+
+
+def check_default_starting_point(
+    benchmarking_problem: BaseBenchmarkingProblem, variable_space: DesignSpace
+) -> None:
+    """Check the default starting point.
+
+    Args:
+        benchmarking_problem: The benchmarking problem.
+        variable_space: The variable space of the benchmarking problem.
+    """
+    (starting_point,) = benchmarking_problem.starting_points
+    assert (starting_point == variable_space.get_current_value()).all()
+
+
+def check_inconsistent_starting_points(
+    benchmarking_problem_class: type[BaseBenchmarkingProblem],
+    create_problem: Callable,
+    *args: Any,
+) -> None:
+    """Check initialization with starting points of inadequate size.
+
+    Args:
+        benchmarking_problem_class: The class of benchmarking problem.
+        create_problem: A function that creates problems.
+        *args: Positional arguments for the class initialization.
+    """
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "A starting point must be a 1-dimensional NumPy array of size 2."
+        ),
+    ):
+        benchmarking_problem_class(
+            "Problem", create_problem, *args, starting_points=[numpy.zeros(3)]
+        )
+
+
+def check_undefined_target_values(
+    benchmarking_problem: BaseBenchmarkingProblem,
+) -> None:
+    """Check that there is no target value.
+
+    Args:
+        benchmarking_problem: The benchmarking problem.
+    """
+    with pytest.raises(
+        ValueError, match=re.escape("The problem configuration has no target value.")
+    ):
+        benchmarking_problem.target_values  # noqa: B018
+
+
+def __check_starting_points_generation(
+    benchmarking_problem_class: type[BaseBenchmarkingProblem],
+    create_problem: Callable,
+    input_doe_size: int | None,
+    actual_doe_size: int,
+    *args: Any,
+) -> None:
+    """Check the generation of the starting points.
+
+    Args:
+        benchmarking_problem_class: The class of benchmarking problem.
+        create_problem: A function that creates problems.
+        input_doe_size: The input number of starting points.
+        actual_doe_size: The actual number of starting points.
+        *args: Positional arguments for the class initialization.
+    """
+    assert (
+        len(
+            benchmarking_problem_class(
+                "Problem",
+                create_problem,
+                *args,
+                doe_algo_name="DiagonalDOE",
+                doe_size=input_doe_size,
+            ).starting_points
+        )
+        == actual_doe_size
+    )
+
+
+def check_starting_points_default_generation(
+    benchmarking_problem_class: type[BaseBenchmarkingProblem],
+    create_problem: Callable,
+    *args: Any,
+) -> None:
+    """Check the generation of the starting points.
+
+    Args:
+        benchmarking_problem_class: The class of benchmarking problem.
+        create_problem: A function that creates problems.
+        *args: Positional arguments for the class initialization.
+    """
+    __check_starting_points_generation(
+        benchmarking_problem_class, create_problem, None, 2, *args
+    )
+
+
+def check_starting_points_generation(
+    benchmarking_problem_class: type[BaseBenchmarkingProblem],
+    create_problem: Callable,
+    *args: Any,
+) -> None:
+    """Check the generation of the starting points.
+
+    Args:
+        benchmarking_problem_class: The class of benchmarking problem.
+        create_problem: A function that creates problems.
+        *args: Positional arguments for the class initialization.
+    """
+    __check_starting_points_generation(
+        benchmarking_problem_class, create_problem, 3, 3, *args
+    )
+
+
+message = (
+    "The starting points shall be passed as (lines of) a 2-dimensional NumPy "
+    "array, or as an iterable of 1-dimensional NumPy arrays."
+)
+
+
+def check_set_starting_points_as_non_2d_array(
+    benchmarking_problem: BaseBenchmarkingProblem,
+) -> None:
+    """Check the setting of starting points as a non 2-dimensional NumPy array.
+
+    Args:
+        benchmarking_problem: The benchmarking problem.
+    """
+    with pytest.raises(
+        ValueError,
+        match=re.escape(f"{message} A 1-dimensional NumPy array was passed."),
+    ):
+        benchmarking_problem.starting_points = zeros(2)
+
+
+def check_set_starting_points_as_non_iterable(
+    benchmarking_problem: BaseBenchmarkingProblem,
+) -> None:
+    """Check the setting of starting points as a non-iterable.
+
+    Args:
+        benchmarking_problem: The benchmarking problem.
+    """
+    with pytest.raises(
+        TypeError,
+        match=re.escape(f"{message} The following type was passed: {float}."),
+    ):
+        benchmarking_problem.starting_points = 0.0
+
+
+def check_set_starting_points_with_wrong_dimension(
+    benchmarking_problem: BaseBenchmarkingProblem,
+) -> None:
+    """Check the setting of starting points of the wrong dimension.
+
+    Args:
+        benchmarking_problem: The benchmarking problem.
+    """
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            f"{message} The number of columns (1) is different from the problem "
+            "dimension (2)."
+        ),
+    ):
+        benchmarking_problem.starting_points = numpy.zeros((3, 1))
+
+
+test_description_parametrize = pytest.mark.parametrize(
+    ("input_description", "actual_description"),
+    [
+        ({}, "No description available."),
+        (
+            {"description": "A description of the problem."},
+            "A description of the problem.",
+        ),
+    ],
+)
+
+
+@test_description_parametrize
+def check_description(
+    benchmarking_problem_class: type[BaseBenchmarkingProblem],
+    create_problem: Callable,
+    input_description: Mapping[str, str],
+    actual_description: str,
+    *args: Any,
+) -> None:
+    """Check the description.
+
+    Args:
+        benchmarking_problem_class: The class of benchmarking problem.
+        create_problem: A function that creates problems.
+        input_description: The input description.
+        actual_description: The actual description.
+        *args: Positional arguments for the class initialization.
+    """
+    assert (
+        benchmarking_problem_class(
+            "Problem", create_problem, *args, **input_description
+        ).description
+        == actual_description
+    )
+
+
+def check_starting_points_saving(
+    tmp_path,
+    benchmarking_problem_class: type[BaseBenchmarkingProblem],
+    create_problem: Callable,
+    *args: Any,
+) -> None:
+    """Check the saving of the starting points.
+
+    Args:
+        tmp_path: The path to a temporary directory.
+        benchmarking_problem_class: The class of benchmarking problem.
+        create_problem: A function that creates problems.
+        *args: Positional arguments for the class initialization.
+    """
+    starting_points = numpy.ones((3, 2))
+    path = tmp_path / "starting_points.npy"
+    benchmarking_problem_class(
+        "Problem", create_problem, *args, starting_points=starting_points
+    ).save_starting_points(path)
+    assert_equal(numpy.load(path), starting_points)
+
+
+def check_starting_point_loading(
+    tmp_path,
+    benchmarking_problem_class: type[BaseBenchmarkingProblem],
+    create_problem: Callable,
+    *args: Any,
+) -> None:
+    """Check the loading of starting points.
+
+    Args:
+        tmp_path: The path to a temporary directory.
+        benchmarking_problem_class: The class of benchmarking problem.
+        create_problem: A function that creates problems.
+        *args: Positional arguments for the class initialization.
+    """
+    starting_points = numpy.ones((3, 2))
+    path = tmp_path / "starting_points.npy"
+    numpy.save(path, starting_points)
+    problem = benchmarking_problem_class(
+        "problem", create_problem, *args, starting_points=starting_points
+    )
+    problem.load_starting_point(path)
+    assert_equal(problem.starting_points, starting_points)
+
+
+test_compute_data_profiles_parametrize = pytest.mark.parametrize(
+    ("baseline_images", "use_iteration_log_scale"),
+    [
+        (
+            [f"data_profiles[use_iteration_log_scale={use_iteration_log_scale}]"],
+            use_iteration_log_scale,
+        )
+        for use_iteration_log_scale in [False, True]
+    ],
+)
+
+
+def check_data_profiles_computation(
+    benchmarking_problem_class: type[BaseBenchmarkingProblem],
+    create_problem: Callable,
+    target_values: TargetValues,
+    algorithm_configurations: AlgorithmsConfigurations,
+    results: Results,
+    use_iteration_log_scale: bool,
+    *args: Any,
+) -> None:
+    """Check the computation of data profiles.
+
+    Args:
+        benchmarking_problem_class: The class of benchmarking problem.
+        create_problem: A function that creates problems.
+        target_values: The target values.
+        algorithm_configurations: The algorithm configurations.
+        results: The benchmarking results.
+        use_iteration_log_scale: Whether to use a logarithmic scale
+            for the number of iterations axis.
+        *args: Positional arguments for the class initialization.
+    """
+    matplotlib.pyplot.close("all")
+    target_values.compute_target_hits_history = mock.Mock(
+        return_value=[0, 0, 0, 1, 1, 2]
+    )
+    benchmarking_problem_class(
+        "Problem", create_problem, *args, target_values=target_values
+    ).compute_data_profile(
+        algorithm_configurations,
+        results,
+        use_iteration_log_scale=use_iteration_log_scale,
+    )
+
+
+def check_data_profiles_computation_with_max_eval_number(
+    benchmarking_problem_class: type[BaseBenchmarkingProblem],
+    create_problem: Callable,
+    target_values: TargetValues,
+    algorithm_configurations: AlgorithmsConfigurations,
+    results: Results,
+    *args: Any,
+) -> None:
+    """Check the computation of data profiles when the evaluations number is limited.
+
+    Args:
+        benchmarking_problem_class: The class of benchmarking problem.
+        create_problem: A function that creates problems.
+        target_values: The target values.
+        algorithm_configurations: The algorithm configurations.
+        results: The benchmarking results.
+        *args: Positional arguments for the class initialization.
+    """
+    matplotlib.pyplot.close("all")
+    target_values.compute_target_hits_history = mock.Mock(return_value=[0, 0, 0, 1])
+    bench_problem = benchmarking_problem_class(
+        "Problem", create_problem, *args, target_values=target_values
+    )
+    bench_problem.compute_data_profile(
+        algorithm_configurations, results, max_iteration_number=4
+    )
+
+
+def check_variable_space(
+    benchmarking_problem: BaseBenchmarkingProblem, variable_space: DesignSpace
+) -> None:
+    """Check the variable space.
+
+    Args:
+        benchmarking_problem: The benchmarking problem.
+        variable_space: The variable space of the benchmarking problem.
+    """
+    assert benchmarking_problem.variable_space is variable_space
+
+
+def check_worker_type(
+    benchmarking_problem: BaseBenchmarkingProblem, worker_type: type[BaseWorker]
+) -> None:
+    """Check the type of benchmarking worker.
+
+    Args:
+        benchmarking_problem_class: The class of benchmarking problem.
+        worker_type: The type of benchmarking worker.
+    """
+    assert benchmarking_problem.worker is worker_type
+
+
+@pytest.fixture
+def target_values():
+    """Target values."""
+    # N.B. passing the configuration is required for the setter.
+    target_values = mock.MagicMock(spec=TargetValues)
+    target1 = mock.Mock()
+    target1.performance_measure = 1.0
+    target2 = mock.Mock()
+    target2.performance_measure = 0.0
+    target_values.__iter__.return_value = [target1, target2]
+    target_values.__len__.return_value = 2
+    return target_values

@@ -25,9 +25,9 @@ from typing import TYPE_CHECKING
 from typing import Callable
 
 from gemseo import execute_algo
-from gemseo.algos.opt.factory import OptimizationLibraryFactory
 from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 
+from gemseo_benchmark.benchmarker.optimization_worker import OptimizationWorker
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
 from gemseo_benchmark.problems.base_problem_configuration import (
     BaseProblemConfiguration,
@@ -47,7 +47,7 @@ if TYPE_CHECKING:
     from gemseo_benchmark.data_profiles.target_values import TargetValues
 
 
-class OptimizationBenchmarkingProblem(BaseProblemConfiguration):
+class OptimizationProblemConfiguration(BaseProblemConfiguration):
     """Problem configuration for optimization.
 
     An *optimization* problem configuration is a problem of reference
@@ -63,6 +63,8 @@ class OptimizationBenchmarkingProblem(BaseProblemConfiguration):
 
     __targets_generator: TargetsGenerator | None
     """The generator of target values for the optimization problem configuration."""
+
+    worker: type[OptimizationWorker] = OptimizationWorker
 
     def __init__(
         self,
@@ -133,21 +135,6 @@ class OptimizationBenchmarkingProblem(BaseProblemConfiguration):
     def constraints_names(self) -> list[str]:
         """The names of the scalar constraints."""
         return self.__optimization_problem.scalar_constraint_names
-
-    # TODO: Delegate to Worker.
-    def is_algorithm_suited(self, name: str) -> bool:
-        """Check whether an algorithm is suited to the problem.
-
-        Args:
-            name: The name of the algorithm.
-
-        Returns:
-            True if the algorithm is suited to the problem, False otherwise.
-        """
-        library = OptimizationLibraryFactory().create(name)
-        return library.is_algorithm_suited(
-            library.ALGORITHM_INFOS[name], self.__optimization_problem
-        )
 
     def compute_target_values(
         self,

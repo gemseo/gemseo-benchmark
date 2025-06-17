@@ -340,7 +340,7 @@ class Figures:
         """
         # Find the extremal feasible performance measure.
         worst_feasible_performances = [
-            history.remove_leading_infeasible()[0].objective_value
+            history.remove_leading_infeasible()[0].performance_measure
             for histories in performance_histories.values()
             for history in histories
             if history[-1].is_feasible
@@ -531,8 +531,8 @@ class Figures:
             for target in problem.minimization_target_values
             if target.is_feasible
         ]
-        best_performance_measure = min(history_items).objective_value
-        worst_performance_measure = max(target_items).objective_value
+        best_performance_measure = min(history_items).performance_measure
+        worst_performance_measure = max(target_items).performance_measure
         if problem.minimize_performance_measure:
             args = (best_performance_measure, worst_performance_measure)
         else:
@@ -561,7 +561,9 @@ class Figures:
             The performance measure of the history item.
         """
         return (
-            item.objective_value if item.is_feasible else infeasible_performance_measure
+            item.performance_measure
+            if item.is_feasible
+            else infeasible_performance_measure
         )
 
     def __plot_infeasibility_measure(
@@ -866,11 +868,11 @@ class Figures:
             performance_axes.autoscale(enable=True, axis="y", tight=True)
             if problem.minimize_performance_measure:
                 performance_axes.set_ylim(
-                    top=max(problem.target_values).objective_value
+                    top=max(problem.target_values).performance_measure
                 )
             else:
                 performance_axes.set_ylim(
-                    bottom=min(problem.target_values).objective_value
+                    bottom=min(problem.target_values).performance_measure
                 )
 
             targets_axes.set_ylim(performance_axes.get_ylim())

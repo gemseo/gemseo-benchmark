@@ -52,14 +52,14 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
 from gemseo_benchmark.problems.optimization_problem_configuration import (
-    OptimizationBenchmarkingProblem,
+    OptimizationProblemConfiguration,
 )
 
 # %%
 # Let us consider the optimization problem
 # [Power2][gemseo.problems.optimization.power_2.Power2]
 # already implemented in GEMSEO.
-problem = OptimizationBenchmarkingProblem(
+problem = OptimizationProblemConfiguration(
     "Power2", Power2, optimum=Power2.get_solution()[1]
 )
 # %%

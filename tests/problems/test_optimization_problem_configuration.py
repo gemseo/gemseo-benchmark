@@ -21,28 +21,40 @@
 
 from __future__ import annotations
 
-import re
-from typing import TYPE_CHECKING
 from typing import Callable
 from unittest import mock
 
-import numpy
 import pytest
+from gemseo.algos.optimization_problem import OptimizationProblem
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
-from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
 from numpy import ones
 from numpy import zeros
 from numpy.testing import assert_allclose
-from numpy.testing import assert_equal
 
+from gemseo_benchmark.benchmarker.optimization_worker import OptimizationWorker
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.problems.optimization_problem_configuration import (
-    OptimizationBenchmarkingProblem,
+    OptimizationProblemConfiguration,
 )
-
-if TYPE_CHECKING:
-    from gemseo import OptimizationProblem
+from tests.problems.conftest import check_data_profiles_computation
+from tests.problems.conftest import check_data_profiles_computation_with_max_eval_number
+from tests.problems.conftest import check_default_starting_point
+from tests.problems.conftest import check_description
+from tests.problems.conftest import check_inconsistent_starting_points
+from tests.problems.conftest import check_no_starting_point
+from tests.problems.conftest import check_set_starting_points_as_non_2d_array
+from tests.problems.conftest import check_set_starting_points_as_non_iterable
+from tests.problems.conftest import check_set_starting_points_with_wrong_dimension
+from tests.problems.conftest import check_starting_point_loading
+from tests.problems.conftest import check_starting_points_default_generation
+from tests.problems.conftest import check_starting_points_generation
+from tests.problems.conftest import check_starting_points_saving
+from tests.problems.conftest import check_undefined_target_values
+from tests.problems.conftest import check_variable_space
+from tests.problems.conftest import check_worker_type
+from tests.problems.conftest import test_compute_data_profiles_parametrize
+from tests.problems.conftest import test_description_parametrize
 
 
 @pytest.fixture(scope="module")
@@ -64,35 +76,37 @@ def maximization_problem_creator(
 @pytest.fixture(scope="module")
 def benchmarking_problem(minimization_problem_creator):
     """A problem configuration."""
-    return OptimizationBenchmarkingProblem("Problem", minimization_problem_creator)
+    return OptimizationProblemConfiguration("Problem", minimization_problem_creator)
 
 
-def test_default_starting_point(benchmarking_problem, minimization_problem):
+def test_undefined_starting_points() -> None:
+    """Check the absence of starting points."""
+    variable_space = mock.Mock()
+    variable_space.has_current_value = False
+
+    def create_problem() -> OptimizationProblem:
+        """Create an optimization problem."""
+        return OptimizationProblem(variable_space)
+
+    check_no_starting_point(OptimizationProblemConfiguration("Problem", create_problem))
+
+
+def test_default_starting_point(benchmarking_problem, design_space):
     """Check that the default starting point is properly set."""
-    starting_points = benchmarking_problem.starting_points
-    assert len(starting_points) == 1
-    assert (
-        starting_points[0] == minimization_problem.design_space.get_current_value()
-    ).all()
+    check_default_starting_point(benchmarking_problem, design_space)
 
 
 def test_inconsistent_starting_points(minimization_problem_creator):
     """Check initialization with starting points of inadequate size."""
-    with pytest.raises(
-        ValueError,
-        match=re.escape(
-            "A starting point must be a 1-dimensional NumPy array of size 2."
-        ),
-    ):
-        OptimizationBenchmarkingProblem(
-            "problem", minimization_problem_creator, [zeros(3)]
-        )
+    check_inconsistent_starting_points(
+        OptimizationProblemConfiguration, minimization_problem_creator
+    )
 
 
 def test_starting_points_iteration(minimization_problem_creator):
     """Check the iteration on starting points."""
     starting_points = [zeros(2), ones(2)]
-    problem = OptimizationBenchmarkingProblem(
+    problem = OptimizationProblemConfiguration(
         "problem", minimization_problem_creator, starting_points
     )
     problem_instances = list(problem)
@@ -107,34 +121,25 @@ def test_starting_points_iteration(minimization_problem_creator):
     )
 
 
-def test_undefined_targets(minimization_problem_creator):
-    """Check the access to undefined targets."""
-    problem = OptimizationBenchmarkingProblem(
-        "problem", minimization_problem_creator, [zeros(2)]
+def test_undefined_target_values(minimization_problem_creator):
+    """Check undefined target values."""
+    check_undefined_target_values(
+        OptimizationProblemConfiguration("problem", minimization_problem_creator)
     )
-    with pytest.raises(
-        ValueError, match=re.escape("The problem configuration has no target value.")
-    ):
-        _ = problem.target_values
+
+
+def test_generate_default_starting_points(minimization_problem_creator):
+    """Check the generation of the default number of starting points."""
+    check_starting_points_default_generation(
+        OptimizationProblemConfiguration, minimization_problem_creator
+    )
 
 
 def test_generate_starting_points(minimization_problem_creator):
     """Check the generation of starting points."""
-    problem = OptimizationBenchmarkingProblem(
-        "problem", minimization_problem_creator, doe_algo_name="DiagonalDOE", doe_size=5
+    check_starting_points_generation(
+        OptimizationProblemConfiguration, minimization_problem_creator
     )
-    assert len(problem.starting_points) == 5
-
-
-def test_undefined_starting_points(minimization_problem_creator):
-    """Check the access to nonexistent starting points."""
-    opt_problem = minimization_problem_creator()
-    opt_problem.design_space.has_current_value = False
-    problem = OptimizationBenchmarkingProblem("problem", lambda: opt_problem)
-    with pytest.raises(
-        ValueError, match=re.escape("The problem configuration has no starting point.")
-    ):
-        _ = problem.starting_points
 
 
 @pytest.mark.parametrize(
@@ -181,7 +186,7 @@ def test__get_description(
 ):
     """Check the description getter."""
     assert (
-        OptimizationBenchmarkingProblem._get_description(
+        OptimizationProblemConfiguration._get_description(
             dimension,
             nonlinear_objective,
             linear_equality_constraints,
@@ -193,20 +198,6 @@ def test__get_description(
     )
 
 
-@pytest.fixture
-def target_values():
-    """Target values."""
-    # N.B. passing the configuration is required for the setter.
-    target_values = mock.MagicMock(spec=TargetValues)
-    target1 = mock.Mock()
-    target1.objective_value = 1.0
-    target2 = mock.Mock()
-    target2.objective_value = 0.0
-    target_values.__iter__.return_value = [target1, target2]
-    target_values.__len__.return_value = 2
-    return target_values
-
-
 @pytest.mark.parametrize("minimize_objective", [False, True])
 def test_init_targets_computation(algorithms_configurations, minimize_objective):
     """Check the computation of targets at the problem creation."""
@@ -216,7 +207,7 @@ def test_init_targets_computation(algorithms_configurations, minimize_objective)
         problem.minimize_objective = minimize_objective
         return problem
 
-    problem = OptimizationBenchmarkingProblem(
+    problem = OptimizationProblemConfiguration(
         "Problem",
         create,
         target_values_algorithms_configurations=algorithms_configurations,
@@ -225,55 +216,19 @@ def test_init_targets_computation(algorithms_configurations, minimize_objective)
     assert isinstance(problem.target_values, TargetValues)
 
 
-message = (
-    "The starting points shall be passed as (lines of) a 2-dimensional NumPy "
-    "array, or as an iterable of 1-dimensional NumPy arrays."
-)
-
-
 def test_starting_points_non_2d_array(benchmarking_problem):
     """Check the setting of starting points as a non 2-dimensional NumPy array."""
-    with pytest.raises(
-        ValueError,
-        match=re.escape(f"{message} A 1-dimensional NumPy array was passed."),
-    ):
-        benchmarking_problem.starting_points = zeros(2)
+    check_set_starting_points_as_non_2d_array(benchmarking_problem)
 
 
 def test_starting_points_non_iterable(benchmarking_problem):
     """Check the setting of starting points as a non-iterable object."""
-    starting_points = 0.0
-    with pytest.raises(
-        TypeError,
-        match=re.escape(
-            f"{message} The following type was passed: {type(starting_points)}."
-        ),
-    ):
-        benchmarking_problem.starting_points = starting_points
+    check_set_starting_points_as_non_iterable(benchmarking_problem)
 
 
 def test_starting_points_wrong_dimension(benchmarking_problem):
     """Check the setting of starting points of the wrong dimension."""
-    with pytest.raises(
-        ValueError,
-        match=re.escape(
-            f"{message} The number of columns (1) is different from the problem "
-            "dimension (2)."
-        ),
-    ):
-        benchmarking_problem.starting_points = zeros((3, 1))
-
-
-@pytest.mark.parametrize("doe_options", [None, {}])
-def test_get_starting_points(minimization_problem_creator, doe_options):
-    """Check the computation of the starting points."""
-    bench_problem = OptimizationBenchmarkingProblem(
-        "Problem",
-        minimization_problem_creator,
-        doe_algo_name="DiagonalDOE",
-        doe_options=doe_options,
-    )
-    assert len(bench_problem.starting_points) == 2
+    check_set_starting_points_with_wrong_dimension(benchmarking_problem)
 
 
 def test_targets_generator_accessor(benchmarking_problem):
@@ -283,49 +238,40 @@ def test_targets_generator_accessor(benchmarking_problem):
 
 def test_target_values_maximization_initial(maximization_problem_creator) -> None:
     """Check the initial target values for a maximization problem."""
-    problem = OptimizationBenchmarkingProblem(
+    problem = OptimizationProblemConfiguration(
         "Rosenbrock maximization",
         maximization_problem_creator,
         [],
         TargetValues([1, 2], [3, 4]),
     )
-    assert problem.target_values.objective_values == [1, 2]
+    assert problem.target_values.performance_measures == [1, 2]
     assert problem.target_values.infeasibility_measures == [3, 4]
-    assert problem.minimization_target_values.objective_values == [-1, -2]
+    assert problem.minimization_target_values.performance_measures == [-1, -2]
     assert problem.minimization_target_values.infeasibility_measures == [3, 4]
 
 
 def test_target_values_maximization_set(maximization_problem_creator) -> None:
     """Check the set target values for a maximization problem."""
-    problem = OptimizationBenchmarkingProblem(
+    problem = OptimizationProblemConfiguration(
         "Rosenbrock maximization", maximization_problem_creator
     )
     problem.target_values = TargetValues([1, 2], [3, 4])
-    assert problem.target_values.objective_values == [1, 2]
+    assert problem.target_values.performance_measures == [1, 2]
     assert problem.target_values.infeasibility_measures == [3, 4]
-    assert problem.minimization_target_values.objective_values == [-1, -2]
+    assert problem.minimization_target_values.performance_measures == [-1, -2]
     assert problem.minimization_target_values.infeasibility_measures == [3, 4]
 
 
-@pytest.mark.parametrize(
-    ("input_description", "description"),
-    [
-        ({}, "No description available."),
-        (
-            {"description": "A description of the problem."},
-            "A description of the problem.",
-        ),
-    ],
-)
-def test_default_description(
-    minimization_problem_creator, input_description, description
+@test_description_parametrize
+def test_description(
+    minimization_problem_creator, input_description, actual_description
 ):
-    """Check the default description of a problem."""
-    assert (
-        OptimizationBenchmarkingProblem(
-            "problem", minimization_problem_creator, **input_description
-        ).description
-        == description
+    """Check the description."""
+    check_description(
+        OptimizationProblemConfiguration,
+        minimization_problem_creator,
+        input_description,
+        actual_description,
     )
 
 
@@ -347,41 +293,24 @@ def test_constraints_names(benchmarking_problem, minimization_problem_creator):
 
 def test_save_starting_points(tmp_path, minimization_problem_creator):
     """Check the saving of starting points."""
-    starting_points = numpy.ones((3, 2))
-    path = tmp_path / "starting_points.npy"
-    OptimizationBenchmarkingProblem(
-        "problem", minimization_problem_creator, starting_points=starting_points
-    ).save_starting_points(path)
-    assert_equal(numpy.load(path), starting_points)
+    check_starting_points_saving(
+        tmp_path, OptimizationProblemConfiguration, minimization_problem_creator
+    )
 
 
 def test_load_starting_points(tmp_path, minimization_problem_creator):
     """Check the loading of starting points."""
-    starting_points = numpy.ones((3, 2))
-    path = tmp_path / "starting_points.npy"
-    numpy.save(path, starting_points)
-    problem = OptimizationBenchmarkingProblem(
-        "problem", minimization_problem_creator, starting_points=starting_points
+    check_starting_point_loading(
+        tmp_path, OptimizationProblemConfiguration, minimization_problem_creator
     )
-    problem.load_starting_point(path)
-    assert_equal(problem.starting_points, starting_points)
 
 
 def test_dimension(benchmarking_problem):
-    """Check the accessor to the problem dimension."""
+    """Check the problem dimension."""
     assert benchmarking_problem.dimension == 2
 
 
-@pytest.mark.parametrize(
-    ("baseline_images", "use_iteration_log_scale"),
-    [
-        (
-            [f"data_profiles[use_iteration_log_scale={use_iteration_log_scale}]"],
-            use_iteration_log_scale,
-        )
-        for use_iteration_log_scale in [False, True]
-    ],
-)
+@test_compute_data_profiles_parametrize
 @image_comparison(None, ["png"])
 def test_compute_data_profile(
     baseline_images,
@@ -392,17 +321,13 @@ def test_compute_data_profile(
     use_iteration_log_scale,
 ):
     """Check the computation of data profiles."""
-    target_values.compute_target_hits_history = mock.Mock(
-        return_value=[0, 0, 0, 1, 1, 2]
-    )
-    bench_problem = OptimizationBenchmarkingProblem(
-        "Problem", minimization_problem_creator, target_values=target_values
-    )
-    pyplot.close("all")
-    bench_problem.compute_data_profile(
+    check_data_profiles_computation(
+        OptimizationProblemConfiguration,
+        minimization_problem_creator,
+        target_values,
         algorithms_configurations,
         results,
-        use_iteration_log_scale=use_iteration_log_scale,
+        use_iteration_log_scale,
     )
 
 
@@ -415,13 +340,12 @@ def test_compute_data_profile_max_eval_number(
     minimization_problem_creator, target_values, algorithms_configurations, results
 ):
     """Check the computation of data profiles when the evaluations number is limited."""
-    bench_problem = OptimizationBenchmarkingProblem(
-        "Problem", minimization_problem_creator, target_values=target_values
-    )
-    target_values.compute_target_hits_history = mock.Mock(return_value=[0, 0, 0, 1])
-    pyplot.close("all")
-    bench_problem.compute_data_profile(
-        algorithms_configurations, results, max_iteration_number=4
+    check_data_profiles_computation_with_max_eval_number(
+        OptimizationProblemConfiguration,
+        minimization_problem_creator,
+        target_values,
+        algorithms_configurations,
+        results,
     )
 
 
@@ -432,8 +356,18 @@ def test_compute_data_profile_max_eval_number(
 def test_minimize_objective(problem_creator, minimize_objective, request) -> None:
     """Check the minimization flag."""
     assert (
-        OptimizationBenchmarkingProblem(
+        OptimizationProblemConfiguration(
             "Problem", request.getfixturevalue(problem_creator)
         ).minimize_performance_measure
         is minimize_objective
     )
+
+
+def test_variable_space(benchmarking_problem, design_space) -> None:
+    """Check the variable space."""
+    check_variable_space(benchmarking_problem, design_space)
+
+
+def test_worker(benchmarking_problem) -> None:
+    """Check the type of benchmarking worker."""
+    check_worker_type(benchmarking_problem, OptimizationWorker)

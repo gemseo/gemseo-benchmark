@@ -44,14 +44,14 @@ def test_check_algorithm_availability() -> None:
 
 @pytest.mark.parametrize("save_gemseo_log", [False, True])
 @pytest.mark.parametrize("save_data", [False, True])
-def test_call(
+def test_execution(
     tmp_wd,  # noqa: F811
     algorithm_configuration,
     rosenbrock,
     save_gemseo_log,
     save_data,
 ) -> None:
-    """Check the call to the benchmarking worker."""
+    """Check the execution of the benchmarking worker."""
     gemseo_log_message = (
         f"Solving problem 1 of problem configuration {rosenbrock.name} "
         f"for algorithm configuration {algorithm_configuration.name}."
@@ -59,7 +59,7 @@ def test_call(
     gemseo_log_path = Path("gemseo.log") if save_gemseo_log else None
     performance_history_path = Path("performance_history.json")
     hdf_file_path = Path("database.h5") if save_data else None
-    OptimizationWorker()(
+    OptimizationWorker().execute(
         algorithm_configuration,
         rosenbrock,
         rosenbrock.create_problem().design_space.get_lower_bounds(),
@@ -126,7 +126,7 @@ def test_create_performance_history(algorithm_configuration, rosenbrock) -> None
     assert performance_history.algorithm_configuration is algorithm_configuration
     assert performance_history.problem_name == rosenbrock.name
     assert len(performance_history) == 1
-    assert performance_history.objective_values == [
+    assert performance_history.performance_measures == [
         values[problem.standardized_objective_name]
     ]
     assert performance_history.infeasibility_measures == [0.0]

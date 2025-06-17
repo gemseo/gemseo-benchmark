@@ -72,8 +72,9 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
             msg = f"The algorithm {algorithm_name!r} is not available."
             raise ValueError(msg)
 
-    def __call__(
-        self,
+    @classmethod
+    def execute(
+        cls,
         algorithm_configuration: AlgorithmConfiguration,
         problem_configuration: BaseProblemConfiguration,
         starting_point: RealArray,
@@ -104,7 +105,7 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
             for logger in loggers:
                 logger.addHandler(file_handler)
 
-        problem = self._get_problem(
+        problem = cls._get_problem(
             algorithm_configuration,
             problem_configuration,
             starting_point,
@@ -112,7 +113,7 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
         )
         benchmarking_logger.info(gemseo_log_message)
         with Timer() as timer:
-            self._execute(
+            cls._execute(
                 algorithm_configuration,
                 problem_configuration,
                 starting_point,
@@ -126,17 +127,17 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
 
             file_handler.close()
 
-        self._create_performance_history(
+        cls._create_performance_history(
             algorithm_configuration,
             problem_configuration,
             problem,
             timer,
         ).to_file(performance_history_path)
-        self._post_execute(problem, hdf_file_path)
+        cls._post_execute(problem, hdf_file_path)
 
+    @staticmethod
     @abstractmethod
     def _get_problem(
-        self,
         algorithm_configuration: AlgorithmConfiguration,
         problem_configuration: BaseProblemConfiguration,
         starting_point: RealArray,
@@ -155,9 +156,9 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
             A problem ready for execution.
         """
 
+    @staticmethod
     @abstractmethod
     def _execute(
-        self,
         algorithm_configuration: AlgorithmConfiguration,
         problem_configuration: BaseProblemConfiguration,
         problem: ProblemType,
@@ -172,9 +173,9 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
             starting_point: The starting point of the algorithm.
         """
 
+    @staticmethod
     @abstractmethod
     def _create_performance_history(
-        self,
         algorithm_configuration: AlgorithmConfiguration,
         problem_configuration: BaseProblemConfiguration,
         problem: ProblemType,
@@ -192,8 +193,9 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
             The performance history.
         """
 
+    @staticmethod
     @abstractmethod
-    def _post_execute(self, problem: ProblemType, hdf_file_path: Path | None) -> None:
+    def _post_execute(problem: ProblemType, hdf_file_path: Path | None) -> None:
         """Run instructions after the execution of the worker.
 
         Args:

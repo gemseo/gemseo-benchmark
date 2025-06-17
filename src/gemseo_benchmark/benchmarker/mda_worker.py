@@ -12,14 +12,15 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-"""Benchmarking worker for optimization algorithms."""
+
+"""Benchmarking worker for multidisciplinary analysis."""
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from gemseo import execute_algo
-from gemseo.algos.opt.factory import OptimizationLibraryFactory
+from gemseo.core.discipline.base_discipline import CacheType
+from gemseo.mda.factory import MDAFactory
 
 from gemseo_benchmark.benchmarker.base_worker import BaseWorker
 from gemseo_benchmark.results.performance_history import PerformanceHistory
@@ -27,63 +28,63 @@ from gemseo_benchmark.results.performance_history import PerformanceHistory
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from gemseo.algos.optimization_problem import OptimizationProblem
     from gemseo.typing import RealArray
     from gemseo.utils.timer import Timer
 
     from gemseo_benchmark.algorithms.algorithm_configuration import (
         AlgorithmConfiguration,
     )
-    from gemseo_benchmark.problems.optimization_problem_configuration import (
-        OptimizationProblemConfiguration,
+    from gemseo_benchmark.problems.mda_problem_configuration import (
+        MDAProblemConfiguration,
     )
+    from gemseo_benchmark.problems.mda_problem_configuration import MDAProblemType
 
 
-class OptimizationWorker(BaseWorker):
-    """A benchmarking worker for optimization."""
+class MDAWorker(BaseWorker):
+    """A benchmarking worker for multidisciplinary analysis."""
 
-    _algorithm_factory: OptimizationLibraryFactory = OptimizationLibraryFactory()
+    _algorithm_factory: MDAFactory = MDAFactory()
 
     @staticmethod
     def _get_problem(
         algorithm_configuration: AlgorithmConfiguration,
-        problem_configuration: OptimizationProblemConfiguration,
+        problem_configuration: MDAProblemConfiguration,
         starting_point: RealArray,
         hdf_file_path: Path | None,
-    ) -> OptimizationProblem:
-        problem = problem_configuration.create_problem()
-        problem.design_space.set_current_value(starting_point)
-        return problem
+    ) -> MDAProblemType:
+        mda, disciplines = problem_configuration.create_problem(algorithm_configuration)
+        if hdf_file_path is not None:
+            mda.set_cache(CacheType.HDF5, hdf_file_path=hdf_file_path)
+
+        return mda, disciplines
 
     @staticmethod
     def _execute(
         algorithm_configuration: AlgorithmConfiguration,
-        problem_configuration: OptimizationProblemConfiguration,
+        problem_configuration: MDAProblemConfiguration,
         starting_point: RealArray,
-        problem: OptimizationProblem,
+        problem: MDAProblemType,
     ) -> None:
-        execute_algo(
-            problem,
-            "opt",
-            algo_name=algorithm_configuration.algorithm_name,
-            **algorithm_configuration.algorithm_options,
+        problem[0].execute(
+            problem_configuration.variable_space.convert_array_to_dict(starting_point)
         )
 
     @staticmethod
     def _create_performance_history(
         algorithm_configuration: AlgorithmConfiguration,
-        problem_configuration: OptimizationProblemConfiguration,
-        problem: OptimizationProblem,
+        problem_configuration: MDAProblemConfiguration,
+        problem: MDAProblemType,
         timer: Timer,
     ) -> PerformanceHistory:
-        performance_history = PerformanceHistory.from_problem(
-            problem, problem_configuration.name
+        # TODO: Store execution times and number of discipline executions.
+        return PerformanceHistory(
+            problem[0].residual_history,
+            problem_name=problem_configuration.name,
+            total_time=timer.elapsed_time,
+            algorithm_configuration=algorithm_configuration,
+            number_of_variables=problem_configuration.dimension,
         )
-        performance_history.algorithm_configuration = algorithm_configuration
-        performance_history.total_time = timer.elapsed_time
-        return performance_history
 
     @staticmethod
-    def _post_execute(problem: OptimizationProblem, hdf_file_path: Path | None) -> None:
-        if hdf_file_path is not None:
-            problem.database.to_hdf(hdf_file_path)
+    def _post_execute(problem: MDAProblemType, hdf_file_path: Path | None) -> None:
+        pass

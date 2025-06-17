@@ -27,17 +27,16 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
-from gemseo.problems.optimization.rastrigin import Rastrigin
 from gemseo.utils.platform import PLATFORM_IS_WINDOWS
-from numpy import array
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
 from gemseo_benchmark.benchmarker.benchmarker import Benchmarker
+from gemseo_benchmark.problems.mda_problem_configuration import MDAProblemConfiguration
 from gemseo_benchmark.problems.optimization_problem_configuration import (
-    OptimizationBenchmarkingProblem,
+    OptimizationProblemConfiguration,
 )
 
 if TYPE_CHECKING:
@@ -45,57 +44,115 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture(scope="module")
-def rastrigin() -> OptimizationBenchmarkingProblem:
-    """A problem configuration based on the 2-dimensional Rastrigin function."""
-    return OptimizationBenchmarkingProblem(
-        "Rastrigin", Rastrigin, [array([0.0, 0.1]), array([0.1, 0.0])]
-    )
-
-
-lbfgsb_configuration = AlgorithmConfiguration("L-BFGS-B")
+def optimization_algorithm_configuration() -> AlgorithmConfiguration:
+    """An algorithm configuration for optimization."""
+    return AlgorithmConfiguration("L-BFGS-B")
 
 
 @pytest.fixture(scope="module")
-def lbfgsb_results(results_root, rosenbrock) -> Results:
-    """The results of L-BFGS-B on the Rosenbrock function."""
+def optimization_results(
+    results_root, rosenbrock, optimization_algorithm_configuration
+) -> Results:
+    """The results of an optimization benchmarking."""
     return Benchmarker(results_root, results_root / "results.json").execute(
-        [rosenbrock], AlgorithmsConfigurations(lbfgsb_configuration)
+        [rosenbrock], AlgorithmsConfigurations(optimization_algorithm_configuration)
     )
 
 
+@pytest.fixture(scope="module")
+def mda_histories_dir(tmp_path_factory) -> Path:
+    """The directory containing the MDA performance histories."""
+    return tmp_path_factory.mktemp("mda_results")
+
+
+@pytest.fixture(scope="module")
+def mda_results(
+    mda_algorithm_configuration, mda_problem_configuration, mda_histories_dir
+) -> Results:
+    """The results of a multidisciplinary analysis benchmarking."""
+    return Benchmarker(mda_histories_dir, mda_histories_dir / "results.json").execute(
+        [mda_problem_configuration],
+        AlgorithmsConfigurations(mda_algorithm_configuration),
+    )
+
+
+@pytest.mark.parametrize(
+    (
+        "algorithm_configuration",
+        "problem_configuration",
+        "results",
+        "histories_dir",
+    ),
+    [
+        (
+            "optimization_algorithm_configuration",
+            "rosenbrock",
+            "optimization_results",
+            "results_root",
+        ),
+        (
+            "mda_algorithm_configuration",
+            "mda_problem_configuration",
+            "mda_results",
+            "mda_histories_dir",
+        ),
+    ],
+)
 @pytest.mark.parametrize("index", [1, 2])
-def test_save_history(results_root, rosenbrock, lbfgsb_results, index):
+def test_save_history(
+    algorithm_configuration,
+    problem_configuration,
+    index,
+    results,
+    histories_dir,
+    request,
+) -> None:
     """Check the saving of performance histories."""
-    algo_pb_dir = results_root / lbfgsb_configuration.name / rosenbrock.name
-    path = algo_pb_dir / f"{lbfgsb_configuration.name}.{index}.json"
+    algo_config = request.getfixturevalue(algorithm_configuration)
+    pb_config = request.getfixturevalue(problem_configuration)
+    reslts = request.getfixturevalue(results)
+    path = (
+        request.getfixturevalue(histories_dir)
+        / algo_config.name
+        / pb_config.name.replace(" ", "_")
+        / f"{algo_config.name}.{index}.json"
+    )
     assert path.is_file()
-    assert lbfgsb_results.contains(
-        lbfgsb_configuration.algorithm_name, rosenbrock.name, path
-    )
-    assert (
-        f"Solving problem {index} "
-        f"of problem configuration {rosenbrock.name} "
-        f"with algorithm configuration {lbfgsb_configuration.name}."
-    )
+    assert reslts.contains(algo_config.algorithm_name, pb_config.name, path)
 
 
-def test_save_database(tmp_path, rosenbrock):
-    """Check the saving of optimization databases."""
-    algo_config = AlgorithmConfiguration("L-BFGS-B")
+configurations = pytest.mark.parametrize(
+    ("algorithm_configuration", "problem_configuration"),
+    [
+        ("optimization_algorithm_configuration", "rosenbrock"),
+        ("mda_algorithm_configuration", "mda_problem_configuration"),
+    ],
+)
+
+
+@configurations
+def test_save_data(
+    tmp_path, algorithm_configuration, problem_configuration, request
+) -> None:
+    """Check the saving of algorithm data."""
+    algo_config = request.getfixturevalue(algorithm_configuration)
+    pb_config = request.getfixturevalue(problem_configuration)
     Benchmarker(tmp_path, tmp_path / "results.json", tmp_path).execute(
-        [rosenbrock], AlgorithmsConfigurations(algo_config)
+        [pb_config], AlgorithmsConfigurations(algo_config)
     )
-    algo_pb_dir = tmp_path / algo_config.name / rosenbrock.name
-    assert (algo_pb_dir / f"{algo_config.name}.1.h5").is_file()
-    assert (algo_pb_dir / f"{algo_config.name}.2.h5").is_file()
+    histories_dir = tmp_path / algo_config.name / pb_config.name.replace(" ", "_")
+    assert (histories_dir / f"{algo_config.name}.1.h5").is_file()
+    assert (histories_dir / f"{algo_config.name}.2.h5").is_file()
 
 
+@configurations
 def test_unavailable_algorithm(
     tmp_path,
-    rosenbrock,
+    algorithm_configuration,
+    problem_configuration,
     unknown_algorithm_configuration,
-    unknown_algorithms_configurations,
-):
+    request,
+) -> None:
     """Check the handling of an unavailable algorithm."""
     with pytest.raises(
         ValueError,
@@ -105,76 +162,101 @@ def test_unavailable_algorithm(
         ),
     ):
         Benchmarker(tmp_path, tmp_path / "results.json").execute(
-            [rosenbrock], unknown_algorithms_configurations
+            [request.getfixturevalue(problem_configuration)],
+            AlgorithmsConfigurations(
+                unknown_algorithm_configuration,
+                request.getfixturevalue(algorithm_configuration),
+            ),
         )
 
 
-def test_is_problem_unsolved(tmp_path, rosenbrock, rastrigin, caplog):
+@configurations
+def test_is_problem_unsolved(
+    tmp_path, algorithm_configuration, problem_configuration, caplog, request
+) -> None:
     """Check the skipping of a problem."""
     results_path = tmp_path / "results.json"
-    algo_config = AlgorithmConfiguration("L-BFGS-B")
-    # Run the algorithm on the Rosenbrock problem configuration
+    algo_config = request.getfixturevalue(algorithm_configuration)
+    pb_config = request.getfixturevalue(problem_configuration)
     Benchmarker(tmp_path, results_path).execute(
-        [rosenbrock], AlgorithmsConfigurations(algo_config)
+        [pb_config], AlgorithmsConfigurations(algo_config)
     )
-    # Run the algorithm on the Rastrigin problem configuration
     Benchmarker(tmp_path, results_path).execute(
-        [rosenbrock, rastrigin], AlgorithmsConfigurations(algo_config)
+        [pb_config], AlgorithmsConfigurations(algo_config)
     )
     assert (
-        f"Skipping problem 1 of problem configuration {rosenbrock.name} for algorithm "
+        f"Skipping problem 1 of problem configuration {pb_config.name} for algorithm "
         f"configuration {algo_config.name}." in caplog.text
     )
     assert (
-        f"Skipping problem 2 of problem configuration {rosenbrock.name} for algorithm "
+        f"Skipping problem 2 of problem configuration {pb_config.name} for algorithm "
         f"configuration {algo_config.name}." in caplog.text
     )
 
 
-@pytest.mark.parametrize(
-    ("n_processes", "use_threading"), [(1, False), (2, False), (2, True)]
-)
-def test_execution(results_root, rosenbrock, n_processes, use_threading):
+@configurations
+@pytest.mark.parametrize("n_processes", [1, 2])
+@pytest.mark.parametrize("use_threading", [False, True])
+def test_execution(
+    results_root,
+    algorithm_configuration,
+    problem_configuration,
+    n_processes,
+    use_threading,
+    request,
+) -> None:
     """Check the execution of the benchmarker."""
+    algo_config = request.getfixturevalue(algorithm_configuration)
+    pb_config = request.getfixturevalue(problem_configuration)
     results = Benchmarker(results_root).execute(
-        [rosenbrock],
-        AlgorithmsConfigurations(lbfgsb_configuration),
+        [pb_config],
+        AlgorithmsConfigurations(algo_config),
         n_processes=n_processes,
         use_threading=use_threading,
     )
-    algo_pb_dir = results_root / lbfgsb_configuration.name / rosenbrock.name
-    path = algo_pb_dir / f"{lbfgsb_configuration.name}.1.json"
+    histories_dir = results_root / algo_config.name / pb_config.name.replace(" ", "_")
+    path = histories_dir / f"{algo_config.name}.1.json"
     assert path.is_file()
-    assert results.contains(lbfgsb_configuration.algorithm_name, rosenbrock.name, path)
-    path = algo_pb_dir / f"{lbfgsb_configuration.name}.2.json"
+    assert results.contains(algo_config.algorithm_name, pb_config.name, path)
+    path = histories_dir / f"{algo_config.name}.2.json"
     assert path.is_file()
-    assert results.contains(lbfgsb_configuration.algorithm_name, rosenbrock.name, path)
+    assert results.contains(algo_config.algorithm_name, pb_config.name, path)
 
 
-def test_problem_specific_algorithm_options(results_root, rosenbrock):
+@pytest.mark.parametrize(
+    ("algorithm_configuration", "problem_configuration", "option_name"),
+    [
+        ("optimization_algorithm_configuration", "rosenbrock", "max_iter"),
+        ("mda_algorithm_configuration", "mda_problem_configuration", "max_mda_iter"),
+    ],
+)
+def test_problem_specific_algorithm_options(
+    results_root, algorithm_configuration, problem_configuration, option_name, request
+) -> None:
     """Check problem-specific algorithm options."""
+    algo_config = request.getfixturevalue(algorithm_configuration)
+    pb_config = request.getfixturevalue(problem_configuration)
     Benchmarker(results_root).execute(
-        [rosenbrock],
+        [pb_config],
         AlgorithmsConfigurations(
             AlgorithmConfiguration(
-                "L-BFGS-B",
+                algo_config.algorithm_name,
                 instance_algorithm_options={
-                    "max_iter": lambda problem_configuration,
-                    index: problem_configuration.dimension + index
+                    option_name: lambda config, index: config.dimension + index
                 },
             )
         ),
     )
     path_base = (
         results_root
-        / lbfgsb_configuration.name
-        / rosenbrock.name
-        / lbfgsb_configuration.name
+        / algo_config.name
+        / pb_config.name.replace(" ", "_")
+        / algo_config.name
     )
     with path_base.with_suffix(".1.json").open("r") as json_file_1:
         assert (
             json.load(json_file_1)["algorithm_configuration"]["algorithm_options"][
-                "max_iter"
+                option_name
             ]
             == 2
         )
@@ -182,35 +264,40 @@ def test_problem_specific_algorithm_options(results_root, rosenbrock):
     with path_base.with_suffix(".2.json").open("r") as json_file_2:
         assert (
             json.load(json_file_2)["algorithm_configuration"]["algorithm_options"][
-                "max_iter"
+                option_name
             ]
             == 3
         )
 
 
+@configurations
 @pytest.mark.parametrize("n_processes", [1, 2])
 @pytest.mark.parametrize("use_threading", [False, True])
 def test_log_to_file(
-    algorithms_configurations,
     algorithm_configuration,
-    rosenbrock,
+    problem_configuration,
     n_processes,
     use_threading,
     tmp_path,
+    request,
 ) -> None:
     """Check the logging of algorithms."""
+    algo_config = request.getfixturevalue(algorithm_configuration)
+    pb_config = request.getfixturevalue(problem_configuration)
     Benchmarker(tmp_path).execute(
-        [rosenbrock],
-        algorithms_configurations,
+        [pb_config],
+        AlgorithmsConfigurations(algo_config),
         n_processes=n_processes,
         use_threading=use_threading,
         save_log=True,
     )
+    reference1_path = Path(__file__).parent / f"{algo_config.name}.1.log"
+    reference2_path = Path(__file__).parent / f"{algo_config.name}.2.log"
     if use_threading:
         with (
             (tmp_path / "gemseo.log").open("r") as file,
-            (Path(__file__).parent / "1.log").open("r") as reference1,
-            (Path(__file__).parent / "2.log").open("r") as reference2,
+            reference1_path.open("r") as reference1,
+            reference2_path.open("r") as reference2,
         ):
             file_contents = file.read()
             for line in reference1.read().split("\n"):
@@ -223,40 +310,59 @@ def test_log_to_file(
             # FIXME: Support logging to file when multiprocessing on Windows.
             return
 
-        path_stem = (
+        path_base = (
             tmp_path
-            / algorithm_configuration.name
-            / rosenbrock.name
-            / f"{algorithm_configuration.name}"
+            / algo_config.name
+            / pb_config.name.replace(" ", "_")
+            / f"{algo_config.name}"
         )
         with (
-            path_stem.with_suffix(".1.log").open("r") as file1,
-            (Path(__file__).parent / "1.log").open("r") as reference1,
+            path_base.with_suffix(".1.log").open("r") as file1,
+            reference1_path.open("r") as reference1,
         ):
             assert reference1.read() in file1.read()
 
         with (
-            path_stem.with_suffix(".2.log").open("r") as file2,
-            (Path(__file__).parent / "2.log").open("r") as reference2,
+            path_base.with_suffix(".2.log").open("r") as file2,
+            reference2_path.open("r") as reference2,
         ):
             assert reference2.read() in file2.read()
 
 
+@configurations
 @pytest.mark.parametrize("overwrite_histories", [False, True])
 def test_overwrite_histories_results_update(
-    tmp_path, rosenbrock, algorithms_configurations, overwrite_histories
+    tmp_path,
+    algorithm_configuration,
+    problem_configuration,
+    overwrite_histories,
+    request,
 ) -> None:
     """Check that results are correctly updated when overwriting histories."""
+    algo_config = request.getfixturevalue(algorithm_configuration)
+    algo_config_name = algo_config.name
+    pb_config = request.getfixturevalue(problem_configuration)
+    pb_config_name = pb_config.name
     results_path = tmp_path / "results.json"
-    history1_path = tmp_path / "SLSQP" / "Rosenbrock" / "SLSQP.1.json"
-    history2_path = tmp_path / "SLSQP" / "Rosenbrock" / "SLSQP.2.json"
+    history1_path = (
+        tmp_path
+        / algo_config_name
+        / pb_config_name.replace(" ", "_")
+        / f"{algo_config_name}.1.json"
+    )
+    history2_path = (
+        tmp_path
+        / algo_config_name
+        / pb_config_name.replace(" ", "_")
+        / f"{algo_config_name}.2.json"
+    )
     benchmarker = Benchmarker(tmp_path, results_path)
-    benchmarker.execute([rosenbrock], algorithms_configurations)
+    benchmarker.execute([pb_config], AlgorithmsConfigurations(algo_config))
     with results_path.open() as results_file:
         data = json.load(results_file)
-        assert data.keys() == {"SLSQP"}
-        assert data["SLSQP"].keys() == {"Rosenbrock"}
-        assert set(data["SLSQP"]["Rosenbrock"]) == {
+        assert data.keys() == {algo_config_name}
+        assert data[algo_config_name].keys() == {pb_config_name}
+        assert set(data[algo_config_name][pb_config_name]) == {
             str(history1_path),
             str(history2_path),
         }
@@ -265,12 +371,14 @@ def test_overwrite_histories_results_update(
     history1_time = history1_path.stat().st_mtime
     history2_time = history2_path.stat().st_mtime
 
-    benchmarker.execute([rosenbrock], algorithms_configurations, overwrite_histories)
+    benchmarker.execute(
+        [pb_config], AlgorithmsConfigurations(algo_config), overwrite_histories
+    )
     with results_path.open() as results_file:
         data = json.load(results_file)
-        assert data.keys() == {"SLSQP"}
-        assert data["SLSQP"].keys() == {"Rosenbrock"}
-        assert set(data["SLSQP"]["Rosenbrock"]) == {
+        assert data.keys() == {algo_config_name}
+        assert data[algo_config_name].keys() == {pb_config_name}
+        assert set(data[algo_config_name][pb_config_name]) == {
             str(history1_path),
             str(history2_path),
         }
@@ -285,31 +393,57 @@ def test_overwrite_histories_results_update(
         assert history2_path.stat().st_mtime == history2_time
 
 
+@pytest.fixture(scope="module")
+def ill_optimization_problem_configuration(
+    rosenbrock,
+) -> OptimizationProblemConfiguration:
+    """An ill optimization problem configuration."""
+    return OptimizationProblemConfiguration(
+        rosenbrock.name, lambda: rosenbrock.create_problem()
+    )
+
+
+@pytest.fixture(scope="module")
+def ill_mda_problem_configuration(
+    mda_variable_space,
+    mda_problem_configuration,
+) -> OptimizationProblemConfiguration:
+    """An ill multidisciplinary analysis problem configuration."""
+    return MDAProblemConfiguration(
+        mda_problem_configuration.name,
+        lambda algorithm_configuration: mda_problem_configuration.create_problem(
+            algorithm_configuration
+        ),
+        mda_variable_space,
+    )
+
+
+@pytest.mark.parametrize(
+    ("algorithm_configuration", "ill_problem_configuration"),
+    [
+        (
+            "optimization_algorithm_configuration",
+            "ill_optimization_problem_configuration",
+        ),
+        ("mda_algorithm_configuration", "ill_mda_problem_configuration"),
+    ],
+)
 def test_worker_raised_exception(
-    tmp_path, rosenbrock, algorithm_configuration, caplog
+    tmp_path, algorithm_configuration, ill_problem_configuration, caplog, request
 ) -> None:
     """Check the case where a worker raised an exception."""
-    problem = OptimizationBenchmarkingProblem(
-        "Problem configuration", lambda: rosenbrock.create_problem()
-    )
-    Benchmarker(tmp_path).execute(
-        [problem],
-        AlgorithmsConfigurations(algorithm_configuration, name="Configuration"),
-    )
+    algo_config = request.getfixturevalue(algorithm_configuration)
+    pb_config = request.getfixturevalue(ill_problem_configuration)
+    Benchmarker(tmp_path).execute([pb_config], AlgorithmsConfigurations(algo_config))
     ((module, level, message),) = caplog.record_tuples
     assert module == "gemseo_benchmark.benchmarker.benchmarker"
     assert level == logging.WARNING
     assert message in {
         (
-            "Solving problem 1 of problem configuration Problem configuration "
-            f"for algorithm configuration {algorithm_configuration.name} "
-            "raised: Can't pickle local object "
-            "'test_worker_raised_exception.<locals>.<lambda>'"
-        ),
-        (
-            "Solving problem 1 of problem configuration Problem configuration "
-            f"for algorithm configuration {algorithm_configuration.name} "
-            "raised: Can't get local object "
-            "'test_worker_raised_exception.<locals>.<lambda>'"
-        ),
+            f"Solving problem 1 of problem configuration {pb_config.name} "
+            f"for algorithm configuration {algo_config.name} "
+            f"raised: Can't {verb} local object "
+            f"'{ill_problem_configuration}.<locals>.<lambda>'"
+        )
+        for verb in {"get", "pickle"}
     }
