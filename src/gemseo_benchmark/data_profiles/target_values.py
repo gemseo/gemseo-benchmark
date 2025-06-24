@@ -126,12 +126,12 @@ class TargetValues(PerformanceHistory):
     def plot_on_axes(
         self,
         axes: matplotlib.axes.Axes,
-        axhline_kwargs: Mapping[str, str | int] = MappingProxyType({
+        axhline_settings: Mapping[str, str | int] = MappingProxyType({
             "color": "red",
             "linestyle": ":",
         }),
         yticklabels_format: str = ".4g",
-        set_ylabel_kwargs: Mapping[str, str | int] = MappingProxyType({
+        set_ylabel_settings: Mapping[str, str | int] = MappingProxyType({
             "rotation": 270,
             "labelpad": 12,
         }),
@@ -140,20 +140,20 @@ class TargetValues(PerformanceHistory):
 
         Args:
             axes: The axes of the plot.
-            axhline_kwargs: Keyword arguments
+            axhline_settings: Keyword arguments
                 for ``matplotlib.axes.Axes.axhline``.
             yticklabels_format: The string format for the target values labels.
-            set_ylabel_kwargs: Keyword arguments
+            set_ylabel_settings: Keyword arguments
                 for ``matplotlib.axes.Axes.set_ylabel``.
         """
         twin_axes = axes.twinx()
         values = [target.performance_measure for target in self if target.is_feasible]
         for value in values:
-            axes.axhline(value, **axhline_kwargs)
+            axes.axhline(value, **axhline_settings)
 
         twin_axes.set_yticks(values)
         twin_axes.set_yticklabels([
             f"{{value:{yticklabels_format}}}".format(value=value) for value in values
         ])
-        twin_axes.set_ylabel("Target values", **set_ylabel_kwargs)
+        twin_axes.set_ylabel("Target values", **set_ylabel_settings)
         twin_axes.set_ylim(axes.get_ylim())

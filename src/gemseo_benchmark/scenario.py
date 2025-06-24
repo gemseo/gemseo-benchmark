@@ -22,6 +22,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Final
 
+from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
+
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
@@ -33,6 +35,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from collections.abc import Mapping
 
+    from gemseo_benchmark import ConfigurationPlotOptions
     from gemseo_benchmark.problems.problems_group import ProblemsGroup
 
 LOGGER = logging.getLogger(__name__)
@@ -90,6 +93,7 @@ class Scenario:
         directory_path: Path | None = None,
         plot_only_median: bool = False,
         use_evaluation_log_scale: bool = False,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
     ) -> Results:
         """Execute the benchmarking scenario.
 
@@ -124,6 +128,8 @@ class Scenario:
             plot_only_median: Whether to plot only the median and no other centile.
             use_evaluation_log_scale: Whether to use a logarithmic scale
                 for the number of function evaluations axis.
+            plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
+                for each algorithm configuration.
 
         Returns:
             The performance histories.
@@ -153,6 +159,7 @@ class Scenario:
                 directory_path,
                 plot_only_median,
                 use_evaluation_log_scale,
+                plot_settings,
             )
 
         return Results(self._results_path)
@@ -228,6 +235,7 @@ class Scenario:
         directory_path: Path | None = None,
         plot_only_median: bool = False,
         use_evaluation_log_scale: bool = False,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
     ) -> None:
         """Generate the benchmarking report.
 
@@ -252,6 +260,8 @@ class Scenario:
             plot_only_median: Whether to plot only the median and no other centile.
             use_evaluation_log_scale: Whether to use a logarithmic scale
                 for the number of function evaluations axis.
+            plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
+                for each algorithm configuration.
         """
         report = Report(
             self.__get_report_path()
@@ -262,6 +272,7 @@ class Scenario:
             Results(self._results_path),
             custom_algos_descriptions,
             max_eval_number_per_group,
+            plot_settings,
         )
         report.generate(
             generate_to_html,
