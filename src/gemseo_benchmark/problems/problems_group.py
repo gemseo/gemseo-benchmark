@@ -103,8 +103,8 @@ class ProblemsGroup:
         plot_path: str | Path = "",
         infeasibility_tolerance: float = 0.0,
         max_eval_number: int = 0,
-        plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
-        grid_kwargs: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        grid_settings: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
         use_evaluation_log_scale: bool = False,
     ) -> None:
         """Generate the data profiles of given algorithms relative to the problems.
@@ -118,9 +118,9 @@ class ProblemsGroup:
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             max_eval_number: The maximum evaluations number to be displayed.
                 If 0, this value is inferred from the longest history.
-            plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
+            plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
-            grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.
+            grid_settings: The keyword arguments of `matplotlib.pyplot.grid`.
             use_evaluation_log_scale: Whether to use a logarithmic scale
                 for the number of function evaluations axis.
         """
@@ -148,8 +148,8 @@ class ProblemsGroup:
         data_profile.plot(
             show=show,
             file_path=plot_path,
-            plot_kwargs=plot_kwargs,
-            grid_kwargs=grid_kwargs,
+            plot_settings=plot_settings,
+            grid_settings=grid_settings,
             use_evaluation_log_scale=use_evaluation_log_scale,
         )
 

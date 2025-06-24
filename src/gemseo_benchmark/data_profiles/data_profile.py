@@ -140,15 +140,15 @@ class DataProfile:
             history
         )
 
-    # TODO: remove argument 'markevery' in favor of 'plot_kwargs' (API break)
+    # TODO: remove argument 'markevery' in favor of 'plot_settings' (API break)
     def plot(
         self,
         algo_names: Iterable[str] | None = None,
         show: bool = True,
         file_path: str | Path = "",
         markevery: MarkeveryType | None = None,
-        plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
-        grid_kwargs: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        grid_settings: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
         use_evaluation_log_scale: bool = False,
     ) -> None:
         """Plot the data profiles of the required algorithms.
@@ -161,9 +161,9 @@ class DataProfile:
                 If empty, the plot is not saved.
             markevery: The sampling parameter for the markers of the plot.
                 Refer to the Matplotlib documentation.
-            plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
+            plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
-            grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.
+            grid_settings: The keyword arguments of `matplotlib.pyplot.grid`.
             use_evaluation_log_scale: Whether to use a logarithmic scale
                 for the number of function evaluations axis.
         """
@@ -171,13 +171,13 @@ class DataProfile:
             algo_names = ()
 
         data_profiles = self.compute_data_profiles(*algo_names)
-        plot_kwargs_copy = plot_kwargs.copy()
-        for kwargs in plot_kwargs_copy.values():
-            if "markevery" not in kwargs:
-                kwargs["markevery"] = markevery
+        plot_settings_copy = plot_settings.copy()
+        for settings in plot_settings_copy.values():
+            if "markevery" not in settings:
+                settings["markevery"] = markevery
 
         figure = self._plot_data_profiles(
-            data_profiles, plot_kwargs_copy, grid_kwargs, use_evaluation_log_scale
+            data_profiles, plot_settings_copy, grid_settings, use_evaluation_log_scale
         )
         save_show_figure(figure, show, file_path)
 
@@ -267,24 +267,24 @@ class DataProfile:
     @staticmethod
     def _plot_data_profiles(
         data_profiles: Mapping[str, Sequence[Number]],
-        plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
-        grid_kwargs: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        grid_settings: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
         use_evaluation_log_scale: bool = False,
     ) -> Figure:
         """Plot the data profiles.
 
         Args:
             data_profiles: The data profiles.
-            plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
+            plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
-            grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.
+            grid_settings: The keyword arguments of `matplotlib.pyplot.grid`.
             use_evaluation_log_scale: Whether to use a logarithmic scale
                 for the number of function evaluations axis.
 
         Returns:
             The data profiles figure.
         """
-        plot_kwargs = _get_configuration_plot_options(plot_kwargs, data_profiles)
+        plot_settings = _get_configuration_plot_options(plot_settings, data_profiles)
         fig = plt.figure()
         axes = fig.add_subplot(1, 1, 1)
 
@@ -306,11 +306,11 @@ class DataProfile:
         for name, profile in data_profiles.items():
             # Plot the data profile
             profile_size = len(profile)
-            axes.plot(range(1, profile_size + 1), profile, **plot_kwargs[name])
+            axes.plot(range(1, profile_size + 1), profile, **plot_settings[name])
 
             # Extend the profile with an horizontal line if necessary
             if profile_size < max_profile_size:
-                color = plot_kwargs[name]["color"]
+                color = plot_settings[name]["color"]
                 tail_size = max_profile_size - profile_size + 1
                 last_value = profile[-1]
                 axes.plot(
@@ -323,5 +323,5 @@ class DataProfile:
                 axes.plot(profile_size, last_value, marker="*", color=color)
 
         plt.legend()
-        plt.grid(**grid_kwargs)
+        plt.grid(**grid_settings)
         return fig

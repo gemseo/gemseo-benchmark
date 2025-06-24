@@ -38,9 +38,9 @@ and this project adheres to
 
 #### Report
 
-- The color and marker for each algorithm configuration can now be customized
-  at the initialization of ``Report`` thanks to the new arguments``colors``
-  and ``markers``.
+- The plot options (ex: color, marker) of each algorithm configuration
+  can now be customized at the execution of a ``Scenario``
+  thanks to the new argument ``plot_settings``.
 - The user can now request that ``Scenario.execute`` or ``Report.generate``
   plot only the median of the performance measure rather than its whole range
   thanks to the new boolean argument ``plot_only_median``.

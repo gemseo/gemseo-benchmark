@@ -179,8 +179,8 @@ def side_effect(
     infeasibility_tolerance=0.0,
     max_eval_number=None,
     use_log_scale=False,
-    plot_kwargs=READ_ONLY_EMPTY_DICT,
-    grid_kwargs=READ_ONLY_EMPTY_DICT,
+    plot_settings=READ_ONLY_EMPTY_DICT,
+    grid_settings=READ_ONLY_EMPTY_DICT,
 ):
     """Side effect for the computation of a data profile."""
     shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(file_path))
@@ -229,8 +229,8 @@ def group(problem_a, problem_b) -> mock.Mock:
         plot_path=None,
         infeasibility_tolerance=0.0,
         max_eval_number=None,
-        plot_kwargs=READ_ONLY_EMPTY_DICT,
-        grid_kwargs=READ_ONLY_EMPTY_DICT,
+        plot_settings=READ_ONLY_EMPTY_DICT,
+        grid_settings=READ_ONLY_EMPTY_DICT,
         use_evaluation_log_scale=False,
     ):
         shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(plot_path))

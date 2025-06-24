@@ -74,7 +74,7 @@ class Figures:
     __directory_path: Path
     """The path to the root directory for the figures."""
 
-    __GRID_KWARGS: Final[Mapping[str, str]] = {"visible": True, "linestyle": ":"}
+    __GRID_SETTINGS: Final[Mapping[str, str]] = {"visible": True, "linestyle": ":"}
     """The keyword arguments of `matplotlib.pyplot.grid`."""
 
     __group: ProblemsGroup
@@ -92,7 +92,7 @@ class Figures:
     __MATPLOTLIB_SYMMETRIC_LOG_SCALE: Final[str] = "symlog"
     """The Matplotlib value for symmetric logarithmic scale."""
 
-    __plot_kwargs: Mapping[str, ConfigurationPlotOptions]
+    __plot_settings: Mapping[str, ConfigurationPlotOptions]
     """The keyword arguments of `matplotlib.axes.Axes.plot`
       for each algorithm configuration."""
 
@@ -109,7 +109,7 @@ class Figures:
     }
     """The percentiles to be displayed in the report tables."""
 
-    __TARGET_VALUES_PLOT_KWARGS: ClassVar[Mapping[str, str | float]] = {
+    __TARGET_VALUES_PLOT_SETTINGS: ClassVar[Mapping[str, str | float]] = {
         "color": "red",
         "linestyle": ":",
         "zorder": 1.9,
@@ -152,7 +152,7 @@ class Figures:
         directory_path: Path,
         infeasibility_tolerance: float,
         max_eval_number: int,
-        plot_kwargs: Mapping[str, ConfigurationPlotOptions],
+        plot_settings: Mapping[str, ConfigurationPlotOptions],
     ) -> None:
         """
         Args:
@@ -165,7 +165,7 @@ class Figures:
             max_eval_number: The maximum number of evaluations to be displayed
                 on the figures.
                 If 0, all the evaluations are displayed.
-            plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
+            plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
         """  # noqa: D205, D212, D415
         self.__algorithm_configurations = algorithm_configurations
@@ -173,8 +173,8 @@ class Figures:
         self.__group = group
         self.__infeasibility_tolerance = infeasibility_tolerance
         self.__max_eval_number = max_eval_number
-        self.__plot_kwargs = _get_configuration_plot_options(
-            plot_kwargs, algorithm_configurations.names
+        self.__plot_settings = _get_configuration_plot_options(
+            plot_settings, algorithm_configurations.names
         )
         self.__results = results
 
@@ -196,8 +196,8 @@ class Figures:
             plot_path=plot_path,
             infeasibility_tolerance=self.__infeasibility_tolerance,
             max_eval_number=self.__max_eval_number,
-            plot_kwargs=self.__plot_kwargs,
-            grid_kwargs=self.__GRID_KWARGS,
+            plot_settings=self.__plot_settings,
+            grid_settings=self.__GRID_SETTINGS,
             use_evaluation_log_scale=use_evaluation_log_scale,
         )
         return plot_path
@@ -453,8 +453,8 @@ class Figures:
             file_path,
             self.__infeasibility_tolerance,
             self.__max_eval_number,
-            self.__plot_kwargs,
-            self.__GRID_KWARGS,
+            self.__plot_settings,
+            self.__GRID_SETTINGS,
             use_evaluation_log_scale,
         )
         return file_path
@@ -509,10 +509,10 @@ class Figures:
         )
         problem.target_values.plot_on_axes(
             axes,
-            self.__TARGET_VALUES_PLOT_KWARGS,
-            set_ylabel_kwargs={"rotation": 270, "labelpad": 20},
+            self.__TARGET_VALUES_PLOT_SETTINGS,
+            set_ylabel_settings={"rotation": 270, "labelpad": 20},
         )
-        axes.grid(**self.__GRID_KWARGS)
+        axes.grid(**self.__GRID_SETTINGS)
         if use_performance_log_scale:
             axes.set_yscale(self.__MATPLOTLIB_SYMMETRIC_LOG_SCALE)
 
@@ -704,7 +704,7 @@ class Figures:
                 axes.plot(
                     range(1, data.shape[1] + 1),
                     data.T,
-                    color=self.__plot_kwargs[name]["color"],
+                    color=self.__plot_settings[name]["color"],
                 )
 
             if not plot_only_median:
@@ -712,13 +712,16 @@ class Figures:
                     data,
                     axes,
                     (0, 100),
-                    {"alpha": self.__ALPHA, "color": self.__plot_kwargs[name]["color"]},
+                    {
+                        "alpha": self.__ALPHA,
+                        "color": self.__plot_settings[name]["color"],
+                    },
                     extremal_feasible_performance,
                     performance_measure_is_minimized,
                 )
 
             PerformanceHistories.plot_median(
-                data, axes, self.__plot_kwargs[name], performance_measure_is_minimized
+                data, axes, self.__plot_settings[name], performance_measure_is_minimized
             )
 
         if use_evaluation_log_scale:
@@ -726,7 +729,7 @@ class Figures:
         else:
             axes.xaxis.set_major_locator(MaxNLocator(integer=True))
 
-        axes.grid(**self.__GRID_KWARGS)
+        axes.grid(**self.__GRID_SETTINGS)
         axes.set_xlabel("Number of functions evaluations")
         axes.set_ylabel(y_label)
         axes.legend()
@@ -765,13 +768,13 @@ class Figures:
             zip(artists["boxes"], artists["medians"])
         ):
             name = labels[index]
-            color = self.__plot_kwargs[name]["color"]
+            color = self.__plot_settings[name]["color"]
             box.set(
                 edgecolor=color,
                 facecolor=(*matplotlib.colors.to_rgb(color), self.__ALPHA),
             )
             median.set(
-                color=color, linewidth=2, marker=self.__plot_kwargs[name]["marker"]
+                color=color, linewidth=2, marker=self.__plot_settings[name]["marker"]
             )
             for whisker in artists["whiskers"][2 * index : 2 * (index + 1)]:
                 whisker.set(color=color)
@@ -784,7 +787,7 @@ class Figures:
                 lambda x, _: str(datetime.timedelta(seconds=x))
             )
         )
-        axes.grid(axis="y", **self.__GRID_KWARGS)
+        axes.grid(axis="y", **self.__GRID_SETTINGS)
         axes.tick_params(axis="x", labelrotation=45)
         axes.set_ylabel(f"Execution time{' (in seconds)' if use_log_scale else ''}")
         if use_log_scale:
@@ -844,7 +847,7 @@ class Figures:
             if use_evaluation_log_scale:
                 axes.set_xscale(self.__MATPLOTLIB_LOG_SCALE)
 
-            axes.grid(**self.__GRID_KWARGS)
+            axes.grid(**self.__GRID_SETTINGS)
             performance_figures[configuration] = figure
 
         self.__set_common_limits(performance_figures.values())
@@ -852,7 +855,7 @@ class Figures:
         for configuration, figure in performance_figures.items():
             # Add the target values and save the figure
             problem.target_values.plot_on_axes(
-                figure.gca(), self.__TARGET_VALUES_PLOT_KWARGS
+                figure.gca(), self.__TARGET_VALUES_PLOT_SETTINGS
             )
             configuration_dir = directory_path / join_substrings(configuration.name)
             configuration_dir.mkdir()
@@ -896,7 +899,7 @@ class Figures:
                 if use_evaluation_log_scale:
                     axes.set_xscale(self.__MATPLOTLIB_LOG_SCALE)
 
-                axes.grid(**self.__GRID_KWARGS)
+                axes.grid(**self.__GRID_SETTINGS)
                 infeasibility_figures[configuration] = figure
 
             self.__set_common_limits(infeasibility_figures.values())
@@ -924,7 +927,7 @@ class Figures:
                 if use_evaluation_log_scale:
                     axes.set_xscale(self.__MATPLOTLIB_LOG_SCALE)
 
-                axes.grid(**self.__GRID_KWARGS)
+                axes.grid(**self.__GRID_SETTINGS)
                 constraints_figures[configuration] = figure
 
             self.__set_common_limits(constraints_figures.values())

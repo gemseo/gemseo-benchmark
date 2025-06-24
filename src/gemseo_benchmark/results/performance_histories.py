@@ -291,7 +291,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         histories: numpy.ndarray,
         axes: Axes,
         centile_range: tuple[float, float],
-        fill_between_kwargs: Mapping[str, str],
+        fill_between_settings: Mapping[str, str],
         infinity: float | None,
         performance_measure_is_minimized: bool,
     ) -> None:
@@ -301,7 +301,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
             histories: The histories data.
             axes: The axes of the plot.
             centile_range: The range of centiles to be drawn.
-            fill_between_kwargs: Keyword arguments
+            fill_between_settings: Keyword arguments
                 for `matplotlib.axes.Axes.fill_between`.
             infinity: The substitute value for infinite ordinates.
             performance_measure_is_minimized: Whether the performance measure
@@ -343,7 +343,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
             range(first_index + 1, histories.shape[1] + 1),
             lower_centile[first_index:],
             upper_centile[first_index:],
-            **fill_between_kwargs,
+            **fill_between_settings,
         )
         axes.xaxis.set_major_locator(MaxNLocator(integer=True))
 
@@ -351,7 +351,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
     def plot_median(
         histories: numpy.ndarray,
         axes: Axes,
-        plot_kwargs: Mapping[str, str | int | float],
+        plot_settings: Mapping[str, str | int | float],
         performance_measure_is_minimized: bool,
     ) -> None:
         """Plot a range of centiles of histories data.
@@ -359,7 +359,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         Args:
             histories: The histories data.
             axes: The axes of the plot.
-            plot_kwargs: Keyword arguments for `matplotlib.axes.Axes.plot`.
+            plot_settings: Keyword arguments for `matplotlib.axes.Axes.plot`.
             performance_measure_is_minimized: Whether the performance measure
                 is minimized (rather than maximized).
         """
@@ -378,7 +378,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         axes.plot(
             range(first_index + 1, histories.shape[1] + 1),
             median[first_index:],
-            **plot_kwargs,
+            **plot_settings,
         )
 
     def switch_performance_measure_sign(self) -> None:

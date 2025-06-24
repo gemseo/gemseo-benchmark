@@ -93,7 +93,7 @@ class Report:
         histories_paths: Results,
         custom_algos_descriptions: Mapping[str, str] | None = None,
         max_eval_number_per_group: dict[str, int] | None = None,
-        plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
     ) -> None:
         """
         Args:
@@ -111,13 +111,13 @@ class Report:
                 If ``None``, all the evaluations are displayed.
                 If the key of a group is missing, all the evaluations are displayed
                 for the group.
-            plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
+            plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
 
         Raises:
             ValueError: If an algorithm has no associated histories.
         """  # noqa: D205, D212, D415
-        self.__plot_kwargs = plot_kwargs
+        self.__plot_settings = plot_settings
         self.__root_directory = Path(root_directory_path)
         self.__algorithms_configurations_groups = algos_configurations_groups
         self.__problems_groups = problems_groups
@@ -417,7 +417,7 @@ class Report:
             figures_dir,
             infeasibility_tolerance,
             self.__max_eval_numbers.get(problems.name),
-            plot_kwargs=self.__plot_kwargs,
+            plot_settings=self.__plot_settings,
         )
         figures, tables = plotter.plot(
             plot_all_histories,
