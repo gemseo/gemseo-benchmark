@@ -2485,7 +2485,7 @@
     <span class="n">histories</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="numpy.ndarray" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a></span><span class="p">,</span>
     <span class="n">axes</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></span><span class="p">,</span>
     <span class="n">centile_range</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">],</span>
-    <span class="n">fill_between_kwargs</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">],</span>
+    <span class="n">fill_between_settings</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">],</span>
     <span class="n">infinity</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">performance_measure_is_minimized</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
@@ -2523,7 +2523,7 @@
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>fill_between_kwargs</code></b>
+            <b><code>fill_between_settings</code></b>
               (<code><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>)
           –
           <div class="doc-md-description">
@@ -2617,7 +2617,7 @@ is minimized (rather than maximized).</p>
     <span class="n">histories</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">axes</span><span class="p">:</span> <span class="n">Axes</span><span class="p">,</span>
     <span class="n">centile_range</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
-    <span class="n">fill_between_kwargs</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+    <span class="n">fill_between_settings</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
     <span class="n">infinity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">performance_measure_is_minimized</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -2627,7 +2627,7 @@ is minimized (rather than maximized).</p>
 <span class="sd">        histories: The histories data.</span>
 <span class="sd">        axes: The axes of the plot.</span>
 <span class="sd">        centile_range: The range of centiles to be drawn.</span>
-<span class="sd">        fill_between_kwargs: Keyword arguments</span>
+<span class="sd">        fill_between_settings: Keyword arguments</span>
 <span class="sd">            for `matplotlib.axes.Axes.fill_between`.</span>
 <span class="sd">        infinity: The substitute value for infinite ordinates.</span>
 <span class="sd">        performance_measure_is_minimized: Whether the performance measure</span>
@@ -2669,7 +2669,7 @@ is minimized (rather than maximized).</p>
         <span class="nb">range</span><span class="p">(</span><span class="n">first_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">histories</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
         <span class="n">lower_centile</span><span class="p">[</span><span class="n">first_index</span><span class="p">:],</span>
         <span class="n">upper_centile</span><span class="p">[</span><span class="n">first_index</span><span class="p">:],</span>
-        <span class="o">**</span><span class="n">fill_between_kwargs</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">fill_between_settings</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">axes</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">MaxNLocator</span><span class="p">(</span><span class="n">integer</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
@@ -2771,7 +2771,7 @@ is minimized (rather than maximized).</p>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">plot_median</span><span class="p">(</span>
     <span class="n">histories</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="numpy.ndarray" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray">ndarray</a></span><span class="p">,</span>
     <span class="n">axes</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></span><span class="p">,</span>
-    <span class="n">plot_kwargs</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">],</span>
+    <span class="n">plot_settings</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">],</span>
     <span class="n">performance_measure_is_minimized</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
@@ -2800,7 +2800,7 @@ is minimized (rather than maximized).</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>plot_kwargs</code></b>
+            <b><code>plot_settings</code></b>
               (<code><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]</code>)
           –
           <div class="doc-md-description">
@@ -2857,7 +2857,7 @@ is minimized (rather than maximized).</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_median</span><span class="p">(</span>
     <span class="n">histories</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">axes</span><span class="p">:</span> <span class="n">Axes</span><span class="p">,</span>
-    <span class="n">plot_kwargs</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="n">plot_settings</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">performance_measure_is_minimized</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot a range of centiles of histories data.</span>
@@ -2865,7 +2865,7 @@ is minimized (rather than maximized).</p>
 <span class="sd">    Args:</span>
 <span class="sd">        histories: The histories data.</span>
 <span class="sd">        axes: The axes of the plot.</span>
-<span class="sd">        plot_kwargs: Keyword arguments for `matplotlib.axes.Axes.plot`.</span>
+<span class="sd">        plot_settings: Keyword arguments for `matplotlib.axes.Axes.plot`.</span>
 <span class="sd">        performance_measure_is_minimized: Whether the performance measure</span>
 <span class="sd">            is minimized (rather than maximized).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2884,7 +2884,7 @@ is minimized (rather than maximized).</p>
     <span class="n">axes</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
         <span class="nb">range</span><span class="p">(</span><span class="n">first_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">histories</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
         <span class="n">median</span><span class="p">[</span><span class="n">first_index</span><span class="p">:],</span>
-        <span class="o">**</span><span class="n">plot_kwargs</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">plot_settings</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>

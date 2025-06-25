@@ -2061,7 +2061,7 @@
         <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">max_eval_number_per_group</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">plot_kwargs</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span>
+    <span class="n">plot_settings</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span>
         <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><span title="gemseo_benchmark.ConfigurationPlotOptions">ConfigurationPlotOptions</span></span>
     <span class="p">]</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.utils.constants.READ_ONLY_EMPTY_DICT" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.utils.constants.html#gemseo.utils.constants.READ_ONLY_EMPTY_DICT">READ_ONLY_EMPTY_DICT</a></span><span class="p">,</span>
 <span class="p">)</span>
@@ -2137,7 +2137,7 @@ for the group.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>plot_kwargs</code></b>
+            <b><code>plot_settings</code></b>
               (<code><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <span title="gemseo_benchmark.ConfigurationPlotOptions">ConfigurationPlotOptions</span>]</code>, default:
                   <code><a class="autorefs autorefs-external" title="gemseo.utils.constants.READ_ONLY_EMPTY_DICT" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.utils.constants.html#gemseo.utils.constants.READ_ONLY_EMPTY_DICT">READ_ONLY_EMPTY_DICT</a></code>
 )
@@ -2230,7 +2230,7 @@ for each algorithm configuration.</p>
     <span class="n">histories_paths</span><span class="p">:</span> <span class="n">Results</span><span class="p">,</span>
     <span class="n">custom_algos_descriptions</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">max_eval_number_per_group</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">plot_kwargs</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ConfigurationPlotOptions</span><span class="p">]</span> <span class="o">=</span> <span class="n">READ_ONLY_EMPTY_DICT</span><span class="p">,</span>
+    <span class="n">plot_settings</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ConfigurationPlotOptions</span><span class="p">]</span> <span class="o">=</span> <span class="n">READ_ONLY_EMPTY_DICT</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
@@ -2248,13 +2248,13 @@ for each algorithm configuration.</p>
 <span class="sd">            If ``None``, all the evaluations are displayed.</span>
 <span class="sd">            If the key of a group is missing, all the evaluations are displayed</span>
 <span class="sd">            for the group.</span>
-<span class="sd">        plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`</span>
+<span class="sd">        plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`</span>
 <span class="sd">            for each algorithm configuration.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If an algorithm has no associated histories.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D205, D212, D415</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">__plot_kwargs</span> <span class="o">=</span> <span class="n">plot_kwargs</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">__plot_settings</span> <span class="o">=</span> <span class="n">plot_settings</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__root_directory</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root_directory_path</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__algorithms_configurations_groups</span> <span class="o">=</span> <span class="n">algos_configurations_groups</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__problems_groups</span> <span class="o">=</span> <span class="n">problems_groups</span>

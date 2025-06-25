@@ -3873,13 +3873,13 @@ If empty, the plot is not saved.</p>
 <a href="#gemseo_benchmark.data_profiles.target_values.TargetValues.plot_on_axes" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">plot_on_axes</span><span class="p">(</span>
     <span class="n">axes</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></span><span class="p">,</span>
-    <span class="n">axhline_kwargs</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span>
+    <span class="n">axhline_settings</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span>
         <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
     <span class="p">]</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="types.MappingProxyType" href="https://docs.python.org/3/library/types.html#types.MappingProxyType">MappingProxyType</a></span><span class="p">(</span>
         <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;linestyle&quot;</span><span class="p">:</span> <span class="s2">&quot;:&quot;</span><span class="p">}</span>
     <span class="p">),</span>
     <span class="n">yticklabels_format</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">=</span> <span class="s2">&quot;.4g&quot;</span><span class="p">,</span>
-    <span class="n">set_ylabel_kwargs</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span>
+    <span class="n">set_ylabel_settings</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span>
         <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
     <span class="p">]</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="types.MappingProxyType" href="https://docs.python.org/3/library/types.html#types.MappingProxyType">MappingProxyType</a></span><span class="p">({</span><span class="s2">&quot;rotation&quot;</span><span class="p">:</span> <span class="mi">270</span><span class="p">,</span> <span class="s2">&quot;labelpad&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">}),</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
@@ -3901,7 +3901,7 @@ If empty, the plot is not saved.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>axhline_kwargs</code></b>
+            <b><code>axhline_settings</code></b>
               (<code><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>]</code>, default:
                   <code><a class="autorefs autorefs-external" title="types.MappingProxyType" href="https://docs.python.org/3/library/types.html#types.MappingProxyType">MappingProxyType</a>({&#39;color&#39;: &#39;red&#39;, &#39;linestyle&#39;: &#39;:&#39;})</code>
 )
@@ -3922,7 +3922,7 @@ for <code>matplotlib.axes.Axes.axhline</code>.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>set_ylabel_kwargs</code></b>
+            <b><code>set_ylabel_settings</code></b>
               (<code><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>]</code>, default:
                   <code><a class="autorefs autorefs-external" title="types.MappingProxyType" href="https://docs.python.org/3/library/types.html#types.MappingProxyType">MappingProxyType</a>({&#39;rotation&#39;: 270, &#39;labelpad&#39;: 12})</code>
 )
@@ -3973,12 +3973,12 @@ for <code>matplotlib.axes.Axes.set_ylabel</code>.</p>
 <span class="normal">159</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">plot_on_axes</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">axes</span><span class="p">:</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">Axes</span><span class="p">,</span>
-    <span class="n">axhline_kwargs</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">MappingProxyType</span><span class="p">({</span>
+    <span class="n">axhline_settings</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">MappingProxyType</span><span class="p">({</span>
         <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span>
         <span class="s2">&quot;linestyle&quot;</span><span class="p">:</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span>
     <span class="p">}),</span>
     <span class="n">yticklabels_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.4g&quot;</span><span class="p">,</span>
-    <span class="n">set_ylabel_kwargs</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">MappingProxyType</span><span class="p">({</span>
+    <span class="n">set_ylabel_settings</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">MappingProxyType</span><span class="p">({</span>
         <span class="s2">&quot;rotation&quot;</span><span class="p">:</span> <span class="mi">270</span><span class="p">,</span>
         <span class="s2">&quot;labelpad&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
     <span class="p">}),</span>
@@ -3987,22 +3987,22 @@ for <code>matplotlib.axes.Axes.set_ylabel</code>.</p>
 
 <span class="sd">    Args:</span>
 <span class="sd">        axes: The axes of the plot.</span>
-<span class="sd">        axhline_kwargs: Keyword arguments</span>
+<span class="sd">        axhline_settings: Keyword arguments</span>
 <span class="sd">            for ``matplotlib.axes.Axes.axhline``.</span>
 <span class="sd">        yticklabels_format: The string format for the target values labels.</span>
-<span class="sd">        set_ylabel_kwargs: Keyword arguments</span>
+<span class="sd">        set_ylabel_settings: Keyword arguments</span>
 <span class="sd">            for ``matplotlib.axes.Axes.set_ylabel``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">twin_axes</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
     <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">target</span><span class="o">.</span><span class="n">performance_measure</span> <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">is_feasible</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
-        <span class="n">axes</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">axhline_kwargs</span><span class="p">)</span>
+        <span class="n">axes</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">axhline_settings</span><span class="p">)</span>
 
     <span class="n">twin_axes</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
     <span class="n">twin_axes</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span>
         <span class="sa">f</span><span class="s2">&quot;</span><span class="se">{{</span><span class="s2">value:</span><span class="si">{</span><span class="n">yticklabels_format</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span>
     <span class="p">])</span>
-    <span class="n">twin_axes</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Target values&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">set_ylabel_kwargs</span><span class="p">)</span>
+    <span class="n">twin_axes</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Target values&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">set_ylabel_settings</span><span class="p">)</span>
     <span class="n">twin_axes</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">axes</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
             </details>
