@@ -3,10 +3,11 @@ name = "gemseo-benchmark"
 authors = [
     {name = "Benoit Pauwels", email = "contact@gemseo.org"}
 ]
-description = "A GEMSEO-based package to benchmark optimization algorithm."
-license = {text = "GNU Lesser General Public License v3"}
+description = "A GEMSEO-based package to benchmark optimization algorithms."
+readme = "README.md"
+license = "LGPL-3.0"
+license-files = ["LICENSE.txt"]
 classifiers = [
-    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering",
     "Operating System :: POSIX :: Linux",
@@ -27,8 +28,8 @@ dependencies = [
     "sphinx <8",
 ]
 
-[project.optional-dependencies]
-test = [
+[dependency-groups]
+dev = [
     "covdefaults",
     "pytest <9",
     "pytest-cov",
@@ -50,13 +51,9 @@ doc = [
 ]
 
 [project.urls]
-Homepage = "https://gitlab.com/gemseo"
+Homepage = "https://gemseo.org"
 Source = "https://gitlab.com/gemseo/dev/gemseo-benchmark"
-Tracker = "https://gitlab.com/gemseo/dev/gemseo-benchmark/-/issues"
-
-[project.readme]
-file = "README.md"
-content-type = "text/markdown"
+Issues = "https://gitlab.com/gemseo/dev/gemseo-benchmark/-/issues"
 
 [build-system]
 requires = [
@@ -66,9 +63,3 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
-
-[tool.setuptools]
-license-files = [
-    "LICENSE.txt",
-    "CREDITS.md",
-]
