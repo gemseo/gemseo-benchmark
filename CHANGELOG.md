@@ -35,6 +35,8 @@ and this project adheres to
 
 - Multidisciplinary analysis problem configurations
   can now be implemented with ``MDAProblemConfiguration``.
+- Multidisciplinary optimization problem configurations
+  can now be implemented with ``MDOProblemConfiguration``.
 
 #### Report
 

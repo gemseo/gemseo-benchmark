@@ -42,12 +42,12 @@ if TYPE_CHECKING:
     from gemseo.algos.design_space import DesignSpace
     from gemseo.algos.doe.base_doe_library import DriverLibraryOptionType
     from gemseo.typing import RealArray
-    from sandbox.tmp_classattribute import BaseWorker
 
     from gemseo_benchmark import ConfigurationPlotOptions
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
     )
+    from gemseo_benchmark.benchmarker.base_worker import BaseWorker
     from gemseo_benchmark.data_profiles.target_values import TargetValues
     from gemseo_benchmark.results.results import Results
 

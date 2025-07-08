@@ -12,7 +12,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-"""Problem configuration for multidisciplinary analysis."""
+"""Problem configuration for multidisciplinary optimization."""
 
 from __future__ import annotations
 
@@ -22,10 +22,10 @@ from typing import Callable
 from typing import ClassVar
 
 from gemseo.core.discipline.discipline import Discipline
-from gemseo.mda.base_mda import BaseMDA
+from gemseo.scenarios.mdo_scenario import MDOScenario
 from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 
-from gemseo_benchmark.benchmarker.mda_worker import MDAWorker
+from gemseo_benchmark.benchmarker.mdo_worker import MDOWorker
 from gemseo_benchmark.problems.base_problem_configuration import (
     BaseProblemConfiguration,
 )
@@ -44,19 +44,20 @@ if TYPE_CHECKING:
         InputStartingPointsType,
     )
 
-MDAProblemType = tuple[BaseMDA, Sequence[Discipline]]
+MDOProblemType = tuple[MDOScenario, Sequence[Discipline]]
 
 
-class MDAProblemConfiguration(BaseProblemConfiguration):
-    """Problem configuration for multidisciplinary analysis."""
+class MDOProblemConfiguration(BaseProblemConfiguration):
+    """Problem configuration for multidisciplinary optimization."""
 
-    worker: ClassVar[type[MDAWorker]] = MDAWorker
+    worker: ClassVar[type[MDOWorker]] = MDOWorker
 
-    def __init__(  # noqa: D107
+    def __init__(
         self,
         name: str,
-        create_problem: Callable[[AlgorithmConfiguration], MDAProblemType],
+        create_problem: Callable[[AlgorithmConfiguration], MDOProblemType],
         variable_space: DesignSpace,
+        minimize_objective_value: bool,
         target_values: TargetValues | None = None,
         starting_points: InputStartingPointsType = (),
         doe_algo_name: str = "",
@@ -64,6 +65,12 @@ class MDAProblemConfiguration(BaseProblemConfiguration):
         doe_options: Mapping[str, DriverLibraryOptionType] = READ_ONLY_EMPTY_DICT,
         description: str = "No description available.",
     ) -> None:
+        """
+        Args:
+            minimize_objective_value: Whether the objective function of the scenario
+                is to be minimized.
+        """  # noqa: D205, D212
+        self.__minimize_objective_value = minimize_objective_value
         super().__init__(
             name,
             create_problem,
@@ -80,4 +87,4 @@ class MDAProblemConfiguration(BaseProblemConfiguration):
     @property
     def minimize_performance_measure(self) -> bool:
         """Whether the performance measure is to be minimized."""
-        return True
+        return self.__minimize_objective_value
