@@ -35,11 +35,15 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
 )
 from gemseo_benchmark.benchmarker.benchmarker import Benchmarker
 from gemseo_benchmark.problems.mda_problem_configuration import MDAProblemConfiguration
+from gemseo_benchmark.problems.mdo_problem_configuration import MDOProblemConfiguration
 from gemseo_benchmark.problems.optimization_problem_configuration import (
     OptimizationProblemConfiguration,
 )
 
 if TYPE_CHECKING:
+    from gemseo_benchmark.problems.base_problem_configuration import (
+        BaseProblemConfiguration,
+    )
     from gemseo_benchmark.results.results import Results
 
 
@@ -49,14 +53,22 @@ def optimization_algorithm_configuration() -> AlgorithmConfiguration:
     return AlgorithmConfiguration("L-BFGS-B")
 
 
+def get_results(
+    results_root: Path,
+    algorithm_configuration: AlgorithmConfiguration,
+    problem_configuration: BaseProblemConfiguration,
+) -> Results:
+    return Benchmarker(results_root, results_root / "results.json").execute(
+        [problem_configuration], AlgorithmsConfigurations(algorithm_configuration)
+    )
+
+
 @pytest.fixture(scope="module")
 def optimization_results(
     results_root, rosenbrock, optimization_algorithm_configuration
 ) -> Results:
     """The results of an optimization benchmarking."""
-    return Benchmarker(results_root, results_root / "results.json").execute(
-        [rosenbrock], AlgorithmsConfigurations(optimization_algorithm_configuration)
-    )
+    return get_results(results_root, optimization_algorithm_configuration, rosenbrock)
 
 
 @pytest.fixture(scope="module")
@@ -70,9 +82,24 @@ def mda_results(
     mda_algorithm_configuration, mda_problem_configuration, mda_histories_dir
 ) -> Results:
     """The results of a multidisciplinary analysis benchmarking."""
-    return Benchmarker(mda_histories_dir, mda_histories_dir / "results.json").execute(
-        [mda_problem_configuration],
-        AlgorithmsConfigurations(mda_algorithm_configuration),
+    return get_results(
+        mda_histories_dir, mda_algorithm_configuration, mda_problem_configuration
+    )
+
+
+@pytest.fixture(scope="module")
+def mdo_histories_dir(tmp_path_factory) -> Path:
+    """The directory containing the MDO performance histories."""
+    return tmp_path_factory.mktemp("mdo_results")
+
+
+@pytest.fixture(scope="module")
+def mdo_results(
+    mdo_algorithm_configuration, mdo_problem_configuration, mdo_histories_dir
+) -> Results:
+    """The results of a multidisciplinary optimization benchmarking."""
+    return get_results(
+        mdo_histories_dir, mdo_algorithm_configuration, mdo_problem_configuration
     )
 
 
@@ -95,6 +122,12 @@ def mda_results(
             "mda_problem_configuration",
             "mda_results",
             "mda_histories_dir",
+        ),
+        (
+            "mdo_algorithm_configuration",
+            "mdo_problem_configuration",
+            "mdo_results",
+            "mdo_histories_dir",
         ),
     ],
 )
@@ -126,6 +159,7 @@ configurations = pytest.mark.parametrize(
     [
         ("optimization_algorithm_configuration", "rosenbrock"),
         ("mda_algorithm_configuration", "mda_problem_configuration"),
+        ("mdo_algorithm_configuration", "mdo_problem_configuration"),
     ],
 )
 
@@ -228,6 +262,7 @@ def test_execution(
     [
         ("optimization_algorithm_configuration", "rosenbrock", "max_iter"),
         ("mda_algorithm_configuration", "mda_problem_configuration", "max_mda_iter"),
+        ("mdo_algorithm_configuration", "mdo_problem_configuration", "max_iter"),
     ],
 )
 def test_problem_specific_algorithm_options(
@@ -405,7 +440,7 @@ def ill_optimization_problem_configuration(
 
 @pytest.fixture(scope="module")
 def ill_mda_problem_configuration(
-    mda_variable_space,
+    multidisciplinary_variable_space,
     mda_problem_configuration,
 ) -> OptimizationProblemConfiguration:
     """An ill multidisciplinary analysis problem configuration."""
@@ -414,7 +449,23 @@ def ill_mda_problem_configuration(
         lambda algorithm_configuration: mda_problem_configuration.create_problem(
             algorithm_configuration
         ),
-        mda_variable_space,
+        multidisciplinary_variable_space,
+    )
+
+
+@pytest.fixture(scope="module")
+def ill_mdo_problem_configuration(
+    multidisciplinary_variable_space,
+    mdo_problem_configuration,
+) -> OptimizationProblemConfiguration:
+    """An ill multidisciplinary optimization problem configuration."""
+    return MDOProblemConfiguration(
+        mdo_problem_configuration.name,
+        lambda algorithm_configuration: mdo_problem_configuration.create_problem(
+            algorithm_configuration
+        ),
+        multidisciplinary_variable_space,
+        True,
     )
 
 
@@ -426,6 +477,7 @@ def ill_mda_problem_configuration(
             "ill_optimization_problem_configuration",
         ),
         ("mda_algorithm_configuration", "ill_mda_problem_configuration"),
+        ("mdo_algorithm_configuration", "ill_mdo_problem_configuration"),
     ],
 )
 def test_worker_raised_exception(

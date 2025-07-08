@@ -1,0 +1,30 @@
+Solving problem 1 of problem configuration Linear MDO for algorithm configuration SLSQP.
+*** Start MDOScenario execution ***
+MDOScenario
+   Disciplines: AnalyticDiscipline AnalyticDiscipline
+   MDO formulation: MDF
+Optimization problem:
+   minimize y1(x1, x2)
+   with respect to x1, x2
+   over the design space:
+      +------+-------------+-------+-------------+-------+
+      | Name | Lower bound | Value | Upper bound | Type  |
+      +------+-------------+-------+-------------+-------+
+      | x1   |      0      |   0   |      10     | float |
+      | x2   |      0      |   1   |      10     | float |
+      +------+-------------+-------+-------------+-------+
+Solving optimization problem with algorithm SLSQP:
+Optimization result:
+   Optimizer info:
+      Status: 8
+      Message: Positive directional derivative for linesearch
+      Number of calls to the objective function by the optimizer: 3
+   Solution:
+      Objective: 0.0
+      Design space:
+         +------+-------------+-------+-------------+-------+
+         | Name | Lower bound | Value | Upper bound | Type  |
+         +------+-------------+-------+-------------+-------+
+         | x1   |      0      |   0   |      10     | float |
+         | x2   |      0      |   0   |      10     | float |
+         +------+-------------+-------+-------------+-------+

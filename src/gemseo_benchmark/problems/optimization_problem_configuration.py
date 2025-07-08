@@ -23,6 +23,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 from typing import Callable
+from typing import ClassVar
 
 from gemseo import execute_algo
 from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
@@ -64,7 +65,7 @@ class OptimizationProblemConfiguration(BaseProblemConfiguration):
     __targets_generator: TargetsGenerator | None
     """The generator of target values for the optimization problem configuration."""
 
-    worker: type[OptimizationWorker] = OptimizationWorker
+    worker: ClassVar[type[OptimizationWorker]] = OptimizationWorker
 
     def __init__(
         self,
