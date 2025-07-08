@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/problems/optimization_problem_configuration/">
       
       
-        <link rel="prev" href="../mda_problem_configuration/">
+        <link rel="prev" href="../mdo_problem_configuration/">
       
       
         <link rel="next" href="../problems_group/">
@@ -938,6 +938,8 @@
       
         
       
+        
+      
     
     
     
@@ -1038,6 +1040,29 @@
   
   <span class="md-ellipsis">
     Mda worker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarker/mdo_worker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Mdo worker
     
   </span>
   
@@ -1231,6 +1256,8 @@
       
         
       
+        
+      
     
     
     
@@ -1308,6 +1335,29 @@
   
   <span class="md-ellipsis">
     Mda problem configuration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mdo_problem_configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Mdo problem configuration
     
   </span>
   
@@ -2417,8 +2467,7 @@ If <code>None</code>, it will not be set.</p>
 
                   <details class="quote">
                     <summary>Source code in <code>src/gemseo_benchmark/problems/optimization_problem_configuration.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 69</span>
-<span class="normal"> 70</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 70</span>
 <span class="normal"> 71</span>
 <span class="normal"> 72</span>
 <span class="normal"> 73</span>
@@ -2462,7 +2511,8 @@ If <code>None</code>, it will not be set.</p>
 <span class="normal">111</span>
 <span class="normal">112</span>
 <span class="normal">113</span>
-<span class="normal">114</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">114</span>
+<span class="normal">115</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">create_problem</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">OptimizationProblem</span><span class="p">],</span>
@@ -2886,7 +2936,6 @@ as the problem.</p>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
 
 <a href="#gemseo_benchmark.problems.optimization_problem_configuration.OptimizationProblemConfiguration.worker" class="headerlink" title="Permanent link">&para;</a></h6>
@@ -3247,8 +3296,7 @@ best target value.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/gemseo_benchmark/problems/optimization_problem_configuration.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">139</span>
-<span class="normal">140</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">140</span>
 <span class="normal">141</span>
 <span class="normal">142</span>
 <span class="normal">143</span>
@@ -3299,7 +3347,8 @@ best target value.</p>
 <span class="normal">188</span>
 <span class="normal">189</span>
 <span class="normal">190</span>
-<span class="normal">191</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_target_values</span><span class="p">(</span>
+<span class="normal">191</span>
+<span class="normal">192</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_target_values</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">targets_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">algorithm_configurations</span><span class="p">:</span> <span class="n">AlgorithmsConfigurations</span><span class="p">,</span>

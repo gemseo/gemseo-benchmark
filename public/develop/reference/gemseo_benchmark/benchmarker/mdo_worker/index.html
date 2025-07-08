@@ -8,28 +8,28 @@
       
       
       
-        <link rel="canonical" href="https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/">
+        <link rel="canonical" href="https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/benchmarker/mdo_worker/">
       
       
-        <link rel="prev" href="../../generated/examples/all/plot_report/">
+        <link rel="prev" href="../mda_worker/">
       
       
-        <link rel="next" href="scenario/">
+        <link rel="next" href="../optimization_worker/">
       
       
-      <link rel="icon" href="../../images/favicon.ico">
+      <link rel="icon" href="../../../../images/favicon.ico">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.15">
     
     
       
-        <title>API documentation - gemseo-benchmark</title>
+        <title>Mdo worker - gemseo-benchmark</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.342714a4.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -48,21 +48,21 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/_markdown_exec_pyodide.css">
+      <link rel="stylesheet" href="../../../../assets/_markdown_exec_pyodide.css">
     
-      <link rel="stylesheet" href="../../assets/_markdown_exec_ansi.css">
+      <link rel="stylesheet" href="../../../../assets/_markdown_exec_ansi.css">
     
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
     
-      <link rel="stylesheet" href="../../sg_gallery-binder.css">
+      <link rel="stylesheet" href="../../../../sg_gallery-binder.css">
     
-      <link rel="stylesheet" href="../../sg_gallery.css">
+      <link rel="stylesheet" href="../../../../sg_gallery.css">
     
-      <link rel="stylesheet" href="../../sg_gallery-rendered-html.css">
+      <link rel="stylesheet" href="../../../../sg_gallery-rendered-html.css">
     
-      <link rel="stylesheet" href="../../sg_gallery-dataframe.css">
+      <link rel="stylesheet" href="../../../../sg_gallery-dataframe.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -88,7 +88,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#gemseo_benchmark" class="md-skip">
+        <a href="#gemseo_benchmark.benchmarker.mdo_worker" class="md-skip">
           Skip to content
         </a>
       
@@ -106,7 +106,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="gemseo-benchmark" class="md-header__button md-logo" aria-label="gemseo-benchmark" data-md-component="logo">
+    <a href="../../../.." title="gemseo-benchmark" class="md-header__button md-logo" aria-label="gemseo-benchmark" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -126,7 +126,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              API documentation
+              Mdo worker
             
           </span>
         </div>
@@ -239,7 +239,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../.." class="md-tabs__link">
+        <a href="../../../.." class="md-tabs__link">
           
   
   
@@ -259,7 +259,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../user_guide/" class="md-tabs__link">
+      <a href="../../../../user_guide/" class="md-tabs__link">
         
   
   
@@ -287,7 +287,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../generated/examples/all/" class="md-tabs__link">
+        <a href="../../../../generated/examples/all/" class="md-tabs__link">
           
   
   
@@ -312,7 +312,7 @@
   
   
     <li class="md-tabs__item md-tabs__item--active">
-      <a href="./" class="md-tabs__link">
+      <a href="../../" class="md-tabs__link">
         
   
   
@@ -347,7 +347,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="gemseo-benchmark" class="md-nav__button md-logo" aria-label="gemseo-benchmark" data-md-component="logo">
+    <a href="../../../.." title="gemseo-benchmark" class="md-nav__button md-logo" aria-label="gemseo-benchmark" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -404,7 +404,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../.." class="md-nav__link ">
+            <a href="../../../.." class="md-nav__link ">
               
   
   
@@ -439,7 +439,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../changelog/" class="md-nav__link">
+      <a href="../../../../changelog/" class="md-nav__link">
         
   
   
@@ -462,7 +462,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../credits/" class="md-nav__link">
+      <a href="../../../../credits/" class="md-nav__link">
         
   
   
@@ -485,7 +485,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../licenses/" class="md-nav__link">
+      <a href="../../../../licenses/" class="md-nav__link">
         
   
   
@@ -515,7 +515,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user_guide/" class="md-nav__link">
+      <a href="../../../../user_guide/" class="md-nav__link">
         
   
   
@@ -609,7 +609,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../generated/examples/all/" class="md-nav__link ">
+            <a href="../../../../generated/examples/all/" class="md-nav__link ">
               
   
   
@@ -644,7 +644,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../generated/examples/all/plot_target_values/" class="md-nav__link">
+      <a href="../../../../generated/examples/all/plot_target_values/" class="md-nav__link">
         
   
   
@@ -667,7 +667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../generated/examples/all/plot_data_profiles/" class="md-nav__link">
+      <a href="../../../../generated/examples/all/plot_data_profiles/" class="md-nav__link">
         
   
   
@@ -690,7 +690,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../generated/examples/all/plot_report/" class="md-nav__link">
+      <a href="../../../../generated/examples/all/plot_report/" class="md-nav__link">
         
   
   
@@ -764,7 +764,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="./" class="md-nav__link md-nav__link--active">
+            <a href="../../" class="md-nav__link ">
               
   
   
@@ -777,7 +777,7 @@
             </a>
             
               
-              <label class="md-nav__link md-nav__link--active" for="__nav_4" id="__nav_4_label" tabindex="">
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
@@ -797,7 +797,7 @@
   
   
     <li class="md-nav__item">
-      <a href="scenario/" class="md-nav__link">
+      <a href="../../scenario/" class="md-nav__link">
         
   
   
@@ -841,7 +841,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="algorithms/" class="md-nav__link ">
+            <a href="../../algorithms/" class="md-nav__link ">
               
   
   
@@ -874,7 +874,7 @@
   
   
     <li class="md-nav__item">
-      <a href="algorithms/algorithm_configuration/" class="md-nav__link">
+      <a href="../../algorithms/algorithm_configuration/" class="md-nav__link">
         
   
   
@@ -897,7 +897,7 @@
   
   
     <li class="md-nav__item">
-      <a href="algorithms/algorithms_configurations/" class="md-nav__link">
+      <a href="../../algorithms/algorithms_configurations/" class="md-nav__link">
         
   
   
@@ -925,8 +925,10 @@
                 
   
   
+    
   
   
+  
     
     
       
@@ -947,15 +949,15 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" checked>
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="benchmarker/" class="md-nav__link ">
+            <a href="../" class="md-nav__link ">
               
   
   
@@ -974,7 +976,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4_3">
             <span class="md-nav__icon md-icon"></span>
             Benchmarker
@@ -988,7 +990,7 @@
   
   
     <li class="md-nav__item">
-      <a href="benchmarker/base_worker/" class="md-nav__link">
+      <a href="../base_worker/" class="md-nav__link">
         
   
   
@@ -1011,7 +1013,7 @@
   
   
     <li class="md-nav__item">
-      <a href="benchmarker/benchmarker/" class="md-nav__link">
+      <a href="../benchmarker/" class="md-nav__link">
         
   
   
@@ -1034,7 +1036,7 @@
   
   
     <li class="md-nav__item">
-      <a href="benchmarker/mda_worker/" class="md-nav__link">
+      <a href="../mda_worker/" class="md-nav__link">
         
   
   
@@ -1054,10 +1056,30 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="benchmarker/mdo_worker/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Mdo worker
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1068,6 +1090,102 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.mdo_worker" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;mdo_worker
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" mdo_worker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.mdo_worker-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Classes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.mdo_worker.MDOWorker" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MDOWorker
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MDOWorker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.mdo_worker.MDOWorker-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.mdo_worker.MDOWorker.check_algorithm_availability" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;check_algorithm_availability
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.mdo_worker.MDOWorker.execute" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;execute
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1080,7 +1198,7 @@
   
   
     <li class="md-nav__item">
-      <a href="benchmarker/optimization_worker/" class="md-nav__link">
+      <a href="../optimization_worker/" class="md-nav__link">
         
   
   
@@ -1134,7 +1252,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="data_profiles/" class="md-nav__link ">
+            <a href="../../data_profiles/" class="md-nav__link ">
               
   
   
@@ -1167,7 +1285,7 @@
   
   
     <li class="md-nav__item">
-      <a href="data_profiles/data_profile/" class="md-nav__link">
+      <a href="../../data_profiles/data_profile/" class="md-nav__link">
         
   
   
@@ -1190,7 +1308,7 @@
   
   
     <li class="md-nav__item">
-      <a href="data_profiles/target_values/" class="md-nav__link">
+      <a href="../../data_profiles/target_values/" class="md-nav__link">
         
   
   
@@ -1213,7 +1331,7 @@
   
   
     <li class="md-nav__item">
-      <a href="data_profiles/targets_generator/" class="md-nav__link">
+      <a href="../../data_profiles/targets_generator/" class="md-nav__link">
         
   
   
@@ -1271,7 +1389,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="problems/" class="md-nav__link ">
+            <a href="../../problems/" class="md-nav__link ">
               
   
   
@@ -1304,7 +1422,7 @@
   
   
     <li class="md-nav__item">
-      <a href="problems/base_problem_configuration/" class="md-nav__link">
+      <a href="../../problems/base_problem_configuration/" class="md-nav__link">
         
   
   
@@ -1327,7 +1445,7 @@
   
   
     <li class="md-nav__item">
-      <a href="problems/mda_problem_configuration/" class="md-nav__link">
+      <a href="../../problems/mda_problem_configuration/" class="md-nav__link">
         
   
   
@@ -1350,7 +1468,7 @@
   
   
     <li class="md-nav__item">
-      <a href="problems/mdo_problem_configuration/" class="md-nav__link">
+      <a href="../../problems/mdo_problem_configuration/" class="md-nav__link">
         
   
   
@@ -1373,7 +1491,7 @@
   
   
     <li class="md-nav__item">
-      <a href="problems/optimization_problem_configuration/" class="md-nav__link">
+      <a href="../../problems/optimization_problem_configuration/" class="md-nav__link">
         
   
   
@@ -1396,7 +1514,7 @@
   
   
     <li class="md-nav__item">
-      <a href="problems/problems_group/" class="md-nav__link">
+      <a href="../../problems/problems_group/" class="md-nav__link">
         
   
   
@@ -1448,7 +1566,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="report/" class="md-nav__link ">
+            <a href="../../report/" class="md-nav__link ">
               
   
   
@@ -1481,7 +1599,7 @@
   
   
     <li class="md-nav__item">
-      <a href="report/conf/" class="md-nav__link">
+      <a href="../../report/conf/" class="md-nav__link">
         
   
   
@@ -1504,7 +1622,7 @@
   
   
     <li class="md-nav__item">
-      <a href="report/report/" class="md-nav__link">
+      <a href="../../report/report/" class="md-nav__link">
         
   
   
@@ -1560,7 +1678,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="results/" class="md-nav__link ">
+            <a href="../../results/" class="md-nav__link ">
               
   
   
@@ -1593,7 +1711,7 @@
   
   
     <li class="md-nav__item">
-      <a href="results/history_item/" class="md-nav__link">
+      <a href="../../results/history_item/" class="md-nav__link">
         
   
   
@@ -1616,7 +1734,7 @@
   
   
     <li class="md-nav__item">
-      <a href="results/performance_histories/" class="md-nav__link">
+      <a href="../../results/performance_histories/" class="md-nav__link">
         
   
   
@@ -1639,7 +1757,7 @@
   
   
     <li class="md-nav__item">
-      <a href="results/performance_history/" class="md-nav__link">
+      <a href="../../results/performance_history/" class="md-nav__link">
         
   
   
@@ -1662,7 +1780,7 @@
   
   
     <li class="md-nav__item">
-      <a href="results/results/" class="md-nav__link">
+      <a href="../../results/results/" class="md-nav__link">
         
   
   
@@ -1718,17 +1836,37 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#gemseo_benchmark" class="md-nav__link">
+  <a href="#gemseo_benchmark.benchmarker.mdo_worker" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;gemseo_benchmark
+      <code class="doc-symbol doc-symbol-toc doc-symbol-module"></code>&nbsp;mdo_worker
     </span>
   </a>
   
-    <nav class="md-nav" aria-label=" gemseo_benchmark">
+    <nav class="md-nav" aria-label=" mdo_worker">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#gemseo_benchmark-functions" class="md-nav__link">
+  <a href="#gemseo_benchmark.benchmarker.mdo_worker-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Classes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.mdo_worker.MDOWorker" class="md-nav__link">
+    <span class="md-ellipsis">
+      <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;MDOWorker
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" MDOWorker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gemseo_benchmark.benchmarker.mdo_worker.MDOWorker-functions" class="md-nav__link">
     <span class="md-ellipsis">
       Functions
     </span>
@@ -1738,20 +1876,30 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#gemseo_benchmark.get_markers_cycle" class="md-nav__link">
+  <a href="#gemseo_benchmark.benchmarker.mdo_worker.MDOWorker.check_algorithm_availability" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;get_markers_cycle
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;check_algorithm_availability
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#gemseo_benchmark.join_substrings" class="md-nav__link">
+  <a href="#gemseo_benchmark.benchmarker.mdo_worker.MDOWorker.execute" class="md-nav__link">
     <span class="md-ellipsis">
-      <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;join_substrings
+      <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;execute
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1784,21 +1932,57 @@
   
 
 
-  <h1>API documentation</h1>
+  <h1>Mdo worker</h1>
 
 <div class="doc doc-object doc-module">
 
 
 
-<h2 id="gemseo_benchmark" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">gemseo_benchmark</span>
+<h2 id="gemseo_benchmark.benchmarker.mdo_worker" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">mdo_worker</span>
 
 
-<a href="#gemseo_benchmark" class="headerlink" title="Permanent link">&para;</a></h2>
+<a href="#gemseo_benchmark.benchmarker.mdo_worker" class="headerlink" title="Permanent link">&para;</a></h2>
 
     <div class="doc doc-contents first">
 
-        <p>Benchmarking of algorithms.</p>
+        <p>Benchmarking worker for multidisciplinary optimization.</p>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+<h3 id="gemseo_benchmark.benchmarker.mdo_worker-classes">Classes<a href="#gemseo_benchmark.benchmarker.mdo_worker-classes" class="headerlink" title="Permanent link">&para;</a></h3>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h4 id="gemseo_benchmark.benchmarker.mdo_worker.MDOWorker" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">MDOWorker</span>
+
+
+<a href="#gemseo_benchmark.benchmarker.mdo_worker.MDOWorker" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            BaseWorker (gemseo_benchmark.benchmarker.base_worker.BaseWorker)" href="../base_worker/#gemseo_benchmark.benchmarker.base_worker.BaseWorker">BaseWorker</a></code></p>
+
+
+        <p>A benchmarking worker for multidisciplinary optimization.</p>
+
 
 
 
@@ -1816,124 +2000,325 @@
 
 
 
-<h3 id="gemseo_benchmark-functions">Functions<a href="#gemseo_benchmark-functions" class="headerlink" title="Permanent link">&para;</a></h3>
+<h5 id="gemseo_benchmark.benchmarker.mdo_worker.MDOWorker-functions">Functions<a href="#gemseo_benchmark.benchmarker.mdo_worker.MDOWorker-functions" class="headerlink" title="Permanent link">&para;</a></h5>
 
 <div class="doc doc-object doc-function">
 
 
-<h4 id="gemseo_benchmark.get_markers_cycle" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">get_markers_cycle</span>
+<h6 id="gemseo_benchmark.benchmarker.mdo_worker.MDOWorker.check_algorithm_availability" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">check_algorithm_availability</span>
 
 
-<a href="#gemseo_benchmark.get_markers_cycle" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_markers_cycle</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Iterator" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator">Iterator</a></span>
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#gemseo_benchmark.benchmarker.mdo_worker.MDOWorker.check_algorithm_availability" class="headerlink" title="Permanent link">&para;</a></h6>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">check_algorithm_availability</span><span class="p">(</span><span class="n">algorithm_name</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Return the markers cycle for the plots.</p>
-
-
-<p><span class="doc-section-title">Returns:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="collections.abc.Iterator" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator">Iterator</a></code>
-          –
-          <div class="doc-md-description">
-            <p>The markers cycle.</p>
-          </div>
-        </li>
-    </ul>
-
-
-            <details class="quote">
-              <summary>Source code in <code>src/gemseo_benchmark/__init__.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_markers_cycle</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the markers cycle for the plots.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        The markers cycle.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">itertools</span><span class="o">.</span><span class="n">cycle</span><span class="p">(</span><span class="n">MARKERS</span><span class="p">)</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="gemseo_benchmark.join_substrings" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">join_substrings</span>
-
-
-<a href="#gemseo_benchmark.join_substrings" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">join_substrings</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Join sub-strings with underscores.</p>
+        <p>Check whether an algorithm is available.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>string</code></b>
+            <b><code>algorithm_name</code></b>
               (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
           –
           <div class="doc-md-description">
-            <p>The string.</p>
+            <p>The name of the algorithm.</p>
           </div>
         </li>
     </ul>
 
 
-<p><span class="doc-section-title">Returns:</span></p>
+<p><span class="doc-section-title">Raises:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-          –
+              <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+            –
           <div class="doc-md-description">
-            <p>The joined sub-strings.</p>
+            <p>If the algorithm is not available.</p>
           </div>
         </li>
     </ul>
 
 
             <details class="quote">
-              <summary>Source code in <code>src/gemseo_benchmark/__init__.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span>
+              <summary>Source code in <code>src/gemseo_benchmark/benchmarker/base_worker.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
 <span class="normal">62</span>
-<span class="normal">63</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">join_substrings</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Join sub-strings with underscores.</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_algorithm_availability</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check whether an algorithm is available.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        string: The string.</span>
+<span class="sd">        algorithm_name: The name of the algorithm.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        The joined sub-strings.</span>
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the algorithm is not available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_algorithm_factory</span><span class="o">.</span><span class="n">is_available</span><span class="p">(</span><span class="n">algorithm_name</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;The algorithm </span><span class="si">{</span><span class="n">algorithm_name</span><span class="si">!r}</span><span class="s2"> is not available.&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
 
 </div>
+
+<div class="doc doc-object doc-function">
+
+
+<h6 id="gemseo_benchmark.benchmarker.mdo_worker.MDOWorker.execute" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">execute</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#gemseo_benchmark.benchmarker.mdo_worker.MDOWorker.execute" class="headerlink" title="Permanent link">&para;</a></h6>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">execute</span><span class="p">(</span>
+    <span class="n">algorithm_configuration</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            AlgorithmConfiguration (gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration)" href="../../algorithms/algorithm_configuration/#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration">AlgorithmConfiguration</a></span><span class="p">,</span>
+    <span class="n">problem_configuration</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseProblemConfiguration (gemseo_benchmark.problems.base_problem_configuration.BaseProblemConfiguration)" href="../../problems/base_problem_configuration/#gemseo_benchmark.problems.base_problem_configuration.BaseProblemConfiguration">BaseProblemConfiguration</a></span><span class="p">,</span>
+    <span class="n">starting_point</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></span><span class="p">,</span>
+    <span class="n">gemseo_log_message</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span>
+    <span class="n">log_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">performance_history_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span><span class="p">,</span>
+    <span class="n">hdf_file_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">benchmarking_logger</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="logging.Logger" href="https://docs.python.org/3/library/logging.html#logging.Logger">Logger</a></span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Create a performance history from a problem.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <ul>
+        <li class="doc-section-item field-body">
+            <b><code>algorithm_configuration</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            AlgorithmConfiguration (gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration)" href="../../algorithms/algorithm_configuration/#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration">AlgorithmConfiguration</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The algorithm configuration.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>problem_configuration</code></b>
+              (<code><a class="autorefs autorefs-internal" title="            BaseProblemConfiguration (gemseo_benchmark.problems.base_problem_configuration.BaseProblemConfiguration)" href="../../problems/base_problem_configuration/#gemseo_benchmark.problems.base_problem_configuration.BaseProblemConfiguration">BaseProblemConfiguration</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The problem configuration.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>starting_point</code></b>
+              (<code><a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The starting point of the algorithm.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>gemseo_log_message</code></b>
+              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The message to log before benchmarking.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>log_path</code></b>
+              (<code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>)
+          –
+          <div class="doc-md-description">
+            <p>The file path to save the log.
+If <code>None</code>, the log is not saved.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>performance_history_path</code></b>
+              (<code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The file path to save the performance history.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>hdf_file_path</code></b>
+              (<code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>)
+          –
+          <div class="doc-md-description">
+            <p>The HDF file path.
+If <code>None</code>, no HDF file will be written.</p>
+          </div>
+        </li>
+        <li class="doc-section-item field-body">
+            <b><code>benchmarking_logger</code></b>
+              (<code><a class="autorefs autorefs-external" title="logging.Logger" href="https://docs.python.org/3/library/logging.html#logging.Logger">Logger</a></code>)
+          –
+          <div class="doc-md-description">
+            <p>The benchmarking logger.</p>
+          </div>
+        </li>
+    </ul>
+
+
+            <details class="quote">
+              <summary>Source code in <code>src/gemseo_benchmark/benchmarker/base_worker.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
+    <span class="bp">cls</span><span class="p">,</span>
+    <span class="n">algorithm_configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">,</span>
+    <span class="n">problem_configuration</span><span class="p">:</span> <span class="n">BaseProblemConfiguration</span><span class="p">,</span>
+    <span class="n">starting_point</span><span class="p">:</span> <span class="n">RealArray</span><span class="p">,</span>
+    <span class="n">gemseo_log_message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">log_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">performance_history_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">hdf_file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">benchmarking_logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a performance history from a problem.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        algorithm_configuration: The algorithm configuration.</span>
+<span class="sd">        problem_configuration: The problem configuration.</span>
+<span class="sd">        starting_point: The starting point of the algorithm.</span>
+<span class="sd">        gemseo_log_message: The message to log before benchmarking.</span>
+<span class="sd">        log_path: The file path to save the log.</span>
+<span class="sd">            If ``None``, the log is not saved.</span>
+<span class="sd">        performance_history_path: The file path to save the performance history.</span>
+<span class="sd">        hdf_file_path: The HDF file path.</span>
+<span class="sd">            If ``None``, no HDF file will be written.</span>
+<span class="sd">        benchmarking_logger: The benchmarking logger.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Start writing in the log file.</span>
+    <span class="k">if</span> <span class="n">log_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">file_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">log_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+        <span class="n">loggers</span> <span class="o">=</span> <span class="p">[</span><span class="n">benchmarking_logger</span><span class="p">,</span> <span class="n">GEMSEO_LOGGER</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">logger</span> <span class="ow">in</span> <span class="n">loggers</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">file_handler</span><span class="p">)</span>
+
+    <span class="n">problem</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_get_problem</span><span class="p">(</span>
+        <span class="n">algorithm_configuration</span><span class="p">,</span>
+        <span class="n">problem_configuration</span><span class="p">,</span>
+        <span class="n">starting_point</span><span class="p">,</span>
+        <span class="n">hdf_file_path</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">benchmarking_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">gemseo_log_message</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">Timer</span><span class="p">()</span> <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_execute</span><span class="p">(</span>
+            <span class="n">algorithm_configuration</span><span class="p">,</span>
+            <span class="n">problem_configuration</span><span class="p">,</span>
+            <span class="n">starting_point</span><span class="p">,</span>
+            <span class="n">problem</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Stop writing in the log file.</span>
+    <span class="k">if</span> <span class="n">log_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">logger</span> <span class="ow">in</span> <span class="n">loggers</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">removeHandler</span><span class="p">(</span><span class="n">file_handler</span><span class="p">)</span>
+
+        <span class="n">file_handler</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="bp">cls</span><span class="o">.</span><span class="n">_create_performance_history</span><span class="p">(</span>
+        <span class="n">algorithm_configuration</span><span class="p">,</span>
+        <span class="n">problem_configuration</span><span class="p">,</span>
+        <span class="n">problem</span><span class="p">,</span>
+        <span class="n">timer</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">performance_history_path</span><span class="p">)</span>
+    <span class="bp">cls</span><span class="o">.</span><span class="n">_post_execute</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">hdf_file_path</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
 
 
 
@@ -1990,14 +2375,14 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.instant", "navigation.indexes"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.tabs", "navigation.instant", "navigation.indexes"], "search": "../../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.56ea9cef.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.56ea9cef.min.js"></script>
       
-        <script src="../../assets/_markdown_exec_pyodide.js"></script>
+        <script src="../../../../assets/_markdown_exec_pyodide.js"></script>
       
-        <script src="../../javascripts/mathjax.js"></script>
+        <script src="../../../../javascripts/mathjax.js"></script>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
