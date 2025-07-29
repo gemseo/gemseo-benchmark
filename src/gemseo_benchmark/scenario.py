@@ -92,7 +92,7 @@ class Scenario:
         log_gemseo_to_file: bool = False,
         directory_path: Path | None = None,
         plot_only_median: bool = False,
-        use_evaluation_log_scale: bool = False,
+        use_abscissa_log_scale: bool = False,
         plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
     ) -> Results:
         """Execute the benchmarking scenario.
@@ -126,8 +126,8 @@ class Scenario:
             directory_path: The path to the directory where the report
                 will be generated.
             plot_only_median: Whether to plot only the median and no other centile.
-            use_evaluation_log_scale: Whether to use a logarithmic scale
-                for the number of function evaluations axis.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
             plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
 
@@ -158,7 +158,7 @@ class Scenario:
                 use_log_scale,
                 directory_path,
                 plot_only_median,
-                use_evaluation_log_scale,
+                use_abscissa_log_scale,
                 plot_settings,
             )
 
@@ -234,7 +234,7 @@ class Scenario:
         use_log_scale: bool = False,
         directory_path: Path | None = None,
         plot_only_median: bool = False,
-        use_evaluation_log_scale: bool = False,
+        use_abscissa_log_scale: bool = False,
         plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
     ) -> None:
         """Generate the benchmarking report.
@@ -258,8 +258,8 @@ class Scenario:
             directory_path: The path to the directory where the report
                 will be generated.
             plot_only_median: Whether to plot only the median and no other centile.
-            use_evaluation_log_scale: Whether to use a logarithmic scale
-                for the number of function evaluations axis.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
             plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
         """
@@ -281,7 +281,7 @@ class Scenario:
             plot_all_histories,
             use_log_scale,
             plot_only_median,
-            use_evaluation_log_scale=use_evaluation_log_scale,
+            use_abscissa_log_scale=use_abscissa_log_scale,
         )
 
     def __get_report_path(self) -> Path:

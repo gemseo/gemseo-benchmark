@@ -1,10 +1,10 @@
 [
   {
-    "performance": -2.0,
-    "infeasibility": 1.0
+    "performance measure": -2.0,
+    "infeasibility measure": 1.0
   },
   {
-    "performance": -3.0,
-    "infeasibility": 0.0
+    "performance measure": -3.0,
+    "infeasibility measure": 0.0
   }
 ]

@@ -20,15 +20,17 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING
 from typing import Callable
 from typing import ClassVar
+from typing import Final
 
 from gemseo.core.discipline.discipline import Discipline
-from gemseo.mda.base_mda import BaseMDA
+from gemseo.mda.base_mda_solver import BaseMDASolver
 from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 
 from gemseo_benchmark.benchmarker.mda_worker import MDAWorker
 from gemseo_benchmark.problems.base_problem_configuration import (
     BaseProblemConfiguration,
 )
+from gemseo_benchmark.report.axis_data import DisciplineData
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -44,12 +46,14 @@ if TYPE_CHECKING:
         InputStartingPointsType,
     )
 
-MDAProblemType = tuple[BaseMDA, Sequence[Discipline]]
+MDAProblemType = tuple[BaseMDASolver, Sequence[Discipline]]
 
 
 class MDAProblemConfiguration(BaseProblemConfiguration):
     """Problem configuration for multidisciplinary analysis."""
 
+    abscissa_data_type: Final[type[DisciplineData]] = DisciplineData
+    performance_measure_label: ClassVar[str] = "Best residual norm"
     worker: ClassVar[type[MDAWorker]] = MDAWorker
 
     def __init__(  # noqa: D107
@@ -74,6 +78,7 @@ class MDAProblemConfiguration(BaseProblemConfiguration):
             doe_size,
             doe_options,
             description,
+            0,
             0,
         )
 

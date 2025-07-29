@@ -442,7 +442,7 @@ def ill_optimization_problem_configuration(
 def ill_mda_problem_configuration(
     multidisciplinary_variable_space,
     mda_problem_configuration,
-) -> OptimizationProblemConfiguration:
+) -> MDAProblemConfiguration:
     """An ill multidisciplinary analysis problem configuration."""
     return MDAProblemConfiguration(
         mda_problem_configuration.name,
@@ -457,7 +457,7 @@ def ill_mda_problem_configuration(
 def ill_mdo_problem_configuration(
     multidisciplinary_variable_space,
     mdo_problem_configuration,
-) -> OptimizationProblemConfiguration:
+) -> MDOProblemConfiguration:
     """An ill multidisciplinary optimization problem configuration."""
     return MDOProblemConfiguration(
         mdo_problem_configuration.name,
@@ -466,6 +466,7 @@ def ill_mdo_problem_configuration(
         ),
         multidisciplinary_variable_space,
         True,
+        0,
     )
 
 

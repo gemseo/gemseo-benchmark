@@ -105,7 +105,7 @@ class ProblemsGroup:
         max_eval_number: int = 0,
         plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
         grid_settings: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
-        use_evaluation_log_scale: bool = False,
+        use_abscissa_log_scale: bool = False,
     ) -> None:
         """Generate the data profiles of given algorithms relative to the problems.
 
@@ -121,8 +121,8 @@ class ProblemsGroup:
             plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
             grid_settings: The keyword arguments of `matplotlib.pyplot.grid`.
-            use_evaluation_log_scale: Whether to use a logarithmic scale
-                for the number of function evaluations axis.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
         """
         data_profile = DataProfile({
             problem.name: problem.minimization_target_values
@@ -150,7 +150,7 @@ class ProblemsGroup:
             file_path=plot_path,
             plot_settings=plot_settings,
             grid_settings=grid_settings,
-            use_evaluation_log_scale=use_evaluation_log_scale,
+            use_abscissa_log_scale=use_abscissa_log_scale,
         )
 
     def __len__(self) -> int:

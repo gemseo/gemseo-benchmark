@@ -27,6 +27,7 @@ from tests.problems.conftest import check_default_starting_point
 from tests.problems.conftest import check_description
 from tests.problems.conftest import check_inconsistent_starting_points
 from tests.problems.conftest import check_no_starting_point
+from tests.problems.conftest import check_number_of_scalar_constraints
 from tests.problems.conftest import check_set_starting_points_as_non_2d_array
 from tests.problems.conftest import check_set_starting_points_as_non_iterable
 from tests.problems.conftest import check_set_starting_points_with_wrong_dimension
@@ -155,7 +156,7 @@ def test_compute_data_profile(
     target_values,
     algorithms_configurations,
     results,
-    use_iteration_log_scale,
+    use_abscissa_log_scale,
 ) -> None:
     """Check the computation of data profiles."""
     check_data_profiles_computation(
@@ -164,7 +165,7 @@ def test_compute_data_profile(
         target_values,
         algorithms_configurations,
         results,
-        use_iteration_log_scale,
+        use_abscissa_log_scale,
         multidisciplinary_variable_space,
     )
 
@@ -206,3 +207,8 @@ def test_variable_space(
 def test_worker(mda_problem_configuration) -> None:
     """Check the type of benchmarking worker."""
     check_worker_type(mda_problem_configuration, MDAWorker)
+
+
+def test_number_of_scalar_constraints(mda_problem_configuration) -> None:
+    """Check the number of scalar constraints."""
+    check_number_of_scalar_constraints(mda_problem_configuration, 0)

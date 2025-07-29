@@ -27,6 +27,7 @@ from gemseo.utils.timer import Timer
 from numpy.testing import assert_equal
 
 from gemseo_benchmark.benchmarker.optimization_worker import OptimizationWorker
+from tests.benchmarker.conftest import check_create_performance_history
 
 
 def test_get_algorithm_factory() -> None:
@@ -119,17 +120,16 @@ def test_create_performance_history(algorithm_configuration, rosenbrock) -> None
     """Check the creation of the performance history."""
     problem = rosenbrock.create_problem()
     problem.preprocess_functions()
-    values, _ = problem.evaluate_functions()
-    performance_history = OptimizationWorker()._create_performance_history(
-        algorithm_configuration, rosenbrock, problem, Timer()
+    with Timer() as timer:
+        values, _ = problem.evaluate_functions()
+
+    check_create_performance_history(
+        algorithm_configuration,
+        rosenbrock,
+        problem,
+        OptimizationWorker,
+        timer,
+        [values[problem.standardized_objective_name]],
+        [0.0],
+        [0],
     )
-    assert performance_history.algorithm_configuration is algorithm_configuration
-    assert performance_history.problem_name == rosenbrock.name
-    assert len(performance_history) == 1
-    assert performance_history.performance_measures == [
-        values[problem.standardized_objective_name]
-    ]
-    assert performance_history.infeasibility_measures == [0.0]
-    assert performance_history.n_unsatisfied_constraints == [0]
-    # TODO: check datetime
-    assert performance_history.total_time == 0.0

@@ -310,13 +310,13 @@ def check_starting_point_loading(
 
 
 test_compute_data_profiles_parametrize = pytest.mark.parametrize(
-    ("baseline_images", "use_iteration_log_scale"),
+    ("baseline_images", "use_abscissa_log_scale"),
     [
         (
-            [f"data_profiles[use_iteration_log_scale={use_iteration_log_scale}]"],
-            use_iteration_log_scale,
+            [f"data_profiles[use_abscissa_log_scale={use_abscissa_log_scale}]"],
+            use_abscissa_log_scale,
         )
-        for use_iteration_log_scale in [False, True]
+        for use_abscissa_log_scale in [False, True]
     ],
 )
 
@@ -327,7 +327,7 @@ def check_data_profiles_computation(
     target_values: TargetValues,
     algorithm_configurations: AlgorithmsConfigurations,
     results: Results,
-    use_iteration_log_scale: bool,
+    use_abscissa_log_scale: bool,
     *args: Any,
 ) -> None:
     """Check the computation of data profiles.
@@ -338,8 +338,8 @@ def check_data_profiles_computation(
         target_values: The target values.
         algorithm_configurations: The algorithm configurations.
         results: The benchmarking results.
-        use_iteration_log_scale: Whether to use a logarithmic scale
-            for the number of iterations axis.
+        use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
         *args: Positional arguments for the class initialization.
     """
     matplotlib.pyplot.close("all")
@@ -351,7 +351,7 @@ def check_data_profiles_computation(
     ).compute_data_profile(
         algorithm_configurations,
         results,
-        use_iteration_log_scale=use_iteration_log_scale,
+        use_abscissa_log_scale=use_abscissa_log_scale,
     )
 
 
@@ -401,10 +401,25 @@ def check_worker_type(
     """Check the type of benchmarking worker.
 
     Args:
-        problem_configuration_class: The class of problem configuration.
+        problem_configuration: The problem configuration.
         worker_type: The type of benchmarking worker.
     """
     assert problem_configuration.worker is worker_type
+
+
+def check_number_of_scalar_constraints(
+    problem_configuration: BaseProblemConfiguration, number_of_scalar_constraints: int
+) -> None:
+    """Check the number of scalar constraints.
+
+    Args:
+        problem_configuration: The problem configuration.
+        number_of_scalar_constraints: The number of scalar constraints.
+    """
+    assert (
+        problem_configuration.number_of_scalar_constraints
+        == number_of_scalar_constraints
+    )
 
 
 @pytest.fixture

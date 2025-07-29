@@ -13,16 +13,24 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+import datetime
 import logging
 from pathlib import Path
+from unittest import mock
 
 import pytest
 from gemseo.core.base_factory import BaseFactory
+from gemseo.utils.timer import Timer
+from numpy.testing import assert_equal
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.benchmarker.base_worker import BaseWorker
+from gemseo_benchmark.benchmarker.base_worker import ProblemType
 from gemseo_benchmark.problems.base_problem_configuration import (
     BaseProblemConfiguration,
+)
+from gemseo_benchmark.problems.optimization_problem_configuration import (
+    OptimizationProblemConfiguration,
 )
 
 
@@ -96,3 +104,61 @@ def check_execution(
     assert performance_history_path.is_file()
     if save_data:
         assert hdf_file_path.is_file()
+
+
+def check_create_performance_history(
+    algorithm_configuration: AlgorithmConfiguration,
+    problem_configuration: BaseProblemConfiguration,
+    problem: ProblemType,
+    worker_type: type[BaseWorker],
+    timer: Timer,
+    performance_measures: list[float],
+    infeasibility_measures: list[float],
+    number_of_unsatisfied_constraints: list[int],
+) -> None:
+    """Check the creation of a performance history by a benchmarking worker.
+
+    Args:
+        algorithm_configuration: The algorithm configuration.
+        problem_configuration: The problem configuration.
+        problem: The problem from which to create a performance history.
+        worker_type: The type of benchmarking worker.
+        timer: The timer of the worker execution.
+        performance_measures: The history of the performance measure.
+        infeasibility_measures: The history of the infeasibility measure.
+        n_unsatisfied_constraints: The history of the number of unsatisfied constraints.
+    """
+    elapsed_times = [
+        datetime.timedelta(seconds=i + 1) for i in range(len(performance_measures))
+    ]
+    time_listener = mock.Mock()
+    time_listener.get_metrics = mock.Mock(return_value=elapsed_times)
+    metrics_listeners = [time_listener]
+    if not isinstance(problem_configuration, OptimizationProblemConfiguration):
+        discipline_listener = mock.Mock()
+        discipline_listener.get_metrics = mock.Mock(
+            return_value=range(1, len(performance_measures) + 1)
+        )
+        metrics_listeners.append(discipline_listener)
+
+    performance_history = worker_type()._create_performance_history(
+        algorithm_configuration,
+        problem_configuration,
+        problem,
+        timer,
+        metrics_listeners,
+    )
+    assert performance_history.algorithm_configuration is algorithm_configuration
+    assert performance_history.problem_name == problem_configuration.name
+    assert len(performance_history) == len(performance_measures)
+    assert_equal(performance_history.performance_measures, performance_measures)
+    assert performance_history.infeasibility_measures == infeasibility_measures
+    assert (
+        performance_history.n_unsatisfied_constraints
+        == number_of_unsatisfied_constraints
+    )
+    assert performance_history.total_time == timer.elapsed_time
+    assert [
+        history_item.elapsed_time.total_seconds()
+        for history_item in performance_history
+    ] == list(range(1, len(performance_measures) + 1))

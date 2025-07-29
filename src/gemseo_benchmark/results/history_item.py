@@ -21,15 +21,29 @@
 
 from __future__ import annotations
 
+import datetime
+from typing import Final
+from typing import Union
+
+HistoryItemDict = dict[str, Union[int, float, datetime.timedelta]]
+
 
 class HistoryItem:
     """A performance history item."""
+
+    __ELAPSED_TIME: Final[str] = "elapsed time"
+    __INFEASIBILITY_MEASURE: Final[str] = "infeasibility measure"
+    __N_DISCIPLINE_EXECUTIONS: Final[str] = "number of discipline executions"
+    __N_UNSATISFIED_CONSTRAINTS: Final[str] = "number of unsatisfied constraints"
+    __PERFORMANCE_MEASURE: Final[str] = "performance measure"
 
     def __init__(
         self,
         performance_measure: float,
         infeasibility_measure: float,
         n_unsatisfied_constraints: int | None = None,
+        elapsed_time: datetime.timedelta = datetime.timedelta(),
+        number_of_discipline_executions: int = 0,
     ) -> None:
         """
         Args:
@@ -39,14 +53,16 @@ class HistoryItem:
                 item.
                 If ``None``, it will be set to 0 if the infeasibility measure is zero,
                 and if the infeasibility measure is positive it will be set to None.
+            elapsed_time: The elapsed time of the item.
+            number_of_disicpline_executions: The number of discipline executions.
         """  # noqa: D205, D212, D415
-        self.__performance_measure = performance_measure
+        self.__elapsed_time = elapsed_time
         (
-            self.__infeas_measure,
+            self.__infeasibility_measure,
             self.__n_unsatisfied_constraints,
-        ) = HistoryItem.__get_infeasibility(
-            infeasibility_measure, n_unsatisfied_constraints
-        )
+        ) = self.__get_infeasibility(infeasibility_measure, n_unsatisfied_constraints)
+        self.__number_of_discipline_executions = number_of_discipline_executions
+        self.__performance_measure = performance_measure
 
     @staticmethod
     def __get_infeasibility(
@@ -107,12 +123,32 @@ class HistoryItem:
         Raises:
              ValueError: If the infeasibility measure is negative.
         """
-        return self.__infeas_measure
+        return self.__infeasibility_measure
 
     @property
     def n_unsatisfied_constraints(self) -> int | None:
         """The number of unsatisfied constraints."""
         return self.__n_unsatisfied_constraints
+
+    @property
+    def elapsed_time(self) -> datetime.timedelta:
+        """The elapsed time."""
+        return self.__elapsed_time
+
+    @elapsed_time.setter
+    def elapsed_time(self, elapsed_time: datetime.timedelta) -> None:
+        self.__elapsed_time = elapsed_time
+
+    @property
+    def number_of_discipline_executions(self) -> int:
+        """The number of discipline executions."""
+        return self.__number_of_discipline_executions
+
+    @number_of_discipline_executions.setter
+    def number_of_discipline_executions(
+        self, number_of_discipline_executions: int
+    ) -> None:
+        self.__number_of_discipline_executions = number_of_discipline_executions
 
     def __repr__(self) -> str:
         return str((self.performance_measure, self.infeasibility_measure))
@@ -127,7 +163,7 @@ class HistoryItem:
             Whether the history item is equal to the other one.
         """
         return (
-            self.__infeas_measure == other.__infeas_measure
+            self.__infeasibility_measure == other.__infeasibility_measure
             and self.performance_measure == other.performance_measure
         )
 
@@ -140,8 +176,8 @@ class HistoryItem:
         Returns:
             Whether the history item is lower than the other one.
         """
-        return self.__infeas_measure < other.__infeas_measure or (
-            self.__infeas_measure == other.__infeas_measure
+        return self.__infeasibility_measure < other.__infeasibility_measure or (
+            self.__infeasibility_measure == other.__infeasibility_measure
             and self.performance_measure < other.performance_measure
         )
 
@@ -170,18 +206,47 @@ class HistoryItem:
         Args:
             infeasibility_tolerance: the tolerance on the infeasibility measure.
         """
-        if self.__infeas_measure <= infeasibility_tolerance:
-            self.__infeas_measure = 0.0
+        if self.__infeasibility_measure <= infeasibility_tolerance:
+            self.__infeasibility_measure = 0.0
             self.__n_unsatisfied_constraints = 0
 
     def copy(self) -> HistoryItem:
         """Return a deep copy of the history item."""
-        return HistoryItem(
+        return self.__class__(
             self.__performance_measure,
-            self.__infeas_measure,
+            self.__infeasibility_measure,
             self.__n_unsatisfied_constraints,
+            self.__elapsed_time,
+            self.__number_of_discipline_executions,
         )
 
     def switch_performance_measure_sign(self) -> None:
         """Switch the sign of the performance measure."""
         self.__performance_measure = -self.__performance_measure
+
+    def to_dict(self) -> HistoryItemDict:
+        """Return the history item as dictionary."""
+        data = {
+            self.__PERFORMANCE_MEASURE: self.__performance_measure,
+            self.__INFEASIBILITY_MEASURE: self.__infeasibility_measure,
+        }
+        if self.n_unsatisfied_constraints is not None:
+            # N.B. type int64 is not JSON serializable
+            data[self.__N_UNSATISFIED_CONSTRAINTS] = int(
+                self.__n_unsatisfied_constraints
+            )
+
+        data[self.__ELAPSED_TIME] = self.__elapsed_time.total_seconds()
+        data[self.__N_DISCIPLINE_EXECUTIONS] = self.__number_of_discipline_executions
+        return data
+
+    @classmethod
+    def from_dict(cls, data: HistoryItemDict) -> HistoryItem:
+        """Create a history item from a dictionary."""
+        return HistoryItem(
+            data[cls.__PERFORMANCE_MEASURE],
+            data[cls.__INFEASIBILITY_MEASURE],
+            data.get(cls.__N_UNSATISFIED_CONSTRAINTS),
+            datetime.timedelta(seconds=data.get(cls.__ELAPSED_TIME, 0)),
+            data.get(cls.__N_DISCIPLINE_EXECUTIONS),
+        )

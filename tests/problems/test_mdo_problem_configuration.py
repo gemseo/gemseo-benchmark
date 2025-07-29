@@ -46,7 +46,9 @@ def test_undefined_starting_points() -> None:
     variable_space = mock.Mock()
     variable_space.has_current_value = False
     check_no_starting_point(
-        MDOProblemConfiguration("Linear MDO", mdo_create_problem, variable_space, True)
+        MDOProblemConfiguration(
+            "Linear MDO", mdo_create_problem, variable_space, True, 0
+        )
     )
 
 
@@ -54,7 +56,7 @@ def test_default_starting_point(multidisciplinary_variable_space) -> None:
     """Check that the default starting point is properly set."""
     check_default_starting_point(
         MDOProblemConfiguration(
-            "Linear MDO", mdo_create_problem, multidisciplinary_variable_space, True
+            "Linear MDO", mdo_create_problem, multidisciplinary_variable_space, True, 0
         ),
         multidisciplinary_variable_space,
     )
@@ -67,6 +69,7 @@ def test_inconsistent_starting_points(multidisciplinary_variable_space) -> None:
         mdo_create_problem,
         multidisciplinary_variable_space,
         True,
+        0,
     )
 
 
@@ -74,7 +77,7 @@ def test_undefined_target_values(multidisciplinary_variable_space) -> None:
     """Check undefined target values."""
     check_undefined_target_values(
         MDOProblemConfiguration(
-            "Linear MDO", mdo_create_problem, multidisciplinary_variable_space, True
+            "Linear MDO", mdo_create_problem, multidisciplinary_variable_space, True, 0
         )
     )
 
@@ -86,6 +89,7 @@ def test_generate_default_starting_points(multidisciplinary_variable_space) -> N
         mdo_create_problem,
         multidisciplinary_variable_space,
         True,
+        0,
     )
 
 
@@ -96,6 +100,7 @@ def test_generate_starting_points(multidisciplinary_variable_space) -> None:
         mdo_create_problem,
         multidisciplinary_variable_space,
         True,
+        0,
     )
 
 
@@ -129,6 +134,7 @@ def test_description(
         actual_description,
         multidisciplinary_variable_space,
         True,
+        0,
     )
 
 
@@ -140,6 +146,7 @@ def test_save_starting_points(tmp_path, multidisciplinary_variable_space) -> Non
         mdo_create_problem,
         multidisciplinary_variable_space,
         True,
+        0,
     )
 
 
@@ -151,6 +158,7 @@ def test_load_starting_points(tmp_path, multidisciplinary_variable_space) -> Non
         mdo_create_problem,
         multidisciplinary_variable_space,
         True,
+        0,
     )
 
 
@@ -167,7 +175,7 @@ def test_compute_data_profile(
     target_values,
     algorithms_configurations,
     results,
-    use_iteration_log_scale,
+    use_abscissa_log_scale,
 ) -> None:
     """Check the computation of data profiles."""
     check_data_profiles_computation(
@@ -176,9 +184,10 @@ def test_compute_data_profile(
         target_values,
         algorithms_configurations,
         results,
-        use_iteration_log_scale,
+        use_abscissa_log_scale,
         multidisciplinary_variable_space,
         True,
+        0,
     )
 
 
@@ -202,6 +211,7 @@ def test_compute_data_profile_max_eval_number(
         results,
         multidisciplinary_variable_space,
         True,
+        0,
     )
 
 

@@ -49,6 +49,7 @@ if TYPE_CHECKING:
     )
     from gemseo_benchmark.benchmarker.base_worker import BaseWorker
     from gemseo_benchmark.data_profiles.target_values import TargetValues
+    from gemseo_benchmark.report.axis_data import AbscissaData
     from gemseo_benchmark.results.results import Results
 
 InputStartingPointsType = Union[ndarray, Iterable[ndarray]]
@@ -108,6 +109,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
         doe_options: Mapping[str, Any],
         description: str,
         optimum: float | None,
+        number_of_scalar_constraints: int,
     ) -> None:
         """
         Args:
@@ -137,11 +139,13 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
                 (to appear in a benchmarking report).
             optimum: The best feasible performance measure of the problem configuration.
                 If ``None``, it will not be set.
+            number_of_scalar_constraints: The number of scalar constraints.
         """  # noqa: D205, D212, D415
         self.__create_problem = create_problem
         self.__description = description
         self.__minimization_target_values = None
         self.__name = name
+        self.__number_of_scalar_constraints = number_of_scalar_constraints
         self.__optimum = optimum
         self.__starting_points = []
         self.__target_values = None
@@ -358,7 +362,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
         max_iteration_number: int = 0,
         plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
         grid_settings: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
-        use_iteration_log_scale: bool = False,
+        use_abscissa_log_scale: bool = False,
     ) -> None:
         """Compute the data profiles of given algorithms.
 
@@ -374,8 +378,8 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
             plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
             grid_settings: The keyword arguments of `matplotlib.pyplot.grid`.
-            use_iteration_log_scale: Whether to use a logarithmic scale
-                for the number of iterations axis.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
         """
         data_profile = DataProfile({self.name: self.minimization_target_values})
         for configuration_name in algos_configurations.names:
@@ -397,7 +401,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
             file_path=file_path,
             plot_settings=plot_settings,
             grid_settings=grid_settings,
-            use_evaluation_log_scale=use_iteration_log_scale,
+            use_abscissa_log_scale=use_abscissa_log_scale,
         )
 
     @property
@@ -425,5 +429,20 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
 
     @property
     @abstractmethod
-    def worker() -> type[BaseWorker]:
+    def worker(self) -> type[BaseWorker]:
         """The type of benchmarking worker."""
+
+    @property
+    def number_of_scalar_constraints(self) -> int:
+        """The number of scalar constraints."""
+        return self.__number_of_scalar_constraints
+
+    @property
+    @abstractmethod
+    def performance_measure_label(self) -> str:
+        """The label for the performance measure axis."""
+
+    @property
+    @abstractmethod
+    def abscissa_data_type(self) -> type[AbscissaData]:
+        """The type of abscissa axis data."""

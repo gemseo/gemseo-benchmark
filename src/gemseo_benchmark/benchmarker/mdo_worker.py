@@ -21,6 +21,8 @@ from typing import TYPE_CHECKING
 
 from gemseo.algos.opt.factory import OptimizationLibraryFactory
 
+from gemseo_benchmark.benchmarker._metrics import DisciplineExecutions
+from gemseo_benchmark.benchmarker._metrics import ElapsedTime
 from gemseo_benchmark.benchmarker.base_worker import BaseWorker
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
@@ -59,6 +61,17 @@ class MDOWorker(BaseWorker):
         )
         return scenario, disciplines
 
+    @classmethod
+    def _add_metrics_listeners(
+        cls, problem: MDOProblemType
+    ) -> tuple[ElapsedTime, DisciplineExecutions]:
+        optimization_problem = problem[0].formulation.optimization_problem
+        elapsed_time = ElapsedTime()
+        optimization_problem.add_listener(elapsed_time.add_metrics)
+        discipline_executions = DisciplineExecutions(problem[1])
+        optimization_problem.add_listener(discipline_executions.add_metrics)
+        return elapsed_time, discipline_executions
+
     @staticmethod
     def _execute(
         algorithm_configuration: AlgorithmConfiguration,
@@ -74,10 +87,14 @@ class MDOWorker(BaseWorker):
         problem_configuration: MDOProblemConfiguration,
         problem: MDOProblemType,
         timer: Timer,
+        metrics_listeners: tuple[ElapsedTime, DisciplineExecutions],
     ) -> PerformanceHistory:
-        # TODO: Store execution times and number of discipline executions.
+        time_listener, discipline_listener = metrics_listeners
         performance_history = PerformanceHistory.from_problem(
-            problem[0].formulation.optimization_problem, problem_configuration.name
+            problem[0].formulation.optimization_problem,
+            problem_configuration.name,
+            elapsed_times=time_listener.get_metrics(timer),
+            number_of_discipline_executions=discipline_listener.get_metrics(),
         )
         performance_history.algorithm_configuration = algorithm_configuration
         performance_history.total_time = timer.elapsed_time

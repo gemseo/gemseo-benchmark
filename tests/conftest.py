@@ -21,6 +21,8 @@
 
 from __future__ import annotations
 
+import datetime
+import math
 import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -46,6 +48,7 @@ from gemseo_benchmark.problems.optimization_problem_configuration import (
     OptimizationProblemConfiguration,
 )
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
+from gemseo_benchmark.report.axis_data import IterationData
 from gemseo_benchmark.results.performance_histories import PerformanceHistories
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
@@ -155,6 +158,7 @@ def minimization_problem(design_space, objective, constraints) -> mock.Mock:
         return_value=(False, 1.0)
     )
     problem.constraints = constraints
+    problem.scalar_constraint_names = constraints.get_names()
     return problem
 
 
@@ -173,6 +177,7 @@ def maximization_problem(design_space, objective, constraints) -> mock.Mock:
         return_value=(False, 1.0)
     )
     problem.constraints = constraints
+    problem.scalar_constraint_names = constraints.get_names()
     return problem
 
 
@@ -203,6 +208,9 @@ def problem_a() -> mock.Mock:
     problem.minimization_target_values = TargetValues([problem.optimum])
     problem.minimize_performance_measure = True
     problem.compute_data_profile = mock.Mock(side_effect=side_effect)
+    problem.performance_measure_label = "Best feasible objective value"
+    problem.number_of_scalar_constraints = 6
+    problem.abscissa_data_type = IterationData
     return problem
 
 
@@ -217,6 +225,9 @@ def problem_b() -> mock.Mock:
     problem.minimization_target_values = TargetValues([1.0])
     problem.minimize_performance_measure = False
     problem.compute_data_profile = mock.Mock(side_effect=side_effect)
+    problem.performance_measure_label = "Best feasible objective value"
+    problem.number_of_scalar_constraints = 6
+    problem.abscissa_data_type = IterationData
     return problem
 
 
@@ -237,7 +248,7 @@ def group(problem_a, problem_b) -> mock.Mock:
         max_eval_number=None,
         plot_settings=READ_ONLY_EMPTY_DICT,
         grid_settings=READ_ONLY_EMPTY_DICT,
-        use_evaluation_log_scale=False,
+        use_abscissa_log_scale=False,
     ):
         shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(plot_path))
 
@@ -441,6 +452,7 @@ def mdo_problem_configuration(
         mdo_create_problem,
         multidisciplinary_variable_space,
         True,
+        0,
         starting_points=[array([0, 1]), array([1, 0])],
     )
 
@@ -449,3 +461,83 @@ def mdo_problem_configuration(
 def mdo_algorithm_configuration() -> AlgorithmConfiguration:
     """An algorithm configuration for multidisciplinary optimization."""
     return AlgorithmConfiguration("SLSQP")
+
+
+@pytest.fixture(scope="module")
+def timed_performance_histories() -> PerformanceHistories:
+    """Performance histories with given elapsed times."""
+    return PerformanceHistories(
+        PerformanceHistory(
+            [1, 1],
+            elapsed_times=[
+                datetime.timedelta(seconds=1),
+                datetime.timedelta(seconds=3),
+            ],
+        ),
+        PerformanceHistory(
+            [2, 2],
+            elapsed_times=[
+                datetime.timedelta(seconds=2),
+                datetime.timedelta(seconds=4),
+            ],
+        ),
+    )
+
+
+def check_spread_over_time(histories: PerformanceHistories) -> None:
+    """Check the spreading of performance histories over a timeline.
+
+    Args:
+        histories: The performance histories.
+    """
+    timeline = [datetime.timedelta(seconds=i) for i in range(1, 5)]
+    assert len(histories) == 2
+
+    assert len(histories[0]) == 4
+    assert [item.performance_measure for item in histories[0]] == [1] * 4
+    assert [item.n_unsatisfied_constraints for item in histories[0]] == [0] * 4
+    assert [item.elapsed_time for item in histories[0]] == timeline
+
+    assert len(histories[1]) == 4
+    assert math.isnan(histories[1][0].performance_measure)
+    assert histories[1][0].n_unsatisfied_constraints == 5
+    assert [item.performance_measure for item in histories[1][1:]] == [2] * 3
+    assert [item.n_unsatisfied_constraints for item in histories[1][1:]] == [0] * 3
+    assert [item.elapsed_time for item in histories[1]] == timeline
+
+
+@pytest.fixture(scope="module")
+def multidisciplinary_histories() -> PerformanceHistories:
+    """Performance histories with given numbers of discipline executions."""
+    return PerformanceHistories(
+        PerformanceHistory([1, 1], number_of_discipline_executions=[1, 3]),
+        PerformanceHistory([2, 2], number_of_discipline_executions=[2, 4]),
+    )
+
+
+def check_spread_over_numbers_of_discipline_executions(
+    histories: PerformanceHistories,
+) -> None:
+    """Check the spreading of performance histories over numbers of executions.
+
+    Args:
+        histories: The performance histories.
+    """
+    numbers_of_discipline_executions = [1, 2, 3, 4]
+    assert len(histories) == 2
+
+    assert len(histories[0]) == 4
+    assert [item.performance_measure for item in histories[0]] == [1] * 4
+    assert [item.n_unsatisfied_constraints for item in histories[0]] == [0] * 4
+    assert [
+        item.number_of_discipline_executions for item in histories[0]
+    ] == numbers_of_discipline_executions
+
+    assert len(histories[1]) == 4
+    assert math.isnan(histories[1][0].performance_measure)
+    assert histories[1][0].n_unsatisfied_constraints == 5
+    assert [item.performance_measure for item in histories[1][1:]] == [2] * 3
+    assert [item.n_unsatisfied_constraints for item in histories[1][1:]] == [0] * 3
+    assert [
+        item.number_of_discipline_executions for item in histories[1]
+    ] == numbers_of_discipline_executions

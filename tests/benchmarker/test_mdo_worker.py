@@ -23,11 +23,11 @@ from gemseo.algos.opt.factory import OptimizationLibraryFactory
 from gemseo.scenarios.mdo_scenario import MDOScenario
 from gemseo.utils.testing.pytest_conftest import tmp_wd  # noqa: F401
 from gemseo.utils.timer import Timer
-from numpy.testing import assert_equal
 
 from gemseo_benchmark.benchmarker.mdo_worker import MDOWorker
 from tests.benchmarker.conftest import check_algorithm_availability
 from tests.benchmarker.conftest import check_algorithm_factory
+from tests.benchmarker.conftest import check_create_performance_history
 from tests.benchmarker.conftest import check_execution
 
 
@@ -107,20 +107,16 @@ def test_create_performance_history(
     with Timer() as timer:
         scenario.execute()
 
-    performance_history = MDOWorker._create_performance_history(
-        algorithm_configuration, mdo_problem_configuration, problem, timer
-    )
-    assert performance_history.algorithm_configuration is algorithm_configuration
-    assert performance_history.problem_name == mdo_problem_configuration.name
     optimization_problem = scenario.formulation.optimization_problem
     database = optimization_problem.database
     database_size = len(database)
-    assert len(performance_history) == database_size
-    assert_equal(
-        performance_history.performance_measures,
+    check_create_performance_history(
+        algorithm_configuration,
+        mdo_problem_configuration,
+        problem,
+        MDOWorker,
+        timer,
         database.get_function_history(optimization_problem.objective_name),
+        [0.0] * database_size,
+        [0] * database_size,
     )
-    assert performance_history.infeasibility_measures == [0.0] * database_size
-    assert performance_history.n_unsatisfied_constraints == [0] * database_size
-    # TODO: check datetime
-    assert performance_history.total_time == timer.elapsed_time

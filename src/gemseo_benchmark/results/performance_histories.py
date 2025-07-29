@@ -27,6 +27,7 @@ from matplotlib.ticker import MaxNLocator
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
+    import datetime
     from collections.abc import Mapping
 
     from matplotlib.axes import Axes
@@ -71,11 +72,11 @@ class PerformanceHistories(collections.abc.MutableSequence):
     def get_equal_size_histories(self) -> PerformanceHistories:
         """Return the histories extended to the maximum size."""
         return PerformanceHistories(*[
-            history.extend(self.__maximum_size) for history in self
+            history.extend(self.maximum_size) for history in self
         ])
 
     @property
-    def __maximum_size(self) -> int:
+    def maximum_size(self) -> int:
         """The maximum size of a history."""
         return max(len(history) for history in self)
 
@@ -385,3 +386,60 @@ class PerformanceHistories(collections.abc.MutableSequence):
         """Switch the sign of the performance measure."""
         for history in self:
             history.switch_performance_measure_sign()
+
+    def get_elapsed_times(self) -> list[datetime.timedelta]:
+        """Return the sorted elapsed times of all the history items.
+
+        Returns:
+            The sorted elapsed times.
+        """
+        return sorted([item.elapsed_time for history in self for item in history])
+
+    def spread_over_time(
+        self, number_of_scalar_constraints: int
+    ) -> PerformanceHistories:
+        """Spread the histories over all the elapsed times.
+
+        Args:
+            number_of_scalar_constraints: The number of scalar constraints
+                of the underlying problem.
+
+        Returns:
+            The performance histories with has as many items as total elapsed times.
+        """
+        timeline = self.get_elapsed_times()
+        return self.__class__(*[
+            history.spread_over_timeline(timeline, number_of_scalar_constraints)
+            for history in self
+        ])
+
+    def get_numbers_of_discipline_executions(self) -> list[int]:
+        """Return the sorted numbers of discipline executions of all the history items.
+
+        Returns:
+            The sorted numbers of discipline executions.
+        """
+        return sorted({
+            item.number_of_discipline_executions for history in self for item in history
+        })
+
+    def spread_over_numbers_of_discipline_executions(
+        self, number_of_scalar_constraints: int
+    ) -> PerformanceHistories:
+        """Spread the histories over all the numbers of discipline executions.
+
+        Args:
+            number_of_scalar_constraints: The number of scalar constraints
+                of the underlying problem.
+
+        Returns:
+            The performance histories with has as many items as total numbers
+            of discipline executions.
+        """
+        numbers_of_discipline_executions = self.get_numbers_of_discipline_executions()
+        return self.__class__(*[
+            history.spread_over_numbers_of_discipline_executions(
+                numbers_of_discipline_executions, number_of_scalar_constraints
+            )
+            for history in self
+        ])

@@ -43,6 +43,7 @@ from tests.problems.conftest import check_default_starting_point
 from tests.problems.conftest import check_description
 from tests.problems.conftest import check_inconsistent_starting_points
 from tests.problems.conftest import check_no_starting_point
+from tests.problems.conftest import check_number_of_scalar_constraints
 from tests.problems.conftest import check_set_starting_points_as_non_2d_array
 from tests.problems.conftest import check_set_starting_points_as_non_iterable
 from tests.problems.conftest import check_set_starting_points_with_wrong_dimension
@@ -198,6 +199,20 @@ def test__get_description(
     )
 
 
+@pytest.fixture
+def target_values():
+    """Target values."""
+    # N.B. passing the configuration is required for the setter.
+    target_values = mock.MagicMock(spec=TargetValues)
+    target1 = mock.Mock()
+    target1.performance_measure = 1.0
+    target2 = mock.Mock()
+    target2.performance_measure = 0.0
+    target_values.__iter__.return_value = [target1, target2]
+    target_values.__len__.return_value = 2
+    return target_values
+
+
 @pytest.mark.parametrize("minimize_objective", [False, True])
 def test_init_targets_computation(algorithms_configurations, minimize_objective):
     """Check the computation of targets at the problem creation."""
@@ -318,7 +333,7 @@ def test_compute_data_profile(
     target_values,
     algorithms_configurations,
     results,
-    use_iteration_log_scale,
+    use_abscissa_log_scale,
 ):
     """Check the computation of data profiles."""
     check_data_profiles_computation(
@@ -327,7 +342,7 @@ def test_compute_data_profile(
         target_values,
         algorithms_configurations,
         results,
-        use_iteration_log_scale,
+        use_abscissa_log_scale,
     )
 
 
@@ -371,3 +386,8 @@ def test_variable_space(benchmarking_problem, design_space) -> None:
 def test_worker(benchmarking_problem) -> None:
     """Check the type of benchmarking worker."""
     check_worker_type(benchmarking_problem, OptimizationWorker)
+
+
+def test_number_of_scalar_constraints(benchmarking_problem) -> None:
+    """Check the number of scalar constraints."""
+    check_number_of_scalar_constraints(benchmarking_problem, 2)
