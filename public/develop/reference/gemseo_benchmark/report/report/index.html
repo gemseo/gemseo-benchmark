@@ -11,10 +11,10 @@
         <link rel="canonical" href="https://gemseo.gitlab.io/gemseo-benchmark/latest/reference/gemseo_benchmark/report/report/">
       
       
-        <link rel="prev" href="../conf/">
+        <link rel="prev" href="../range_plot/">
       
       
-        <link rel="next" href="../../results/">
+        <link rel="next" href="../report_plot/">
       
       
       <link rel="icon" href="../../../../images/favicon.ico">
@@ -1435,6 +1435,12 @@
       
         
       
+        
+      
+        
+      
+        
+      
     
     
     
@@ -1483,12 +1489,58 @@
   
   
     <li class="md-nav__item">
+      <a href="../axis_data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Axis data
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../conf/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     Conf
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../range_plot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Range plot
     
   </span>
   
@@ -1651,6 +1703,29 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../report_plot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Report plot
+    
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -2357,7 +2432,7 @@ for each algorithm configuration.</p>
     <span class="n">use_log_scale</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">plot_only_median</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">use_time_log_scale</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">use_evaluation_log_scale</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">use_abscissa_log_scale</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
@@ -2440,14 +2515,14 @@ for the time axis.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>use_evaluation_log_scale</code></b>
+            <b><code>use_abscissa_log_scale</code></b>
               (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>, default:
                   <code>False</code>
 )
           –
           <div class="doc-md-description">
             <p>Whether to use a logarithmic scale
-for the number of function evaluations axis.</p>
+for the abscissa axis.</p>
           </div>
         </li>
     </ul>
@@ -2501,7 +2576,7 @@ for the number of function evaluations axis.</p>
     <span class="n">use_log_scale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">plot_only_median</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">use_time_log_scale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">use_evaluation_log_scale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">use_abscissa_log_scale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate the benchmarking report.</span>
 
@@ -2514,8 +2589,8 @@ for the number of function evaluations axis.</p>
 <span class="sd">        plot_only_median: Whether to plot only the median and no other centile.</span>
 <span class="sd">        use_time_log_scale: Whether to use a logarithmic scale</span>
 <span class="sd">            for the time axis.</span>
-<span class="sd">        use_evaluation_log_scale: Whether to use a logarithmic scale</span>
-<span class="sd">            for the number of function evaluations axis.</span>
+<span class="sd">        use_abscissa_log_scale: Whether to use a logarithmic scale</span>
+<span class="sd">            for the abscissa axis.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__create_root_directory</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__create_algos_file</span><span class="p">()</span>
@@ -2526,7 +2601,7 @@ for the number of function evaluations axis.</p>
         <span class="n">use_log_scale</span><span class="p">,</span>
         <span class="n">plot_only_median</span><span class="p">,</span>
         <span class="n">use_time_log_scale</span><span class="p">,</span>
-        <span class="n">use_evaluation_log_scale</span><span class="p">,</span>
+        <span class="n">use_abscissa_log_scale</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__create_index</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__build_report</span><span class="p">(</span><span class="n">to_html</span><span class="p">,</span> <span class="n">to_pdf</span><span class="p">)</span>
