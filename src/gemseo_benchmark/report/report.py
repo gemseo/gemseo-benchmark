@@ -149,7 +149,7 @@ class Report:
         use_log_scale: bool = False,
         plot_only_median: bool = False,
         use_time_log_scale: bool = False,
-        use_evaluation_log_scale: bool = False,
+        use_abscissa_log_scale: bool = False,
     ) -> None:
         """Generate the benchmarking report.
 
@@ -162,8 +162,8 @@ class Report:
             plot_only_median: Whether to plot only the median and no other centile.
             use_time_log_scale: Whether to use a logarithmic scale
                 for the time axis.
-            use_evaluation_log_scale: Whether to use a logarithmic scale
-                for the number of function evaluations axis.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
         """
         self.__create_root_directory()
         self.__create_algos_file()
@@ -174,7 +174,7 @@ class Report:
             use_log_scale,
             plot_only_median,
             use_time_log_scale,
-            use_evaluation_log_scale,
+            use_abscissa_log_scale,
         )
         self.__create_index()
         self.__build_report(to_html, to_pdf)
@@ -268,7 +268,7 @@ class Report:
         use_log_scale: bool = False,
         plot_only_median: bool = False,
         use_time_log_scale: bool = False,
-        use_evaluation_log_scale: bool = False,
+        use_abscissa_log_scale: bool = False,
     ) -> None:
         """Create the files corresponding to the benchmarking results.
 
@@ -279,8 +279,8 @@ class Report:
             plot_only_median: Whether to plot only the median and no other centile.
             use_time_log_scale: Whether to use a logarithmic scale
                 for the time axis.
-            use_evaluation_log_scale: Whether to use a logarithmic scale
-                for the number of function evaluations axis.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
         """
         self.__fill_template(
             self.__root_directory / FileName.RESULTS.value,
@@ -293,7 +293,7 @@ class Report:
                     use_log_scale,
                     plot_only_median,
                     use_time_log_scale,
-                    use_evaluation_log_scale,
+                    use_abscissa_log_scale,
                 )
                 for group in self.__algorithms_configurations_groups
             ],
@@ -307,7 +307,7 @@ class Report:
         use_log_scale: bool,
         plot_only_median: bool,
         use_time_log_scale: bool,
-        use_evaluation_log_scale: bool,
+        use_abscissa_log_scale: bool,
     ) -> str:
         """Create the results files of a group of algorithm configurations.
 
@@ -319,8 +319,8 @@ class Report:
             plot_only_median: Whether to plot only the median and no other centile.
             use_time_log_scale: Whether to use a logarithmic scale
                 for the time axis.
-            use_evaluation_log_scale: Whether to use a logarithmic scale
-                for the number of function evaluations axis.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
 
         Returns:
             The path to the main file.
@@ -360,7 +360,7 @@ class Report:
                     use_log_scale,
                     plot_only_median,
                     use_time_log_scale,
-                    use_evaluation_log_scale,
+                    use_abscissa_log_scale,
                 )
                 .relative_to(results_root)
                 .as_posix()
@@ -387,7 +387,7 @@ class Report:
         use_log_scale: bool,
         plot_only_median: bool,
         use_time_log_scale: bool,
-        use_evaluation_log_scale: bool,
+        use_abscissa_log_scale: bool,
     ) -> Path:
         """Create the results file of a group of algorithm configurations.
 
@@ -402,8 +402,8 @@ class Report:
             plot_only_median: Whether to plot only the median and no other centile.
             use_time_log_scale: Whether to use a logarithmic scale
                 for the time axis.
-            use_evaluation_log_scale: Whether to use a logarithmic scale
-                for the number of function evaluations axis.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
 
         Returns:
             The path to the main file.
@@ -424,7 +424,7 @@ class Report:
             use_log_scale,
             plot_only_median,
             use_time_log_scale,
-            use_evaluation_log_scale,
+            use_abscissa_log_scale,
         )
 
         # Create the file dedicated to the group of problems
@@ -441,7 +441,7 @@ class Report:
             problems_group_name=problems.name,
             problems_group_description=problems.description,
             data_profile=self.__get_relative_path(
-                plotter.plot_data_profiles(use_evaluation_log_scale)
+                plotter.plot_data_profiles(use_abscissa_log_scale)
             ),
             problems_names=[problem.name for problem in problems],
             group_problems_paths=[

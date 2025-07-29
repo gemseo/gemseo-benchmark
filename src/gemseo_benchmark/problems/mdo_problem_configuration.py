@@ -20,6 +20,7 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING
 from typing import Callable
 from typing import ClassVar
+from typing import Final
 
 from gemseo.core.discipline.discipline import Discipline
 from gemseo.scenarios.mdo_scenario import MDOScenario
@@ -29,6 +30,7 @@ from gemseo_benchmark.benchmarker.mdo_worker import MDOWorker
 from gemseo_benchmark.problems.base_problem_configuration import (
     BaseProblemConfiguration,
 )
+from gemseo_benchmark.report.axis_data import DisciplineData
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -50,6 +52,8 @@ MDOProblemType = tuple[MDOScenario, Sequence[Discipline]]
 class MDOProblemConfiguration(BaseProblemConfiguration):
     """Problem configuration for multidisciplinary optimization."""
 
+    abscissa_data_type: Final[type[DisciplineData]] = DisciplineData
+    performance_measure_label: ClassVar[str] = "Best feasible objective value"
     worker: ClassVar[type[MDOWorker]] = MDOWorker
 
     def __init__(
@@ -58,12 +62,14 @@ class MDOProblemConfiguration(BaseProblemConfiguration):
         create_problem: Callable[[AlgorithmConfiguration], MDOProblemType],
         variable_space: DesignSpace,
         minimize_objective_value: bool,
+        number_of_scalar_constraints: int,
         target_values: TargetValues | None = None,
         starting_points: InputStartingPointsType = (),
         doe_algo_name: str = "",
         doe_size: int | None = None,
         doe_options: Mapping[str, DriverLibraryOptionType] = READ_ONLY_EMPTY_DICT,
         description: str = "No description available.",
+        optimum: float | None = None,
     ) -> None:
         """
         Args:
@@ -81,7 +87,8 @@ class MDOProblemConfiguration(BaseProblemConfiguration):
             doe_size,
             doe_options,
             description,
-            0,
+            optimum,
+            number_of_scalar_constraints,
         )
 
     @property

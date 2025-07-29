@@ -56,18 +56,18 @@ def test_compute_target_values():
 
 
 @pytest.mark.parametrize(
-    ("baseline_images", "use_evaluation_log_scale"),
+    ("baseline_images", "use_abscissa_log_scale"),
     [
         (
-            [f"data_profile[use_evaluation_log_scale={use_evaluation_log_scale}]"],
-            use_evaluation_log_scale,
+            [f"data_profile[use_abscissa_log_scale={use_abscissa_log_scale}]"],
+            use_abscissa_log_scale,
         )
-        for use_evaluation_log_scale in [False, True]
+        for use_abscissa_log_scale in [False, True]
     ],
 )
 @image_comparison(None, ["png"])
 def test_compute_data_profile(
-    baseline_images, problem_a, problem_b, results, use_evaluation_log_scale
+    baseline_images, problem_a, problem_b, results, use_abscissa_log_scale
 ):
     """Check the computation of data profiles."""
     group = ProblemsGroup("A group", [problem_a, problem_b])
@@ -77,7 +77,7 @@ def test_compute_data_profile(
         results,
         show=False,
         max_eval_number=5,
-        use_evaluation_log_scale=use_evaluation_log_scale,
+        use_abscissa_log_scale=use_abscissa_log_scale,
     )
 
 

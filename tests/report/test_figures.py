@@ -59,7 +59,7 @@ plot_options = pytest.mark.parametrize(
         "use_performance_log_scale",
         "plot_only_median",
         "use_time_log_scale",
-        "use_evaluation_log_scale",
+        "use_abscissa_log_scale",
     ),
     [
         (False, False, False, False, False),
@@ -80,7 +80,7 @@ def test_plot(
     use_performance_log_scale,
     plot_only_median,
     use_time_log_scale,
-    use_evaluation_log_scale,
+    use_abscissa_log_scale,
 ) -> None:
     """Check the plotting of the figures dedicated to each problem."""
     figures = problems_figures.plot(
@@ -88,7 +88,7 @@ def test_plot(
         use_performance_log_scale,
         plot_only_median,
         use_time_log_scale,
-        use_evaluation_log_scale,
+        use_abscissa_log_scale,
     )[0]
     baseline_path = (
         Path(__file__).parent
@@ -100,7 +100,7 @@ def test_plot(
             f"-{use_performance_log_scale}"
             f"-{plot_only_median}"
             f"-{use_time_log_scale}"
-            f"-{use_evaluation_log_scale}"
+            f"-{use_abscissa_log_scale}"
         )
     )
     __check_problem_images(tmp_path, figures, "Problem_A", "SLSQP", baseline_path)
@@ -451,7 +451,7 @@ def test_plot_infeasible(
     use_performance_log_scale,
     plot_only_median,
     use_time_log_scale,
-    use_evaluation_log_scale,
+    use_abscissa_log_scale,
     request,
 ) -> None:
     """Check the plotting and tabulating of infeasible performance measures."""
@@ -473,7 +473,7 @@ def test_plot_infeasible(
         use_performance_log_scale,
         plot_only_median,
         use_time_log_scale,
-        use_evaluation_log_scale,
+        use_abscissa_log_scale,
     )
     baseline_path = (
         Path(__file__).parent
@@ -485,7 +485,7 @@ def test_plot_infeasible(
             f"-{use_performance_log_scale}"
             f"-{plot_only_median}"
             f"-{use_time_log_scale}"
-            f"-{use_evaluation_log_scale}"
+            f"-{use_abscissa_log_scale}"
         )
     )
     algorithm_name = algorithm_configuration.algorithm_name

@@ -32,6 +32,7 @@ from gemseo.utils.metaclasses import ABCGoogleDocstringInheritanceMeta
 from gemseo.utils.timer import Timer
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from pathlib import Path
 
     from gemseo.algos.base_algo_factory import BaseAlgoFactory
@@ -40,6 +41,7 @@ if TYPE_CHECKING:
     from gemseo_benchmark.algorithms.algorithm_configuration import (
         AlgorithmConfiguration,
     )
+    from gemseo_benchmark.benchmarker._metrics import BaseMetrics
     from gemseo_benchmark.problems.base_problem_configuration import (
         BaseProblemConfiguration,
     )
@@ -111,6 +113,9 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
             starting_point,
             hdf_file_path,
         )
+
+        metrics_listeners = cls._add_metrics_listeners(problem)
+
         benchmarking_logger.info(gemseo_log_message)
         with Timer() as timer:
             cls._execute(
@@ -132,6 +137,7 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
             problem_configuration,
             problem,
             timer,
+            metrics_listeners,
         ).to_file(performance_history_path)
         cls._post_execute(problem, hdf_file_path)
 
@@ -154,6 +160,18 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
 
         Return:
             A problem ready for execution.
+        """
+
+    @classmethod
+    @abstractmethod
+    def _add_metrics_listeners(cls, problem: ProblemType) -> tuple[BaseMetrics, ...]:
+        """Add the listeners for the metrics of an execution.
+
+        Args:
+            problem: A problem.
+
+        Returns:
+            The metrics listeners.
         """
 
     @staticmethod
@@ -180,6 +198,7 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
         problem_configuration: BaseProblemConfiguration,
         problem: ProblemType,
         timer: Timer,
+        metrics_listeners: Iterable[BaseMetrics],
     ) -> PerformanceHistory:
         """Create a performance history from a solved problem.
 
@@ -188,6 +207,7 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
             problem_configuration: The problem configuration.
             problem: A problem.
             timer: The timer of the worker execution.
+            metrics_listeners: The metrics listeners.
 
         Return:
             The performance history.

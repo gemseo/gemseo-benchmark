@@ -126,7 +126,7 @@ class TargetValues(PerformanceHistory):
     def plot_on_axes(
         self,
         axes: matplotlib.axes.Axes,
-        axhline_settings: Mapping[str, str | int] = MappingProxyType({
+        axhline_settings: Mapping[str, str | int | float] = MappingProxyType({
             "color": "red",
             "linestyle": ":",
         }),
@@ -147,6 +147,7 @@ class TargetValues(PerformanceHistory):
                 for ``matplotlib.axes.Axes.set_ylabel``.
         """
         twin_axes = axes.twinx()
+        twin_axes.set_yscale(axes.get_yscale())
         values = [target.performance_measure for target in self if target.is_feasible]
         for value in values:
             axes.axhline(value, **axhline_settings)

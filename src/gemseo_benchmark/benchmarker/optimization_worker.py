@@ -21,10 +21,12 @@ from typing import TYPE_CHECKING
 from gemseo import execute_algo
 from gemseo.algos.opt.factory import OptimizationLibraryFactory
 
+from gemseo_benchmark.benchmarker._metrics import ElapsedTime
 from gemseo_benchmark.benchmarker.base_worker import BaseWorker
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from pathlib import Path
 
     from gemseo.algos.optimization_problem import OptimizationProblem
@@ -55,6 +57,12 @@ class OptimizationWorker(BaseWorker):
         problem.design_space.set_current_value(starting_point)
         return problem
 
+    @classmethod
+    def _add_metrics_listeners(cls, problem: OptimizationProblem) -> tuple[ElapsedTime]:
+        elapsed_time = ElapsedTime()
+        problem.add_listener(elapsed_time.add_metrics)
+        return (elapsed_time,)
+
     @staticmethod
     def _execute(
         algorithm_configuration: AlgorithmConfiguration,
@@ -75,9 +83,13 @@ class OptimizationWorker(BaseWorker):
         problem_configuration: OptimizationProblemConfiguration,
         problem: OptimizationProblem,
         timer: Timer,
+        metrics_listeners: Iterable[ElapsedTime],
     ) -> PerformanceHistory:
+        (time_listener,) = metrics_listeners
         performance_history = PerformanceHistory.from_problem(
-            problem, problem_configuration.name
+            problem,
+            problem_configuration.name,
+            time_listener.get_metrics(timer),
         )
         performance_history.algorithm_configuration = algorithm_configuration
         performance_history.total_time = timer.elapsed_time

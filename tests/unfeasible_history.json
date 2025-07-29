@@ -3,34 +3,40 @@
   "execution_time": 2.0,
   "history_items": [
     {
-      "performance": 1.0,
-      "infeasibility": 1.0,
-      "n_unsatisfied_constraints": 6
+      "performance measure": 1.0,
+      "infeasibility measure": 1.0,
+      "number of unsatisfied constraints": 6,
+      "elapsed time": 0.3
     },
     {
-      "performance": 0.5,
-      "infeasibility": 1.0,
-      "n_unsatisfied_constraints": 5
+      "performance measure": 0.5,
+      "infeasibility measure": 1.0,
+      "number of unsatisfied constraints": 5,
+      "elapsed time": 0.4
     },
     {
-      "performance": 2.0,
-      "infeasibility": 1.0,
-      "n_unsatisfied_constraints": 4
+      "performance measure": 2.0,
+      "infeasibility measure": 1.0,
+      "number of unsatisfied constraints": 4,
+      "elapsed time": 0.5
     },
     {
-      "performance": 1.0,
-      "infeasibility": 1.0,
-      "n_unsatisfied_constraints": 3
+      "performance measure": 1.0,
+      "infeasibility measure": 1.0,
+      "number of unsatisfied constraints": 3,
+      "elapsed time": 0.6
     },
     {
-      "performance": 0.3,
-      "infeasibility": 1.0,
-      "n_unsatisfied_constraints": 2
+      "performance measure": 0.3,
+      "infeasibility measure": 1.0,
+      "number of unsatisfied constraints": 2,
+      "elapsed time": 0.7
     },
     {
-      "performance": 0.0,
-      "infeasibility": 1.0,
-      "n_unsatisfied_constraints": 1
+      "performance measure": 0.0,
+      "infeasibility measure": 1.0,
+      "number of unsatisfied constraints": 1,
+      "elapsed time": 0.8
     }
   ]
 }

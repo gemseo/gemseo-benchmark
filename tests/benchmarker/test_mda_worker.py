@@ -28,6 +28,7 @@ from gemseo.utils.timer import Timer
 from gemseo_benchmark.benchmarker.mda_worker import MDAWorker
 from tests.benchmarker.conftest import check_algorithm_availability
 from tests.benchmarker.conftest import check_algorithm_factory
+from tests.benchmarker.conftest import check_create_performance_history
 from tests.benchmarker.conftest import check_execution
 
 
@@ -110,19 +111,14 @@ def test_create_performance_history(
         mda.execute()
 
     residual_history = mda.residual_history
-    performance_history = MDAWorker._create_performance_history(
-        mda_algorithm_configuration, mda_problem_configuration, problem, timer
+    history_size = len(residual_history)
+    check_create_performance_history(
+        mda_algorithm_configuration,
+        mda_problem_configuration,
+        problem,
+        MDAWorker,
+        timer,
+        residual_history,
+        [0.0] * history_size,
+        [0] * history_size,
     )
-    assert performance_history.algorithm_configuration is mda_algorithm_configuration
-    assert performance_history.problem_name == mda_problem_configuration.name
-    assert (
-        performance_history._number_of_variables == mda_problem_configuration.dimension
-    )
-
-    assert len(performance_history) == 1
-    assert performance_history.performance_measures == residual_history
-
-    assert performance_history.infeasibility_measures == [0.0] * len(residual_history)
-    assert performance_history.n_unsatisfied_constraints == [0] * len(residual_history)
-    # TODO: check datetime
-    assert performance_history.total_time == timer.elapsed_time

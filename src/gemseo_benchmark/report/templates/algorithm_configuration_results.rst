@@ -19,7 +19,7 @@ Performance measure
    :file: /{{ tables["performance_measure.csv"] }}
    :header-rows: 1
    :stub-columns: 1
-{% if problem.constraints_names %}
+{% if problem.number_of_scalar_constraints %}
 Infeasibility measure
 ---------------------
 

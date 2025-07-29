@@ -149,7 +149,7 @@ class DataProfile:
         markevery: MarkeveryType | None = None,
         plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
         grid_settings: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
-        use_evaluation_log_scale: bool = False,
+        use_abscissa_log_scale: bool = False,
     ) -> None:
         """Plot the data profiles of the required algorithms.
 
@@ -164,8 +164,8 @@ class DataProfile:
             plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
             grid_settings: The keyword arguments of `matplotlib.pyplot.grid`.
-            use_evaluation_log_scale: Whether to use a logarithmic scale
-                for the number of function evaluations axis.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
         """
         if algo_names is None:
             algo_names = ()
@@ -177,7 +177,7 @@ class DataProfile:
                 settings["markevery"] = markevery
 
         figure = self._plot_data_profiles(
-            data_profiles, plot_settings_copy, grid_settings, use_evaluation_log_scale
+            data_profiles, plot_settings_copy, grid_settings, use_abscissa_log_scale
         )
         save_show_figure(figure, show, file_path)
 
@@ -269,7 +269,7 @@ class DataProfile:
         data_profiles: Mapping[str, Sequence[Number]],
         plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
         grid_settings: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
-        use_evaluation_log_scale: bool = False,
+        use_abscissa_log_scale: bool = False,
     ) -> Figure:
         """Plot the data profiles.
 
@@ -278,8 +278,8 @@ class DataProfile:
             plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
             grid_settings: The keyword arguments of `matplotlib.pyplot.grid`.
-            use_evaluation_log_scale: Whether to use a logarithmic scale
-                for the number of function evaluations axis.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
 
         Returns:
             The data profiles figure.
@@ -292,7 +292,7 @@ class DataProfile:
         axes.set_title(f"Data profile{'s' if len(data_profiles) > 1 else ''}")
         max_profile_size = max(len(profile) for profile in data_profiles.values())
         axes.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
-        if use_evaluation_log_scale:
+        if use_abscissa_log_scale:
             axes.set_xscale("log")
 
         plt.xlabel("Number of functions evaluations")

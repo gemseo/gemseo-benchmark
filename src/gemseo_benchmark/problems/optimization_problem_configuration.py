@@ -24,6 +24,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from typing import Callable
 from typing import ClassVar
+from typing import Final
 
 from gemseo import execute_algo
 from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
@@ -34,6 +35,7 @@ from gemseo_benchmark.problems.base_problem_configuration import (
     BaseProblemConfiguration,
 )
 from gemseo_benchmark.problems.base_problem_configuration import InputStartingPointsType
+from gemseo_benchmark.report.axis_data import IterationData
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
@@ -59,8 +61,12 @@ class OptimizationProblemConfiguration(BaseProblemConfiguration):
     and its target values (refer to :mod:`.data_profiles.target_values`).
     """
 
+    abscissa_data_type: Final[type[IterationData]] = IterationData
+
     __optimization_problem: OptimizationProblem
     """A problem of the configuration."""
+
+    performance_measure_label: ClassVar[str] = "Best feasible objective value"
 
     __targets_generator: TargetsGenerator | None
     """The generator of target values for the optimization problem configuration."""
@@ -103,6 +109,7 @@ class OptimizationProblemConfiguration(BaseProblemConfiguration):
             doe_options,
             description,
             optimum,
+            len(self.__optimization_problem.scalar_constraint_names),
         )
         self.__targets_generator = None
         if (

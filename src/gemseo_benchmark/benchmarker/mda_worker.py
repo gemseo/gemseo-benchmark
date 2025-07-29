@@ -22,6 +22,8 @@ from typing import TYPE_CHECKING
 from gemseo.core.discipline.base_discipline import CacheType
 from gemseo.mda.factory import MDAFactory
 
+from gemseo_benchmark.benchmarker._metrics import DisciplineExecutions
+from gemseo_benchmark.benchmarker._metrics import ElapsedTime
 from gemseo_benchmark.benchmarker.base_worker import BaseWorker
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
@@ -58,6 +60,17 @@ class MDAWorker(BaseWorker):
 
         return mda, disciplines
 
+    @classmethod
+    def _add_metrics_listeners(
+        cls, problem: MDAProblemType
+    ) -> tuple[ElapsedTime, DisciplineExecutions]:
+        mda_solver = problem[0]
+        elapsed_time = ElapsedTime()
+        mda_solver.add_iteration_callback(elapsed_time.add_metrics)
+        discipline_executions = DisciplineExecutions(problem[1])
+        mda_solver.add_iteration_callback(discipline_executions.add_metrics)
+        return elapsed_time, discipline_executions
+
     @staticmethod
     def _execute(
         algorithm_configuration: AlgorithmConfiguration,
@@ -75,14 +88,17 @@ class MDAWorker(BaseWorker):
         problem_configuration: MDAProblemConfiguration,
         problem: MDAProblemType,
         timer: Timer,
+        metrics_listeners: tuple[ElapsedTime, DisciplineExecutions],
     ) -> PerformanceHistory:
-        # TODO: Store execution times and number of discipline executions.
+        time_listener, discipline_listener = metrics_listeners
         return PerformanceHistory(
             problem[0].residual_history,
             problem_name=problem_configuration.name,
             total_time=timer.elapsed_time,
             algorithm_configuration=algorithm_configuration,
             number_of_variables=problem_configuration.dimension,
+            elapsed_times=time_listener.get_metrics(timer),
+            number_of_discipline_executions=discipline_listener.get_metrics(),
         )
 
     @staticmethod
