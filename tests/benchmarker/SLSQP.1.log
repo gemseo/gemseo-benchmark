@@ -18,7 +18,7 @@ Optimization result:
    Optimizer info:
       Status: 8
       Message: Positive directional derivative for linesearch
-      Number of calls to the objective function by the optimizer: 3
+      Number of calls to the objective function by the optimizer: 0
    Solution:
       Objective: 0.0
       Design space:

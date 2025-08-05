@@ -80,7 +80,9 @@ def test_get_problem(
     assert isinstance(scenario, MDOScenario)
 
 
-def test_execute(algorithm_configuration, mdo_problem_configuration) -> None:
+def test_execute(
+    algorithm_configuration, mdo_problem_configuration, enable_discipline_statistics
+) -> None:
     """Check the execution of the benchmarking worker."""
     problem = mdo_problem_configuration.create_problem(algorithm_configuration)
     scenario, (discipline1, discipline2) = problem

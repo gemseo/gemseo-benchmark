@@ -36,6 +36,7 @@ from gemseo.algos.optimization_problem import OptimizationProblem
 from gemseo.disciplines.analytic import AnalyticDiscipline
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
 from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
+from gemseo.utils.testing.pytest_conftest import *  # noqa: F401,F403
 from numpy import array
 from numpy import ndarray
 

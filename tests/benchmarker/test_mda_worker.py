@@ -83,7 +83,9 @@ def test_get_problem(
         assert isinstance(mda.cache, HDF5Cache)
 
 
-def test_execute(mda_algorithm_configuration, mda_problem_configuration) -> None:
+def test_execute(
+    mda_algorithm_configuration, mda_problem_configuration, enable_discipline_statistics
+) -> None:
     """Check the execution of the benchmarking worker."""
     problem = mda_problem_configuration.create_problem(mda_algorithm_configuration)
     mda, (discipline1, discipline2) = problem

@@ -21,6 +21,7 @@ from abc import abstractmethod
 from typing import TYPE_CHECKING
 from typing import Union
 
+from gemseo import configure
 from gemseo.mda.base_mda_solver import BaseMDASolver
 from gemseo.typing import RealArray
 from gemseo.utils.metaclasses import ABCGoogleDocstringInheritanceMeta
@@ -84,6 +85,7 @@ class DisciplineExecutions(BaseMetrics):
         Args:
             disciplines: The disciplines.
         """  # noqa: D205, D212
+        configure(enable_discipline_statistics=True)
         super().__init__()
         self.__disciplines = disciplines
 
