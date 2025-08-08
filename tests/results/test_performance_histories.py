@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
+
 import matplotlib
 import matplotlib.pyplot
 import matplotlib.testing
@@ -25,6 +27,8 @@ from matplotlib.testing.decorators import image_comparison
 from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_histories import PerformanceHistories
 from gemseo_benchmark.results.performance_history import PerformanceHistory
+from tests.conftest import check_spread_over_numbers_of_discipline_executions
+from tests.conftest import check_spread_over_time
 
 
 def test_compute_minimum(performance_histories):
@@ -134,13 +138,9 @@ def five_performance_histories() -> PerformanceHistories:
             extremal_feasible_performance,
             performance_measure_is_minimized,
         ) in [
-            (False, None, False),
             (False, -6, False),
-            (True, None, False),
             (True, -6, False),
-            (False, None, True),
             (False, -1, True),
-            (True, None, True),
             (True, -1, True),
         ]
     ],
@@ -158,6 +158,7 @@ def test_plot_performance_measure_distribution(
     five_performance_histories.plot_performance_measure_distribution(
         matplotlib.pyplot.figure().gca(),
         extremal_feasible_performance,
+        float("nan"),
         plot_all_histories,
         performance_measure_is_minimized,
     )
@@ -173,7 +174,9 @@ def test_plot_performance_measure_distribution_infeasible_centile():
         PerformanceHistory([4, 3, 2], [1, 1, 1]),
         PerformanceHistory([3, 2, 1], [1, 1, 1]),
         PerformanceHistory([2, 1, 0], [1, 0, 0]),
-    ).plot_performance_measure_distribution(matplotlib.pyplot.figure().gca())
+    ).plot_performance_measure_distribution(
+        matplotlib.pyplot.figure().gca(), 1, float("nan")
+    )
 
 
 @image_comparison(["infeasibility_measure_distribution"], ["png"])
@@ -204,7 +207,40 @@ def test_switch_performance_measure_sign() -> None:
         PerformanceHistory([1, 2], [3, 4]), PerformanceHistory([5, 6], [7, 8])
     )
     histories.switch_performance_measure_sign()
-    assert histories[0].objective_values == [-1, -2]
+    assert histories[0].performance_measures == [-1, -2]
     assert histories[0].infeasibility_measures == [3, 4]
-    assert histories[1].objective_values == [-5, -6]
+    assert histories[1].performance_measures == [-5, -6]
     assert histories[1].infeasibility_measures == [7, 8]
+
+
+def test_get_elapsed_times(timed_performance_histories) -> None:
+    """Check the access to the elapsed times."""
+    assert timed_performance_histories.get_elapsed_times() == [
+        timedelta(seconds=i) for i in range(1, 5)
+    ]
+
+
+def test_spread_over_time(timed_performance_histories) -> None:
+    """Check the spreading of performance histories over time."""
+    check_spread_over_time(timed_performance_histories.spread_over_time(5))
+
+
+def test_get_numbers_of_discipline_executions(
+    multidisciplinary_histories,
+) -> None:
+    """Check the access to the numbers of discipline executions."""
+    assert multidisciplinary_histories.get_numbers_of_discipline_executions() == [
+        1,
+        2,
+        3,
+        4,
+    ]
+
+
+def test_spread_over_numbers_of_discipline_executions(
+    multidisciplinary_histories,
+) -> None:
+    """Check the spreading of performance histories over time."""
+    check_spread_over_numbers_of_discipline_executions(
+        multidisciplinary_histories.spread_over_numbers_of_discipline_executions(5)
+    )

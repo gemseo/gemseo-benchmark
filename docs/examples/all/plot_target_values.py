@@ -35,7 +35,7 @@ Generate target values
 
 # %%
 # In this example,
-# we generate **target values** for a problem
+# we generate **target values** for an optimization problem configuration
 # based on the performances of an algorithm configuration.
 #
 # Imports
@@ -51,20 +51,23 @@ from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfigu
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
-from gemseo_benchmark.problems.problem import Problem
+from gemseo_benchmark.problems.optimization_problem_configuration import (
+    OptimizationProblemConfiguration,
+)
 
 # %%
-# Let us consider the problem [Power2][gemseo.problems.optimization.power_2.Power2]
+# Let us consider the optimization problem
+# [Power2][gemseo.problems.optimization.power_2.Power2]
 # already implemented in GEMSEO.
-problem = Problem(
-    name="Power2",
-    optimization_problem_creator=Power2,
-    optimum=Power2.get_solution()[1],
+problem = OptimizationProblemConfiguration(
+    "Power2", Power2, optimum=Power2.get_solution()[1]
 )
 # %%
 # We define ten starting points by optimized Latin hypercube sampling (LHS).
-design_space = problem.creator().design_space
-problem.start_points = compute_doe(design_space, algo_name="OT_OPT_LHS", n_samples=10)
+design_space = problem.create_problem().design_space
+problem.starting_points = compute_doe(
+    design_space, algo_name="OT_OPT_LHS", n_samples=10
+)
 # %%
 # Let use the optimizer COBYLA to generate performance histories on the problem.
 algorithms_configurations = AlgorithmsConfigurations(
@@ -73,6 +76,10 @@ algorithms_configurations = AlgorithmsConfigurations(
         max_iter=65,
         eq_tolerance=1e-4,
         ineq_tolerance=0.0,
+        xtol_abs=0,
+        xtol_rel=0,
+        ftol_abs=0,
+        ftol_rel=0,
     )
 )
 # %%
@@ -87,13 +94,14 @@ configure(
 # Let us compute five target values for the problem.
 # This automatic procedure has two stages:
 #
-# 1. execution of the specified algorithms once for each of the starting points,
-# 2. automatic selection of target values based on the algorithms histories.
+# 1. execution of the specified algorithm configurations
+#    once for each of the starting points,
+# 2. automatic selection of target values based on the performance histories.
 #
-# These targets represent the milestones of the problem resolution.
-problem.compute_targets(5, algorithms_configurations, best_target_tolerance=1e-5)
+# These target values represent the milestones of the problem resolution.
+problem.compute_target_values(5, algorithms_configurations, best_target_tolerance=1e-5)
 # %%
-# We can plot the algorithms histories used as reference
+# We can plot the performace histories used as reference
 # for the computation of the target values,
 # with the objective value on the vertical axis
 # and the number of functions evaluations on the horizontal axis.

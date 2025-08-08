@@ -22,6 +22,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Final
 
+from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
+
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
@@ -33,6 +35,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from collections.abc import Mapping
 
+    from gemseo_benchmark import ConfigurationPlotOptions
     from gemseo_benchmark.problems.problems_group import ProblemsGroup
 
 LOGGER = logging.getLogger(__name__)
@@ -80,7 +83,7 @@ class Scenario:
         generate_pdf_report: bool = False,
         infeasibility_tolerance: float = 0.0,
         save_databases: bool = False,
-        number_of_processes: int = 1,
+        n_processes: int = 1,
         use_threading: bool = False,
         custom_algos_descriptions: Mapping[str, str] | None = None,
         max_eval_number_per_group: dict[str, int] | None = None,
@@ -89,12 +92,13 @@ class Scenario:
         log_gemseo_to_file: bool = False,
         directory_path: Path | None = None,
         plot_only_median: bool = False,
-        use_evaluation_log_scale: bool = False,
+        use_abscissa_log_scale: bool = False,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
     ) -> Results:
         """Execute the benchmarking scenario.
 
         Args:
-            problems_groups: The groups of benchmarking problems.
+            problems_groups: The groups of problem configurations.
             overwrite_histories: Whether to overwrite the performance histories.
             skip_solvers: Whether to skip the running of solvers.
             skip_report: Whether to skip the generation of the report.
@@ -102,8 +106,8 @@ class Scenario:
             generate_pdf_report: Whether to generate the report in PDF format.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             save_databases: Whether to save the databases of the optimizations.
-            number_of_processes: The maximum number of simultaneous threads or
-                processes used to parallelize the execution.
+            n_processes: The maximum number of simultaneous threads or processes
+                used to parallelize the execution.
             use_threading: Whether to use threads instead of processes
                 to parallelize the execution.
             custom_algos_descriptions: Custom descriptions of the algorithms,
@@ -122,19 +126,21 @@ class Scenario:
             directory_path: The path to the directory where the report
                 will be generated.
             plot_only_median: Whether to plot only the median and no other centile.
-            use_evaluation_log_scale: Whether to use a logarithmic scale
-                for the number of function evaluations axis.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
+            plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
+                for each algorithm configuration.
 
         Returns:
             The performance histories.
         """
         if not skip_solvers:
-            LOGGER.info("Run the solvers on the benchmarking problems")
+            LOGGER.info("Run the solvers on the problem configurations")
             self._run_solvers(
                 problems_groups,
                 overwrite_histories,
                 save_databases,
-                number_of_processes,
+                n_processes,
                 use_threading,
                 log_gemseo_to_file,
             )
@@ -152,7 +158,8 @@ class Scenario:
                 use_log_scale,
                 directory_path,
                 plot_only_median,
-                use_evaluation_log_scale,
+                use_abscissa_log_scale,
+                plot_settings,
             )
 
         return Results(self._results_path)
@@ -162,18 +169,18 @@ class Scenario:
         problems_groups: Iterable[ProblemsGroup],
         overwrite_histories: bool,
         save_databases: bool,
-        number_of_processes: int,
+        n_processes: int,
         use_threading: bool,
         log_gemseo_to_file: bool,
     ) -> None:
-        """Run the solvers on the benchmarking problems.
+        """Run the solvers on the problem configurations.
 
         Args:
-            problems_groups: The groups of benchmarking problems.
+            problems_groups: The groups of problem configurations.
             overwrite_histories: Whether to overwrite the performance histories.
             save_databases: Whether to save the databases of the optimizations.
-            number_of_processes: The maximum number of simultaneous threads or
-                processes used to parallelize the execution.
+            n_processes: The maximum number of simultaneous threads or processes
+                used to parallelize the execution.
             use_threading: Whether to use threads instead of processes
                 to parallelize the execution.
             log_gemseo_to_file: Whether to save the GEMSEO log to a file
@@ -193,7 +200,7 @@ class Scenario:
             {problem for group in problems_groups for problem in group},
             algorithms_configurations,
             overwrite_histories,
-            number_of_processes,
+            n_processes,
             use_threading,
             log_gemseo_to_file,
         )
@@ -227,12 +234,13 @@ class Scenario:
         use_log_scale: bool = False,
         directory_path: Path | None = None,
         plot_only_median: bool = False,
-        use_evaluation_log_scale: bool = False,
+        use_abscissa_log_scale: bool = False,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
     ) -> None:
         """Generate the benchmarking report.
 
         Args:
-            problems_groups: The groups of benchmarking problems.
+            problems_groups: The groups of problem configurations.
             generate_to_html: Whether to generate the report in HTML format.
             generate_to_pdf: Whether to generate the report in PDF format.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
@@ -250,8 +258,10 @@ class Scenario:
             directory_path: The path to the directory where the report
                 will be generated.
             plot_only_median: Whether to plot only the median and no other centile.
-            use_evaluation_log_scale: Whether to use a logarithmic scale
-                for the number of function evaluations axis.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
+            plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
+                for each algorithm configuration.
         """
         report = Report(
             self.__get_report_path()
@@ -262,6 +272,7 @@ class Scenario:
             Results(self._results_path),
             custom_algos_descriptions,
             max_eval_number_per_group,
+            plot_settings,
         )
         report.generate(
             generate_to_html,
@@ -270,7 +281,7 @@ class Scenario:
             plot_all_histories,
             use_log_scale,
             plot_only_median,
-            use_evaluation_log_scale=use_evaluation_log_scale,
+            use_abscissa_log_scale=use_abscissa_log_scale,
         )
 
     def __get_report_path(self) -> Path:

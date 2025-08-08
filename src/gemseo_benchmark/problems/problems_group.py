@@ -18,7 +18,7 @@
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
-"""Grouping of reference problems for benchmarking."""
+"""Grouping of problem configurations."""
 
 from __future__ import annotations
 
@@ -39,68 +39,60 @@ if TYPE_CHECKING:
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
     )
-    from gemseo_benchmark.problems.problem import Problem
+    from gemseo_benchmark.problems.base_problem_configuration import (
+        BaseProblemConfiguration,
+    )
     from gemseo_benchmark.results.results import Results
 
 
 class ProblemsGroup:
-    """A group of reference problems for benchmarking.
+    """A group of problem configurations.
 
-    .. note::
+    !!! note
 
-       Reference problems should be grouped based on common characteristics such as
-       functions smoothness and constraint set geometry.
-
-    Attributes:
-        name (str): The name of the group of problems.
+        Problem configurations should be grouped based on common characteristics such as
+        functions smoothness and constraint set geometry.
     """
+
+    name: str
+    """The name of the group of problem configurations."""
 
     def __init__(
         self,
         name: str,
-        problems: Iterable[Problem],
+        problems: Iterable[BaseProblemConfiguration],
         description: str = "",
     ) -> None:
         """
         Args:
-            name: The name of the group of problems.
-            problems: The benchmarking problems of the group.
-            description: The description of the group of problems.
+            name: The name of the group of problem configurations.
+            problems: The problem configurations of the group.
+            description: The description of the group of problem configurations.
         """  # noqa: D205, D212, D415
         self.name = name
         self.__problems = problems
         self.description = description
 
-    def __iter__(self) -> Iterator[Problem]:
+    def __iter__(self) -> Iterator[BaseProblemConfiguration]:
         return iter(self.__problems)
 
-    def is_algorithm_suited(self, name: str) -> bool:
-        """Check whether an algorithm is suited to all the problems in the group.
-
-        Args:
-            name: The name of the algorithm.
-
-        Returns:
-            True if the algorithm is suited.
-        """
-        return all(problem.is_algorithm_suited(name) for problem in self.__problems)
-
-    def compute_targets(
+    # FIXME: Not suited to MDO and MDA?
+    def compute_target_values(
         self,
         targets_number: int,
-        ref_algos_configurations: AlgorithmsConfigurations,
+        algorithm_configurations: AlgorithmsConfigurations,
         only_feasible: bool = True,
     ) -> None:
-        """Generate targets for all the problems based on given reference algorithms.
+        """Compute target values based on algorithm configurations.
 
         Args:
-            targets_number: The number of targets to generate.
-            ref_algos_configurations: The configurations of the reference algorithms.
-            only_feasible: Whether to generate only feasible targets.
+            targets_number: The number of target values to generate.
+            algorithm_configurations: The algorithm configurations.
+            only_feasible: Whether to generate only feasible target values.
         """
         for problem in self.__problems:
-            problem.compute_targets(
-                targets_number, ref_algos_configurations, only_feasible
+            problem.compute_target_values(
+                targets_number, algorithm_configurations, only_feasible
             )
 
     def compute_data_profile(
@@ -108,37 +100,35 @@ class ProblemsGroup:
         algos_configurations: AlgorithmsConfigurations,
         histories_paths: Results,
         show: bool = True,
-        plot_path: str | Path | None = None,
+        plot_path: str | Path = "",
         infeasibility_tolerance: float = 0.0,
         max_eval_number: int = 0,
-        plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
-        grid_kwargs: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
-        use_evaluation_log_scale: bool = False,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        grid_settings: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
+        use_abscissa_log_scale: bool = False,
     ) -> None:
         """Generate the data profiles of given algorithms relative to the problems.
 
         Args:
             algos_configurations: The algorithms configurations.
             histories_paths: The paths to the reference histories for each algorithm.
-            show: If True, show the plot.
+            show: If ``True``, show the plot.
             plot_path: The path where to save the plot.
-                By default the plot is not saved.
+                If empty, the plot is not saved.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             max_eval_number: The maximum evaluations number to be displayed.
                 If 0, this value is inferred from the longest history.
-            plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
+            plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
-            grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.
-            use_evaluation_log_scale: Whether to use a logarithmic scale
-                for the number of function evaluations axis.
+            grid_settings: The keyword arguments of `matplotlib.pyplot.grid`.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
         """
-        # Initialize the data profile
         data_profile = DataProfile({
             problem.name: problem.minimization_target_values
             for problem in self.__problems
         })
 
-        # Generate the performance histories
         for configuration_name in algos_configurations.names:
             for problem in self.__problems:
                 for history_path in histories_paths.get_paths(
@@ -151,17 +141,16 @@ class ProblemsGroup:
                     data_profile.add_history(
                         problem.name,
                         configuration_name,
-                        history.objective_values,
+                        history.performance_measures,
                         history.infeasibility_measures,
                     )
 
-        # Plot and/or save the data profile
         data_profile.plot(
             show=show,
             file_path=plot_path,
-            plot_kwargs=plot_kwargs,
-            grid_kwargs=grid_kwargs,
-            use_evaluation_log_scale=use_evaluation_log_scale,
+            plot_settings=plot_settings,
+            grid_settings=grid_settings,
+            use_abscissa_log_scale=use_abscissa_log_scale,
         )
 
     def __len__(self) -> int:

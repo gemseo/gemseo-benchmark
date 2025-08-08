@@ -27,13 +27,11 @@ from matplotlib.ticker import MaxNLocator
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    import datetime
     from collections.abc import Mapping
-    from collections.abc import Sequence
 
     from matplotlib.axes import Axes
 
-    from gemseo_benchmark import MarkeveryType
     from gemseo_benchmark.results.history_item import HistoryItem
 
 
@@ -74,11 +72,11 @@ class PerformanceHistories(collections.abc.MutableSequence):
     def get_equal_size_histories(self) -> PerformanceHistories:
         """Return the histories extended to the maximum size."""
         return PerformanceHistories(*[
-            history.extend(self.__maximum_size) for history in self
+            history.extend(self.maximum_size) for history in self
         ])
 
     @property
-    def __maximum_size(self) -> int:
+    def maximum_size(self) -> int:
         """The maximum size of a history."""
         return max(len(history) for history in self)
 
@@ -142,106 +140,11 @@ class PerformanceHistories(collections.abc.MutableSequence):
             history.compute_cumulated_minimum() for history in self
         ])
 
-    def plot_algorithm_histories(
-        self,
-        axes: Axes,
-        algorithm_name: str,
-        max_feasible_objective: float,
-        plot_all: bool,
-        color: str,
-        marker: str,
-        alpha: float,
-        markevery: MarkeveryType,
-    ) -> float | None:
-        """Plot the histories associated with an algorithm.
-
-        Args:
-            axes: The axes on which to plot the performance histories.
-            algorithm_name: The name of the algorithm.
-            max_feasible_objective: The ordinate for infeasible history items.
-            plot_all: Whether to plot all the performance histories.
-            color: The color of the plot.
-            marker: The marker type of the plot.
-            alpha: The opacity level for overlapping areas.
-                Refer to the Matplotlib documentation.
-            markevery: The sampling parameter for the markers of the plot.
-                Refer to the Matplotlib documentation.
-
-        Returns:
-            The minimum feasible objective value of the median history
-            or ``None`` if the median history has no feasible item.
-        """
-        # Plot all the performance histories
-        if plot_all:
-            for history in self:
-                history.plot(axes, only_feasible=True, color=color, alpha=alpha)
-
-        # Get the minimum history, starting from its first feasible item
-        abscissas, minimum_items = self.compute_minimum().get_plot_data(feasible=True)
-        minimum_ordinates = [item.objective_value for item in minimum_items]
-
-        # Get the maximum history for the same abscissas as the minimum history
-        maximum_items = self.compute_maximum().items
-        # Replace the infeasible objective values with the maximum value
-        # N.B. Axes.fill_between requires finite values, that is why the infeasible
-        # objective values are replaced with a finite value rather than with infinity.
-        maximum_ordinates = self.__get_penalized_objective_values(
-            maximum_items, abscissas, max_feasible_objective
-        )
-
-        # Plot the area between the minimum and maximum histories.
-        axes.fill_between(abscissas, minimum_ordinates, maximum_ordinates, alpha=alpha)
-        axes.plot(abscissas, minimum_ordinates, color=color, alpha=alpha)
-        # Replace the infeasible objective values with infinity
-        maximum_ordinates = self.__get_penalized_objective_values(
-            maximum_items, abscissas, numpy.inf
-        )
-        axes.plot(abscissas, maximum_ordinates, color=color, alpha=alpha)
-
-        # Plot the median history
-        median = self.compute_median()
-        median.plot(
-            axes,
-            only_feasible=True,
-            label=algorithm_name,
-            color=color,
-            marker=marker,
-            markevery=markevery,
-        )
-
-        # Return the smallest objective value of the median
-        _, history_items = median.get_plot_data(feasible=True)
-        if history_items:
-            return min(history_items).objective_value
-        return None
-
-    @staticmethod
-    def __get_penalized_objective_values(
-        history_items: Sequence[HistoryItem], indexes: Iterable[int], value: float
-    ) -> list[float]:
-        """Return the objectives of history items, replacing the infeasible ones.
-
-        Args:
-            history_items: The history items.
-            indexes: The 1-based indexes of the history items.
-            value: The replacement for infeasible objective values.
-
-        Returns:
-            The objective values.
-        """
-        return [
-            history_items[index - 1].objective_value
-            if history_items[index - 1].is_feasible
-            else value
-            for index in indexes
-        ]
-
     def plot_performance_measure_distribution(
         self,
         axes: Axes,
-        # TODO: API BREAK: Rename argument 'max_feasible_objective'
-        # into 'extremal_feasible_performance'.
-        max_feasible_objective: float | None = None,
+        extremal_feasible_performance: float | None,
+        infeasible_performance_measure: float,
         plot_all_histories: bool = False,
         performance_measure_is_minimized: bool = True,
     ) -> None:
@@ -249,29 +152,19 @@ class PerformanceHistories(collections.abc.MutableSequence):
 
         Args:
             axes: The axes of the plot.
-            max_feasible_objective: The extremal feasible performance measure.
+            extremal_feasible_performance: The extremal feasible performance measure.
+            infeasible_performance_measure: The value to replace the performance measure
+                of infeasible history items when computing statistics.
             plot_all_histories: Whether to plot all the performance histories.
             performance_measure_is_minimized: Whether the performance measure
                 is minimized (rather than maximized).
         """
-        if max_feasible_objective is None:
-            feasible_performances = [
-                item.objective_value
-                for history in self
-                for item in history
-                if item.is_feasible
-            ]
-            if performance_measure_is_minimized:
-                extremal_feasible_performance = max(feasible_performances)
-            else:
-                extremal_feasible_performance = min(feasible_performances)
-        else:
-            extremal_feasible_performance = max_feasible_objective
-
         self.__plot_distribution(
             numpy.array([
                 [
-                    item.objective_value if item.is_feasible else numpy.nan
+                    item.performance_measure
+                    if item.is_feasible
+                    else infeasible_performance_measure
                     for item in history
                 ]
                 for history in self.get_equal_size_histories()
@@ -399,7 +292,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         histories: numpy.ndarray,
         axes: Axes,
         centile_range: tuple[float, float],
-        fill_between_kwargs: Mapping[str, str],
+        fill_between_settings: Mapping[str, str],
         infinity: float | None,
         performance_measure_is_minimized: bool,
     ) -> None:
@@ -409,7 +302,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
             histories: The histories data.
             axes: The axes of the plot.
             centile_range: The range of centiles to be drawn.
-            fill_between_kwargs: Keyword arguments
+            fill_between_settings: Keyword arguments
                 for `matplotlib.axes.Axes.fill_between`.
             infinity: The substitute value for infinite ordinates.
             performance_measure_is_minimized: Whether the performance measure
@@ -451,7 +344,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
             range(first_index + 1, histories.shape[1] + 1),
             lower_centile[first_index:],
             upper_centile[first_index:],
-            **fill_between_kwargs,
+            **fill_between_settings,
         )
         axes.xaxis.set_major_locator(MaxNLocator(integer=True))
 
@@ -459,7 +352,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
     def plot_median(
         histories: numpy.ndarray,
         axes: Axes,
-        plot_kwargs: Mapping[str, str | int | float],
+        plot_settings: Mapping[str, str | int | float],
         performance_measure_is_minimized: bool,
     ) -> None:
         """Plot a range of centiles of histories data.
@@ -467,7 +360,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         Args:
             histories: The histories data.
             axes: The axes of the plot.
-            plot_kwargs: Keyword arguments for `matplotlib.axes.Axes.plot`.
+            plot_settings: Keyword arguments for `matplotlib.axes.Axes.plot`.
             performance_measure_is_minimized: Whether the performance measure
                 is minimized (rather than maximized).
         """
@@ -486,10 +379,67 @@ class PerformanceHistories(collections.abc.MutableSequence):
         axes.plot(
             range(first_index + 1, histories.shape[1] + 1),
             median[first_index:],
-            **plot_kwargs,
+            **plot_settings,
         )
 
     def switch_performance_measure_sign(self) -> None:
         """Switch the sign of the performance measure."""
         for history in self:
             history.switch_performance_measure_sign()
+
+    def get_elapsed_times(self) -> list[datetime.timedelta]:
+        """Return the sorted elapsed times of all the history items.
+
+        Returns:
+            The sorted elapsed times.
+        """
+        return sorted([item.elapsed_time for history in self for item in history])
+
+    def spread_over_time(
+        self, number_of_scalar_constraints: int
+    ) -> PerformanceHistories:
+        """Spread the histories over all the elapsed times.
+
+        Args:
+            number_of_scalar_constraints: The number of scalar constraints
+                of the underlying problem.
+
+        Returns:
+            The performance histories with has as many items as total elapsed times.
+        """
+        timeline = self.get_elapsed_times()
+        return self.__class__(*[
+            history.spread_over_timeline(timeline, number_of_scalar_constraints)
+            for history in self
+        ])
+
+    def get_numbers_of_discipline_executions(self) -> list[int]:
+        """Return the sorted numbers of discipline executions of all the history items.
+
+        Returns:
+            The sorted numbers of discipline executions.
+        """
+        return sorted({
+            item.number_of_discipline_executions for history in self for item in history
+        })
+
+    def spread_over_numbers_of_discipline_executions(
+        self, number_of_scalar_constraints: int
+    ) -> PerformanceHistories:
+        """Spread the histories over all the numbers of discipline executions.
+
+        Args:
+            number_of_scalar_constraints: The number of scalar constraints
+                of the underlying problem.
+
+        Returns:
+            The performance histories with has as many items as total numbers
+            of discipline executions.
+        """
+        numbers_of_discipline_executions = self.get_numbers_of_discipline_executions()
+        return self.__class__(*[
+            history.spread_over_numbers_of_discipline_executions(
+                numbers_of_discipline_executions, number_of_scalar_constraints
+            )
+            for history in self
+        ])

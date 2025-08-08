@@ -47,7 +47,9 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
 
     from gemseo_benchmark import ConfigurationPlotOptions
-    from gemseo_benchmark.problems.problem import Problem
+    from gemseo_benchmark.problems.optimization_problem_configuration import (
+        OptimizationProblemConfiguration,
+    )
     from gemseo_benchmark.problems.problems_group import ProblemsGroup
     from gemseo_benchmark.results.results import Results
 
@@ -91,7 +93,7 @@ class Report:
         histories_paths: Results,
         custom_algos_descriptions: Mapping[str, str] | None = None,
         max_eval_number_per_group: dict[str, int] | None = None,
-        plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
     ) -> None:
         """
         Args:
@@ -109,13 +111,13 @@ class Report:
                 If ``None``, all the evaluations are displayed.
                 If the key of a group is missing, all the evaluations are displayed
                 for the group.
-            plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
+            plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
 
         Raises:
             ValueError: If an algorithm has no associated histories.
         """  # noqa: D205, D212, D415
-        self.__plot_kwargs = plot_kwargs
+        self.__plot_settings = plot_settings
         self.__root_directory = Path(root_directory_path)
         self.__algorithms_configurations_groups = algos_configurations_groups
         self.__problems_groups = problems_groups
@@ -147,7 +149,7 @@ class Report:
         use_log_scale: bool = False,
         plot_only_median: bool = False,
         use_time_log_scale: bool = False,
-        use_evaluation_log_scale: bool = False,
+        use_abscissa_log_scale: bool = False,
     ) -> None:
         """Generate the benchmarking report.
 
@@ -160,8 +162,8 @@ class Report:
             plot_only_median: Whether to plot only the median and no other centile.
             use_time_log_scale: Whether to use a logarithmic scale
                 for the time axis.
-            use_evaluation_log_scale: Whether to use a logarithmic scale
-                for the number of function evaluations axis.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
         """
         self.__create_root_directory()
         self.__create_algos_file()
@@ -172,7 +174,7 @@ class Report:
             use_log_scale,
             plot_only_median,
             use_time_log_scale,
-            use_evaluation_log_scale,
+            use_abscissa_log_scale,
         )
         self.__create_index()
         self.__build_report(to_html, to_pdf)
@@ -214,7 +216,7 @@ class Report:
         )
 
     def __create_problems_files(self) -> None:
-        """Create the files describing the benchmarking problems."""
+        """Create the files describing the problem configurations."""
         problems_dir = self.__root_directory / DirectoryName.PROBLEMS.value
         problems_dir.mkdir()
 
@@ -246,7 +248,7 @@ class Report:
             problems_paths=problems_paths,
         )
 
-    def __get_problem_path(self, problem: Problem) -> Path:
+    def __get_problem_path(self, problem: OptimizationProblemConfiguration) -> Path:
         """Return the path to a problem file.
 
         Args:
@@ -266,7 +268,7 @@ class Report:
         use_log_scale: bool = False,
         plot_only_median: bool = False,
         use_time_log_scale: bool = False,
-        use_evaluation_log_scale: bool = False,
+        use_abscissa_log_scale: bool = False,
     ) -> None:
         """Create the files corresponding to the benchmarking results.
 
@@ -277,8 +279,8 @@ class Report:
             plot_only_median: Whether to plot only the median and no other centile.
             use_time_log_scale: Whether to use a logarithmic scale
                 for the time axis.
-            use_evaluation_log_scale: Whether to use a logarithmic scale
-                for the number of function evaluations axis.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
         """
         self.__fill_template(
             self.__root_directory / FileName.RESULTS.value,
@@ -291,7 +293,7 @@ class Report:
                     use_log_scale,
                     plot_only_median,
                     use_time_log_scale,
-                    use_evaluation_log_scale,
+                    use_abscissa_log_scale,
                 )
                 for group in self.__algorithms_configurations_groups
             ],
@@ -305,7 +307,7 @@ class Report:
         use_log_scale: bool,
         plot_only_median: bool,
         use_time_log_scale: bool,
-        use_evaluation_log_scale: bool,
+        use_abscissa_log_scale: bool,
     ) -> str:
         """Create the results files of a group of algorithm configurations.
 
@@ -317,8 +319,8 @@ class Report:
             plot_only_median: Whether to plot only the median and no other centile.
             use_time_log_scale: Whether to use a logarithmic scale
                 for the time axis.
-            use_evaluation_log_scale: Whether to use a logarithmic scale
-                for the number of function evaluations axis.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
 
         Returns:
             The path to the main file.
@@ -358,7 +360,7 @@ class Report:
                     use_log_scale,
                     plot_only_median,
                     use_time_log_scale,
-                    use_evaluation_log_scale,
+                    use_abscissa_log_scale,
                 )
                 .relative_to(results_root)
                 .as_posix()
@@ -385,7 +387,7 @@ class Report:
         use_log_scale: bool,
         plot_only_median: bool,
         use_time_log_scale: bool,
-        use_evaluation_log_scale: bool,
+        use_abscissa_log_scale: bool,
     ) -> Path:
         """Create the results file of a group of algorithm configurations.
 
@@ -400,8 +402,8 @@ class Report:
             plot_only_median: Whether to plot only the median and no other centile.
             use_time_log_scale: Whether to use a logarithmic scale
                 for the time axis.
-            use_evaluation_log_scale: Whether to use a logarithmic scale
-                for the number of function evaluations axis.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
 
         Returns:
             The path to the main file.
@@ -415,14 +417,14 @@ class Report:
             figures_dir,
             infeasibility_tolerance,
             self.__max_eval_numbers.get(problems.name),
-            plot_kwargs=self.__plot_kwargs,
+            plot_settings=self.__plot_settings,
         )
         figures, tables = plotter.plot(
             plot_all_histories,
             use_log_scale,
             plot_only_median,
             use_time_log_scale,
-            use_evaluation_log_scale,
+            use_abscissa_log_scale,
         )
 
         # Create the file dedicated to the group of problems
@@ -439,7 +441,7 @@ class Report:
             problems_group_name=problems.name,
             problems_group_description=problems.description,
             data_profile=self.__get_relative_path(
-                plotter.plot_data_profiles(use_evaluation_log_scale)
+                plotter.plot_data_profiles(use_abscissa_log_scale)
             ),
             problems_names=[problem.name for problem in problems],
             group_problems_paths=[
@@ -459,7 +461,7 @@ class Report:
 
     def __create_problem_results_files(
         self,
-        problem: Problem,
+        problem: OptimizationProblemConfiguration,
         algorithm_configurations: AlgorithmsConfigurations,
         figures: Figures.ProblemFigurePaths,
         directory_path: Path,

@@ -24,7 +24,6 @@ from __future__ import annotations
 import re
 
 import pytest
-from gemseo.problems.optimization.power_2 import Power2
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
 from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
@@ -35,48 +34,40 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
 from gemseo_benchmark.data_profiles.target_values import TargetValues
-from gemseo_benchmark.problems.problem import Problem
+from gemseo_benchmark.problems.optimization_problem_configuration import (
+    OptimizationProblemConfiguration,
+)
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
 
 algorithms_configurations = AlgorithmsConfigurations(AlgorithmConfiguration("L-BFGS-B"))
 
 
-def test_is_algorithm_suited():
-    """Check the assessment of the suitability of an algorithm to a problems group."""
-    # Check a suited algorithm
-    rosenbrock = Problem("Rosenbrock", Rosenbrock, [zeros(2)])
-    group = ProblemsGroup("group", [rosenbrock])
-    assert group.is_algorithm_suited("L-BFGS-B")
-    # Check an ill-suited algorithm
-    power2 = Problem("Power2", Power2, [zeros(3)])
-    group = ProblemsGroup("another group", [rosenbrock, power2])
-    assert not group.is_algorithm_suited("L-BFGS-B")
-
-
-def test_compute_targets():
+def test_compute_target_values():
     """Check the computation of target values."""
-    rosenbrock = Problem("Rosenbrock", Rosenbrock, [zeros(2)])
+    rosenbrock = OptimizationProblemConfiguration("Rosenbrock", Rosenbrock, [zeros(2)])
     with pytest.raises(
-        ValueError, match=re.escape("The benchmarking problem has no target value.")
+        ValueError, match=re.escape("The problem configuration has no target value.")
     ):
         _ = rosenbrock.target_values
-    ProblemsGroup("group", [rosenbrock]).compute_targets(2, algorithms_configurations)
+    ProblemsGroup("group", [rosenbrock]).compute_target_values(
+        2, algorithms_configurations
+    )
     assert isinstance(rosenbrock.target_values, TargetValues)
 
 
 @pytest.mark.parametrize(
-    ("baseline_images", "use_evaluation_log_scale"),
+    ("baseline_images", "use_abscissa_log_scale"),
     [
         (
-            [f"data_profile[use_evaluation_log_scale={use_evaluation_log_scale}]"],
-            use_evaluation_log_scale,
+            [f"data_profile[use_abscissa_log_scale={use_abscissa_log_scale}]"],
+            use_abscissa_log_scale,
         )
-        for use_evaluation_log_scale in [False, True]
+        for use_abscissa_log_scale in [False, True]
     ],
 )
 @image_comparison(None, ["png"])
 def test_compute_data_profile(
-    baseline_images, problem_a, problem_b, results, use_evaluation_log_scale
+    baseline_images, problem_a, problem_b, results, use_abscissa_log_scale
 ):
     """Check the computation of data profiles."""
     group = ProblemsGroup("A group", [problem_a, problem_b])
@@ -86,7 +77,7 @@ def test_compute_data_profile(
         results,
         show=False,
         max_eval_number=5,
-        use_evaluation_log_scale=use_evaluation_log_scale,
+        use_abscissa_log_scale=use_abscissa_log_scale,
     )
 
 

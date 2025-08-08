@@ -17,28 +17,10 @@
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
-"""Class to compute data profiles for algorithms comparison.
-
-A data profile is a graphical tool to compare iterative algorithms, e.g. optimization
-algorithms or root-finding algorithms, on reference problems.
-
-Each of the reference problems must be assigned targets, i.e. values of the objective
-function or values of the residual norm, ranging from a first acceptable value to the
-best known value for the problem.
-
-The algorithms will be compared based on the number of targets they reach, cumulated
-over all the reference problems, relative to the number of problems functions
-evaluations they make.
-
-The data profile is the empirical cumulated distribution function of the number of
-functions evaluations made by an algorithm to reach a problem target.
-"""
+"""Class to compute data profiles for algorithms comparison."""
 
 from __future__ import annotations
 
-from collections.abc import Iterable
-from collections.abc import Mapping
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 import matplotlib
@@ -56,6 +38,9 @@ from gemseo_benchmark import _get_configuration_plot_options
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from collections.abc import Mapping
+    from collections.abc import Sequence
     from numbers import Number
     from pathlib import Path
 
@@ -67,9 +52,19 @@ if TYPE_CHECKING:
 class DataProfile:
     """Data profile that compares iterative algorithms on reference problems.
 
-    A data profile is an empirical cumulative distribution function of the number of
-    problems functions evaluations required by an algorithm to reach a reference problem
-    target.
+    A data profile is a graphical tool to compare iterative algorithms,
+    e.g. optimization algorithms or root-finding algorithms, on reference problems.
+
+    Each of the reference problems must be assigned targets,
+    i.e. values of the objective function or values of the residual norm,
+    ranging from a first acceptable value to the best known value for the problem.
+
+    The algorithms will be compared based on the number of targets they reach,
+    cumulated over all the reference problems,
+    relative to the number of problems functions evaluations they make.
+
+    The data profile is the empirical cumulated distribution function of the number of
+    functions evaluations made by an algorithm to reach a problem target.
     """
 
     def __init__(self, target_values: Mapping[str, TargetValues]) -> None:
@@ -91,7 +86,6 @@ class DataProfile:
         algorithm at each iteration.
 
         Raises:
-            TypeError: if the target values are not passed as a dictionary.
             ValueError: If the reference problems have different numbers of target
                 values.
         """
@@ -99,10 +93,6 @@ class DataProfile:
 
     @target_values.setter
     def target_values(self, target_values: Mapping[str, TargetValues]) -> None:
-        if not isinstance(target_values, Mapping):
-            msg = "The target values be must passed as a mapping"
-            raise TypeError(msg)
-
         targets_numbers = {len(pb_targets) for pb_targets in target_values.values()}
         if len(targets_numbers) != 1:
             msg = "The reference problems must have the same number of target values."
@@ -115,7 +105,7 @@ class DataProfile:
         self,
         problem_name: str,
         algorithm_configuration_name: str,
-        objective_values: Sequence[float],
+        performance_measures: Sequence[float],
         infeasibility_measures: Sequence[float] | None = None,
         feasibility_statuses: Sequence[bool] | None = None,
     ) -> None:
@@ -124,7 +114,7 @@ class DataProfile:
         Args:
             problem_name: The name of the problem.
             algorithm_configuration_name: The name of the algorithm configuration.
-            objective_values: A history of objective values.
+            performance_measures: A history of performance measures.
                 N.B. the value at index ``i`` is assumed to have been obtained with
                 ``i+1`` evaluations.
             infeasibility_measures: A history of infeasibility measures.
@@ -144,22 +134,22 @@ class DataProfile:
                 pb_name: [] for pb_name in self.__target_values
             }
         history = PerformanceHistory(
-            objective_values, infeasibility_measures, feasibility_statuses
+            performance_measures, infeasibility_measures, feasibility_statuses
         )
         self.__values_histories[algorithm_configuration_name][problem_name].append(
             history
         )
 
-    # TODO: remove argument 'markevery' in favor of 'plot_kwargs' (API break)
+    # TODO: remove argument 'markevery' in favor of 'plot_settings' (API break)
     def plot(
         self,
         algo_names: Iterable[str] | None = None,
         show: bool = True,
-        file_path: str | Path | None = None,
+        file_path: str | Path = "",
         markevery: MarkeveryType | None = None,
-        plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
-        grid_kwargs: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
-        use_evaluation_log_scale: bool = False,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        grid_settings: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
+        use_abscissa_log_scale: bool = False,
     ) -> None:
         """Plot the data profiles of the required algorithms.
 
@@ -168,26 +158,26 @@ class DataProfile:
                 If ``None`` then all the algorithms are considered.
             show: If True, show the plot.
             file_path: The path where to save the plot.
-                If ``None``, the plot is not saved.
+                If empty, the plot is not saved.
             markevery: The sampling parameter for the markers of the plot.
                 Refer to the Matplotlib documentation.
-            plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
+            plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
-            grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.
-            use_evaluation_log_scale: Whether to use a logarithmic scale
-                for the number of function evaluations axis.
+            grid_settings: The keyword arguments of `matplotlib.pyplot.grid`.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
         """
         if algo_names is None:
             algo_names = ()
 
         data_profiles = self.compute_data_profiles(*algo_names)
-        plot_kwargs_copy = plot_kwargs.copy()
-        for kwargs in plot_kwargs_copy.values():
-            if "markevery" not in kwargs:
-                kwargs["markevery"] = markevery
+        plot_settings_copy = plot_settings.copy()
+        for settings in plot_settings_copy.values():
+            if "markevery" not in settings:
+                settings["markevery"] = markevery
 
         figure = self._plot_data_profiles(
-            data_profiles, plot_kwargs_copy, grid_kwargs, use_evaluation_log_scale
+            data_profiles, plot_settings_copy, grid_settings, use_abscissa_log_scale
         )
         save_show_figure(figure, show, file_path)
 
@@ -277,24 +267,24 @@ class DataProfile:
     @staticmethod
     def _plot_data_profiles(
         data_profiles: Mapping[str, Sequence[Number]],
-        plot_kwargs: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
-        grid_kwargs: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
-        use_evaluation_log_scale: bool = False,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        grid_settings: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
+        use_abscissa_log_scale: bool = False,
     ) -> Figure:
         """Plot the data profiles.
 
         Args:
             data_profiles: The data profiles.
-            plot_kwargs: The keyword arguments of `matplotlib.axes.Axes.plot`
+            plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
-            grid_kwargs: The keyword arguments of `matplotlib.pyplot.grid`.
-            use_evaluation_log_scale: Whether to use a logarithmic scale
-                for the number of function evaluations axis.
+            grid_settings: The keyword arguments of `matplotlib.pyplot.grid`.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
 
         Returns:
             The data profiles figure.
         """
-        plot_kwargs = _get_configuration_plot_options(plot_kwargs, data_profiles)
+        plot_settings = _get_configuration_plot_options(plot_settings, data_profiles)
         fig = plt.figure()
         axes = fig.add_subplot(1, 1, 1)
 
@@ -302,7 +292,7 @@ class DataProfile:
         axes.set_title(f"Data profile{'s' if len(data_profiles) > 1 else ''}")
         max_profile_size = max(len(profile) for profile in data_profiles.values())
         axes.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
-        if use_evaluation_log_scale:
+        if use_abscissa_log_scale:
             axes.set_xscale("log")
 
         plt.xlabel("Number of functions evaluations")
@@ -316,11 +306,11 @@ class DataProfile:
         for name, profile in data_profiles.items():
             # Plot the data profile
             profile_size = len(profile)
-            axes.plot(range(1, profile_size + 1), profile, **plot_kwargs[name])
+            axes.plot(range(1, profile_size + 1), profile, **plot_settings[name])
 
             # Extend the profile with an horizontal line if necessary
             if profile_size < max_profile_size:
-                color = plot_kwargs[name]["color"]
+                color = plot_settings[name]["color"]
                 tail_size = max_profile_size - profile_size + 1
                 last_value = profile[-1]
                 axes.plot(
@@ -333,5 +323,5 @@ class DataProfile:
                 axes.plot(profile_size, last_value, marker="*", color=color)
 
         plt.legend()
-        plt.grid(**grid_kwargs)
+        plt.grid(**grid_settings)
         return fig

@@ -21,22 +21,40 @@
 
 from __future__ import annotations
 
+import datetime
+import math
 import shutil
 from pathlib import Path
+from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
+from gemseo import create_mda
+from gemseo import create_scenario
+from gemseo.algos.design_space import DesignSpace
 from gemseo.algos.optimization_problem import OptimizationProblem
+from gemseo.disciplines.analytic import AnalyticDiscipline
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
 from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
+from gemseo.utils.testing.pytest_conftest import *  # noqa: F401,F403
 from numpy import array
 from numpy import ndarray
 
+from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.data_profiles.target_values import TargetValues
-from gemseo_benchmark.problems.problem import Problem
+from gemseo_benchmark.problems.mda_problem_configuration import MDAProblemConfiguration
+from gemseo_benchmark.problems.mda_problem_configuration import MDAProblemType
+from gemseo_benchmark.problems.mdo_problem_configuration import MDOProblemConfiguration
+from gemseo_benchmark.problems.optimization_problem_configuration import (
+    OptimizationProblemConfiguration,
+)
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
+from gemseo_benchmark.report.axis_data import IterationData
 from gemseo_benchmark.results.performance_histories import PerformanceHistories
 from gemseo_benchmark.results.performance_history import PerformanceHistory
+
+if TYPE_CHECKING:
+    from gemseo_benchmark.problems.mdo_problem_configuration import MDOProblemType
 
 design_variables = array([0.0, 1.0])
 
@@ -49,7 +67,7 @@ def design_space() -> mock.Mock:
     design_space.variable_names = ["x"]
     design_space.variable_sizes = {"x": 2}
     design_space.get_current_value = mock.Mock(return_value=design_variables)
-    design_space.has_current_value = mock.Mock(return_value=True)
+    design_space.has_current_value = True
     design_space.set_current_value = mock.Mock()
     design_space.unnormalize_vect = lambda _: _
     design_space.untransform_vect = lambda x, no_check: x
@@ -141,6 +159,7 @@ def minimization_problem(design_space, objective, constraints) -> mock.Mock:
         return_value=(False, 1.0)
     )
     problem.constraints = constraints
+    problem.scalar_constraint_names = constraints.get_names()
     return problem
 
 
@@ -159,6 +178,7 @@ def maximization_problem(design_space, objective, constraints) -> mock.Mock:
         return_value=(False, 1.0)
     )
     problem.constraints = constraints
+    problem.scalar_constraint_names = constraints.get_names()
     return problem
 
 
@@ -171,8 +191,8 @@ def side_effect(
     infeasibility_tolerance=0.0,
     max_eval_number=None,
     use_log_scale=False,
-    plot_kwargs=READ_ONLY_EMPTY_DICT,
-    grid_kwargs=READ_ONLY_EMPTY_DICT,
+    plot_settings=READ_ONLY_EMPTY_DICT,
+    grid_settings=READ_ONLY_EMPTY_DICT,
 ):
     """Side effect for the computation of a data profile."""
     shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(file_path))
@@ -187,9 +207,11 @@ def problem_a() -> mock.Mock:
     problem.optimum = 1.0
     problem.target_values = TargetValues([problem.optimum])
     problem.minimization_target_values = TargetValues([problem.optimum])
-    problem.minimize_objective = True
+    problem.minimize_performance_measure = True
     problem.compute_data_profile = mock.Mock(side_effect=side_effect)
-    problem.plot_histories = mock.Mock(side_effect=side_effect)
+    problem.performance_measure_label = "Best feasible objective value"
+    problem.number_of_scalar_constraints = 6
+    problem.abscissa_data_type = IterationData
     return problem
 
 
@@ -202,9 +224,11 @@ def problem_b() -> mock.Mock:
     problem.optimum = None
     problem.target_values = TargetValues([-1.0])
     problem.minimization_target_values = TargetValues([1.0])
-    problem.minimize_objective = False
+    problem.minimize_performance_measure = False
     problem.compute_data_profile = mock.Mock(side_effect=side_effect)
-    problem.plot_histories = mock.Mock(side_effect=side_effect)
+    problem.performance_measure_label = "Best feasible objective value"
+    problem.number_of_scalar_constraints = 6
+    problem.abscissa_data_type = IterationData
     return problem
 
 
@@ -223,9 +247,9 @@ def group(problem_a, problem_b) -> mock.Mock:
         plot_path=None,
         infeasibility_tolerance=0.0,
         max_eval_number=None,
-        plot_kwargs=READ_ONLY_EMPTY_DICT,
-        grid_kwargs=READ_ONLY_EMPTY_DICT,
-        use_evaluation_log_scale=False,
+        plot_settings=READ_ONLY_EMPTY_DICT,
+        grid_settings=READ_ONLY_EMPTY_DICT,
+        use_abscissa_log_scale=False,
     ):
         shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(plot_path))
 
@@ -242,6 +266,13 @@ def algorithm_configuration() -> mock.Mock:
     algo_config.name = "SLSQP"
     algo_config.instance_algorithm_options = {}
     algo_config.copy = mock.Mock(return_value=algo_config)
+    algo_config.to_dict = mock.Mock(
+        return_value={
+            "configuration_name": "SLSQP",
+            "algorithm_name": "SLSQP",
+            "algorithm_options": {"normalize_design_space": False, "max_iter": 3},
+        }
+    )
     return algo_config
 
 
@@ -314,9 +345,9 @@ def results(
 
 
 @pytest.fixture(scope="package")
-def rosenbrock() -> Problem:
-    """A benchmarking problem based on the 2-dimensional Rosenbrock function."""
-    return Problem(
+def rosenbrock() -> OptimizationProblemConfiguration:
+    """A problem configuration based on the 2-dimensional Rosenbrock function."""
+    return OptimizationProblemConfiguration(
         "Rosenbrock",
         Rosenbrock,
         [array([0.0, 1.0]), array([1.0, 0.0])],
@@ -346,3 +377,168 @@ def performance_histories() -> PerformanceHistories:
         PerformanceHistory([3.0, -3.0, 3.0], [0.0, 0.0, 0.0]),
         PerformanceHistory([0.0, -2.0, 4.0], [0.0, 0.0, 0.0]),
     )
+
+
+def mda_create_problem(
+    algorithm_configuration: AlgorithmConfiguration,
+) -> MDAProblemType:
+    """Create an MDA problem."""
+    disciplines = (
+        AnalyticDiscipline({"y1": "x1 + y2"}),
+        AnalyticDiscipline({"y2": "x2 - y1"}),
+    )
+    return create_mda(
+        algorithm_configuration.algorithm_name,
+        disciplines,
+        **algorithm_configuration.algorithm_options,
+    ), disciplines
+
+
+@pytest.fixture(scope="module")
+def multidisciplinary_variable_space() -> DesignSpace:
+    """The variable space of a multidisciplinary problem configuration."""
+    variable_space = DesignSpace()
+    variable_space.add_variable("y1", lower_bound=0, upper_bound=1, value=0.5)
+    variable_space.add_variable("y2", lower_bound=0, upper_bound=1, value=0.5)
+    return variable_space
+
+
+@pytest.fixture(scope="module")
+def mda_problem_configuration(
+    multidisciplinary_variable_space,
+) -> MDAProblemConfiguration:
+    """A problem configuration for multidisciplinary analysis."""
+    return MDAProblemConfiguration(
+        "Linear MDA",
+        mda_create_problem,
+        multidisciplinary_variable_space,
+        starting_points=[array([0, 1]), array([1, 0])],
+    )
+
+
+@pytest.fixture(scope="module")
+def mda_algorithm_configuration() -> AlgorithmConfiguration:
+    """An algorithm configuration for multidisciplinary analysis."""
+    return AlgorithmConfiguration("MDAJacobi")
+
+
+def mdo_create_problem(
+    algorithm_configuration: AlgorithmConfiguration,
+) -> MDOProblemType:
+    """Create an MDO problem."""
+    disciplines = (
+        AnalyticDiscipline({"y1": "x1 + y2"}),
+        AnalyticDiscipline({"y2": "x2 - y1"}),
+    )
+    variable_space = DesignSpace()
+    variable_space.add_variable("x1", lower_bound=0, upper_bound=10, value=5)
+    variable_space.add_variable("x2", lower_bound=0, upper_bound=10, value=5)
+    scenario = create_scenario(
+        disciplines, "y1", variable_space, formulation_name="MDF"
+    )
+    scenario.set_algorithm(
+        algo_name=algorithm_configuration.algorithm_name,
+        **algorithm_configuration.algorithm_options,
+    )
+    return scenario, disciplines
+
+
+@pytest.fixture(scope="module")
+def mdo_problem_configuration(
+    multidisciplinary_variable_space,
+) -> MDOProblemConfiguration:
+    """A problem configuration for multidisciplinary optimization."""
+    return MDOProblemConfiguration(
+        "Linear MDO",
+        mdo_create_problem,
+        multidisciplinary_variable_space,
+        True,
+        0,
+        starting_points=[array([0, 1]), array([1, 0])],
+    )
+
+
+@pytest.fixture(scope="module")
+def mdo_algorithm_configuration() -> AlgorithmConfiguration:
+    """An algorithm configuration for multidisciplinary optimization."""
+    return AlgorithmConfiguration("SLSQP")
+
+
+@pytest.fixture(scope="module")
+def timed_performance_histories() -> PerformanceHistories:
+    """Performance histories with given elapsed times."""
+    return PerformanceHistories(
+        PerformanceHistory(
+            [1, 1],
+            elapsed_times=[
+                datetime.timedelta(seconds=1),
+                datetime.timedelta(seconds=3),
+            ],
+        ),
+        PerformanceHistory(
+            [2, 2],
+            elapsed_times=[
+                datetime.timedelta(seconds=2),
+                datetime.timedelta(seconds=4),
+            ],
+        ),
+    )
+
+
+def check_spread_over_time(histories: PerformanceHistories) -> None:
+    """Check the spreading of performance histories over a timeline.
+
+    Args:
+        histories: The performance histories.
+    """
+    timeline = [datetime.timedelta(seconds=i) for i in range(1, 5)]
+    assert len(histories) == 2
+
+    assert len(histories[0]) == 4
+    assert [item.performance_measure for item in histories[0]] == [1] * 4
+    assert [item.n_unsatisfied_constraints for item in histories[0]] == [0] * 4
+    assert [item.elapsed_time for item in histories[0]] == timeline
+
+    assert len(histories[1]) == 4
+    assert math.isnan(histories[1][0].performance_measure)
+    assert histories[1][0].n_unsatisfied_constraints == 5
+    assert [item.performance_measure for item in histories[1][1:]] == [2] * 3
+    assert [item.n_unsatisfied_constraints for item in histories[1][1:]] == [0] * 3
+    assert [item.elapsed_time for item in histories[1]] == timeline
+
+
+@pytest.fixture(scope="module")
+def multidisciplinary_histories() -> PerformanceHistories:
+    """Performance histories with given numbers of discipline executions."""
+    return PerformanceHistories(
+        PerformanceHistory([1, 1], number_of_discipline_executions=[1, 3]),
+        PerformanceHistory([2, 2], number_of_discipline_executions=[2, 4]),
+    )
+
+
+def check_spread_over_numbers_of_discipline_executions(
+    histories: PerformanceHistories,
+) -> None:
+    """Check the spreading of performance histories over numbers of executions.
+
+    Args:
+        histories: The performance histories.
+    """
+    numbers_of_discipline_executions = [1, 2, 3, 4]
+    assert len(histories) == 2
+
+    assert len(histories[0]) == 4
+    assert [item.performance_measure for item in histories[0]] == [1] * 4
+    assert [item.n_unsatisfied_constraints for item in histories[0]] == [0] * 4
+    assert [
+        item.number_of_discipline_executions for item in histories[0]
+    ] == numbers_of_discipline_executions
+
+    assert len(histories[1]) == 4
+    assert math.isnan(histories[1][0].performance_measure)
+    assert histories[1][0].n_unsatisfied_constraints == 5
+    assert [item.performance_measure for item in histories[1][1:]] == [2] * 3
+    assert [item.n_unsatisfied_constraints for item in histories[1][1:]] == [0] * 3
+    assert [
+        item.number_of_discipline_executions for item in histories[1]
+    ] == numbers_of_discipline_executions

@@ -30,14 +30,6 @@ from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.results.history_item import HistoryItem
 
 
-def test_target_values_as_mapping():
-    """Check the setting of target values as a mapping."""
-    with pytest.raises(
-        TypeError, match="The target values be must passed as a mapping"
-    ):
-        DataProfile([TargetValues([2.0, 1.0])])
-
-
 def test_consistent_target_values():
     """Check the setting of consistent target values."""
     with pytest.raises(
@@ -69,24 +61,24 @@ def test_compute_data_profiles():
 
 
 @pytest.mark.parametrize(
-    ("baseline_images", "use_evaluation_log_scale"),
+    ("baseline_images", "use_abscissa_log_scale"),
     [
         (
-            [f"data_profile[use_evaluation_log_scale={use_evaluation_log_scale}]"],
-            use_evaluation_log_scale,
+            [f"data_profile[use_abscissa_log_scale={use_abscissa_log_scale}]"],
+            use_abscissa_log_scale,
         )
-        for use_evaluation_log_scale in [False, True]
+        for use_abscissa_log_scale in [False, True]
     ],
 )
 @image_comparison(None, ["png"])
-def test_plot_data_profiles(baseline_images, use_evaluation_log_scale):
+def test_plot_data_profiles(baseline_images, use_abscissa_log_scale):
     """Check the data profiles figure."""
     data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
     data_profile.add_history("problem", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
     data_profiles = data_profile.compute_data_profiles("algo")
     pyplot.close("all")
     data_profile._plot_data_profiles(
-        data_profiles, use_evaluation_log_scale=use_evaluation_log_scale
+        data_profiles, use_abscissa_log_scale=use_abscissa_log_scale
     )
 
 

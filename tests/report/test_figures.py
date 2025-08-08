@@ -25,6 +25,10 @@ from unittest import mock
 import pytest
 from matplotlib.testing.compare import compare_images
 
+from gemseo_benchmark.algorithms.algorithms_configurations import (
+    AlgorithmsConfigurations,
+)
+from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.report._figures import Figures
 
 
@@ -37,7 +41,7 @@ def problems_figures(tmp_path, algorithms_configurations, group, results) -> Fig
         results,
         tmp_path,
         0,
-        None,
+        0,
         {"SLSQP": {"color": "blue", "marker": "o"}},
     )
 
@@ -49,13 +53,13 @@ def test_plot_data_profiles(tmp_path, problems_figures):
     assert path.is_file()
 
 
-@pytest.mark.parametrize(
+plot_options = pytest.mark.parametrize(
     (
         "plot_all_histories",
         "use_performance_log_scale",
         "plot_only_median",
         "use_time_log_scale",
-        "use_evaluation_log_scale",
+        "use_abscissa_log_scale",
     ),
     [
         (False, False, False, False, False),
@@ -66,6 +70,9 @@ def test_plot_data_profiles(tmp_path, problems_figures):
         (True, False, False, False, False),
     ],
 )
+
+
+@plot_options
 def test_plot(
     tmp_path,
     problems_figures,
@@ -73,7 +80,7 @@ def test_plot(
     use_performance_log_scale,
     plot_only_median,
     use_time_log_scale,
-    use_evaluation_log_scale,
+    use_abscissa_log_scale,
 ) -> None:
     """Check the plotting of the figures dedicated to each problem."""
     figures = problems_figures.plot(
@@ -81,7 +88,7 @@ def test_plot(
         use_performance_log_scale,
         plot_only_median,
         use_time_log_scale,
-        use_evaluation_log_scale,
+        use_abscissa_log_scale,
     )[0]
     baseline_path = (
         Path(__file__).parent
@@ -93,7 +100,7 @@ def test_plot(
             f"-{use_performance_log_scale}"
             f"-{plot_only_median}"
             f"-{use_time_log_scale}"
-            f"-{use_evaluation_log_scale}"
+            f"-{use_abscissa_log_scale}"
         )
     )
     __check_problem_images(tmp_path, figures, "Problem_A", "SLSQP", baseline_path)
@@ -359,7 +366,7 @@ def test_no_data_profiles_duplicates(
         results,
         tmp_path,
         0,
-        None,
+        0,
         {"SLSQP": {"color": "blue", "marker": "o"}},
     )
     group_call_count = group.compute_data_profile.call_count
@@ -383,7 +390,7 @@ def figures_unequal_representation(
         results,
         tmp_path,
         0,
-        None,
+        0,
         {"SLSQP": {"color": "blue", "marker": "o"}},
     )
 
@@ -432,3 +439,60 @@ def test_bypass_unequal_representation(
         )
         for problem in [problem_a, problem_b]
     ]
+
+
+@pytest.mark.parametrize("problem", ["problem_a", "problem_b"])
+@plot_options
+def test_plot_infeasible(
+    algorithm_configuration,
+    problem,
+    tmp_path,
+    plot_all_histories,
+    use_performance_log_scale,
+    plot_only_median,
+    use_time_log_scale,
+    use_abscissa_log_scale,
+    request,
+) -> None:
+    """Check the plotting and tabulating of infeasible performance measures."""
+    problem = request.getfixturevalue(problem)
+    infeasible_results = mock.Mock()
+    infeasible_results.get_paths = mock.Mock(
+        return_value=[Path(__file__).parent.parent / "unfeasible_history.json"]
+    )
+    figures, tables = Figures(
+        AlgorithmsConfigurations(algorithm_configuration),
+        ProblemsGroup("Singleton", [problem]),
+        infeasible_results,
+        tmp_path,
+        0,
+        0,
+        {"SLSQP": {"color": "blue", "marker": "o"}},
+    ).plot(
+        plot_all_histories,
+        use_performance_log_scale,
+        plot_only_median,
+        use_time_log_scale,
+        use_abscissa_log_scale,
+    )
+    baseline_path = (
+        Path(__file__).parent
+        / "baseline_images"
+        / "test_figures"
+        / (
+            "test_plot_infeasible"
+            f"-{plot_all_histories}"
+            f"-{use_performance_log_scale}"
+            f"-{plot_only_median}"
+            f"-{use_time_log_scale}"
+            f"-{use_abscissa_log_scale}"
+        )
+    )
+    algorithm_name = algorithm_configuration.algorithm_name
+    problem_name = problem.name.replace(" ", "_")
+    __check_problem_images(
+        tmp_path, figures, problem_name, algorithm_name, baseline_path
+    )
+    __check_problem_tables(
+        tmp_path, tables, problem_name, algorithm_name, baseline_path
+    )

@@ -1,0 +1,12 @@
+Solving problem 2 of problem configuration Rosenbrock for algorithm configuration L-BFGS-B.
+Optimization problem:
+   minimize rosen(x) = sum( 100*(x[1:] - x[:-1]**2)**2 + (1 - x[:-1])**2 )
+   with respect to x
+   over the design space:
+      +------+-------------+-------+-------------+-------+
+      | Name | Lower bound | Value | Upper bound | Type  |
+      +------+-------------+-------+-------------+-------+
+      | x[0] |      -2     |   1   |      2      | float |
+      | x[1] |      -2     |   0   |      2      | float |
+      +------+-------------+-------+-------------+-------+
+Solving optimization problem with algorithm L-BFGS-B:

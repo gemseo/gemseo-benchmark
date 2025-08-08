@@ -17,15 +17,7 @@
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
-"""Computation of target values out of algorithms performance histories.
-
-Consider a problem to be solved by an iterative algorithm, e.g. an optimization problem
-or a root-finding problem. Targets are values, i.e. values of the objective function or
-values of the residual norm, ranging from a first acceptable value to the best known
-value for the problem. Targets are used to estimate the efficiency (relative to the
-number of problem functions evaluations) of an algorithm to solve a problem (or several)
-and computes its data profile (see :mod:`.data_profiles.data_profile`).
-"""
+"""Computation of target values out of algorithms performance histories."""
 
 from __future__ import annotations
 
@@ -49,7 +41,18 @@ if TYPE_CHECKING:
 
 
 class TargetValues(PerformanceHistory):
-    """Target values of a problem."""
+    """Target values of a problem.
+
+    Consider a problem to be solved by an iterative algorithm,
+    e.g. an optimization problem or a root-finding problem.
+    Targets are values,
+    i.e. values of the objective function or values of the residual norm,
+    ranging from a first acceptable value to the best known value for the problem.
+    Targets are used to estimate the efficiency
+    (relative to the number of problem functions evaluations)
+    of an algorithm to solve a problem (or several)
+    and computes its data profile (see :mod:`.data_profiles.data_profile`).
+    """
 
     def compute_target_hits_history(
         self, values_history: PerformanceHistory
@@ -68,13 +71,13 @@ class TargetValues(PerformanceHistory):
             for minimum in minimum_history
         ]
 
-    def plot(self, show: bool = True, file_path: str | Path | None = None) -> Figure:
+    def plot(self, show: bool = True, file_path: str | Path = "") -> Figure:
         """Plot the target values.
 
         Args:
             show: Whether to show the plot.
             file_path: The path where to save the plot.
-                If ``None``, the plot is not saved.
+                If empty, the plot is not saved.
 
         Returns:
             A figure showing the target values.
@@ -90,12 +93,12 @@ class TargetValues(PerformanceHistory):
         indexes, history_items = self.get_plot_data()
 
         # Plot the feasible target values
-        objective_values = [item.objective_value for item in history_items]
+        performance_measures = [item.performance_measure for item in history_items]
         is_feasible = array([item.is_feasible for item in history_items])
         if is_feasible.any():
             axes.plot(
                 array(indexes)[is_feasible],
-                array(objective_values)[is_feasible],
+                array(performance_measures)[is_feasible],
                 color="black",
                 marker="o",
                 linestyle="",
@@ -107,7 +110,7 @@ class TargetValues(PerformanceHistory):
         if is_infeasible.any():
             axes.plot(
                 array(indexes)[is_infeasible],
-                array(objective_values)[is_infeasible],
+                array(performance_measures)[is_infeasible],
                 color="red",
                 marker="x",
                 linestyle="",
@@ -123,12 +126,12 @@ class TargetValues(PerformanceHistory):
     def plot_on_axes(
         self,
         axes: matplotlib.axes.Axes,
-        axhline_kwargs: Mapping[str, str | int] = MappingProxyType({
+        axhline_settings: Mapping[str, str | int | float] = MappingProxyType({
             "color": "red",
             "linestyle": ":",
         }),
         yticklabels_format: str = ".4g",
-        set_ylabel_kwargs: Mapping[str, str | int] = MappingProxyType({
+        set_ylabel_settings: Mapping[str, str | int] = MappingProxyType({
             "rotation": 270,
             "labelpad": 12,
         }),
@@ -137,20 +140,21 @@ class TargetValues(PerformanceHistory):
 
         Args:
             axes: The axes of the plot.
-            axhline_kwargs: Keyword arguments
+            axhline_settings: Keyword arguments
                 for ``matplotlib.axes.Axes.axhline``.
             yticklabels_format: The string format for the target values labels.
-            set_ylabel_kwargs: Keyword arguments
+            set_ylabel_settings: Keyword arguments
                 for ``matplotlib.axes.Axes.set_ylabel``.
         """
         twin_axes = axes.twinx()
-        values = [target.objective_value for target in self if target.is_feasible]
+        twin_axes.set_yscale(axes.get_yscale())
+        values = [target.performance_measure for target in self if target.is_feasible]
         for value in values:
-            axes.axhline(value, **axhline_kwargs)
+            axes.axhline(value, **axhline_settings)
 
         twin_axes.set_yticks(values)
         twin_axes.set_yticklabels([
             f"{{value:{yticklabels_format}}}".format(value=value) for value in values
         ])
-        twin_axes.set_ylabel("Target values", **set_ylabel_kwargs)
+        twin_axes.set_ylabel("Target values", **set_ylabel_settings)
         twin_axes.set_ylim(axes.get_ylim())

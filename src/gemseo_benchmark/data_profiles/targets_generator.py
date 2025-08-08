@@ -17,12 +17,7 @@
 #                           documentation
 #        :author: Benoit Pauwels
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
-"""Generation of targets for a problem to be solved by an iterative algorithm.
-
-The targets are generated out of algorithms histories considered to be of reference: the
-median of the reference histories is computed and a uniformly distributed subset (of the
-required size) of this median history is extracted.
-"""
+"""Generation of targets for a problem to be solved by an iterative algorithm."""
 
 from __future__ import annotations
 
@@ -48,7 +43,12 @@ if TYPE_CHECKING:
 
 
 class TargetsGenerator:
-    """Compute the target values for an objective to minimize."""
+    """Compute the target values for an objective to minimize.
+
+    The targets are generated out of algorithms histories considered to be of reference:
+    the median of the reference histories is computed and a uniformly distributed subset
+    (of the required size) of this median history is extracted.
+    """
 
     __NO_HISTORIES_MESSAGE: Final[str] = (
         "There are no histories to generate the targets from."
@@ -62,7 +62,7 @@ class TargetsGenerator:
 
     def add_history(
         self,
-        objective_values: Sequence[float] | None = None,
+        performance_measures: Sequence[float] | None = None,
         infeasibility_measures: Sequence[float] | None = None,
         feasibility_statuses: Sequence[bool] | None = None,
         history: PerformanceHistory | None = None,
@@ -70,7 +70,7 @@ class TargetsGenerator:
         """Add a history of objective values.
 
         Args:
-            objective_values: A history of objective values.
+            performance_measures: A history of performance measures.
                 If ``None``, a performance history must be passed.
                 N.B. the value at index i is assumed to have been obtained with i+1
                 evaluations.
@@ -87,15 +87,15 @@ class TargetsGenerator:
                 passed, or if both are passed.
         """
         if history is not None:
-            if objective_values is not None:
+            if performance_measures is not None:
                 msg = "Both a performance history and objective values were passed."
                 raise ValueError(msg)
-        elif objective_values is None:
+        elif performance_measures is None:
             msg = "Either a performance history or objective values must be passed."
             raise ValueError(msg)
         else:
             history = PerformanceHistory(
-                objective_values, infeasibility_measures, feasibility_statuses
+                performance_measures, infeasibility_measures, feasibility_statuses
             )
         self.__histories.append(history)
 
@@ -105,7 +105,7 @@ class TargetsGenerator:
         budget_min: int = 1,
         feasible: bool = True,
         show: bool = False,
-        file_path: str | Path | None = None,
+        file_path: str | Path = "",
         best_target_objective: float | None = None,
         best_target_tolerance: float = 0.0,
     ) -> TargetValues:
@@ -122,7 +122,7 @@ class TargetsGenerator:
             feasible: Whether to generate only feasible targets.
             show: Whether to show the plot.
             file_path: The file path to save the plot.
-                If ``None``, the plot is not saved.
+                If empty, the plot is not saved.
             best_target_objective: The objective value of the best target value.
                 If ``None``, it will be inferred from the performance histories.
             best_target_tolerance: The relative tolerance for comparison with the
@@ -161,7 +161,7 @@ class TargetsGenerator:
         target_values.items = [median_history[item - 1] for item in budget_scale]
 
         # Plot the target values
-        if show or file_path is not None:
+        if show or file_path:
             target_values.plot(show, file_path)
 
         return target_values
@@ -264,7 +264,7 @@ class TargetsGenerator:
         if best_target_objective is None:
             best_item = min(history[-1] for history in reference_histories)
             best_target = TargetsGenerator.__get_best_target(
-                best_item.objective_value,
+                best_item.performance_measure,
                 best_item.infeasibility_measure,
                 best_target_tolerance,
             )
@@ -291,7 +291,7 @@ class TargetsGenerator:
         self,
         best_target_value: float | None = None,
         show: bool = False,
-        file_path: str | Path | None = None,
+        file_path: str | Path = "",
     ) -> Figure:
         """Plot the histories used as a basis to compute the target values.
 
@@ -301,7 +301,7 @@ class TargetsGenerator:
                 If ``None``, no best target value will be plotted.
             show: Whether to show the figure.
             file_path: The path where to save the figure.
-                If ``None``, the figure will not be saved.
+                If empty, the figure will not be saved.
 
         Returns:
             The histories figure.
@@ -328,7 +328,7 @@ class TargetsGenerator:
 
             axes.plot(
                 budgets,
-                [item.objective_value for item in items],
+                [item.performance_measure for item in items],
                 marker="o",
                 linestyle=":",
             )

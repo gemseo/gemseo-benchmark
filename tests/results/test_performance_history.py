@@ -22,6 +22,8 @@
 from __future__ import annotations
 
 import re
+from datetime import timedelta
+from math import isnan
 from pathlib import Path
 from unittest import mock
 
@@ -39,25 +41,45 @@ def test_invalid_init_lengths():
         ValueError,
         match=re.escape(
             "The performance history and the infeasibility history "
-            "must have same length."
+            "must have same length: 2 != 1."
         ),
     ):
         PerformanceHistory([3.0, 2.0], [1.0])
     with pytest.raises(
         ValueError,
         match=re.escape(
-            "The performance history and the feasibility history must have same length."
+            "The performance history and the feasibility history must have same length:"
+            " 2 != 1."
         ),
     ):
         PerformanceHistory([3.0, 2.0], feasibility_statuses=[False])
     with pytest.raises(
         ValueError,
         match=re.escape(
-            "The unsatisfied constraints history and the feasibility history"
-            " must have same length."
+            "The unsatisfied constraints history and the infeasibility history"
+            " must have same length: 1 != 2."
         ),
     ):
         PerformanceHistory([3.0, 2.0], [1.0, 0.0], n_unsatisfied_constraints=[1])
+
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "The performance history and the elasped time history "
+            "must have same length: 2 != 1."
+        ),
+    ):
+        PerformanceHistory([3.0, 2.0], elapsed_times=[timedelta(seconds=10)])
+
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "The performance history "
+            "and the number of discipline executions history "
+            "must have same length: 2 != 1."
+        ),
+    ):
+        PerformanceHistory([3.0, 2.0], number_of_discipline_executions=[10])
 
 
 def test_negative_infeasibility_measures():
@@ -129,44 +151,6 @@ def test_compute_cumulated_minimum(performance_history) -> None:
     assert cumulated_minimum[3] is not cumulated_minimum[4]
 
 
-history_1 = PerformanceHistory([1.0, -1.0, 0.0], [2.0, 0.0, 3.0])
-history_2 = PerformanceHistory([-2.0, -2.0, 2.0], [0.0, 3.0, 0.0])
-history_3 = PerformanceHistory([3.0, -3.0, 3.0], [0.0, 0.0, 0.0])
-
-
-def test_compute_minimum_history():
-    """Check the computation of the minimum history."""
-    items = [HistoryItem(-2.0, 0.0), HistoryItem(-3.0, 0.0), HistoryItem(2.0, 0.0)]
-    minimum = PerformanceHistory.compute_minimum_history([
-        history_1,
-        history_2,
-        history_3,
-    ])
-    assert minimum.items == items
-
-
-def test_compute_maximum_history():
-    """Check the computation of the maximum history."""
-    items = [HistoryItem(1.0, 2.0), HistoryItem(-2.0, 3.0), HistoryItem(0.0, 3.0)]
-    maximum = PerformanceHistory.compute_maximum_history([
-        history_1,
-        history_2,
-        history_3,
-    ])
-    assert maximum.items == items
-
-
-def test_compute_median_history():
-    """Check the computation of the median history."""
-    items = [HistoryItem(3.0, 0.0), HistoryItem(-1.0, 0.0), HistoryItem(3.0, 0.0)]
-    median = PerformanceHistory.compute_median_history([
-        history_1,
-        history_2,
-        history_3,
-    ])
-    assert median.items == items
-
-
 def test_remove_leading_infeasible(performance_history):
     """Check the removal of the leading infeasible items in a performance history."""
     truncation = performance_history.remove_leading_infeasible()
@@ -215,6 +199,19 @@ def test_to_file(tmp_path):
     assert contents == reference[:-1]  # disregard last line break
 
 
+def test_to_file_empty(tmp_path):
+    """Check the writing of an empty performance history into a file."""
+    file_path = tmp_path / "history.json"
+    PerformanceHistory().to_file(file_path)
+    with file_path.open("r") as file:
+        assert (
+            file.read()
+            == """{
+  "history_items": []
+}"""
+        )
+
+
 def test_from_file():
     """Check the initialization of a performance history from a file."""
     reference_path = Path(__file__).parent / "reference_history.json"
@@ -230,21 +227,12 @@ def test_from_file():
     }
     assert history.doe_size == 7
     assert history.total_time == 123.45
-    assert history.items[0].objective_value == -2.0
+    assert history.items[0].performance_measure == -2.0
     assert history.items[0].infeasibility_measure == 1.0
     assert history.items[0].n_unsatisfied_constraints == 1
-    assert history.items[1].objective_value == -3.0
+    assert history.items[1].performance_measure == -3.0
     assert history.items[1].infeasibility_measure == 0.0
     assert history.items[1].n_unsatisfied_constraints == 0
-
-
-def test_history_items_setter():
-    """Check the setting of history items."""
-    history = PerformanceHistory()
-    with pytest.raises(
-        TypeError, match=re.escape("History items must be of type HistoryItem.")
-    ):
-        history.items = [1.0, 2.0]
 
 
 def test_repr():
@@ -257,7 +245,7 @@ def test_from_problem(minimization_problem, database):
     """Check the creation of a performance history out of a solved problem."""
     minimization_problem.database = database
     history = PerformanceHistory.from_problem(minimization_problem, "problem")
-    assert history.objective_values == [2.0]
+    assert history.performance_measures == [2.0]
     assert history.infeasibility_measures == [1.0]
     assert history.n_unsatisfied_constraints == [1]
 
@@ -325,5 +313,41 @@ def test_switch_performance_measure_sign() -> None:
     """Check the switch of sign of the performance measure."""
     history = PerformanceHistory([1, 2], [3, 4])
     history.switch_performance_measure_sign()
-    assert history.objective_values == [-1, -2]
+    assert history.performance_measures == [-1, -2]
     assert history.infeasibility_measures == [3, 4]
+
+
+def test_spread_over_timeline() -> None:
+    """Check the spreading of a performance history over a timeline."""
+    history = PerformanceHistory(
+        [1, 2, 3], elapsed_times=[timedelta(seconds=seconds) for seconds in (2, 4, 6)]
+    ).spread_over_timeline([timedelta(seconds=seconds) for seconds in range(1, 10)], 4)
+    assert isnan(history[0].performance_measure)
+    assert history.n_unsatisfied_constraints == [4] + [0] * 8
+    assert history[0].elapsed_time == timedelta(seconds=1)
+    assert [
+        (item.performance_measure, item.n_unsatisfied_constraints, item.elapsed_time)
+        for item in history.items[1:]
+    ] == [(1, 0, timedelta(seconds=seconds)) for seconds in range(2, 4)] + [
+        (2, 0, timedelta(seconds=seconds)) for seconds in range(4, 6)
+    ] + [(3, 0, timedelta(seconds=seconds)) for seconds in range(6, 10)]
+
+
+def test_spread_over_numbers_of_discipline_executions() -> None:
+    """Check the spreading of a performance history over a numbers of executions."""
+    history = PerformanceHistory(
+        [1, 2, 3], number_of_discipline_executions=[2, 4, 6]
+    ).spread_over_numbers_of_discipline_executions(range(1, 10), 4)
+    assert isnan(history[0].performance_measure)
+    assert history.n_unsatisfied_constraints == [4] + [0] * 8
+    assert history[0].number_of_discipline_executions == 1
+    assert [
+        (
+            item.performance_measure,
+            item.n_unsatisfied_constraints,
+            item.number_of_discipline_executions,
+        )
+        for item in history.items[1:]
+    ] == [(1, 0, executions) for executions in range(2, 4)] + [
+        (2, 0, executions) for executions in range(4, 6)
+    ] + [(3, 0, executions) for executions in range(6, 10)]

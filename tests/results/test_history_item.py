@@ -21,6 +21,7 @@
 
 from __future__ import annotations
 
+import datetime
 import re
 
 import pytest
@@ -95,6 +96,9 @@ def test_copy() -> None:
     item = HistoryItem(1, 2, 3)
     copy = item.copy()
     assert copy == item
+    assert copy.n_unsatisfied_constraints == item.n_unsatisfied_constraints
+    assert copy.elapsed_time == item.elapsed_time
+    assert copy.number_of_discipline_executions == item.number_of_discipline_executions
     assert copy is not item
 
 
@@ -102,6 +106,58 @@ def test_switch_performance_measure_sign() -> None:
     """Check the switch of sign of the performance measure."""
     item = HistoryItem(1, 2, 3)
     item.switch_performance_measure_sign()
-    assert item.objective_value == -1
+    assert item.performance_measure == -1
     assert item.infeasibility_measure == 2
     assert item.n_unsatisfied_constraints == 3
+
+
+@pytest.mark.parametrize("n_unsatisfied_constraints", [None, 3])
+def test_to_dict(n_unsatisfied_constraints) -> None:
+    """Check the export to dictionary."""
+    reference = {
+        "performance measure": 1,
+        "infeasibility measure": 2,
+        "number of discipline executions": 0,
+    }
+    if n_unsatisfied_constraints is not None:
+        reference["number of unsatisfied constraints"] = n_unsatisfied_constraints
+
+    reference["elapsed time"] = 0
+    assert HistoryItem(1, 2, n_unsatisfied_constraints).to_dict() == reference
+
+
+@pytest.mark.parametrize("n_unsatisfied_constraints", [None, 3])
+@pytest.mark.parametrize("elapsed_time", [None, 10])
+def test_from_dict(n_unsatisfied_constraints, elapsed_time) -> None:
+    """Check the creation from a dictionary."""
+    data = {"performance measure": 1, "infeasibility measure": 2}
+    if n_unsatisfied_constraints is not None:
+        data["number of unsatisfied constraints"] = n_unsatisfied_constraints
+
+    if elapsed_time is not None:
+        data["elapsed time"] = elapsed_time
+
+    item = HistoryItem.from_dict(data)
+    assert item.performance_measure == 1
+    assert item.infeasibility_measure == 2
+    assert item.n_unsatisfied_constraints == n_unsatisfied_constraints
+    if elapsed_time is None:
+        assert item.elapsed_time.total_seconds() == 0
+    else:
+        assert item.elapsed_time.total_seconds() == elapsed_time
+
+
+def test_set_elapsed_time() -> None:
+    """Check the setting of the elapsed time."""
+    item = HistoryItem(1, 2, 3)
+    assert item.elapsed_time == datetime.timedelta(seconds=0)
+    item.elapsed_time = datetime.timedelta(seconds=10)
+    assert item.elapsed_time == datetime.timedelta(seconds=10)
+
+
+def test_set_number_of_discipline_executions() -> None:
+    """Check the setting of the number of discipline executions."""
+    item = HistoryItem(1, 2, 3)
+    assert item.number_of_discipline_executions == 0
+    item.number_of_discipline_executions = 1
+    assert item.number_of_discipline_executions == 1
