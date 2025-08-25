@@ -309,7 +309,7 @@ tqdm==4.67.1
     # via
     #   gemseo
     #   mkdocs-gallery
-typing-extensions==4.14.1
+typing-extensions==4.15.0
     # via
     #   fieldz
     #   gemseo
