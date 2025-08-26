@@ -55,7 +55,7 @@ ghp-import==2.1.0
     # via mkdocs
 graphviz==0.21
     # via gemseo
-griffe==1.12.1
+griffe==1.13.0
     # via
     #   griffe-fieldz
     #   griffe-inherited-docstrings
@@ -127,7 +127,7 @@ mkdocs==1.6.1
     #   mkdocs-material
     #   mkdocs-section-index
     #   mkdocstrings
-mkdocs-autorefs==1.4.2
+mkdocs-autorefs==1.4.3
     # via
     #   mkdocstrings
     #   mkdocstrings-python
@@ -155,7 +155,7 @@ mkdocstrings==0.30.0
     # via
     #   gemseo-benchmark (pyproject.toml:doc)
     #   mkdocstrings-python
-mkdocstrings-python==1.17.0
+mkdocstrings-python==1.18.0
     # via mkdocstrings
 mpmath==1.3.0
     # via sympy
@@ -203,7 +203,7 @@ pillow==11.2.1
     # via
     #   gemseo
     #   matplotlib
-platformdirs==4.3.8
+platformdirs==4.4.0
     # via
     #   black
     #   mkdocs-get-deps
