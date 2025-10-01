@@ -22,8 +22,6 @@
 from __future__ import annotations
 
 import logging
-from concurrent.futures import Executor
-from concurrent.futures import Future
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import as_completed
@@ -37,6 +35,8 @@ from gemseo_benchmark.results.results import Results
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
+    from concurrent.futures import Executor
+    from concurrent.futures import Future
     from pathlib import Path
 
     from gemseo_benchmark.algorithms.algorithms_configurations import (

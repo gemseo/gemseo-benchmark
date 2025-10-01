@@ -18,7 +18,6 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 from typing import Any
-from typing import Callable
 from unittest import mock
 
 import matplotlib.pyplot
@@ -30,6 +29,7 @@ from numpy.testing import assert_equal
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from collections.abc import Mapping
 
     from gemseo.algos.design_space import DesignSpace

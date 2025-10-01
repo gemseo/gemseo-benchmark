@@ -18,12 +18,9 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from collections.abc import Iterable
-from collections.abc import Mapping
 from copy import deepcopy
 from typing import TYPE_CHECKING
 from typing import Any
-from typing import Callable
-from typing import Union
 
 from gemseo import compute_doe
 from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
@@ -37,6 +34,8 @@ from gemseo_benchmark.data_profiles.data_profile import DataProfile
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+    from collections.abc import Mapping
     from pathlib import Path
 
     from gemseo.algos.design_space import DesignSpace
@@ -52,7 +51,7 @@ if TYPE_CHECKING:
     from gemseo_benchmark.report.axis_data import AbscissaData
     from gemseo_benchmark.results.results import Results
 
-InputStartingPointsType = Union[ndarray, Iterable[ndarray]]
+InputStartingPointsType = ndarray | Iterable[ndarray]
 
 
 class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):

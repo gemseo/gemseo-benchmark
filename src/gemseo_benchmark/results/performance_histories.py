@@ -19,7 +19,6 @@ from __future__ import annotations
 import collections.abc
 import statistics
 from typing import TYPE_CHECKING
-from typing import Callable
 
 import numpy
 from matplotlib.ticker import MaxNLocator
@@ -28,6 +27,7 @@ from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
     import datetime
+    from collections.abc import Callable
     from collections.abc import Mapping
 
     from matplotlib.axes import Axes
@@ -128,9 +128,10 @@ class PerformanceHistories(collections.abc.MutableSequence):
         history = PerformanceHistory()
         history.items = [
             statistic_computer(items)
-            for items in zip(*[
-                history.items for history in self.get_equal_size_histories()
-            ])
+            for items in zip(
+                *[history.items for history in self.get_equal_size_histories()],
+                strict=False,
+            )
         ]
         return history
 
@@ -277,12 +278,15 @@ class PerformanceHistories(collections.abc.MutableSequence):
         )
         # Reorder the legend
         axes.legend(
-            *zip(*[
-                list(zip(*axes.get_legend_handles_labels()))[
-                    index + legend_handles_offset
-                ]
-                for index in range(3 + plot_all_histories, -1, -1)
-            ])
+            *zip(
+                *[
+                    list(zip(*axes.get_legend_handles_labels(), strict=False))[
+                        index + legend_handles_offset
+                    ]
+                    for index in range(3 + plot_all_histories, -1, -1)
+                ],
+                strict=False,
+            )
         )
         axes.set_xlabel("Number of functions evaluations")
         axes.set_ylabel(y_label)

@@ -22,7 +22,6 @@
 from __future__ import annotations
 
 import collections.abc
-import datetime
 import json
 from copy import copy
 from datetime import timedelta
@@ -37,6 +36,7 @@ from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfigu
 from gemseo_benchmark.results.history_item import HistoryItem
 
 if TYPE_CHECKING:
+    import datetime
     from collections.abc import Iterable
     from collections.abc import Sequence
 

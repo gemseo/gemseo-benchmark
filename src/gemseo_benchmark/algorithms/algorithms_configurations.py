@@ -22,10 +22,13 @@
 from __future__ import annotations
 
 import bisect
-from collections.abc import Iterator
 from collections.abc import MutableSet
+from typing import TYPE_CHECKING
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 
 class AlgorithmsConfigurations(MutableSet[AlgorithmConfiguration]):

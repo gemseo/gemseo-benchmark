@@ -25,7 +25,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import ClassVar
 from typing import Final
-from typing import Union
 
 import matplotlib.pyplot
 import numpy
@@ -132,9 +131,7 @@ class Figures:
         PERFORMANCE_MEASURE = "performance_measure.png"
         PERFORMANCE_MEASURE_FOCUS = "performance_measure_focus.png"
 
-    ProblemFigurePaths = dict[
-        Union[_FigureFileName, str], Union[Path, dict[_FigureFileName, Path]]
-    ]
+    ProblemFigurePaths = dict[_FigureFileName | str, Path | dict[_FigureFileName, Path]]
     """The paths to the figures dedicated to a problem configuration."""
 
     class _TableFileName(enum.Enum):
@@ -144,9 +141,7 @@ class Figures:
         NUMBER_OF_UNSATISFIED_CONSTRAINTS = "number_of_unsatisfied_constraints.csv"
         PERFORMANCE_MEASURE = "performance_measure.csv"
 
-    ProblemTablePaths = dict[
-        Union[_TableFileName, str], Union[Path, dict[_TableFileName, Path]]
-    ]
+    ProblemTablePaths = dict[_TableFileName | str, Path | dict[_TableFileName, Path]]
     """The paths to the tables dedicated to a problem configuration."""
 
     def __init__(
@@ -525,6 +520,7 @@ class Figures:
             axes_array,
             (problem_configuration.abscissa_data_type, TimeAbscissaData),
             (use_abscissa_log_scale, use_time_log_scale),
+            strict=False,
         ):
             RangePlot(
                 self.__plot_settings,
@@ -671,6 +667,7 @@ class Figures:
             axes_array,
             (problem_configuration.abscissa_data_type, TimeAbscissaData),
             (use_abscissa_log_scale, use_time_log_scale),
+            strict=False,
         ):
             RangePlot(
                 self.__plot_settings,
@@ -740,6 +737,7 @@ class Figures:
             axes_array,
             (problem_configuration.abscissa_data_type, TimeAbscissaData),
             (use_abscissa_log_scale, use_time_log_scale),
+            strict=False,
         ):
             RangePlot(
                 self.__plot_settings,

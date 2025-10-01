@@ -28,7 +28,6 @@ import matplotlib.pyplot as plt
 from gemseo.utils.matplotlib_figure import save_show_figure
 from matplotlib.ticker import MaxNLocator
 from numpy import linspace
-from numpy import ndarray
 
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.results.history_item import HistoryItem
@@ -40,6 +39,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from matplotlib.figure import Figure
+    from numpy import ndarray
 
 
 class TargetsGenerator:
