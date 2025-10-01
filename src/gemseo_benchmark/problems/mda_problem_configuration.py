@@ -18,7 +18,6 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
-from typing import Callable
 from typing import ClassVar
 from typing import Final
 
@@ -33,6 +32,7 @@ from gemseo_benchmark.problems.base_problem_configuration import (
 from gemseo_benchmark.report.axis_data import DisciplineData
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from collections.abc import Mapping
 
     from gemseo.algos.design_space import DesignSpace

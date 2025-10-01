@@ -22,7 +22,6 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from typing import Callable
 from typing import ClassVar
 from typing import Final
 
@@ -34,11 +33,11 @@ from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
 from gemseo_benchmark.problems.base_problem_configuration import (
     BaseProblemConfiguration,
 )
-from gemseo_benchmark.problems.base_problem_configuration import InputStartingPointsType
 from gemseo_benchmark.report.axis_data import IterationData
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from collections.abc import Mapping
 
     from gemseo.algos.doe.base_doe_library import DriverLibraryOptionType
@@ -48,6 +47,9 @@ if TYPE_CHECKING:
         AlgorithmsConfigurations,
     )
     from gemseo_benchmark.data_profiles.target_values import TargetValues
+    from gemseo_benchmark.problems.base_problem_configuration import (
+        InputStartingPointsType,
+    )
 
 
 class OptimizationProblemConfiguration(BaseProblemConfiguration):

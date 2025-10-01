@@ -38,12 +38,10 @@ from gemseo.problems.optimization.rosenbrock import Rosenbrock
 from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 from gemseo.utils.testing.pytest_conftest import *  # noqa: F401,F403
 from numpy import array
-from numpy import ndarray
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.data_profiles.target_values import TargetValues
 from gemseo_benchmark.problems.mda_problem_configuration import MDAProblemConfiguration
-from gemseo_benchmark.problems.mda_problem_configuration import MDAProblemType
 from gemseo_benchmark.problems.mdo_problem_configuration import MDOProblemConfiguration
 from gemseo_benchmark.problems.optimization_problem_configuration import (
     OptimizationProblemConfiguration,
@@ -54,6 +52,9 @@ from gemseo_benchmark.results.performance_histories import PerformanceHistories
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
+    from numpy import ndarray
+
+    from gemseo_benchmark.problems.mda_problem_configuration import MDAProblemType
     from gemseo_benchmark.problems.mdo_problem_configuration import MDOProblemType
 
 design_variables = array([0.0, 1.0])

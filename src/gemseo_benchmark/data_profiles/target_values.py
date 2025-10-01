@@ -24,7 +24,6 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import TYPE_CHECKING
 
-import matplotlib
 import matplotlib.pyplot as plt
 from gemseo.utils.matplotlib_figure import save_show_figure
 from numpy import array
@@ -37,6 +36,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
     from pathlib import Path
 
+    import matplotlib
     from matplotlib.figure import Figure
 
 

@@ -21,7 +21,7 @@
 
 from __future__ import annotations
 
-from typing import Callable
+from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
@@ -56,6 +56,9 @@ from tests.problems.conftest import check_variable_space
 from tests.problems.conftest import check_worker_type
 from tests.problems.conftest import test_compute_data_profiles_parametrize
 from tests.problems.conftest import test_description_parametrize
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 @pytest.fixture(scope="module")

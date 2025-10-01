@@ -12,26 +12,33 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+from __future__ import annotations
 
 import datetime
 import logging
 from pathlib import Path
+from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
-from gemseo.core.base_factory import BaseFactory
-from gemseo.utils.timer import Timer
 from numpy.testing import assert_equal
 
-from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
-from gemseo_benchmark.benchmarker.base_worker import BaseWorker
-from gemseo_benchmark.benchmarker.base_worker import ProblemType
-from gemseo_benchmark.problems.base_problem_configuration import (
-    BaseProblemConfiguration,
-)
 from gemseo_benchmark.problems.optimization_problem_configuration import (
     OptimizationProblemConfiguration,
 )
+
+if TYPE_CHECKING:
+    from gemseo.core.base_factory import BaseFactory
+    from gemseo.utils.timer import Timer
+
+    from gemseo_benchmark.algorithms.algorithm_configuration import (
+        AlgorithmConfiguration,
+    )
+    from gemseo_benchmark.benchmarker.base_worker import BaseWorker
+    from gemseo_benchmark.benchmarker.base_worker import ProblemType
+    from gemseo_benchmark.problems.base_problem_configuration import (
+        BaseProblemConfiguration,
+    )
 
 
 def check_algorithm_factory(
