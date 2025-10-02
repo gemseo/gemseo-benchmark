@@ -18,9 +18,7 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-import matplotlib
 import matplotlib.pyplot
-import matplotlib.testing
 import pytest
 from matplotlib.testing.decorators import image_comparison
 
