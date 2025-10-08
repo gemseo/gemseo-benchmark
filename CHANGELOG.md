@@ -26,10 +26,19 @@ The format is based on
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-# Version 4.0.0 (August 2025)
+# Unreleased
 
 ## Added
 
+- Support for Python 3.13.
+
+### Removed
+
+- Support for Python 3.9.
+
+# Version 4.0.0 (August 2025)
+
+## Added
 
 ### Problems
 
@@ -62,25 +71,25 @@ and this project adheres to
 
 ## Changed
 
-* The phrasing "problem configuration" is now used instead of "benchmarking problem".
+- The phrasing "problem configuration" is now used instead of "benchmarking problem".
   Thus the two main types of inputs to be defined by the user
   are *algorithm* configurations and *problem* configurations.
 
 #### Problems
 
-* The class to implement optimization benchmarking problems is now called
+- The class to implement optimization benchmarking problems is now called
   ``OptimizationBenchmarkingProblem`` (rather than ``Problem`` formerly).
 
 #### Benchmarker
 
-* Argument ``databases_path`` of ``Benchmarker.__init__`` is renamed into ``hdf_path``
+- Argument ``databases_path`` of ``Benchmarker.__init__`` is renamed into ``hdf_path``
   as the saved files could represent caches rather than databases.
-* Arguments ``problems`` and ``algorithm`` of ``Benchmarker.execute`` are renamed into
+- Arguments ``problems`` and ``algorithm`` of ``Benchmarker.execute`` are renamed into
   ``problem_configurations`` and ``algorithm_configurations``
   to avoid confusion with optimization problems and algorithm names respectively.
-* Argument ``number_of_processes`` of ``Benchmarker.execute`` is renamed into
+- Argument ``number_of_processes`` of ``Benchmarker.execute`` is renamed into
   ``n_processes`` for consistency with GEMSEO.
-* The stopping criteria of the algorithms are no longer automatically disabled.
+- The stopping criteria of the algorithms are no longer automatically disabled.
   The user is now free to disable (or not) the stopping criteria of their choice
   in the options of the algorithm configurations.
 
@@ -95,7 +104,7 @@ and this project adheres to
 
 ### Scenario
 
-* Argument ``number_of_processes`` of ``Scenario.execute`` is renamed into
+- Argument ``number_of_processes`` of ``Scenario.execute`` is renamed into
   ``n_processes`` for consistency with GEMSEO.
 
 ## Fixed
@@ -128,8 +137,9 @@ and this project adheres to
 
 #### Problems
 
-* Method ``Problem.plot_histories`` was removed as it was redundant with ``Figures.plot``.
+- Method ``Problem.plot_histories`` was removed as it was redundant with ``Figures.plot``.
   To obtain a figure similar to the one formerly returned by
+
   ```python
   problem.plot_histories(
     algos_configurations,
@@ -144,7 +154,9 @@ and this project adheres to
     use_log_scale
   )
   ```
+
   one can make the following call instead:
+
   ```python
   Figures(
     algos_configurations,
@@ -157,12 +169,15 @@ and this project adheres to
   ).plot(plot_all_histories, use_log_scale, False, False, False)
   ```
 
-* Method ``Problem.compute_performance`` was removed as is was redundant with ``PerformanceHistory.from_problem``.
+- Method ``Problem.compute_performance`` was removed as is was redundant with ``PerformanceHistory.from_problem``.
   To obtain values similar to the former
+
   ```python
   objective_values, infeasibility_measures, feasibility_statuses = Problem.compute_performance(problem)
   ```
+
   one can use the following instructions instead:
+
   ```python
   performance_history = PerformanceHistory.from_problem(problem)
   objective_values = performance_history.objective_values
@@ -172,10 +187,11 @@ and this project adheres to
 
 ### Results
 
-* Methods ``PerformanceHistories.plot_algorithm_histories``
+- Methods ``PerformanceHistories.plot_algorithm_histories``
   and ``PerformanceHistory.plot`` were removed
   as they were redundant with ``Figures.plot``.
   To obtain a figure similar to the one formerly returned by
+
   ```python
   performance_histories.plot_algorithm_histories(
     axes,
@@ -188,7 +204,9 @@ and this project adheres to
     markevery
   )
   ```
+
   one can use the following instructions instead:
+
   ```python
   results = Results()
   for index, performance_history in enumerate(performance_histories):
