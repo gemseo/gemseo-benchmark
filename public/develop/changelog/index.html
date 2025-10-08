@@ -1848,8 +1848,17 @@ Changelog titles are:
 <a href="https://keepachangelog.com/en/1.0.0">Keep a Changelog</a>
 and this project adheres to
 <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
-<h1 id="version-400-august-2025">Version 4.0.0 (August 2025)<a class="headerlink" href="#version-400-august-2025" title="Permanent link">&para;</a></h1>
+<h1 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h1>
 <h2 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Support for Python 3.13.</li>
+</ul>
+<h3 id="removed">Removed<a class="headerlink" href="#removed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Support for Python 3.9.</li>
+</ul>
+<h1 id="version-400-august-2025">Version 4.0.0 (August 2025)<a class="headerlink" href="#version-400-august-2025" title="Permanent link">&para;</a></h1>
+<h2 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h2>
 <h3 id="problems">Problems<a class="headerlink" href="#problems" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Multidisciplinary analysis problem configurations
@@ -1942,13 +1951,13 @@ and this project adheres to
 <li>An algorithm configuration can now belong to several groups
   of algorithm configurations.</li>
 </ul>
-<h3 id="removed">Removed<a class="headerlink" href="#removed" title="Permanent link">&para;</a></h3>
+<h3 id="removed_1">Removed<a class="headerlink" href="#removed_1" title="Permanent link">&para;</a></h3>
 <h4 id="problems_2">Problems<a class="headerlink" href="#problems_2" title="Permanent link">&para;</a></h4>
 <ul>
-<li>
-<p>Method <code>Problem.plot_histories</code> was removed as it was redundant with <code>Figures.plot</code>.
-  To obtain a figure similar to the one formerly returned by
-  <div class="highlight"><pre><span></span><code><span class="n">problem</span><span class="o">.</span><span class="n">plot_histories</span><span class="p">(</span>
+<li>Method <code>Problem.plot_histories</code> was removed as it was redundant with <code>Figures.plot</code>.
+  To obtain a figure similar to the one formerly returned by</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">problem</span><span class="o">.</span><span class="n">plot_histories</span><span class="p">(</span>
   <span class="n">algos_configurations</span><span class="p">,</span>
   <span class="n">results</span><span class="p">,</span>
   <span class="kc">False</span><span class="p">,</span>
@@ -1961,8 +1970,8 @@ and this project adheres to
   <span class="n">use_log_scale</span>
 <span class="p">)</span>
 </code></pre></div>
-  one can make the following call instead:
-  <div class="highlight"><pre><span></span><code><span class="n">Figures</span><span class="p">(</span>
+<p>one can make the following call instead:</p>
+<div class="highlight"><pre><span></span><code><span class="n">Figures</span><span class="p">(</span>
   <span class="n">algos_configurations</span><span class="p">,</span>
   <span class="n">ProblemsGroup</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">[</span><span class="n">problem</span><span class="p">]),</span>
   <span class="n">results</span><span class="p">,</span>
@@ -1971,28 +1980,27 @@ and this project adheres to
   <span class="n">max_eval_number</span><span class="p">,</span>
   <span class="p">{</span><span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="n">alpha</span><span class="p">,</span> <span class="s2">&quot;markevery&quot;</span><span class="p">:</span> <span class="n">markevery</span><span class="p">}</span>
 <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">plot_all_histories</span><span class="p">,</span> <span class="n">use_log_scale</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-</code></pre></div></p>
-</li>
-<li>
-<p>Method <code>Problem.compute_performance</code> was removed as is was redundant with <code>PerformanceHistory.from_problem</code>.
-  To obtain values similar to the former
-  <div class="highlight"><pre><span></span><code><span class="n">objective_values</span><span class="p">,</span> <span class="n">infeasibility_measures</span><span class="p">,</span> <span class="n">feasibility_statuses</span> <span class="o">=</span> <span class="n">Problem</span><span class="o">.</span><span class="n">compute_performance</span><span class="p">(</span><span class="n">problem</span><span class="p">)</span>
 </code></pre></div>
-  one can use the following instructions instead:
-  <div class="highlight"><pre><span></span><code><span class="n">performance_history</span> <span class="o">=</span> <span class="n">PerformanceHistory</span><span class="o">.</span><span class="n">from_problem</span><span class="p">(</span><span class="n">problem</span><span class="p">)</span>
+<ul>
+<li>Method <code>Problem.compute_performance</code> was removed as is was redundant with <code>PerformanceHistory.from_problem</code>.
+  To obtain values similar to the former</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">objective_values</span><span class="p">,</span> <span class="n">infeasibility_measures</span><span class="p">,</span> <span class="n">feasibility_statuses</span> <span class="o">=</span> <span class="n">Problem</span><span class="o">.</span><span class="n">compute_performance</span><span class="p">(</span><span class="n">problem</span><span class="p">)</span>
+</code></pre></div>
+<p>one can use the following instructions instead:</p>
+<div class="highlight"><pre><span></span><code><span class="n">performance_history</span> <span class="o">=</span> <span class="n">PerformanceHistory</span><span class="o">.</span><span class="n">from_problem</span><span class="p">(</span><span class="n">problem</span><span class="p">)</span>
 <span class="n">objective_values</span> <span class="o">=</span> <span class="n">performance_history</span><span class="o">.</span><span class="n">objective_values</span>
 <span class="n">infeasibility_measures</span> <span class="o">=</span> <span class="n">performance_history</span><span class="o">.</span><span class="n">infeasibility_measures</span>
 <span class="n">feasibility_statuses</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">is_feasible</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">performance_history</span><span class="p">]</span>
-</code></pre></div></p>
-</li>
-</ul>
+</code></pre></div>
 <h3 id="results_1">Results<a class="headerlink" href="#results_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Methods <code>PerformanceHistories.plot_algorithm_histories</code>
   and <code>PerformanceHistory.plot</code> were removed
   as they were redundant with <code>Figures.plot</code>.
-  To obtain a figure similar to the one formerly returned by
-  <div class="highlight"><pre><span></span><code><span class="n">performance_histories</span><span class="o">.</span><span class="n">plot_algorithm_histories</span><span class="p">(</span>
+  To obtain a figure similar to the one formerly returned by</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">performance_histories</span><span class="o">.</span><span class="n">plot_algorithm_histories</span><span class="p">(</span>
   <span class="n">axes</span><span class="p">,</span>
   <span class="n">algorithm_name</span><span class="p">,</span>
   <span class="n">max_feasible_objective</span><span class="p">,</span>
@@ -2003,8 +2011,8 @@ and this project adheres to
   <span class="n">markevery</span>
 <span class="p">)</span>
 </code></pre></div>
-  one can use the following instructions instead:
-  <div class="highlight"><pre><span></span><code><span class="n">results</span> <span class="o">=</span> <span class="n">Results</span><span class="p">()</span>
+<p>one can use the following instructions instead:</p>
+<div class="highlight"><pre><span></span><code><span class="n">results</span> <span class="o">=</span> <span class="n">Results</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">performance_history</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">performance_histories</span><span class="p">):</span>
   <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">.json&quot;</span>
   <span class="n">performance_history</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
@@ -2019,10 +2027,9 @@ and this project adheres to
   <span class="mi">0</span><span class="p">,</span>
   <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span> <span class="s2">&quot;marker&quot;</span><span class="p">:</span> <span class="n">marker</span><span class="p">,</span> <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="n">alpha</span><span class="p">,</span> <span class="s2">&quot;markevery&quot;</span><span class="p">:</span> <span class="n">markevery</span><span class="p">}</span>
 <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">plot_all</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-</code></pre></div></li>
-</ul>
+</code></pre></div>
 <h2 id="version-300-november-2024">Version 3.0.0 (November 2024)<a class="headerlink" href="#version-300-november-2024" title="Permanent link">&para;</a></h2>
-<h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
+<h3 id="added_2">Added<a class="headerlink" href="#added_2" title="Permanent link">&para;</a></h3>
 <h4 id="benchmarker_2">Benchmarker<a class="headerlink" href="#benchmarker_2" title="Permanent link">&para;</a></h4>
 <ul>
 <li>The option <code>log_gemseo_to_file</code> has been added to <code>Benchmarker.execute</code>
@@ -2074,7 +2081,7 @@ and this project adheres to
   The user can still set the value of <code>PerformanceHistory.doe_size</code>
   by themselves since it is a public attribute.</li>
 </ul>
-<h3 id="added_2">Added<a class="headerlink" href="#added_2" title="Permanent link">&para;</a></h3>
+<h3 id="added_3">Added<a class="headerlink" href="#added_3" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Support for Python 3.11.</li>
 </ul>
@@ -2087,12 +2094,12 @@ and this project adheres to
 <ul>
 <li>One can get the path to a performance history file with <code>Benchmarker.get_history_path</code>.</li>
 </ul>
-<h3 id="removed_1">Removed<a class="headerlink" href="#removed_1" title="Permanent link">&para;</a></h3>
+<h3 id="removed_2">Removed<a class="headerlink" href="#removed_2" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Support for Python 3.8.</li>
 </ul>
 <h2 id="version-110-september-2023">Version 1.1.0 (September 2023)<a class="headerlink" href="#version-110-september-2023" title="Permanent link">&para;</a></h2>
-<h3 id="added_3">Added<a class="headerlink" href="#added_3" title="Permanent link">&para;</a></h3>
+<h3 id="added_4">Added<a class="headerlink" href="#added_4" title="Permanent link">&para;</a></h3>
 <h4 id="results_4">Results<a class="headerlink" href="#results_4" title="Permanent link">&para;</a></h4>
 <ul>
 <li>The names of functions and the number of variables are stored in the
