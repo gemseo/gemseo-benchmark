@@ -26,13 +26,13 @@ The format is based on
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-# Unreleased
+# Version 4.0.1 (October 2025)
 
 ## Added
 
 - Support for Python 3.13.
 
-### Removed
+## Removed
 
 - Support for Python 3.9.
 
