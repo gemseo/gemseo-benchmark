@@ -23,9 +23,8 @@ from __future__ import annotations
 
 import datetime
 from typing import Final
-from typing import Union
 
-HistoryItemDict = dict[str, Union[int, float, datetime.timedelta]]
+HistoryItemDict = dict[str, int | float | datetime.timedelta]
 
 
 class HistoryItem:

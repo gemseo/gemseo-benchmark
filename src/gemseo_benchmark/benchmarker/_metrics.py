@@ -19,7 +19,6 @@ from __future__ import annotations
 import datetime
 from abc import abstractmethod
 from typing import TYPE_CHECKING
-from typing import Union
 
 from gemseo import configure
 from gemseo.mda.base_mda_solver import BaseMDASolver
@@ -32,7 +31,7 @@ if TYPE_CHECKING:
     from gemseo.core.discipline.discipline import Discipline
     from gemseo.utils.timer import Timer
 
-MetricsDataType = Union[RealArray, BaseMDASolver]
+MetricsDataType = RealArray | BaseMDASolver
 
 
 class BaseMetrics(metaclass=ABCGoogleDocstringInheritanceMeta):

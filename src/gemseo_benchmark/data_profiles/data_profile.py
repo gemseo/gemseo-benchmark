@@ -29,11 +29,8 @@ from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 from gemseo.utils.matplotlib_figure import save_show_figure
 from numpy import array
 from numpy import linspace
-from numpy import ndarray
 from numpy import zeros
 
-from gemseo_benchmark import ConfigurationPlotOptions
-from gemseo_benchmark import MarkeveryType
 from gemseo_benchmark import _get_configuration_plot_options
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
@@ -45,7 +42,10 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from matplotlib.figure import Figure
+    from numpy import ndarray
 
+    from gemseo_benchmark import ConfigurationPlotOptions
+    from gemseo_benchmark import MarkeveryType
     from gemseo_benchmark.data_profiles.target_values import TargetValues
 
 

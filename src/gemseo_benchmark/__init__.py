@@ -25,7 +25,6 @@ import itertools
 import re
 from collections.abc import Mapping
 from typing import TYPE_CHECKING
-from typing import Union
 
 import matplotlib
 
@@ -33,9 +32,9 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from collections.abc import Iterator
 
-MarkeveryType = Union[
-    int, tuple[int, int], slice, list[int], float, tuple[float, float], list[bool], None
-]
+MarkeveryType = (
+    int | tuple[int] | slice | list[int] | float | tuple[float] | list[bool] | None
+)
 # The colors cycle for the plots
 COLORS_CYCLE = matplotlib.rcParams["axes.prop_cycle"].by_key()["color"]
 # The markers for the plots
@@ -97,6 +96,7 @@ def _get_configuration_plot_options(
                 if option_name not in options[configuration_name]
             ),
             __DEFAULT_OPTIONS[option_name](),
+            strict=False,
         ):
             options[configuration_name][option_name] = default_value
 

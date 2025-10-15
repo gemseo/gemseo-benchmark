@@ -21,15 +21,18 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable
 from collections.abc import MutableMapping
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Any
-from typing import Callable
 from typing import Final
 
 from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 from gemseo.utils.string_tools import pretty_repr
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 InstanceAlgorithmOptions = MutableMapping[str, Callable[[int], Any]]
 

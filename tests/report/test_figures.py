@@ -15,11 +15,13 @@
 
 """Tests for the figures of the report."""
 
+from __future__ import annotations
+
 import logging
 import re
 import shutil
-from collections.abc import Mapping
 from pathlib import Path
+from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
@@ -30,6 +32,9 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
 )
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.report._figures import Figures
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 
 @pytest.fixture
