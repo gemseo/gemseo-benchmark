@@ -121,7 +121,7 @@ For example, we define below problem configurations based on
 -   5 starting points are computed by Latin hypercube sampling (LHS),
 
     ```python
-    doe_settings = {"doe_size": 5, "doe_algo_name": "lhs"}
+    doe_settings = {"doe_size": 5, "doe_algo_name": "LHS"}
     ```
 
 -   and the target values are passed directly as an exponential scale
