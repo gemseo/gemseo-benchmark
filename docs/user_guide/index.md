@@ -95,7 +95,7 @@ The [gemseo_benchmark.problems][gemseo_benchmark.problems]
 sub-package handles the problem configurations, on which the performances
 of the algorithms configurations is to be measured.
 
-A [OptimizationBenchmarkingProblem][gemseo_benchmark.problems.optimization_benchmarking_problem.OptimizationBenchmarkingProblem] contains the mathematical
+A [OptimizationProblemConfiguration][gemseo_benchmark.problems.optimization_problem_configuration.OptimizationProblemConfiguration] contains the mathematical
 definition of the problem, as an [OptimizationProblem][gemseo.algos.optimization_problem.OptimizationProblem], and requires three other features.
 
 1.  The starting points, from which the algorithms configurations should
@@ -135,7 +135,7 @@ For example, we define below problem configurations based on
 presented [further down](#target-values).)
 
 ```python
-rastrigin = OptimizationBenchmarkingProblem(
+rastrigin = OptimizationProblemConfiguration(
     "Rastrigin",
     Rastrigin,
     target_values=target_values,
@@ -143,7 +143,7 @@ rastrigin = OptimizationBenchmarkingProblem(
     optimum=0.0,
 )
 
-rosenbrock = OptimizationBenchmarkingProblem(
+rosenbrock = OptimizationProblemConfiguration(
     "Rosenbrock",
     Rosenbrock,
     target_values=target_values,
@@ -152,12 +152,12 @@ rosenbrock = OptimizationBenchmarkingProblem(
 )
 ```
 
-Note that the second argument of [OptimizationBenchmarkingProblem][gemseo_benchmark.problems.optimization_benchmarking_problem.OptimizationBenchmarkingProblem] must be callable.
+Note that the second argument of [OptimizationProblemConfiguration][gemseo_benchmark.problems.optimization_problem_configuration.OptimizationProblemConfiguration] must be callable.
 For example, a five-variables
 problem configuration based on [Rosenbrock][gemseo.problems.optimization.rosenbrock.Rosenbrock] may be defined as follows.
 
 ```python
-rosenbrock_5d = OptimizationBenchmarkingProblem(
+rosenbrock_5d = OptimizationProblemConfiguration(
     "Rosenbrock 5D",
     lambda: Rosenbrock(5),
     target_values=target_values,
