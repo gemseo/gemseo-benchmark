@@ -157,9 +157,12 @@ For example, a five-variables
 problem configuration based on [Rosenbrock][gemseo.problems.optimization.rosenbrock.Rosenbrock] may be defined as follows.
 
 ```python
+def create_problem():
+    return Rosenbrock(5)
+
 rosenbrock_5d = OptimizationProblemConfiguration(
     "Rosenbrock 5D",
-    lambda: Rosenbrock(5),
+    create_problem,
     target_values=target_values,
     **doe_settings,
     optimum=0.0,
