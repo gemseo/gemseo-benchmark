@@ -2479,9 +2479,12 @@ presented <a href="#target-values">further down</a>.)</p>
 <p>Note that the second argument of <a class="autorefs autorefs-internal" title="            OptimizationProblemConfiguration" href="../reference/gemseo_benchmark/problems/optimization_problem_configuration/#gemseo_benchmark.problems.optimization_problem_configuration.OptimizationProblemConfiguration">OptimizationProblemConfiguration</a> must be callable.
 For example, a five-variables
 problem configuration based on <a class="autorefs autorefs-external" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.problems.optimization.rosenbrock.html#gemseo.problems.optimization.rosenbrock.Rosenbrock">Rosenbrock</a> may be defined as follows.</p>
-<div class="highlight"><pre><span></span><code><span class="n">rosenbrock_5d</span> <span class="o">=</span> <span class="n">OptimizationProblemConfiguration</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_problem</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">Rosenbrock</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="n">rosenbrock_5d</span> <span class="o">=</span> <span class="n">OptimizationProblemConfiguration</span><span class="p">(</span>
     <span class="s2">&quot;Rosenbrock 5D&quot;</span><span class="p">,</span>
-    <span class="k">lambda</span><span class="p">:</span> <span class="n">Rosenbrock</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span>
+    <span class="n">create_problem</span><span class="p">,</span>
     <span class="n">target_values</span><span class="o">=</span><span class="n">target_values</span><span class="p">,</span>
     <span class="o">**</span><span class="n">doe_settings</span><span class="p">,</span>
     <span class="n">optimum</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
