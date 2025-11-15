@@ -8,7 +8,7 @@ babel==2.17.0
     # via
     #   mkdocs-material
     #   sphinx
-backrefs==6.0.1
+backrefs==6.1
     # via mkdocs-material
 black==25.11.0
     # via gemseo-benchmark (pyproject.toml:doc)
@@ -18,7 +18,7 @@ certifi==2025.11.12
     # via requests
 charset-normalizer==3.4.4
     # via requests
-click==8.3.0
+click==8.3.1
     # via
     #   black
     #   mkdocs
