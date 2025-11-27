@@ -2566,11 +2566,11 @@
 
 <a href="#gemseo_benchmark.results.history_item.HistoryItem" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">HistoryItem</span><span class="p">(</span>
-    <span class="n">performance_measure</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">,</span>
-    <span class="n">infeasibility_measure</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">,</span>
-    <span class="n">n_unsatisfied_constraints</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">elapsed_time</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="datetime.timedelta" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta">timedelta</a></span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="datetime.timedelta" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta">timedelta</a></span><span class="p">(),</span>
-    <span class="n">number_of_discipline_executions</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">performance_measure</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span>
+    <span class="n">infeasibility_measure</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span>
+    <span class="n">n_unsatisfied_constraints</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">elapsed_time</span><span class="p">:</span> <span class="n"><span title="datetime.timedelta">timedelta</span></span> <span class="o">=</span> <span class="n"><span title="datetime.timedelta">timedelta</span></span><span class="p">(),</span>
+    <span class="n">number_of_discipline_executions</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -2586,7 +2586,7 @@
     <ul>
         <li class="doc-section-item field-body">
             <b><code>performance_measure</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>)
+              (<code><span title="float">float</span></code>)
           –
           <div class="doc-md-description">
             <p>The performance measure of the item.</p>
@@ -2594,7 +2594,7 @@
         </li>
         <li class="doc-section-item field-body">
             <b><code>infeasibility_measure</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>)
+              (<code><span title="float">float</span></code>)
           –
           <div class="doc-md-description">
             <p>The infeasibility measure of the item.</p>
@@ -2602,7 +2602,7 @@
         </li>
         <li class="doc-section-item field-body">
             <b><code>n_unsatisfied_constraints</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | None</code>, default:
+              (<code><span title="int">int</span> | None</code>, default:
                   <code>None</code>
 )
           –
@@ -2615,8 +2615,8 @@ and if the infeasibility measure is positive it will be set to None.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>elapsed_time</code></b>
-              (<code><a class="autorefs autorefs-external" title="datetime.timedelta" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta">timedelta</a></code>, default:
-                  <code><a class="autorefs autorefs-external" title="datetime.timedelta" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta">timedelta</a>()</code>
+              (<code><span title="datetime.timedelta">timedelta</span></code>, default:
+                  <code><span title="datetime.timedelta">timedelta</span>()</code>
 )
           –
           <div class="doc-md-description">
@@ -2719,7 +2719,7 @@ and if the infeasibility measure is positive it will be set to None.</p>
   </span>
 
 <a href="#gemseo_benchmark.results.history_item.HistoryItem.elapsed_time" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">elapsed_time</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="datetime.timedelta" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta">timedelta</a></span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">elapsed_time</span><span class="p">:</span> <span class="n"><span title="datetime.timedelta">timedelta</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2743,7 +2743,7 @@ and if the infeasibility measure is positive it will be set to None.</p>
   </span>
 
 <a href="#gemseo_benchmark.results.history_item.HistoryItem.infeasibility_measure" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">infeasibility_measure</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">infeasibility_measure</span><span class="p">:</span> <span class="n"><span title="float">float</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2754,7 +2754,7 @@ and if the infeasibility measure is positive it will be set to None.</p>
 <p><span class="doc-section-title">Raises:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+              <code><span title="ValueError">ValueError</span></code>
             –
           <div class="doc-md-description">
             <p>If the infeasibility measure is negative.</p>
@@ -2779,7 +2779,7 @@ and if the infeasibility measure is positive it will be set to None.</p>
   </span>
 
 <a href="#gemseo_benchmark.results.history_item.HistoryItem.is_feasible" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">is_feasible</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">is_feasible</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2803,7 +2803,7 @@ and if the infeasibility measure is positive it will be set to None.</p>
   </span>
 
 <a href="#gemseo_benchmark.results.history_item.HistoryItem.n_unsatisfied_constraints" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">n_unsatisfied_constraints</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">|</span> <span class="kc">None</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">n_unsatisfied_constraints</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2828,7 +2828,7 @@ and if the infeasibility measure is positive it will be set to None.</p>
   </span>
 
 <a href="#gemseo_benchmark.results.history_item.HistoryItem.number_of_discipline_executions" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">number_of_discipline_executions</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">number_of_discipline_executions</span><span class="p">:</span> <span class="n"><span title="int">int</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2852,7 +2852,7 @@ and if the infeasibility measure is positive it will be set to None.</p>
   </span>
 
 <a href="#gemseo_benchmark.results.history_item.HistoryItem.performance_measure" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">performance_measure</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">performance_measure</span><span class="p">:</span> <span class="n"><span title="float">float</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2875,7 +2875,7 @@ and if the infeasibility measure is positive it will be set to None.</p>
 
 <a href="#gemseo_benchmark.results.history_item.HistoryItem.apply_infeasibility_tolerance" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">apply_infeasibility_tolerance</span><span class="p">(</span>
-    <span class="n">infeasibility_tolerance</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">,</span>
+    <span class="n">infeasibility_tolerance</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
@@ -2890,7 +2890,7 @@ tolerance.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>infeasibility_tolerance</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>)
+              (<code><span title="float">float</span></code>)
           –
           <div class="doc-md-description">
             <p>the tolerance on the infeasibility measure.</p>

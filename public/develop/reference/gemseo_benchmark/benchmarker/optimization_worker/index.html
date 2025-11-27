@@ -2376,7 +2376,7 @@
   </span>
 
 <a href="#gemseo_benchmark.benchmarker.optimization_worker.OptimizationWorker.check_algorithm_availability" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">check_algorithm_availability</span><span class="p">(</span><span class="n">algorithm_name</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">check_algorithm_availability</span><span class="p">(</span><span class="n">algorithm_name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2388,7 +2388,7 @@
     <ul>
         <li class="doc-section-item field-body">
             <b><code>algorithm_name</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
+              (<code><span title="str">str</span></code>)
           –
           <div class="doc-md-description">
             <p>The name of the algorithm.</p>
@@ -2400,7 +2400,7 @@
 <p><span class="doc-section-title">Raises:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+              <code><span title="ValueError">ValueError</span></code>
             –
           <div class="doc-md-description">
             <p>If the algorithm is not available.</p>
@@ -2457,12 +2457,12 @@
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">execute</span><span class="p">(</span>
     <span class="n">algorithm_configuration</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            AlgorithmConfiguration (gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration)" href="../../algorithms/algorithm_configuration/#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration">AlgorithmConfiguration</a></span><span class="p">,</span>
     <span class="n">problem_configuration</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            BaseProblemConfiguration (gemseo_benchmark.problems.base_problem_configuration.BaseProblemConfiguration)" href="../../problems/base_problem_configuration/#gemseo_benchmark.problems.base_problem_configuration.BaseProblemConfiguration">BaseProblemConfiguration</a></span><span class="p">,</span>
-    <span class="n">starting_point</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></span><span class="p">,</span>
-    <span class="n">gemseo_log_message</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span>
-    <span class="n">log_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">performance_history_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span><span class="p">,</span>
-    <span class="n">hdf_file_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">benchmarking_logger</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="logging.Logger" href="https://docs.python.org/3/library/logging.html#logging.Logger">Logger</a></span><span class="p">,</span>
+    <span class="n">starting_point</span><span class="p">:</span> <span class="n"><span title="gemseo.typing.RealArray">RealArray</span></span><span class="p">,</span>
+    <span class="n">gemseo_log_message</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span>
+    <span class="n">log_path</span><span class="p">:</span> <span class="n"><span title="pathlib.Path">Path</span></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">performance_history_path</span><span class="p">:</span> <span class="n"><span title="pathlib.Path">Path</span></span><span class="p">,</span>
+    <span class="n">hdf_file_path</span><span class="p">:</span> <span class="n"><span title="pathlib.Path">Path</span></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">benchmarking_logger</span><span class="p">:</span> <span class="n"><span title="logging.Logger">Logger</span></span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
@@ -2491,7 +2491,7 @@
         </li>
         <li class="doc-section-item field-body">
             <b><code>starting_point</code></b>
-              (<code><a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></code>)
+              (<code><span title="gemseo.typing.RealArray">RealArray</span></code>)
           –
           <div class="doc-md-description">
             <p>The starting point of the algorithm.</p>
@@ -2499,7 +2499,7 @@
         </li>
         <li class="doc-section-item field-body">
             <b><code>gemseo_log_message</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
+              (<code><span title="str">str</span></code>)
           –
           <div class="doc-md-description">
             <p>The message to log before benchmarking.</p>
@@ -2507,7 +2507,7 @@
         </li>
         <li class="doc-section-item field-body">
             <b><code>log_path</code></b>
-              (<code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>)
+              (<code><span title="pathlib.Path">Path</span> | None</code>)
           –
           <div class="doc-md-description">
             <p>The file path to save the log.
@@ -2516,7 +2516,7 @@ If <code>None</code>, the log is not saved.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>performance_history_path</code></b>
-              (<code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>)
+              (<code><span title="pathlib.Path">Path</span></code>)
           –
           <div class="doc-md-description">
             <p>The file path to save the performance history.</p>
@@ -2524,7 +2524,7 @@ If <code>None</code>, the log is not saved.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>hdf_file_path</code></b>
-              (<code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>)
+              (<code><span title="pathlib.Path">Path</span> | None</code>)
           –
           <div class="doc-md-description">
             <p>The HDF file path.
@@ -2533,7 +2533,7 @@ If <code>None</code>, no HDF file will be written.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>benchmarking_logger</code></b>
-              (<code><a class="autorefs autorefs-external" title="logging.Logger" href="https://docs.python.org/3/library/logging.html#logging.Logger">Logger</a></code>)
+              (<code><span title="logging.Logger">Logger</span></code>)
           –
           <div class="doc-md-description">
             <p>The benchmarking logger.</p>

@@ -2312,10 +2312,10 @@
 
 <a href="#gemseo_benchmark.report.range_plot.RangePlot" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">RangePlot</span><span class="p">(</span>
-    <span class="n">plot_kwargs</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><span title="gemseo_benchmark.ConfigurationPlotOptions">ConfigurationPlotOptions</span></span><span class="p">],</span>
-    <span class="n">grid_kwargs</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">],</span>
-    <span class="n">alpha</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">,</span>
-    <span class="n">matplotlib_log_scale</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span>
+    <span class="n">plot_kwargs</span><span class="p">:</span> <span class="n"><span title="collections.abc.Mapping">Mapping</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="gemseo_benchmark.ConfigurationPlotOptions">ConfigurationPlotOptions</span></span><span class="p">],</span>
+    <span class="n">grid_kwargs</span><span class="p">:</span> <span class="n"><span title="collections.abc.Mapping">Mapping</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="str">str</span></span><span class="p">],</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span>
+    <span class="n">matplotlib_log_scale</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -2348,7 +2348,7 @@ for each algorithm configuration.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>alpha</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>)
+              (<code><span title="float">float</span></code>)
           –
           <div class="doc-md-description">
             <p>The opacity level for overlapping areas.
@@ -2357,7 +2357,7 @@ for each algorithm configuration.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>matplotlib_log_scale</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
+              (<code><span title="str">str</span></code>)
           –
           <div class="doc-md-description">
             <p>The Matplotlib value for logarithmic scale.</p>
@@ -2447,18 +2447,18 @@ for each algorithm configuration.</p>
 
 <a href="#gemseo_benchmark.report.range_plot.RangePlot.plot" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">plot</span><span class="p">(</span>
-    <span class="n">axes</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></span><span class="p">,</span>
-    <span class="n">performance_histories</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span>
+    <span class="n">axes</span><span class="p">:</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span><span class="p">,</span>
+    <span class="n">performance_histories</span><span class="p">:</span> <span class="n"><span title="collections.abc.Mapping">Mapping</span></span><span class="p">[</span>
         <span class="n"><a class="autorefs autorefs-internal" title="            AlgorithmConfiguration (gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration)" href="../../algorithms/algorithm_configuration/#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration">AlgorithmConfiguration</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            PerformanceHistories (gemseo_benchmark.results.performance_histories.PerformanceHistories)" href="../../results/performance_histories/#gemseo_benchmark.results.performance_histories.PerformanceHistories">PerformanceHistories</a></span>
     <span class="p">],</span>
     <span class="n">ordinate_data</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            OrdinateData (gemseo_benchmark.report.axis_data.OrdinateData)" href="../axis_data/#gemseo_benchmark.report.axis_data.OrdinateData">OrdinateData</a></span><span class="p">,</span>
     <span class="n">abscissa_data</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            AbscissaData (gemseo_benchmark.report.axis_data.AbscissaData)" href="../axis_data/#gemseo_benchmark.report.axis_data.AbscissaData">AbscissaData</a></span><span class="p">,</span>
-    <span class="n">infinity_replacement</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">,</span>
-    <span class="n">plot_only_median</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span><span class="p">,</span>
-    <span class="n">plot_all_histories</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span><span class="p">,</span>
-    <span class="n">data_is_minimized</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span><span class="p">,</span>
-    <span class="n">nan_replacement</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">,</span>
-    <span class="n">use_ordinate_log_scale</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span><span class="p">,</span>
+    <span class="n">infinity_replacement</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span>
+    <span class="n">plot_only_median</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span><span class="p">,</span>
+    <span class="n">plot_all_histories</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span><span class="p">,</span>
+    <span class="n">data_is_minimized</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span><span class="p">,</span>
+    <span class="n">nan_replacement</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span>
+    <span class="n">use_ordinate_log_scale</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
@@ -2471,7 +2471,7 @@ for each algorithm configuration.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>axes</code></b>
-              (<code><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></code>)
+              (<code><span title="matplotlib.axes.Axes">Axes</span></code>)
           –
           <div class="doc-md-description">
             <p>The axes of the plot.</p>
@@ -2479,7 +2479,7 @@ for each algorithm configuration.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>performance_histories</code></b>
-              (<code><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a>[<a class="autorefs autorefs-internal" title="            AlgorithmConfiguration (gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration)" href="../../algorithms/algorithm_configuration/#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration">AlgorithmConfiguration</a>, <a class="autorefs autorefs-internal" title="            PerformanceHistories (gemseo_benchmark.results.performance_histories.PerformanceHistories)" href="../../results/performance_histories/#gemseo_benchmark.results.performance_histories.PerformanceHistories">PerformanceHistories</a>]</code>)
+              (<code><span title="collections.abc.Mapping">Mapping</span>[<a class="autorefs autorefs-internal" title="            AlgorithmConfiguration (gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration)" href="../../algorithms/algorithm_configuration/#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration">AlgorithmConfiguration</a>, <a class="autorefs autorefs-internal" title="            PerformanceHistories (gemseo_benchmark.results.performance_histories.PerformanceHistories)" href="../../results/performance_histories/#gemseo_benchmark.results.performance_histories.PerformanceHistories">PerformanceHistories</a>]</code>)
           –
           <div class="doc-md-description">
             <p>The performance histories
@@ -2504,7 +2504,7 @@ of algorithm configurations.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>infinity_replacement</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>)
+              (<code><span title="float">float</span></code>)
           –
           <div class="doc-md-description">
             <p>The finite substitute value for infinite ordinates
@@ -2513,7 +2513,7 @@ to enable <code>matplotlib.axes.Axes.fill_between</code>.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>plot_only_median</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>)
+              (<code><span title="bool">bool</span></code>)
           –
           <div class="doc-md-description">
             <p>Whether to plot only the median and no other centile.</p>
@@ -2521,7 +2521,7 @@ to enable <code>matplotlib.axes.Axes.fill_between</code>.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>plot_all_histories</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>)
+              (<code><span title="bool">bool</span></code>)
           –
           <div class="doc-md-description">
             <p>Whether to plot all the performance histories.</p>
@@ -2529,7 +2529,7 @@ to enable <code>matplotlib.axes.Axes.fill_between</code>.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>data_is_minimized</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>)
+              (<code><span title="bool">bool</span></code>)
           –
           <div class="doc-md-description">
             <p>Whether the data is minimized (rather than maximized).</p>
@@ -2537,7 +2537,7 @@ to enable <code>matplotlib.axes.Axes.fill_between</code>.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>nan_replacement</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>)
+              (<code><span title="float">float</span></code>)
           –
           <div class="doc-md-description">
             <p>The value to replace NaN history entries
@@ -2546,7 +2546,7 @@ to enable the computation of centiles.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>use_ordinate_log_scale</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>)
+              (<code><span title="bool">bool</span></code>)
           –
           <div class="doc-md-description">
             <p>Whether to use a logarithmic scale

@@ -3770,9 +3770,9 @@
 
 <a href="#gemseo_benchmark.report.axis_data.AbscissaData" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">AbscissaData</span><span class="p">(</span>
-    <span class="n">axes</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></span><span class="p">,</span>
-    <span class="n">number_of_scalar_constraints</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span><span class="p">,</span>
-    <span class="n">use_log_scale</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span><span class="p">,</span>
+    <span class="n">axes</span><span class="p">:</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span><span class="p">,</span>
+    <span class="n">number_of_scalar_constraints</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span>
+    <span class="n">use_log_scale</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -3790,7 +3790,7 @@
     <ul>
         <li class="doc-section-item field-body">
             <b><code>axes</code></b>
-              (<code><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></code>)
+              (<code><span title="matplotlib.axes.Axes">Axes</span></code>)
           –
           <div class="doc-md-description">
             <p>The axes of the plot.</p>
@@ -3798,7 +3798,7 @@
         </li>
         <li class="doc-section-item field-body">
             <b><code>number_of_scalar_constraints</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>)
+              (<code><span title="int">int</span></code>)
           –
           <div class="doc-md-description">
             <p>The number of scalar constraints
@@ -3807,7 +3807,7 @@ of the underlying problem.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>use_log_scale</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>)
+              (<code><span title="bool">bool</span></code>)
           –
           <div class="doc-md-description">
             <p>Whether to use a logarithmic scale for the axis.</p>
@@ -3889,8 +3889,8 @@ of the underlying problem.</p>
   </span>
 
 <a href="#gemseo_benchmark.report.axis_data.AbscissaData.time_tick_formatter" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span><span class="p">(</span>
-    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">(</span><span class="n"><a class="autorefs autorefs-external" title="datetime.timedelta" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta">timedelta</a></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span> <span class="o">=</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta">timedelta</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -3919,7 +3919,7 @@ of the underlying problem.</p>
 <a href="#gemseo_benchmark.report.axis_data.AbscissaData.get" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">get</span><span class="p">(</span>
     <span class="n">performance_histories</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            PerformanceHistories (gemseo_benchmark.results.performance_histories.PerformanceHistories)" href="../../results/performance_histories/#gemseo_benchmark.results.performance_histories.PerformanceHistories">PerformanceHistories</a></span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.IntegerArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.IntegerArray">IntegerArray</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="gemseo.typing.IntegerArray">IntegerArray</span></span> <span class="o">|</span> <span class="n"><span title="gemseo.typing.RealArray">RealArray</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3943,7 +3943,7 @@ of the underlying problem.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="gemseo.typing.IntegerArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.IntegerArray">IntegerArray</a> | <a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></code>
+              <code><span title="gemseo.typing.IntegerArray">IntegerArray</span> | <span title="gemseo.typing.RealArray">RealArray</span></code>
           –
           <div class="doc-md-description">
             <p>The axis data.</p>
@@ -4039,7 +4039,7 @@ of the underlying problem.</p>
 
 
 <a href="#gemseo_benchmark.report.axis_data.AxisData" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">AxisData</span><span class="p">(</span><span class="n">axes</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">AxisData</span><span class="p">(</span><span class="n">axes</span><span class="p">:</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4054,7 +4054,7 @@ of the underlying problem.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>axes</code></b>
-              (<code><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></code>)
+              (<code><span title="matplotlib.axes.Axes">Axes</span></code>)
           –
           <div class="doc-md-description">
             <p>The axes of the plot.</p>
@@ -4108,8 +4108,8 @@ of the underlying problem.</p>
   </span>
 
 <a href="#gemseo_benchmark.report.axis_data.AxisData.time_tick_formatter" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span><span class="p">(</span>
-    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">(</span><span class="n"><a class="autorefs autorefs-external" title="datetime.timedelta" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta">timedelta</a></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span> <span class="o">=</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta">timedelta</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -4138,7 +4138,7 @@ of the underlying problem.</p>
 <a href="#gemseo_benchmark.report.axis_data.AxisData.get" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">get</span><span class="p">(</span>
     <span class="n">performance_histories</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            PerformanceHistories (gemseo_benchmark.results.performance_histories.PerformanceHistories)" href="../../results/performance_histories/#gemseo_benchmark.results.performance_histories.PerformanceHistories">PerformanceHistories</a></span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.IntegerArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.IntegerArray">IntegerArray</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="gemseo.typing.IntegerArray">IntegerArray</span></span> <span class="o">|</span> <span class="n"><span title="gemseo.typing.RealArray">RealArray</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4162,7 +4162,7 @@ of the underlying problem.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="gemseo.typing.IntegerArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.IntegerArray">IntegerArray</a> | <a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></code>
+              <code><span title="gemseo.typing.IntegerArray">IntegerArray</span> | <span title="gemseo.typing.RealArray">RealArray</span></code>
           –
           <div class="doc-md-description">
             <p>The axis data.</p>
@@ -4219,7 +4219,7 @@ of the underlying problem.</p>
 
 
 <a href="#gemseo_benchmark.report.axis_data.ConstraintData" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ConstraintData</span><span class="p">(</span><span class="n">axes</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ConstraintData</span><span class="p">(</span><span class="n">axes</span><span class="p">:</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4236,7 +4236,7 @@ of the underlying problem.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>axes</code></b>
-              (<code><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></code>)
+              (<code><span title="matplotlib.axes.Axes">Axes</span></code>)
           –
           <div class="doc-md-description">
             <p>The axes of the plot.</p>
@@ -4284,8 +4284,8 @@ of the underlying problem.</p>
   </span>
 
 <a href="#gemseo_benchmark.report.axis_data.ConstraintData.time_tick_formatter" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span><span class="p">(</span>
-    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">(</span><span class="n"><a class="autorefs autorefs-external" title="datetime.timedelta" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta">timedelta</a></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span> <span class="o">=</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta">timedelta</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -4310,7 +4310,7 @@ of the underlying problem.</p>
 <a href="#gemseo_benchmark.report.axis_data.ConstraintData.get" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">get</span><span class="p">(</span>
     <span class="n">performance_histories</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            PerformanceHistories (gemseo_benchmark.results.performance_histories.PerformanceHistories)" href="../../results/performance_histories/#gemseo_benchmark.results.performance_histories.PerformanceHistories">PerformanceHistories</a></span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.IntegerArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.IntegerArray">IntegerArray</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="gemseo.typing.IntegerArray">IntegerArray</span></span> <span class="o">|</span> <span class="n"><span title="gemseo.typing.RealArray">RealArray</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4334,7 +4334,7 @@ of the underlying problem.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="gemseo.typing.IntegerArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.IntegerArray">IntegerArray</a> | <a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></code>
+              <code><span title="gemseo.typing.IntegerArray">IntegerArray</span> | <span title="gemseo.typing.RealArray">RealArray</span></code>
           –
           <div class="doc-md-description">
             <p>The axis data.</p>
@@ -4382,9 +4382,9 @@ of the underlying problem.</p>
 
 <a href="#gemseo_benchmark.report.axis_data.DisciplineData" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">DisciplineData</span><span class="p">(</span>
-    <span class="n">axes</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></span><span class="p">,</span>
-    <span class="n">number_of_scalar_constraints</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span><span class="p">,</span>
-    <span class="n">use_log_scale</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span><span class="p">,</span>
+    <span class="n">axes</span><span class="p">:</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span><span class="p">,</span>
+    <span class="n">number_of_scalar_constraints</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span>
+    <span class="n">use_log_scale</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -4402,7 +4402,7 @@ of the underlying problem.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>axes</code></b>
-              (<code><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></code>)
+              (<code><span title="matplotlib.axes.Axes">Axes</span></code>)
           –
           <div class="doc-md-description">
             <p>The axes of the plot.</p>
@@ -4410,7 +4410,7 @@ of the underlying problem.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>number_of_scalar_constraints</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>)
+              (<code><span title="int">int</span></code>)
           –
           <div class="doc-md-description">
             <p>The number of scalar constraints
@@ -4419,7 +4419,7 @@ of the underlying problem.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>use_log_scale</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>)
+              (<code><span title="bool">bool</span></code>)
           –
           <div class="doc-md-description">
             <p>Whether to use a logarithmic scale for the axis.</p>
@@ -4501,8 +4501,8 @@ of the underlying problem.</p>
   </span>
 
 <a href="#gemseo_benchmark.report.axis_data.DisciplineData.time_tick_formatter" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span><span class="p">(</span>
-    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">(</span><span class="n"><a class="autorefs autorefs-external" title="datetime.timedelta" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta">timedelta</a></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span> <span class="o">=</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta">timedelta</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -4527,7 +4527,7 @@ of the underlying problem.</p>
 <a href="#gemseo_benchmark.report.axis_data.DisciplineData.get" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">get</span><span class="p">(</span>
     <span class="n">performance_histories</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            PerformanceHistories (gemseo_benchmark.results.performance_histories.PerformanceHistories)" href="../../results/performance_histories/#gemseo_benchmark.results.performance_histories.PerformanceHistories">PerformanceHistories</a></span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.IntegerArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.IntegerArray">IntegerArray</a></span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="gemseo.typing.IntegerArray">IntegerArray</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4551,7 +4551,7 @@ of the underlying problem.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="gemseo.typing.IntegerArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.IntegerArray">IntegerArray</a></code>
+              <code><span title="gemseo.typing.IntegerArray">IntegerArray</span></code>
           –
           <div class="doc-md-description">
             <p>The axis data.</p>
@@ -4638,7 +4638,7 @@ of the underlying problem.</p>
 
 
 <a href="#gemseo_benchmark.report.axis_data.InfeasibilityData" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">InfeasibilityData</span><span class="p">(</span><span class="n">axes</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">InfeasibilityData</span><span class="p">(</span><span class="n">axes</span><span class="p">:</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4655,7 +4655,7 @@ of the underlying problem.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>axes</code></b>
-              (<code><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></code>)
+              (<code><span title="matplotlib.axes.Axes">Axes</span></code>)
           –
           <div class="doc-md-description">
             <p>The axes of the plot.</p>
@@ -4703,8 +4703,8 @@ of the underlying problem.</p>
   </span>
 
 <a href="#gemseo_benchmark.report.axis_data.InfeasibilityData.time_tick_formatter" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span><span class="p">(</span>
-    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">(</span><span class="n"><a class="autorefs autorefs-external" title="datetime.timedelta" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta">timedelta</a></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span> <span class="o">=</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta">timedelta</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -4729,7 +4729,7 @@ of the underlying problem.</p>
 <a href="#gemseo_benchmark.report.axis_data.InfeasibilityData.get" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">get</span><span class="p">(</span>
     <span class="n">performance_histories</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            PerformanceHistories (gemseo_benchmark.results.performance_histories.PerformanceHistories)" href="../../results/performance_histories/#gemseo_benchmark.results.performance_histories.PerformanceHistories">PerformanceHistories</a></span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.IntegerArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.IntegerArray">IntegerArray</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="gemseo.typing.IntegerArray">IntegerArray</span></span> <span class="o">|</span> <span class="n"><span title="gemseo.typing.RealArray">RealArray</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4753,7 +4753,7 @@ of the underlying problem.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="gemseo.typing.IntegerArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.IntegerArray">IntegerArray</a> | <a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></code>
+              <code><span title="gemseo.typing.IntegerArray">IntegerArray</span> | <span title="gemseo.typing.RealArray">RealArray</span></code>
           –
           <div class="doc-md-description">
             <p>The axis data.</p>
@@ -4801,9 +4801,9 @@ of the underlying problem.</p>
 
 <a href="#gemseo_benchmark.report.axis_data.IterationData" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">IterationData</span><span class="p">(</span>
-    <span class="n">axes</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></span><span class="p">,</span>
-    <span class="n">number_of_scalar_constraints</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span><span class="p">,</span>
-    <span class="n">use_log_scale</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span><span class="p">,</span>
+    <span class="n">axes</span><span class="p">:</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span><span class="p">,</span>
+    <span class="n">number_of_scalar_constraints</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span>
+    <span class="n">use_log_scale</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -4821,7 +4821,7 @@ of the underlying problem.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>axes</code></b>
-              (<code><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></code>)
+              (<code><span title="matplotlib.axes.Axes">Axes</span></code>)
           –
           <div class="doc-md-description">
             <p>The axes of the plot.</p>
@@ -4829,7 +4829,7 @@ of the underlying problem.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>number_of_scalar_constraints</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>)
+              (<code><span title="int">int</span></code>)
           –
           <div class="doc-md-description">
             <p>The number of scalar constraints
@@ -4838,7 +4838,7 @@ of the underlying problem.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>use_log_scale</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>)
+              (<code><span title="bool">bool</span></code>)
           –
           <div class="doc-md-description">
             <p>Whether to use a logarithmic scale for the axis.</p>
@@ -4920,8 +4920,8 @@ of the underlying problem.</p>
   </span>
 
 <a href="#gemseo_benchmark.report.axis_data.IterationData.time_tick_formatter" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span><span class="p">(</span>
-    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">(</span><span class="n"><a class="autorefs autorefs-external" title="datetime.timedelta" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta">timedelta</a></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span> <span class="o">=</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta">timedelta</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -4946,7 +4946,7 @@ of the underlying problem.</p>
 <a href="#gemseo_benchmark.report.axis_data.IterationData.get" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">get</span><span class="p">(</span>
     <span class="n">performance_histories</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            PerformanceHistories (gemseo_benchmark.results.performance_histories.PerformanceHistories)" href="../../results/performance_histories/#gemseo_benchmark.results.performance_histories.PerformanceHistories">PerformanceHistories</a></span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.IntegerArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.IntegerArray">IntegerArray</a></span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="gemseo.typing.IntegerArray">IntegerArray</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4970,7 +4970,7 @@ of the underlying problem.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="gemseo.typing.IntegerArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.IntegerArray">IntegerArray</a></code>
+              <code><span title="gemseo.typing.IntegerArray">IntegerArray</span></code>
           –
           <div class="doc-md-description">
             <p>The axis data.</p>
@@ -5053,7 +5053,7 @@ of the underlying problem.</p>
 
 
 <a href="#gemseo_benchmark.report.axis_data.OrdinateData" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">OrdinateData</span><span class="p">(</span><span class="n">axes</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">OrdinateData</span><span class="p">(</span><span class="n">axes</span><span class="p">:</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -5070,7 +5070,7 @@ of the underlying problem.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>axes</code></b>
-              (<code><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></code>)
+              (<code><span title="matplotlib.axes.Axes">Axes</span></code>)
           –
           <div class="doc-md-description">
             <p>The axes of the plot.</p>
@@ -5118,8 +5118,8 @@ of the underlying problem.</p>
   </span>
 
 <a href="#gemseo_benchmark.report.axis_data.OrdinateData.time_tick_formatter" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span><span class="p">(</span>
-    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">(</span><span class="n"><a class="autorefs autorefs-external" title="datetime.timedelta" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta">timedelta</a></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span> <span class="o">=</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta">timedelta</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -5144,7 +5144,7 @@ of the underlying problem.</p>
 <a href="#gemseo_benchmark.report.axis_data.OrdinateData.get" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">get</span><span class="p">(</span>
     <span class="n">performance_histories</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            PerformanceHistories (gemseo_benchmark.results.performance_histories.PerformanceHistories)" href="../../results/performance_histories/#gemseo_benchmark.results.performance_histories.PerformanceHistories">PerformanceHistories</a></span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.IntegerArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.IntegerArray">IntegerArray</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="gemseo.typing.IntegerArray">IntegerArray</span></span> <span class="o">|</span> <span class="n"><span title="gemseo.typing.RealArray">RealArray</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -5168,7 +5168,7 @@ of the underlying problem.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="gemseo.typing.IntegerArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.IntegerArray">IntegerArray</a> | <a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></code>
+              <code><span title="gemseo.typing.IntegerArray">IntegerArray</span> | <span title="gemseo.typing.RealArray">RealArray</span></code>
           –
           <div class="doc-md-description">
             <p>The axis data.</p>
@@ -5216,9 +5216,9 @@ of the underlying problem.</p>
 
 <a href="#gemseo_benchmark.report.axis_data.PerformanceData" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">PerformanceData</span><span class="p">(</span>
-    <span class="n">axes</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></span><span class="p">,</span>
-    <span class="n">infeasible_performance_measure</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">,</span>
-    <span class="n">label</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span>
+    <span class="n">axes</span><span class="p">:</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span><span class="p">,</span>
+    <span class="n">infeasible_performance_measure</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span>
+    <span class="n">label</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -5236,7 +5236,7 @@ of the underlying problem.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>axes</code></b>
-              (<code><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></code>)
+              (<code><span title="matplotlib.axes.Axes">Axes</span></code>)
           –
           <div class="doc-md-description">
             <p>The axes of the plot.</p>
@@ -5244,7 +5244,7 @@ of the underlying problem.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>infeasible_performance_measure</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>)
+              (<code><span title="float">float</span></code>)
           –
           <div class="doc-md-description">
             <p>The performance measure
@@ -5253,7 +5253,7 @@ for infeasible history items.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>label</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
+              (<code><span title="str">str</span></code>)
           –
           <div class="doc-md-description">
             <p>The description is missing.</p>
@@ -5323,8 +5323,8 @@ for infeasible history items.</p>
   </span>
 
 <a href="#gemseo_benchmark.report.axis_data.PerformanceData.time_tick_formatter" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span><span class="p">(</span>
-    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">(</span><span class="n"><a class="autorefs autorefs-external" title="datetime.timedelta" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta">timedelta</a></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span> <span class="o">=</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta">timedelta</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -5349,7 +5349,7 @@ for infeasible history items.</p>
 <a href="#gemseo_benchmark.report.axis_data.PerformanceData.get" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">get</span><span class="p">(</span>
     <span class="n">performance_histories</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            PerformanceHistories (gemseo_benchmark.results.performance_histories.PerformanceHistories)" href="../../results/performance_histories/#gemseo_benchmark.results.performance_histories.PerformanceHistories">PerformanceHistories</a></span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.IntegerArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.IntegerArray">IntegerArray</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="gemseo.typing.IntegerArray">IntegerArray</span></span> <span class="o">|</span> <span class="n"><span title="gemseo.typing.RealArray">RealArray</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -5373,7 +5373,7 @@ for infeasible history items.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="gemseo.typing.IntegerArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.IntegerArray">IntegerArray</a> | <a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></code>
+              <code><span title="gemseo.typing.IntegerArray">IntegerArray</span> | <span title="gemseo.typing.RealArray">RealArray</span></code>
           –
           <div class="doc-md-description">
             <p>The axis data.</p>
@@ -5421,9 +5421,9 @@ for infeasible history items.</p>
 
 <a href="#gemseo_benchmark.report.axis_data.TimeAbscissaData" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">TimeAbscissaData</span><span class="p">(</span>
-    <span class="n">axes</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></span><span class="p">,</span>
-    <span class="n">number_of_scalar_constraints</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span><span class="p">,</span>
-    <span class="n">use_log_scale</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span><span class="p">,</span>
+    <span class="n">axes</span><span class="p">:</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span><span class="p">,</span>
+    <span class="n">number_of_scalar_constraints</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span>
+    <span class="n">use_log_scale</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -5441,7 +5441,7 @@ for infeasible history items.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>axes</code></b>
-              (<code><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></code>)
+              (<code><span title="matplotlib.axes.Axes">Axes</span></code>)
           –
           <div class="doc-md-description">
             <p>The axes of the plot.</p>
@@ -5449,7 +5449,7 @@ for infeasible history items.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>number_of_scalar_constraints</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>)
+              (<code><span title="int">int</span></code>)
           –
           <div class="doc-md-description">
             <p>The number of scalar constraints
@@ -5458,7 +5458,7 @@ of the underlying problem.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>use_log_scale</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>)
+              (<code><span title="bool">bool</span></code>)
           –
           <div class="doc-md-description">
             <p>Whether to use a logarithmic scale for the axis.</p>
@@ -5540,8 +5540,8 @@ of the underlying problem.</p>
   </span>
 
 <a href="#gemseo_benchmark.report.axis_data.TimeAbscissaData.time_tick_formatter" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span><span class="p">(</span>
-    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">(</span><span class="n"><a class="autorefs autorefs-external" title="datetime.timedelta" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta">timedelta</a></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span> <span class="o">=</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta">timedelta</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -5566,7 +5566,7 @@ of the underlying problem.</p>
 <a href="#gemseo_benchmark.report.axis_data.TimeAbscissaData.get" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">get</span><span class="p">(</span>
     <span class="n">performance_histories</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            PerformanceHistories (gemseo_benchmark.results.performance_histories.PerformanceHistories)" href="../../results/performance_histories/#gemseo_benchmark.results.performance_histories.PerformanceHistories">PerformanceHistories</a></span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="gemseo.typing.RealArray">RealArray</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -5590,7 +5590,7 @@ of the underlying problem.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></code>
+              <code><span title="gemseo.typing.RealArray">RealArray</span></code>
           –
           <div class="doc-md-description">
             <p>The axis data.</p>
@@ -5681,7 +5681,7 @@ of the underlying problem.</p>
 
 
 <a href="#gemseo_benchmark.report.axis_data.TimeOrdinateData" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">TimeOrdinateData</span><span class="p">(</span><span class="n">axes</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">TimeOrdinateData</span><span class="p">(</span><span class="n">axes</span><span class="p">:</span> <span class="n"><span title="matplotlib.axes.Axes">Axes</span></span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -5698,7 +5698,7 @@ of the underlying problem.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>axes</code></b>
-              (<code><a class="autorefs autorefs-external" title="matplotlib.axes.Axes" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes">Axes</a></code>)
+              (<code><span title="matplotlib.axes.Axes">Axes</span></code>)
           –
           <div class="doc-md-description">
             <p>The axes of the plot.</p>
@@ -5746,8 +5746,8 @@ of the underlying problem.</p>
   </span>
 
 <a href="#gemseo_benchmark.report.axis_data.TimeOrdinateData.time_tick_formatter" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.ticker.FuncFormatter" href="https://matplotlib.org/stable/api/ticker_api.html#matplotlib.ticker.FuncFormatter">FuncFormatter</a></span><span class="p">(</span>
-    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">(</span><span class="n"><a class="autorefs autorefs-external" title="datetime.timedelta" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta">timedelta</a></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">time_tick_formatter</span><span class="p">:</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span> <span class="o">=</span> <span class="n"><span title="matplotlib.ticker.FuncFormatter">FuncFormatter</span></span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta">timedelta</span></span><span class="p">(</span><span class="n"><span title="datetime.timedelta(seconds)">seconds</span></span><span class="o">=</span><span class="n"><span title="x">x</span></span><span class="p">))</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -5772,7 +5772,7 @@ of the underlying problem.</p>
 <a href="#gemseo_benchmark.report.axis_data.TimeOrdinateData.get" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">get</span><span class="p">(</span>
     <span class="n">performance_histories</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            PerformanceHistories (gemseo_benchmark.results.performance_histories.PerformanceHistories)" href="../../results/performance_histories/#gemseo_benchmark.results.performance_histories.PerformanceHistories">PerformanceHistories</a></span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.IntegerArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.IntegerArray">IntegerArray</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="gemseo.typing.IntegerArray">IntegerArray</span></span> <span class="o">|</span> <span class="n"><span title="gemseo.typing.RealArray">RealArray</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -5796,7 +5796,7 @@ of the underlying problem.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="gemseo.typing.IntegerArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.IntegerArray">IntegerArray</a> | <a class="autorefs autorefs-external" title="gemseo.typing.RealArray" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.typing.html#gemseo.typing.RealArray">RealArray</a></code>
+              <code><span title="gemseo.typing.IntegerArray">IntegerArray</span> | <span title="gemseo.typing.RealArray">RealArray</span></code>
           –
           <div class="doc-md-description">
             <p>The axis data.</p>

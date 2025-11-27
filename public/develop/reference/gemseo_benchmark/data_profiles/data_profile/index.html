@@ -2411,7 +2411,7 @@
 
 
 <a href="#gemseo_benchmark.data_profiles.data_profile.DataProfile" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">DataProfile</span><span class="p">(</span><span class="n">target_values</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            TargetValues (gemseo_benchmark.data_profiles.target_values.TargetValues)" href="../target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a></span><span class="p">])</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">DataProfile</span><span class="p">(</span><span class="n">target_values</span><span class="p">:</span> <span class="n"><span title="collections.abc.Mapping">Mapping</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            TargetValues (gemseo_benchmark.data_profiles.target_values.TargetValues)" href="../target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a></span><span class="p">])</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2436,7 +2436,7 @@ functions evaluations made by an algorithm to reach a problem target.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>target_values</code></b>
-              (<code><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-internal" title="            TargetValues (gemseo_benchmark.data_profiles.target_values.TargetValues)" href="../target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a>]</code>)
+              (<code><span title="collections.abc.Mapping">Mapping</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="            TargetValues (gemseo_benchmark.data_profiles.target_values.TargetValues)" href="../target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a>]</code>)
           –
           <div class="doc-md-description">
             <p>The target values of each of the reference problems.</p>
@@ -2495,7 +2495,7 @@ functions evaluations made by an algorithm to reach a problem target.</p>
   </span>
 
 <a href="#gemseo_benchmark.data_profiles.data_profile.DataProfile.target_values" class="headerlink" title="Permanent link">&para;</a></h6>
-<div class="doc-signature highlight"><pre><span></span><code><span class="n">target_values</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            TargetValues (gemseo_benchmark.data_profiles.target_values.TargetValues)" href="../target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a></span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">target_values</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="            TargetValues (gemseo_benchmark.data_profiles.target_values.TargetValues)" href="../target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a></span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2510,7 +2510,7 @@ algorithm at each iteration.</p>
 <p><span class="doc-section-title">Raises:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+              <code><span title="ValueError">ValueError</span></code>
             –
           <div class="doc-md-description">
             <p>If the reference problems have different numbers of target
@@ -2535,11 +2535,11 @@ values.</p>
 
 <a href="#gemseo_benchmark.data_profiles.data_profile.DataProfile.add_history" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">add_history</span><span class="p">(</span>
-    <span class="n">problem_name</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span>
-    <span class="n">algorithm_configuration_name</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span>
-    <span class="n">performance_measures</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">],</span>
-    <span class="n">infeasibility_measures</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">feasibility_statuses</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">problem_name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span>
+    <span class="n">algorithm_configuration_name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span>
+    <span class="n">performance_measures</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">],</span>
+    <span class="n">infeasibility_measures</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">feasibility_statuses</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="bool">bool</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
@@ -2552,7 +2552,7 @@ values.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>problem_name</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
+              (<code><span title="str">str</span></code>)
           –
           <div class="doc-md-description">
             <p>The name of the problem.</p>
@@ -2560,7 +2560,7 @@ values.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>algorithm_configuration_name</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
+              (<code><span title="str">str</span></code>)
           –
           <div class="doc-md-description">
             <p>The name of the algorithm configuration.</p>
@@ -2568,7 +2568,7 @@ values.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>performance_measures</code></b>
-              (<code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]</code>)
+              (<code><span title="collections.abc.Sequence">Sequence</span>[<span title="float">float</span>]</code>)
           –
           <div class="doc-md-description">
             <p>A history of performance measures.
@@ -2578,7 +2578,7 @@ N.B. the value at index <code>i</code> is assumed to have been obtained with
         </li>
         <li class="doc-section-item field-body">
             <b><code>infeasibility_measures</code></b>
-              (<code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>] | None</code>, default:
+              (<code><span title="collections.abc.Sequence">Sequence</span>[<span title="float">float</span>] | None</code>, default:
                   <code>None</code>
 )
           –
@@ -2590,7 +2590,7 @@ to infinity otherwise.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>feasibility_statuses</code></b>
-              (<code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a>] | None</code>, default:
+              (<code><span title="collections.abc.Sequence">Sequence</span>[<span title="bool">bool</span>] | None</code>, default:
                   <code>None</code>
 )
           –
@@ -2605,7 +2605,7 @@ If <code>None</code> then feasibility is always assumed.</p>
 <p><span class="doc-section-title">Raises:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+              <code><span title="ValueError">ValueError</span></code>
             –
           <div class="doc-md-description">
             <p>If the problem name is not the name of a reference problem.</p>
@@ -2706,8 +2706,8 @@ If <code>None</code> then feasibility is always assumed.</p>
 
 <a href="#gemseo_benchmark.data_profiles.data_profile.DataProfile.compute_data_profiles" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">compute_data_profiles</span><span class="p">(</span>
-    <span class="o">*</span><span class="n">algo_names</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" title="numbers.Number" href="https://docs.python.org/3/library/numbers.html#numbers.Number">Number</a></span><span class="p">]]</span>
+    <span class="o">*</span><span class="n">algo_names</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="numbers.Number">Number</span></span><span class="p">]]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2721,7 +2721,7 @@ of evaluations required by the algorithm to reach a reference target.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>algo_names</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>, default:
+              (<code><span title="str">str</span></code>, default:
                   <code>()</code>
 )
           –
@@ -2736,7 +2736,7 @@ If <code>None</code> then all the algorithms are considered.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-external" title="numbers.Number" href="https://docs.python.org/3/library/numbers.html#numbers.Number">Number</a>]]</code>
+              <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="list">list</span>[<span title="numbers.Number">Number</span>]]</code>
           –
           <div class="doc-md-description">
             <p>The data profiles.</p>
@@ -2811,15 +2811,15 @@ If <code>None</code> then all the algorithms are considered.</p>
 
 <a href="#gemseo_benchmark.data_profiles.data_profile.DataProfile.plot" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">plot</span><span class="p">(</span>
-    <span class="n">algo_names</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">show</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">file_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">algo_names</span><span class="p">:</span> <span class="n"><span title="collections.abc.Iterable">Iterable</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">show</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">file_path</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="pathlib.Path">Path</span></span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">markevery</span><span class="p">:</span> <span class="n"><span title="gemseo_benchmark.MarkeveryType">MarkeveryType</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">plot_settings</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span>
-        <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><span title="gemseo_benchmark.ConfigurationPlotOptions">ConfigurationPlotOptions</span></span>
-    <span class="p">]</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.utils.constants.READ_ONLY_EMPTY_DICT" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.utils.constants.html#gemseo.utils.constants.READ_ONLY_EMPTY_DICT">READ_ONLY_EMPTY_DICT</a></span><span class="p">,</span>
-    <span class="n">grid_settings</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span><span class="p">]</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-external" title="gemseo.utils.constants.READ_ONLY_EMPTY_DICT" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.utils.constants.html#gemseo.utils.constants.READ_ONLY_EMPTY_DICT">READ_ONLY_EMPTY_DICT</a></span><span class="p">,</span>
-    <span class="n">use_abscissa_log_scale</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">plot_settings</span><span class="p">:</span> <span class="n"><span title="collections.abc.Mapping">Mapping</span></span><span class="p">[</span>
+        <span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="gemseo_benchmark.ConfigurationPlotOptions">ConfigurationPlotOptions</span></span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n"><span title="gemseo.utils.constants.READ_ONLY_EMPTY_DICT">READ_ONLY_EMPTY_DICT</span></span><span class="p">,</span>
+    <span class="n">grid_settings</span><span class="p">:</span> <span class="n"><span title="collections.abc.Mapping">Mapping</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="str">str</span></span><span class="p">]</span> <span class="o">=</span> <span class="n"><span title="gemseo.utils.constants.READ_ONLY_EMPTY_DICT">READ_ONLY_EMPTY_DICT</span></span><span class="p">,</span>
+    <span class="n">use_abscissa_log_scale</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
@@ -2832,7 +2832,7 @@ If <code>None</code> then all the algorithms are considered.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>algo_names</code></b>
-              (<code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>] | None</code>, default:
+              (<code><span title="collections.abc.Iterable">Iterable</span>[<span title="str">str</span>] | None</code>, default:
                   <code>None</code>
 )
           –
@@ -2843,7 +2843,7 @@ If <code>None</code> then all the algorithms are considered.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>show</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>, default:
+              (<code><span title="bool">bool</span></code>, default:
                   <code>True</code>
 )
           –
@@ -2853,7 +2853,7 @@ If <code>None</code> then all the algorithms are considered.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>file_path</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>, default:
+              (<code><span title="str">str</span> | <span title="pathlib.Path">Path</span></code>, default:
                   <code>&#39;&#39;</code>
 )
           –
@@ -2875,8 +2875,8 @@ Refer to the Matplotlib documentation.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>plot_settings</code></b>
-              (<code><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <span title="gemseo_benchmark.ConfigurationPlotOptions">ConfigurationPlotOptions</span>]</code>, default:
-                  <code><a class="autorefs autorefs-external" title="gemseo.utils.constants.READ_ONLY_EMPTY_DICT" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.utils.constants.html#gemseo.utils.constants.READ_ONLY_EMPTY_DICT">READ_ONLY_EMPTY_DICT</a></code>
+              (<code><span title="collections.abc.Mapping">Mapping</span>[<span title="str">str</span>, <span title="gemseo_benchmark.ConfigurationPlotOptions">ConfigurationPlotOptions</span>]</code>, default:
+                  <code><span title="gemseo.utils.constants.READ_ONLY_EMPTY_DICT">READ_ONLY_EMPTY_DICT</span></code>
 )
           –
           <div class="doc-md-description">
@@ -2886,8 +2886,8 @@ for each algorithm configuration.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>grid_settings</code></b>
-              (<code><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>, default:
-                  <code><a class="autorefs autorefs-external" title="gemseo.utils.constants.READ_ONLY_EMPTY_DICT" href="https://gemseo.readthedocs.io/en/stable/modules/gemseo.utils.constants.html#gemseo.utils.constants.READ_ONLY_EMPTY_DICT">READ_ONLY_EMPTY_DICT</a></code>
+              (<code><span title="collections.abc.Mapping">Mapping</span>[<span title="str">str</span>, <span title="str">str</span>]</code>, default:
+                  <code><span title="gemseo.utils.constants.READ_ONLY_EMPTY_DICT">READ_ONLY_EMPTY_DICT</span></code>
 )
           –
           <div class="doc-md-description">
@@ -2896,7 +2896,7 @@ for each algorithm configuration.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>use_abscissa_log_scale</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>, default:
+              (<code><span title="bool">bool</span></code>, default:
                   <code>False</code>
 )
           –

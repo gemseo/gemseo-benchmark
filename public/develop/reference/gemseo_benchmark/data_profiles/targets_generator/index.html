@@ -2404,9 +2404,9 @@ the median of the reference histories is computed and a uniformly distributed su
 
 <a href="#gemseo_benchmark.data_profiles.targets_generator.TargetsGenerator.add_history" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">add_history</span><span class="p">(</span>
-    <span class="n">performance_measures</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">infeasibility_measures</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">feasibility_statuses</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">performance_measures</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">infeasibility_measures</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">feasibility_statuses</span><span class="p">:</span> <span class="n"><span title="collections.abc.Sequence">Sequence</span></span><span class="p">[</span><span class="n"><span title="bool">bool</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">history</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="            PerformanceHistory (gemseo_benchmark.results.performance_history.PerformanceHistory)" href="../../results/performance_history/#gemseo_benchmark.results.performance_history.PerformanceHistory">PerformanceHistory</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
@@ -2420,7 +2420,7 @@ the median of the reference histories is computed and a uniformly distributed su
     <ul>
         <li class="doc-section-item field-body">
             <b><code>performance_measures</code></b>
-              (<code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>] | None</code>, default:
+              (<code><span title="collections.abc.Sequence">Sequence</span>[<span title="float">float</span>] | None</code>, default:
                   <code>None</code>
 )
           –
@@ -2433,7 +2433,7 @@ evaluations.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>infeasibility_measures</code></b>
-              (<code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>] | None</code>, default:
+              (<code><span title="collections.abc.Sequence">Sequence</span>[<span title="float">float</span>] | None</code>, default:
                   <code>None</code>
 )
           –
@@ -2445,7 +2445,7 @@ to infinity otherwise.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>feasibility_statuses</code></b>
-              (<code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a>] | None</code>, default:
+              (<code><span title="collections.abc.Sequence">Sequence</span>[<span title="bool">bool</span>] | None</code>, default:
                   <code>None</code>
 )
           –
@@ -2471,7 +2471,7 @@ If <code>None</code>, objective values must be passed.</p>
 <p><span class="doc-section-title">Raises:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+              <code><span title="ValueError">ValueError</span></code>
             –
           <div class="doc-md-description">
             <p>If neither a performance history nor objective values are
@@ -2573,13 +2573,13 @@ passed, or if both are passed.</p>
 
 <a href="#gemseo_benchmark.data_profiles.targets_generator.TargetsGenerator.compute_target_values" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">compute_target_values</span><span class="p">(</span>
-    <span class="n">targets_number</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span><span class="p">,</span>
-    <span class="n">budget_min</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="n">feasible</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">show</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">file_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">best_target_objective</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">best_target_tolerance</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">targets_number</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">,</span>
+    <span class="n">budget_min</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">feasible</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">show</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">file_path</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="pathlib.Path">Path</span></span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">best_target_objective</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">best_target_tolerance</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            TargetValues (gemseo_benchmark.data_profiles.target_values.TargetValues)" href="../target_values/#gemseo_benchmark.data_profiles.target_values.TargetValues">TargetValues</a></span>
 </code></pre></div>
 
@@ -2592,7 +2592,7 @@ passed, or if both are passed.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>targets_number</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>)
+              (<code><span title="int">int</span></code>)
           –
           <div class="doc-md-description">
             <p>The number of targets to compute.</p>
@@ -2600,7 +2600,7 @@ passed, or if both are passed.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>budget_min</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>, default:
+              (<code><span title="int">int</span></code>, default:
                   <code>1</code>
 )
           –
@@ -2615,7 +2615,7 @@ best target value.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>feasible</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>, default:
+              (<code><span title="bool">bool</span></code>, default:
                   <code>True</code>
 )
           –
@@ -2625,7 +2625,7 @@ best target value.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>show</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>, default:
+              (<code><span title="bool">bool</span></code>, default:
                   <code>False</code>
 )
           –
@@ -2635,7 +2635,7 @@ best target value.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>file_path</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>, default:
+              (<code><span title="str">str</span> | <span title="pathlib.Path">Path</span></code>, default:
                   <code>&#39;&#39;</code>
 )
           –
@@ -2646,7 +2646,7 @@ If empty, the plot is not saved.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>best_target_objective</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a> | None</code>, default:
+              (<code><span title="float">float</span> | None</code>, default:
                   <code>None</code>
 )
           –
@@ -2657,7 +2657,7 @@ If <code>None</code>, it will be inferred from the performance histories.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>best_target_tolerance</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>, default:
+              (<code><span title="float">float</span></code>, default:
                   <code>0.0</code>
 )
           –
@@ -2684,7 +2684,7 @@ best target value.</p>
 <p><span class="doc-section-title">Raises:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
+              <code><span title="RuntimeError">RuntimeError</span></code>
             –
           <div class="doc-md-description">
             <p>If feasibility is required but the best target value is not
@@ -2842,10 +2842,10 @@ feasible.</p>
 
 <a href="#gemseo_benchmark.data_profiles.targets_generator.TargetsGenerator.plot_histories" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">plot_histories</span><span class="p">(</span>
-    <span class="n">best_target_value</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">show</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">file_path</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-external" title="matplotlib.figure.Figure" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure">Figure</a></span>
+    <span class="n">best_target_value</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">show</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">file_path</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="pathlib.Path">Path</span></span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="matplotlib.figure.Figure">Figure</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2857,7 +2857,7 @@ feasible.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>best_target_value</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a> | None</code>, default:
+              (<code><span title="float">float</span> | None</code>, default:
                   <code>None</code>
 )
           –
@@ -2869,7 +2869,7 @@ If <code>None</code>, no best target value will be plotted.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>show</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>, default:
+              (<code><span title="bool">bool</span></code>, default:
                   <code>False</code>
 )
           –
@@ -2879,7 +2879,7 @@ If <code>None</code>, no best target value will be plotted.</p>
         </li>
         <li class="doc-section-item field-body">
             <b><code>file_path</code></b>
-              (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>, default:
+              (<code><span title="str">str</span> | <span title="pathlib.Path">Path</span></code>, default:
                   <code>&#39;&#39;</code>
 )
           –
@@ -2894,7 +2894,7 @@ If empty, the figure will not be saved.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><a class="autorefs autorefs-external" title="matplotlib.figure.Figure" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure">Figure</a></code>
+              <code><span title="matplotlib.figure.Figure">Figure</span></code>
           –
           <div class="doc-md-description">
             <p>The histories figure.</p>
