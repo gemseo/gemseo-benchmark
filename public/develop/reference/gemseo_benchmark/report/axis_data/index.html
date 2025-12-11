@@ -3789,14 +3789,6 @@
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>axes</code></b>
-              (<code><span title="matplotlib.axes.Axes">Axes</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The axes of the plot.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
             <b><code>number_of_scalar_constraints</code></b>
               (<code><span title="int">int</span></code>)
           –
@@ -4401,14 +4393,6 @@ of the underlying problem.</p>
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>axes</code></b>
-              (<code><span title="matplotlib.axes.Axes">Axes</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The axes of the plot.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
             <b><code>number_of_scalar_constraints</code></b>
               (<code><span title="int">int</span></code>)
           –
@@ -4551,7 +4535,7 @@ of the underlying problem.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="gemseo.typing.IntegerArray">IntegerArray</span></code>
+              <code><span title="gemseo.typing.IntegerArray">IntegerArray</span> | <span title="gemseo.typing.RealArray">RealArray</span></code>
           –
           <div class="doc-md-description">
             <p>The axis data.</p>
@@ -4587,19 +4571,6 @@ of the underlying problem.</p>
     <div class="doc doc-contents ">
 
         <p>Spread histories.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>performance_histories</code></b>
-              (<code><a class="autorefs autorefs-internal" title="            PerformanceHistories (gemseo_benchmark.results.performance_histories.PerformanceHistories)" href="../../results/performance_histories/#gemseo_benchmark.results.performance_histories.PerformanceHistories">PerformanceHistories</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The description is missing.</p>
-          </div>
-        </li>
-    </ul>
 
 
             <details class="mkdocstrings-source">
@@ -4820,14 +4791,6 @@ of the underlying problem.</p>
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>axes</code></b>
-              (<code><span title="matplotlib.axes.Axes">Axes</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The axes of the plot.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
             <b><code>number_of_scalar_constraints</code></b>
               (<code><span title="int">int</span></code>)
           –
@@ -4970,7 +4933,7 @@ of the underlying problem.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="gemseo.typing.IntegerArray">IntegerArray</span></code>
+              <code><span title="gemseo.typing.IntegerArray">IntegerArray</span> | <span title="gemseo.typing.RealArray">RealArray</span></code>
           –
           <div class="doc-md-description">
             <p>The axis data.</p>
@@ -5006,19 +4969,6 @@ of the underlying problem.</p>
     <div class="doc doc-contents ">
 
         <p>Spread histories.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>performance_histories</code></b>
-              (<code><a class="autorefs autorefs-internal" title="            PerformanceHistories (gemseo_benchmark.results.performance_histories.PerformanceHistories)" href="../../results/performance_histories/#gemseo_benchmark.results.performance_histories.PerformanceHistories">PerformanceHistories</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The description is missing.</p>
-          </div>
-        </li>
-    </ul>
 
 
             <details class="mkdocstrings-source">
@@ -5235,28 +5185,12 @@ of the underlying problem.</p>
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>axes</code></b>
-              (<code><span title="matplotlib.axes.Axes">Axes</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The axes of the plot.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
             <b><code>infeasible_performance_measure</code></b>
               (<code><span title="float">float</span></code>)
           –
           <div class="doc-md-description">
             <p>The performance measure
 for infeasible history items.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
-            <b><code>label</code></b>
-              (<code><span title="str">str</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The description is missing.</p>
           </div>
         </li>
     </ul>
@@ -5440,14 +5374,6 @@ for infeasible history items.</p>
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>axes</code></b>
-              (<code><span title="matplotlib.axes.Axes">Axes</span></code>)
-          –
-          <div class="doc-md-description">
-            <p>The axes of the plot.</p>
-          </div>
-        </li>
-        <li class="doc-section-item field-body">
             <b><code>number_of_scalar_constraints</code></b>
               (<code><span title="int">int</span></code>)
           –
@@ -5590,7 +5516,7 @@ of the underlying problem.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="gemseo.typing.RealArray">RealArray</span></code>
+              <code><span title="gemseo.typing.IntegerArray">IntegerArray</span> | <span title="gemseo.typing.RealArray">RealArray</span></code>
           –
           <div class="doc-md-description">
             <p>The axis data.</p>
@@ -5630,19 +5556,6 @@ of the underlying problem.</p>
     <div class="doc doc-contents ">
 
         <p>Spread histories.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <ul>
-        <li class="doc-section-item field-body">
-            <b><code>performance_histories</code></b>
-              (<code><a class="autorefs autorefs-internal" title="            PerformanceHistories (gemseo_benchmark.results.performance_histories.PerformanceHistories)" href="../../results/performance_histories/#gemseo_benchmark.results.performance_histories.PerformanceHistories">PerformanceHistories</a></code>)
-          –
-          <div class="doc-md-description">
-            <p>The description is missing.</p>
-          </div>
-        </li>
-    </ul>
 
 
             <details class="mkdocstrings-source">
