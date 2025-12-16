@@ -14,7 +14,7 @@
         <link rel="prev" href="../plot_target_values/">
       
       
-        <link rel="next" href="../plot_report/">
+        <link rel="next" href="../plot_parameterizable_benchmark/">
       
       
         
@@ -643,6 +643,8 @@
       
         
       
+        
+      
     
     
     
@@ -848,6 +850,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plot_parameterizable_benchmark/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use a parametric benchmark problem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2241,14 +2271,14 @@
 to download the full example code</p>
 </div>
 <h1 id="compute-data-profiles">Compute data profiles<a class="headerlink" href="#compute-data-profiles" title="Permanent link">&para;</a></h1>
-<!-- GENERATED FROM PYTHON SOURCE LINES 37-44 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 19-26 -->
 
 <p>In this example,
 we compute the <strong>data profiles</strong> of three algorithms configurations
 based on two reference problems.</p>
 <h2 id="imports">Imports<a class="headerlink" href="#imports" title="Permanent link">&para;</a></h2>
 <p>We start by making the necessary imports.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 44-65 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 26-47 -->
 
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -2271,7 +2301,7 @@ based on two reference problems.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">gemseo_benchmark.problems.problems_group</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProblemsGroup</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">gemseo_benchmark.scenario</span><span class="w"> </span><span class="kn">import</span> <span class="n">Scenario</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 66-75 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 48-57 -->
 
 <h2 id="set-the-algorithms-configurations">Set the algorithms configurations<a class="headerlink" href="#set-the-algorithms-configurations" title="Permanent link">&para;</a></h2>
 <p>Let us define the algorithms configurations
@@ -2280,7 +2310,7 @@ for which we want to compute data profiles.</p>
 let us choose a configuration of the L-BFGS-B algorithm
 with a number of Hessian corrections limited to 2.
 (This option is called <code>maxcor</code>.)</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 75-80 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 57-62 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">lbfgsb_2_corrections</span> <span class="o">=</span> <span class="n">AlgorithmConfiguration</span><span class="p">(</span>
     <span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span>
@@ -2288,7 +2318,7 @@ with a number of Hessian corrections limited to 2.
     <span class="n">maxcor</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 81-88 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 63-70 -->
 
 <p>Note:
     The customized name <code>"L-BFGS-B with 2 Hessian corrections"</code>
@@ -2296,7 +2326,7 @@ with a number of Hessian corrections limited to 2.
 <p>To investigate the influence of the <code>maxcor</code> option,
 let us consider a different configuration of L-BFGS-B
 with up to 20 Hessian corrections.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 88-93 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 70-75 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">lbfgsb_20_corrections</span> <span class="o">=</span> <span class="n">AlgorithmConfiguration</span><span class="p">(</span>
     <span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span>
@@ -2304,20 +2334,20 @@ with up to 20 Hessian corrections.</p>
     <span class="n">maxcor</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 94-98 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 76-80 -->
 
 <p>Additionally,
 let us choose the SLSQP algorithm,
 with all its options set to their default values,
 to compare it against L-BFGS-B.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 98-99 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 80-81 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">slsqp_default</span> <span class="o">=</span> <span class="n">AlgorithmConfiguration</span><span class="p">(</span><span class="s2">&quot;SLSQP&quot;</span><span class="p">)</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 100-101 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 82-83 -->
 
 <p>Finally, we gather our selection of algorithms configurations in a group.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 101-107 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 83-89 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">algorithms_configurations</span> <span class="o">=</span> <span class="n">AlgorithmsConfigurations</span><span class="p">(</span>
     <span class="n">lbfgsb_2_corrections</span><span class="p">,</span>
@@ -2326,7 +2356,7 @@ to compare it against L-BFGS-B.</p>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Derivative-based algorithms&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 108-117 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 90-99 -->
 
 <h2 id="set-the-reference-problems">Set the reference problems<a class="headerlink" href="#set-the-reference-problems" title="Permanent link">&para;</a></h2>
 <p>Let us choose two problems already implemented in GEMSEO as references
@@ -2335,18 +2365,18 @@ to measure the performances of our selection of algorithms configurations:
 and [Rosenbrock][gemseo.problems.optimization.rosenbrock.Rosenbrock].</p>
 <p>We define target values as an exponential scale of values decreasing towards zero,
 the minimum value of both Rastrigin's and Rosenbrock's functions.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 117-119 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 99-101 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">optimum</span> <span class="o">=</span> <span class="mf">0.0</span>
 <span class="n">target_values</span> <span class="o">=</span> <span class="n">TargetValues</span><span class="p">([</span><span class="mi">10</span><span class="o">**-</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="n">optimum</span><span class="p">])</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 120-125 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 102-107 -->
 
 <p>Note:
     It could be preferable to customize a different scale of target values
     for each problem, although we keep it simple here.</p>
 <p>We now have all the elements to define the problem configurations.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 125-141 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 107-123 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">rastrigin</span> <span class="o">=</span> <span class="n">OptimizationProblemConfiguration</span><span class="p">(</span>
     <span class="s2">&quot;Rastrigin&quot;</span><span class="p">,</span>
@@ -2365,16 +2395,16 @@ the minimum value of both Rastrigin's and Rosenbrock's functions.</p>
     <span class="n">target_values</span><span class="o">=</span><span class="n">target_values</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 142-146 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 124-128 -->
 
 <p>Here we configure a design of experiments (DOE)
 to generate five starting points by optimized Latin hypercube sampling (LHS).</p>
 <p>Finally, we gather our reference problems in a group.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 146-147 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 128-129 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">problems</span> <span class="o">=</span> <span class="n">ProblemsGroup</span><span class="p">(</span><span class="s2">&quot;Reference problems&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">rastrigin</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">])</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 148-156 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 130-138 -->
 
 <h2 id="generate-the-benchmarking-results">Generate the benchmarking results<a class="headerlink" href="#generate-the-benchmarking-results" title="Permanent link">&para;</a></h2>
 <p>Now that the algorithms configurations and the reference problems are properly set,
@@ -2382,16 +2412,16 @@ we can measure the performances of the former on the latter.</p>
 <p>We set up a <a class="autorefs autorefs-internal" title="            Scenario" href="../../../../reference/gemseo_benchmark/scenario/#gemseo_benchmark.scenario.Scenario">Scenario</a> with
 our group of algorithms configurations
 and a path to a directory where to save the performance histories.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 156-158 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 138-140 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">scenario_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">())</span>
 <span class="n">scenario</span> <span class="o">=</span> <span class="n">Scenario</span><span class="p">([</span><span class="n">algorithms_configurations</span><span class="p">],</span> <span class="n">scenario_dir</span><span class="p">)</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 159-161 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 141-143 -->
 
 <p>Here we choose to deactivate the functions counters, progress bars and bounds check
 of GEMSEO to accelerate the script.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 161-166 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 143-148 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">configure</span><span class="p">(</span>
     <span class="n">enable_function_statistics</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -2399,38 +2429,38 @@ of GEMSEO to accelerate the script.</p>
     <span class="n">check_desvars_bounds</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 167-172 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 149-154 -->
 
 <p>Let us execute the benchmarking scenario on our group of reference problems.</p>
 <p>Note:
     Here we skip the generation of the report
     as we only intend to compute the data profiles.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 172-173 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 154-155 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">results</span> <span class="o">=</span> <span class="n">scenario</span><span class="o">.</span><span class="n">execute</span><span class="p">([</span><span class="n">problems</span><span class="p">],</span> <span class="n">skip_report</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 <p class="mkd-glr-script-out">Out:</p>
-<div class="mkd-glr-script-out-disp highlight"><pre><span></span><code>/usr/lib64/python3.13/multiprocessing/popen_fork.py:67:<span class="w"> </span>DeprecationWarning:<span class="w"> </span>This<span class="w"> </span>process<span class="w"> </span><span class="o">(</span><span class="nv">pid</span><span class="o">=</span><span class="m">287</span><span class="o">)</span><span class="w"> </span>is<span class="w"> </span>multi-threaded,<span class="w"> </span>use<span class="w"> </span>of<span class="w"> </span>fork<span class="o">()</span><span class="w"> </span>may<span class="w"> </span>lead<span class="w"> </span>to<span class="w"> </span>deadlocks<span class="w"> </span><span class="k">in</span><span class="w"> </span>the<span class="w"> </span>child.
+<div class="mkd-glr-script-out-disp highlight"><pre><span></span><code>/usr/lib64/python3.13/multiprocessing/popen_fork.py:67:<span class="w"> </span>DeprecationWarning:<span class="w"> </span>This<span class="w"> </span>process<span class="w"> </span><span class="o">(</span><span class="nv">pid</span><span class="o">=</span><span class="m">177</span><span class="o">)</span><span class="w"> </span>is<span class="w"> </span>multi-threaded,<span class="w"> </span>use<span class="w"> </span>of<span class="w"> </span>fork<span class="o">()</span><span class="w"> </span>may<span class="w"> </span>lead<span class="w"> </span>to<span class="w"> </span>deadlocks<span class="w"> </span><span class="k">in</span><span class="w"> </span>the<span class="w"> </span>child.
 <span class="w">  </span>self.pid<span class="w"> </span><span class="o">=</span><span class="w"> </span>os.fork<span class="o">()</span>
 </code></pre></div>
-<!-- GENERATED FROM PYTHON SOURCE LINES 174-178 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 156-160 -->
 
 <h2 id="compute-the-datas-profiles">Compute the datas profiles<a class="headerlink" href="#compute-the-datas-profiles" title="Permanent link">&para;</a></h2>
 <p>Now that the performances histories are generated for the reference problems,
 the data profiles of the algorithms configurations can be computed.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 178-179 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 160-161 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">problems</span><span class="o">.</span><span class="n">compute_data_profile</span><span class="p">(</span><span class="n">algorithms_configurations</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 <p><img alt="Data profiles" class="mkd-glr-single-img" src="../images/mkd_glr_plot_data_profiles_001.png" srcset="../images/mkd_glr_plot_data_profiles_001.png" /></p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 180-181 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 162-163 -->
 
 <p>Here we remove the performances histories as we do not wish to keep them.</p>
-<!-- GENERATED FROM PYTHON SOURCE LINES 181-182 -->
+<!-- GENERATED FROM PYTHON SOURCE LINES 163-164 -->
 
 <div class="highlight"><pre><span></span><code><span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">scenario_dir</span><span class="p">)</span>
 </code></pre></div>
-<p><strong>Total running time of the script:</strong> ( 0 minutes  0.682 seconds)</p>
+<p><strong>Total running time of the script:</strong> ( 0 minutes  0.667 seconds)</p>
 <div id="download_links"></div>
 
 <p><a class="md-button center" href="../plot_data_profiles.py"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M256 32c0-17.7-14.3-32-32-32s-32 14.3-32 32v210.7l-41.4-41.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l96 96c12.5 12.5 32.8 12.5 45.3 0l96-96c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 242.7zM64 320c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64h320c35.3 0 64-28.7 64-64v-32c0-35.3-28.7-64-64-64h-46.9l-56.6 56.6c-31.2 31.2-81.9 31.2-113.1 0L110.9 320zm304 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48"/></svg></span> Download Python source code: plot_data_profiles.py</a></p>
