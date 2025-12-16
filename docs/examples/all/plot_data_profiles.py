@@ -13,18 +13,15 @@
 # FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION
 # WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-"""
-Compute data profiles
-=====================
-"""
+"""# Compute data profiles"""
 
 # %%
 # In this example,
 # we compute the **data profiles** of three algorithms configurations
 # based on two reference problems.
 #
-# Imports
-# -------
+# ## Imports
+#
 # We start by making the necessary imports.
 from __future__ import annotations
 
@@ -48,8 +45,8 @@ from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.scenario import Scenario
 
 # %%
-# Set the algorithms configurations
-# ---------------------------------
+# ## Set the algorithms configurations
+#
 # Let us define the algorithms configurations
 # for which we want to compute data profiles.
 #
@@ -90,8 +87,8 @@ algorithms_configurations = AlgorithmsConfigurations(
     name="Derivative-based algorithms",
 )
 # %%
-# Set the reference problems
-# --------------------------
+# ## Set the reference problems
+#
 # Let us choose two problems already implemented in GEMSEO as references
 # to measure the performances of our selection of algorithms configurations:
 # [Rastrigin][gemseo.problems.optimization.rastrigin.Rastrigin]
@@ -130,8 +127,8 @@ rosenbrock = OptimizationProblemConfiguration(
 # Finally, we gather our reference problems in a group.
 problems = ProblemsGroup("Reference problems", [rastrigin, rosenbrock])
 # %%
-# Generate the benchmarking results
-# ---------------------------------
+# ## Generate the benchmarking results
+#
 # Now that the algorithms configurations and the reference problems are properly set,
 # we can measure the performances of the former on the latter.
 #
@@ -156,8 +153,8 @@ configure(
 #     as we only intend to compute the data profiles.
 results = scenario.execute([problems], skip_report=True)
 # %%
-# Compute the datas profiles
-# --------------------------
+# ## Compute the datas profiles
+#
 # Now that the performances histories are generated for the reference problems,
 # the data profiles of the algorithms configurations can be computed.
 problems.compute_data_profile(algorithms_configurations, results, show=True)

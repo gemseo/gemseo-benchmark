@@ -13,10 +13,7 @@
 # FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION
 # WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-"""
-Generate a benchmarking report
-==============================
-"""
+"""# Generate a benchmarking report"""
 
 # %%
 # In this example,
@@ -24,8 +21,8 @@ Generate a benchmarking report
 # based on the performances of three algorithms configurations
 # on three reference problems.
 #
-# Imports
-# -------
+# ## Imports
+#
 # We start by making the necessary imports.
 from __future__ import annotations
 
@@ -49,8 +46,8 @@ from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.scenario import Scenario
 
 # %%
-# Set the algorithms configurations
-# ---------------------------------
+# ## Set the algorithms configurations
+#
 # Let us define the algorithms configurations that we want to benchmark.
 #
 # For example,
@@ -93,8 +90,8 @@ lbfgsb_configurations = AlgorithmsConfigurations(
 slsqp_default = AlgorithmConfiguration("SLSQP")
 slsqp_configurations = AlgorithmsConfigurations(slsqp_default, name="SLSQP")
 # %%
-# Set the reference problems
-# --------------------------
+# ## Set the reference problems
+#
 # Let us choose two problems already implemented in GEMSEO as references
 # to measure the performances of our selection of algorithms configurations:
 # [Rastrigin][gemseo.problems.optimization.rastrigin.Rastrigin]
@@ -153,8 +150,8 @@ rosenbrock_5d = OptimizationProblemConfiguration(
 )
 problems_5d = ProblemsGroup("5D problems", [rosenbrock_5d])
 # %%
-# Generate the benchmarking results
-# ---------------------------------
+# ## Generate the benchmarking results
+#
 # Now that the algorithms configurations and the reference problems are properly set,
 # we can measure the performances of the former on the latter.
 #

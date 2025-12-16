@@ -13,18 +13,15 @@
 # FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION
 # WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-"""
-Generate target values
-======================
-"""
+"""# Generate target values"""
 
 # %%
 # In this example,
 # we generate **target values** for an optimization problem configuration
 # based on the performances of an algorithm configuration.
 #
-# Imports
-# -------
+# ## Imports
+#
 # We start by making the necessary imports.
 from __future__ import annotations
 
@@ -86,7 +83,7 @@ configure(
 # These target values represent the milestones of the problem resolution.
 problem.compute_target_values(5, algorithms_configurations, best_target_tolerance=1e-5)
 # %%
-# We can plot the performace histories used as reference
+# We can plot the performance histories used as reference
 # for the computation of the target values,
 # with the objective value on the vertical axis
 # and the number of functions evaluations on the horizontal axis.
