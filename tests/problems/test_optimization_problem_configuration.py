@@ -173,9 +173,11 @@ def test_generate_starting_points(minimization_problem_creator):
             0,
             0,
             0,
-            "A problem depending on 2 bounded variables,"
-            " with a nonlinear objective,"
-            " subject to 1 linear equality constraint.",
+            (
+                "A problem depending on 2 bounded variables,"
+                " with a nonlinear objective,"
+                " subject to 1 linear equality constraint."
+            ),
         ),
     ],
 )

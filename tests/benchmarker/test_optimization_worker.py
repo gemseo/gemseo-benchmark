@@ -76,8 +76,10 @@ def test_execution(
             assert gemseo_log_message in log
             for line in [
                 "Optimization problem:",
-                "   minimize rosen(x) = "
-                "sum( 100*(x[1:] - x[:-1]**2)**2 + (1 - x[:-1])**2 )",
+                (
+                    "   minimize rosen(x) = "
+                    "sum( 100*(x[1:] - x[:-1]**2)**2 + (1 - x[:-1])**2 )"
+                ),
                 "   with respect to x",
                 "   over the design space:",
                 "      +------+-------------+-------+-------------+-------+",
