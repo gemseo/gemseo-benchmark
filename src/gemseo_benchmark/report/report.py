@@ -347,7 +347,8 @@ class Report:
 
             problems_dirname = join_substrings(group.name)
             paths.append(
-                self.__create_problems_group_files(
+                self
+                .__create_problems_group_files(
                     group,
                     actual_configurations,
                     configurations_dir,
@@ -445,7 +446,8 @@ class Report:
             ),
             problems_names=[problem.name for problem in problems],
             group_problems_paths=[
-                self.__create_problem_results_files(
+                self
+                .__create_problem_results_files(
                     problem,
                     algorithm_configurations,
                     figures[problem.name],

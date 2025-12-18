@@ -124,8 +124,10 @@ def five_performance_histories() -> PerformanceHistories:
     [
         (
             [
-                "performance_measure_distribution"
-                f"[plot_all={plot_all_histories},extremum={extremal_feasible_performance},minimize={performance_measure_is_minimized}]"
+                (
+                    "performance_measure_distribution"
+                    f"[plot_all={plot_all_histories},extremum={extremal_feasible_performance},minimize={performance_measure_is_minimized}]"
+                )
             ],
             plot_all_histories,
             extremal_feasible_performance,
