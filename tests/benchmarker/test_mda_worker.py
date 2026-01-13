@@ -15,6 +15,8 @@
 
 """Tests for the multidisciplinary analysis benchmarking worker."""
 
+from __future__ import annotations
+
 from pathlib import Path
 
 import numpy
