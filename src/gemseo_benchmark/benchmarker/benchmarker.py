@@ -150,7 +150,6 @@ class Benchmarker:
                             use_threading,
                         )
                     )
-
         for future in as_completed(future_to_path):
             exception = future.exception()
             if exception is None:
@@ -241,7 +240,6 @@ class Benchmarker:
                 )
             else:
                 hdf_file_path = None
-
             future_to_path[
                 executor.submit(
                     worker.execute,
@@ -256,7 +254,7 @@ class Benchmarker:
                     gemseo_log_path,
                     performance_history_path,
                     hdf_file_path,
-                    LOGGER,
+                    GEMSEO_LOGGER,
                 )
             ] = (
                 gemseo_log_message,
@@ -301,7 +299,7 @@ class Benchmarker:
         ):
             return f"Solving {execution_info}."
 
-        LOGGER.info("Skipping %s.", execution_info)
+        GEMSEO_LOGGER.info("Skipping %s.", execution_info)
         return ""
 
     @staticmethod
