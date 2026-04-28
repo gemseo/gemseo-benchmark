@@ -117,27 +117,27 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
                 !!! warning
                     If multiprocessing is intended when executing
                     algorithm configurations on the problem,
-                    ``create_problem`` has to be pickable.
+                    `create_problem` has to be pickable.
             target_values: The target values of the problem configuration.
             starting_points: The starting points of the problem configuration.
                 If empty:
-                if ``doe_algo_name`` is not empty
+                if `doe_algo_name` is not empty
                 then the starting points will be generated as a DOE;
                 otherwise the current value of the optimization problem
                 will be set as the single starting point.
             variable_space: The space of the problem variables.
             doe_algo_name: The name of the DOE algorithm.
-                If empty and ``starting_points`` is empty,
+                If empty and `starting_points` is empty,
                 the current point of the variable space
                 is set as the only starting point.
             doe_size: The number of starting points.
-                If ``None``,
+                If `None`,
                 this number is set as the problem dimension or 10 if bigger.
             doe_options: The options of the DOE algorithm.
             description: The description of the problem configuration
                 (to appear in a benchmarking report).
             optimum: The best feasible performance measure of the problem configuration.
-                If ``None``, it will not be set.
+                If `None`, it will not be set.
             number_of_scalar_constraints: The number of scalar constraints.
         """  # noqa: D205, D212, D415
         self.__create_problem = create_problem
@@ -283,7 +283,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
         Args:
             doe_algo_name: The name of the DOE algorithm.
             doe_size: The number of starting points.
-                If ``None``, this number is set as the problem dimension or 10 if
+                If `None`, this number is set as the problem dimension or 10 if
                 bigger.
             doe_options: The options of the DOE algorithm.
 
@@ -305,7 +305,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
 
         Return:
             The current value of the design space if it has one,
-            ``None`` otherwise.
+            `None` otherwise.
         """
         if self.__variable_space.has_current_value:
             return self.__variable_space.get_current_value()
@@ -373,7 +373,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
                 If empty, the plot is not saved.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             max_iteration_number: The maximum number of iterations to plot.
-                If ``0``, this value is inferred from the longest history.
+                If `0`, this value is inferred from the longest history.
             plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
             grid_settings: The keyword arguments of `matplotlib.pyplot.grid`.

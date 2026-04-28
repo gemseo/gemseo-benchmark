@@ -71,16 +71,16 @@ class TargetsGenerator:
 
         Args:
             performance_measures: A history of performance measures.
-                If ``None``, a performance history must be passed.
+                If `None`, a performance history must be passed.
                 N.B. the value at index i is assumed to have been obtained with i+1
                 evaluations.
             infeasibility_measures: A history of infeasibility measures.
-                If ``None`` then measures are set to zero in case of feasibility and set
+                If `None` then measures are set to zero in case of feasibility and set
                 to infinity otherwise.
             feasibility_statuses: A history of (boolean) feasibility statuses.
-                If ``None`` then feasibility is always assumed.
+                If `None` then feasibility is always assumed.
             history: A performance history.
-                If ``None``, objective values must be passed.
+                If `None`, objective values must be passed.
 
         Raises:
             ValueError: If neither a performance history nor objective values are
@@ -115,7 +115,7 @@ class TargetsGenerator:
             targets_number: The number of targets to compute.
             budget_min: The number of functions evaluations to be used to define the
                 first target.
-                If argument ``feasible`` is set to ``True``, this argument will be
+                If argument `feasible` is set to `True`, this argument will be
                 disregarded and the evaluation budget defining the easiest target
                 will be the budget of the first item in the histories reaching the
                 best target value.
@@ -124,7 +124,7 @@ class TargetsGenerator:
             file_path: The file path to save the plot.
                 If empty, the plot is not saved.
             best_target_objective: The objective value of the best target value.
-                If ``None``, it will be inferred from the performance histories.
+                If `None`, it will be inferred from the performance histories.
             best_target_tolerance: The relative tolerance for comparison with the
                 best target value.
 
@@ -298,7 +298,7 @@ class TargetsGenerator:
         Args:
             best_target_value: The best target value
                 to be represented with a horizontal line.
-                If ``None``, no best target value will be plotted.
+                If `None`, no best target value will be plotted.
             show: Whether to show the figure.
             file_path: The path where to save the figure.
                 If empty, the figure will not be saved.

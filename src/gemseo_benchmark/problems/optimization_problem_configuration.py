@@ -93,9 +93,9 @@ class OptimizationProblemConfiguration(BaseProblemConfiguration):
         Args:
             target_values_algorithms_configurations: The configurations of the
                 optimization algorithms for the computation of target values.
-                If ``None``, the target values will not be computed.
+                If `None`, the target values will not be computed.
             target_values_number: The number of target values to compute.
-                If ``None``, the target values will not be computed.
+                If `None`, the target values will not be computed.
                 N.B. the number of target values shall be the same for all the
                 problem configurations of a same group.
         """  # noqa: D205, D212, D415

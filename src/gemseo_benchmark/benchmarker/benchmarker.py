@@ -78,9 +78,9 @@ class Benchmarker:
             results_path: The path to the file for saving the performance histories
                 paths.
                 If exists, the file is updated with the new performance histories paths.
-                If ``None``, no performance history path will be saved.
+                If `None`, no performance history path will be saved.
             hdf_path: The path to the destination directory for the HDF files.
-                If ``None``, no HDF file will be saved.
+                If `None`, no HDF file will be saved.
         """  # noqa: D205, D212, D415
         self.__hdf_path = hdf_path
         self.__histories_path = histories_path
@@ -111,7 +111,7 @@ class Benchmarker:
             use_threading: Whether to use threads instead of processes
                 to parallelize the execution.
             save_log: Whether to save the log to a file.
-                If ``use_threading`` is ``True``, a single global file will be saved
+                If `use_threading` is `True`, a single global file will be saved
                 in the performance histories directory.
                 Otherwise, one file per optimization will be saved
                 next to each performance history file.
@@ -375,7 +375,7 @@ class Benchmarker:
             problem_configuration_name: The name of the problem configuration.
             index: The index of the problem.
             extension: The extension of the path.
-                If ``None``, the extension is for a JSON file.
+                If `None`, the extension is for a JSON file.
             make_parents: Whether to make the parent directories of the path.
 
         Returns:

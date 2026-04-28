@@ -42,7 +42,7 @@ if TYPE_CHECKING:
         AlgorithmConfiguration,
     )
     from gemseo_benchmark.data_profiles.target_values import TargetValues
-    from gemseo_benchmark.problems.base_benchmarking_problem import (
+    from gemseo_benchmark.problems.base_problem_configuration import (
         InputStartingPointsType,
     )
 

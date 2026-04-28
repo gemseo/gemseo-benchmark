@@ -64,7 +64,7 @@ class AlgorithmConfiguration:
             configuration_name: The name of the configuration of the algorithm.
                 If empty, a name will be generated based on the algorithm name and
                 its options, based on the pattern
-                ``"algorithm_name[option_name=option_value, ...]"``.
+                `"algorithm_name[option_name=option_value, ...]"`.
             instance_algorithm_options: The options of the algorithm specific to
                 instances of a problem.
                 They shall be passed as a mapping
