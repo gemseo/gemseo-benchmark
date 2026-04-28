@@ -318,15 +318,17 @@ class Benchmarker:
         Returns:
             The algorithm configuration of the problem.
         """
-        algorithm_options = dict(algorithm_configuration.algorithm_options)
-        for name, value in algorithm_configuration.instance_algorithm_options.items():
-            algorithm_options[name] = value(problem_configuration, index)
-
+        instance_options = {
+            name: fn(problem_configuration, index)
+            for name, fn in algorithm_configuration.instance_algorithm_options.items()
+        }
+        updated_settings = algorithm_configuration.algorithm_settings.model_copy(
+            update=instance_options
+        )
         return AlgorithmConfiguration(
-            algorithm_configuration.algorithm_name,
+            updated_settings,
             algorithm_configuration.name,
             {},
-            **algorithm_options,
         )
 
     def get_history_path(

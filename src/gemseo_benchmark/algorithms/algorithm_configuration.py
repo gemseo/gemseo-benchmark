@@ -21,6 +21,7 @@
 
 from __future__ import annotations
 
+import importlib
 from collections.abc import Callable
 from collections.abc import MutableMapping
 from pathlib import Path
@@ -34,6 +35,8 @@ from gemseo.utils.string_tools import pretty_repr
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
+    from gemseo.settings.base_settings import BaseSettings
+
 InstanceAlgorithmOptions = MutableMapping[str, Callable[[int], Any]]
 
 
@@ -44,21 +47,20 @@ class AlgorithmConfiguration:
     A value set defines a configuration of the algorithm.
     """
 
-    __ALGORITHM_NAME: Final[str] = "algorithm_name"
-    __ALGORITHM_OPTIONS: Final[str] = "algorithm_options"
+    __ALGORITHM_SETTINGS_CLASS: Final[str] = "algorithm_settings_class"
+    __ALGORITHM_SETTINGS: Final[str] = "algorithm_settings"
     __CONFIGURATION_NAME: Final[str] = "configuration_name"
     __INSTANCE_ALGORITHM_OPTIONS: Final[str] = "instance_algorithm_options"
 
     def __init__(
         self,
-        algorithm_name: str,
+        algorithm_settings: BaseSettings,
         configuration_name: str = "",
         instance_algorithm_options: InstanceAlgorithmOptions = READ_ONLY_EMPTY_DICT,
-        **algorithm_options: Any,
     ) -> None:
         """
         Args:
-            algorithm_name: The name of the algorithm.
+            algorithm_settings: The settings of the algorithm.
             configuration_name: The name of the configuration of the algorithm.
                 If empty, a name will be generated based on the algorithm name and
                 its options, based on the pattern
@@ -69,35 +71,32 @@ class AlgorithmConfiguration:
                 that links the name of an algorithm option
                 to a callable that takes the 0-based index of the instance as argument
                 and returns the value of the option.
-            **algorithm_options: The options of the algorithm.
         """  # noqa: D205, D212, D415
-        self.__algorithm_name = algorithm_name
-        self.__algorithm_options = algorithm_options
+        self.__algorithm_settings = algorithm_settings
+        algorithm_name = algorithm_settings._TARGET_CLASS_NAME
+        non_default_opts = algorithm_settings.model_dump(exclude_unset=True)
         self.__configuration_name = configuration_name or self.__get_configuration_name(
-            algorithm_name, **algorithm_options
+            algorithm_name, non_default_opts
         )
         self.__instance_algorithm_options = instance_algorithm_options
 
     @classmethod
     def __get_configuration_name(
-        cls, algorithm_name: str, **algorithm_options: Any
+        cls, algorithm_name: str, options: dict[str, Any]
     ) -> str:
         """Return a name for the configuration based on the algorithm name and options.
 
         Args:
             algorithm_name: The name of the algorithm.
-            **algorithm_options: The options of the algorithm.
+            options: The explicitly-set options of the algorithm.
 
         Returns:
             The name of the algorithm configuration.
         """
-        if not algorithm_options:
+        if not options:
             return algorithm_name
 
-        return (
-            f"{algorithm_name}"
-            f"_{pretty_repr(cls.__make_json_serializable(algorithm_options))}"
-        )
+        return f"{algorithm_name}_{pretty_repr(cls.__make_json_serializable(options))}"
 
     @property
     def name(self) -> str:
@@ -105,23 +104,26 @@ class AlgorithmConfiguration:
         return self.__configuration_name
 
     @property
+    def algorithm_settings(self) -> BaseSettings:
+        """The settings of the algorithm."""
+        return self.__algorithm_settings
+
+    @property
     def algorithm_name(self) -> str:
         """The name of the algorithm."""
-        return self.__algorithm_name
+        return self.__algorithm_settings._TARGET_CLASS_NAME
 
     @property
     def algorithm_options(self) -> dict[str, Any]:
-        """The options of the algorithm."""
-        return self.__algorithm_options
+        """The explicitly-set options of the algorithm."""
+        return self.__algorithm_settings.model_dump(exclude_unset=True)
 
     @property
     def instance_algorithm_options(self) -> InstanceAlgorithmOptions:
         """The instance-specific options of the algorithm."""
         return self.__instance_algorithm_options
 
-    def to_dict(
-        self, skip_instance_algorithm_options: bool = False
-    ) -> dict[str, str | dict[str, Any]]:
+    def to_dict(self, skip_instance_algorithm_options: bool = False) -> dict[str, Any]:
         """Return the algorithm configuration as a dictionary.
 
         Args:
@@ -131,11 +133,14 @@ class AlgorithmConfiguration:
         Returns:
             The algorithm configuration as a dictionary.
         """
+        settings_class = type(self.__algorithm_settings)
         dictionary = {
             self.__CONFIGURATION_NAME: self.__configuration_name,
-            self.__ALGORITHM_NAME: self.__algorithm_name,
-            self.__ALGORITHM_OPTIONS: self.__make_json_serializable(
-                self.__algorithm_options
+            self.__ALGORITHM_SETTINGS_CLASS: (
+                f"{settings_class.__module__}.{settings_class.__qualname__}"
+            ),
+            self.__ALGORITHM_SETTINGS: self.__make_json_serializable(
+                self.algorithm_options
             ),
         }
         if not skip_instance_algorithm_options:
@@ -164,7 +169,7 @@ class AlgorithmConfiguration:
 
     @classmethod
     def from_dict(
-        cls, algorithm_configuration: dict[str, str | dict[str, Any]]
+        cls, algorithm_configuration: dict[str, Any]
     ) -> AlgorithmConfiguration:
         """Load an algorithm configuration from a dictionary.
 
@@ -174,11 +179,14 @@ class AlgorithmConfiguration:
         Returns:
             The algorithm configuration.
         """
-        return AlgorithmConfiguration(
-            algorithm_configuration[cls.__ALGORITHM_NAME],
+        fqn = algorithm_configuration[cls.__ALGORITHM_SETTINGS_CLASS]
+        module_name, _, class_name = fqn.rpartition(".")
+        settings_class = getattr(importlib.import_module(module_name), class_name)
+        settings = settings_class(**algorithm_configuration[cls.__ALGORITHM_SETTINGS])
+        return cls(
+            settings,
             algorithm_configuration[cls.__CONFIGURATION_NAME],
             algorithm_configuration.get(cls.__INSTANCE_ALGORITHM_OPTIONS, {}),
-            **algorithm_configuration[cls.__ALGORITHM_OPTIONS],
         )
 
     def copy(self) -> AlgorithmConfiguration:
@@ -188,8 +196,7 @@ class AlgorithmConfiguration:
             A copy of the algorithm configuration.
         """
         return AlgorithmConfiguration(
-            self.algorithm_name,
+            self.__algorithm_settings.model_copy(),
             self.name,
-            self.instance_algorithm_options,
-            **self.algorithm_options,
+            dict(self.instance_algorithm_options),
         )

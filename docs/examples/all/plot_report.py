@@ -31,6 +31,8 @@ import tempfile
 from pathlib import Path
 
 from gemseo import configure
+from gemseo.algos.opt.scipy_local.settings.lbfgsb import L_BFGS_B_Settings
+from gemseo.algos.opt.scipy_local.settings.slsqp import SLSQP_Settings
 from gemseo.problems.optimization.rastrigin import Rastrigin
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
 
@@ -55,9 +57,8 @@ from gemseo_benchmark.scenario import Scenario
 # with a number of Hessian corrections limited to 2.
 # (this option is called ``maxcor``.)
 lbfgsb_2_corrections = AlgorithmConfiguration(
-    "L-BFGS-B",
+    L_BFGS_B_Settings(maxcor=2),
     "L-BFGS-B with 2 Hessian corrections",
-    maxcor=2,
 )
 # %%
 # Note:
@@ -68,9 +69,8 @@ lbfgsb_2_corrections = AlgorithmConfiguration(
 # let us consider a different configuration of L-BFGS-B
 # with up to 20 Hessian corrections.
 lbfgsb_20_corrections = AlgorithmConfiguration(
-    "L-BFGS-B",
+    L_BFGS_B_Settings(maxcor=20),
     "L-BFGS-B with 20 Hessian corrections",
-    maxcor=20,
 )
 # %%
 # Let us put these two configurations of L-BFGS-B
@@ -87,7 +87,7 @@ lbfgsb_configurations = AlgorithmsConfigurations(
 # with all its options set to their default values,
 # to compare it against L-BFGS-B.
 # Let us put it in a group of its own.
-slsqp_default = AlgorithmConfiguration("SLSQP")
+slsqp_default = AlgorithmConfiguration(SLSQP_Settings())
 slsqp_configurations = AlgorithmsConfigurations(slsqp_default, name="SLSQP")
 # %%
 # ## Set the reference problems

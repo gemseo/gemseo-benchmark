@@ -32,8 +32,10 @@ import pytest
 from gemseo import create_mda
 from gemseo import create_scenario
 from gemseo.algos.design_space import DesignSpace
+from gemseo.algos.opt.scipy_local.settings.slsqp import SLSQP_Settings
 from gemseo.algos.optimization_problem import OptimizationProblem
 from gemseo.disciplines.analytic import AnalyticDiscipline
+from gemseo.mda.jacobi_settings import MDAJacobi_Settings
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
 from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 from gemseo.utils.testing.pytest_conftest import *  # noqa: F401,F403
@@ -263,6 +265,9 @@ def algorithm_configuration() -> mock.Mock:
     """The configuration of an algorithm."""
     algo_config = mock.Mock()
     algo_config.algorithm_name = "SLSQP"
+    algo_config.algorithm_settings = SLSQP_Settings(
+        normalize_design_space=False, max_iter=3
+    )
     algo_config.algorithm_options = {
         "normalize_design_space": False,
         "max_iter": 3,
@@ -273,8 +278,10 @@ def algorithm_configuration() -> mock.Mock:
     algo_config.to_dict = mock.Mock(
         return_value={
             "configuration_name": "SLSQP",
-            "algorithm_name": "SLSQP",
-            "algorithm_options": {"normalize_design_space": False, "max_iter": 3},
+            "algorithm_settings_class": (
+                "gemseo.algos.opt.scipy_local.settings.slsqp.SLSQP_Settings"
+            ),
+            "algorithm_settings": {"normalize_design_space": False, "max_iter": 3},
         }
     )
     return algo_config
@@ -423,7 +430,7 @@ def mda_problem_configuration(
 @pytest.fixture(scope="module")
 def mda_algorithm_configuration() -> AlgorithmConfiguration:
     """An algorithm configuration for multidisciplinary analysis."""
-    return AlgorithmConfiguration("MDAJacobi")
+    return AlgorithmConfiguration(MDAJacobi_Settings())
 
 
 def mdo_create_problem(
@@ -465,7 +472,7 @@ def mdo_problem_configuration(
 @pytest.fixture(scope="module")
 def mdo_algorithm_configuration() -> AlgorithmConfiguration:
     """An algorithm configuration for multidisciplinary optimization."""
-    return AlgorithmConfiguration("SLSQP")
+    return AlgorithmConfiguration(SLSQP_Settings())
 
 
 @pytest.fixture(scope="module")

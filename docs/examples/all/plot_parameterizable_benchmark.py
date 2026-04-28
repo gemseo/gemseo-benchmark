@@ -31,6 +31,8 @@ import tempfile
 from pathlib import Path
 
 from gemseo import configuration
+from gemseo.algos.opt.scipy_local.settings.lbfgsb import L_BFGS_B_Settings
+from gemseo.algos.opt.scipy_local.settings.slsqp import SLSQP_Settings
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -107,8 +109,8 @@ def generate_problems(n_x: int) -> ProblemsGroup:
 # For example,
 # let us choose the L-BFGS-B and SLSQP algorithms.
 algorithms_configurations = AlgorithmsConfigurations(
-    AlgorithmConfiguration("L-BFGS-B"),
-    AlgorithmConfiguration("SLSQP"),
+    AlgorithmConfiguration(L_BFGS_B_Settings()),
+    AlgorithmConfiguration(SLSQP_Settings()),
     name="Derivative-based algorithms",
 )
 # %%

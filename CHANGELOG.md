@@ -26,6 +26,23 @@ The format is based on
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# Develop
+
+## Added
+
+- The attribute `algorithm_settings` of `AlgorithmConfiguration`
+  is the `algorithm_settings` argument passed at instantiation.
+
+## Changed
+
+- The arguments `algorithm_name` and `**algorithm_options` of `AlgorithmConfiguration`
+  have been replaced by `algorithm_settings` of type `BaseSettings`.
+- The `to_dict` method of `AlgorithmConfiguration` returns a dictionary
+  containing
+  the configuration name,
+  the absolute path of the algorithm settings class
+  and the explicitly-set algorithm settings.
+
 # Version 4.0.1 (October 2025)
 
 ## Added
@@ -82,7 +99,7 @@ and this project adheres to
 
 #### Benchmarker
 
-- Argument ``databases_path`` of ``Benchmarker.__init__`` is renamed into ``hdf_path``
+- Argument ``databases_path`` of ``Benchmarker`` is renamed into ``hdf_path``
   as the saved files could represent caches rather than databases.
 - Arguments ``problems`` and ``algorithm`` of ``Benchmarker.execute`` are renamed into
   ``problem_configurations`` and ``algorithm_configurations``
@@ -307,7 +324,7 @@ and this project adheres to
 #### Results
 
 - The names of functions and the number of variables are stored in the
-    performance history files.
+  performance history files.
 
 #### Report
 
@@ -316,9 +333,9 @@ and this project adheres to
 #### Scenario
 
 - The options `custom_algos_descriptions` and
-    `max_eval_number_per_group` of `Report`{.interpreted-text
-    role="class"} can be passed through `Scenario`{.interpreted-text
-    role="class"}.
+  `max_eval_number_per_group` of `Report`{.interpreted-text
+  role="class"} can be passed through `Scenario`{.interpreted-text
+  role="class"}.
 
 ### Fixed
 
@@ -326,7 +343,7 @@ and this project adheres to
 
 - The sections of the PDF report are correctly numbered.
 - The graphs of the PDF report are anchored to their expected
-    locations.
+  locations.
 
 ## Version 1.0.0 (June 2023)
 
