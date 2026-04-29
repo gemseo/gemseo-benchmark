@@ -26,7 +26,6 @@ from typing import ClassVar
 from typing import Final
 
 from gemseo import execute_algo
-from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 
 from gemseo_benchmark.benchmarker.optimization_worker import OptimizationWorker
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
@@ -38,18 +37,14 @@ from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from collections.abc import Mapping
 
-    from gemseo.algos.doe.base_doe_library import DriverLibraryOptionType
+    from gemseo.algos.doe.base_doe_settings import BaseDOESettings
     from gemseo.algos.optimization_problem import OptimizationProblem
 
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
     )
     from gemseo_benchmark.data_profiles.target_values import TargetValues
-    from gemseo_benchmark.problems.base_problem_configuration import (
-        InputStartingPointsType,
-    )
 
 
 class OptimizationProblemConfiguration(BaseProblemConfiguration):
@@ -79,11 +74,8 @@ class OptimizationProblemConfiguration(BaseProblemConfiguration):
         self,
         name: str,
         create_problem: Callable[[], OptimizationProblem],
-        starting_points: InputStartingPointsType = (),
         target_values: TargetValues | None = None,
-        doe_algo_name: str = "",
-        doe_size: int | None = None,
-        doe_options: Mapping[str, DriverLibraryOptionType] = READ_ONLY_EMPTY_DICT,
+        doe_settings: BaseDOESettings | None = None,
         description: str = "No description available.",
         target_values_algorithms_configurations: AlgorithmsConfigurations | None = None,
         target_values_number: int | None = None,
@@ -104,11 +96,8 @@ class OptimizationProblemConfiguration(BaseProblemConfiguration):
             name,
             create_problem,
             target_values,
-            starting_points,
             self.__optimization_problem.design_space,
-            doe_algo_name,
-            doe_size,
-            doe_options,
+            doe_settings,
             description,
             optimum,
             len(self.__optimization_problem.scalar_constraint_names),

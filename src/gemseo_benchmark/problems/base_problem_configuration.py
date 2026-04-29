@@ -23,6 +23,9 @@ from typing import TYPE_CHECKING
 from typing import Any
 
 from gemseo import compute_doe
+from gemseo.algos.doe.base_n_samples_based_doe_settings import (
+    BaseNSamplesBasedDOESettings,
+)
 from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 from gemseo.utils.metaclasses import ABCGoogleDocstringInheritanceMeta
 from numpy import array
@@ -39,7 +42,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from gemseo.algos.design_space import DesignSpace
-    from gemseo.algos.doe.base_doe_library import DriverLibraryOptionType
+    from gemseo.algos.doe.base_doe_settings import BaseDOESettings
     from gemseo.typing import RealArray
 
     from gemseo_benchmark import ConfigurationPlotOptions
@@ -101,11 +104,8 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
         name: str,
         create_problem: Callable[[], Any],
         target_values: TargetValues | None,
-        starting_points: InputStartingPointsType,
         variable_space: DesignSpace,
-        doe_algo_name: str,
-        doe_size: int | None,
-        doe_options: Mapping[str, Any],
+        doe_settings: BaseDOESettings | None,
         description: str,
         optimum: float | None,
         number_of_scalar_constraints: int,
@@ -119,21 +119,15 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
                     algorithm configurations on the problem,
                     `create_problem` has to be pickable.
             target_values: The target values of the problem configuration.
-            starting_points: The starting points of the problem configuration.
-                If empty:
-                if `doe_algo_name` is not empty
-                then the starting points will be generated as a DOE;
-                otherwise the current value of the optimization problem
-                will be set as the single starting point.
             variable_space: The space of the problem variables.
-            doe_algo_name: The name of the DOE algorithm.
-                If empty and `starting_points` is empty,
+            doe_settings: The settings of the DOE algorithm.
+                If `None`,
                 the current point of the variable space
                 is set as the only starting point.
-            doe_size: The number of starting points.
-                If `None`,
+                If `n_samples` is not set explicitly,
                 this number is set as the problem dimension or 10 if bigger.
-            doe_options: The options of the DOE algorithm.
+                To use custom starting points,
+                pass `CustomDOE_Settings(samples=...)`.
             description: The description of the problem configuration
                 (to appear in a benchmarking report).
             optimum: The best feasible performance measure of the problem configuration.
@@ -150,18 +144,20 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
         self.__target_values = None
         self.__variable_space = variable_space
 
-        if len(starting_points) > 0:
-            self.starting_points = starting_points
-        elif doe_algo_name:
-            self.starting_points = self.__get_starting_points(
-                doe_algo_name, doe_size, doe_options
-            )
+        if doe_settings is None:
+            self.__starting_points = []
+            if self.__variable_space.has_current_value:
+                self.__starting_points.append(self.__variable_space.get_current_value())
         else:
-            default_starting_point = self._get_default_starting_point()
-            if default_starting_point is None:
-                self.starting_points = []
-            else:
-                self.starting_points = [default_starting_point]
+            if (
+                isinstance(doe_settings, BaseNSamplesBasedDOESettings)
+                and "n_samples" not in doe_settings.model_fields_set
+            ):
+                doe_settings.n_samples = min([self.dimension, 10])
+
+            self.starting_points = compute_doe(
+                self.__variable_space, settings_model=doe_settings
+            )
 
         if target_values is not None:
             self.target_values = target_values
@@ -271,46 +267,6 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
                 f"{self.dimension}."
             )
             raise ValueError(msg)
-
-    def __get_starting_points(
-        self,
-        doe_algo_name: str,
-        doe_size: int | None,
-        doe_options: Mapping[str, DriverLibraryOptionType],
-    ) -> ndarray:
-        """Return the starting points of the problem configuration.
-
-        Args:
-            doe_algo_name: The name of the DOE algorithm.
-            doe_size: The number of starting points.
-                If `None`, this number is set as the problem dimension or 10 if
-                bigger.
-            doe_options: The options of the DOE algorithm.
-
-        Returns:
-            The starting points.
-        """
-        if doe_size is None:
-            doe_size = min([self.dimension, 10])
-
-        return compute_doe(
-            self.__variable_space,
-            algo_name=doe_algo_name,
-            n_samples=doe_size,
-            **doe_options,
-        )
-
-    def _get_default_starting_point(self) -> RealArray | None:
-        """Return the default starting point of the problem configuration.
-
-        Return:
-            The current value of the design space if it has one,
-            `None` otherwise.
-        """
-        if self.__variable_space.has_current_value:
-            return self.__variable_space.get_current_value()
-
-        return None
 
     @property
     def target_values(self) -> TargetValues:

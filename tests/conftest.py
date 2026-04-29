@@ -32,6 +32,7 @@ import pytest
 from gemseo import create_mda
 from gemseo import create_scenario
 from gemseo.algos.design_space import DesignSpace
+from gemseo.algos.doe.custom_doe.settings.custom_doe_settings import CustomDOE_Settings
 from gemseo.algos.opt.scipy_local.settings.slsqp import SLSQP_Settings
 from gemseo.algos.optimization_problem import OptimizationProblem
 from gemseo.disciplines.analytic import AnalyticDiscipline
@@ -155,6 +156,7 @@ def minimization_problem(design_space, objective, constraints) -> mock.Mock:
     problem.tolerances.equality = 1e-2
     problem.design_space = design_space
     problem.design_space.dimension = design_space.dimension
+    problem.design_space.transform_vect = lambda x: x
     problem.objective = objective
     problem.minimize_objective = True
     problem.history = mock.Mock()
@@ -361,8 +363,8 @@ def rosenbrock() -> OptimizationProblemConfiguration:
     return OptimizationProblemConfiguration(
         "Rosenbrock",
         Rosenbrock,
-        [array([0.0, 1.0]), array([1.0, 0.0])],
-        TargetValues([1e-2, 1e-4, 1e-6, 0.0]),
+        doe_settings=CustomDOE_Settings(samples=array([[0.0, 1.0], [1.0, 0.0]])),
+        target_values=TargetValues([1e-2, 1e-4, 1e-6, 0.0]),
         optimum=0.0,
     )
 
@@ -423,7 +425,7 @@ def mda_problem_configuration(
         "Linear MDA",
         mda_create_problem,
         multidisciplinary_variable_space,
-        starting_points=[array([0, 1]), array([1, 0])],
+        doe_settings=CustomDOE_Settings(samples=array([[0, 1], [1, 0]])),
     )
 
 
@@ -465,7 +467,7 @@ def mdo_problem_configuration(
         multidisciplinary_variable_space,
         True,
         0,
-        starting_points=[array([0, 1]), array([1, 0])],
+        doe_settings=CustomDOE_Settings(samples=array([[0, 1], [1, 0]])),
     )
 
 

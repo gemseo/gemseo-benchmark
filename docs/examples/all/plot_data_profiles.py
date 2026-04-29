@@ -30,6 +30,7 @@ import tempfile
 from pathlib import Path
 
 from gemseo import configure
+from gemseo.algos.doe.openturns.settings.ot_opt_lhs import OT_OPT_LHS_Settings
 from gemseo.algos.opt.scipy_local.settings.lbfgsb import L_BFGS_B_Settings
 from gemseo.algos.opt.scipy_local.settings.slsqp import SLSQP_Settings
 from gemseo.problems.optimization.rastrigin import Rastrigin
@@ -108,16 +109,14 @@ rastrigin = OptimizationProblemConfiguration(
     "Rastrigin",
     Rastrigin,
     optimum=optimum,
-    doe_size=5,
-    doe_algo_name="OT_OPT_LHS",
+    doe_settings=OT_OPT_LHS_Settings(n_samples=5),
     target_values=target_values,
 )
 rosenbrock = OptimizationProblemConfiguration(
     "Rosenbrock",
     Rosenbrock,
     optimum=optimum,
-    doe_size=5,
-    doe_algo_name="OT_OPT_LHS",
+    doe_settings=OT_OPT_LHS_Settings(n_samples=5),
     target_values=target_values,
 )
 # %%

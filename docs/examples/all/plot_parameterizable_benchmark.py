@@ -31,6 +31,7 @@ import tempfile
 from pathlib import Path
 
 from gemseo import configuration
+from gemseo.algos.doe.openturns.settings.ot_opt_lhs import OT_OPT_LHS_Settings
 from gemseo.algos.opt.scipy_local.settings.lbfgsb import L_BFGS_B_Settings
 from gemseo.algos.opt.scipy_local.settings.slsqp import SLSQP_Settings
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
@@ -91,8 +92,7 @@ def generate_problems(n_x: int) -> ProblemsGroup:
         f"Rosenbrock_{dimension}D",
         problem_creator,
         optimum=optimum,
-        doe_size=5,
-        doe_algo_name="OT_OPT_LHS",
+        doe_settings=OT_OPT_LHS_Settings(n_samples=5),
         target_values=target_values,
     )
     return ProblemsGroup(f"{n_x}D_problems", [problem_configuration])

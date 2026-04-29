@@ -35,6 +35,8 @@ and this project adheres to
 
 ## Changed
 
+- The arguments `doe_name`, `doe_options` and `doe_size` of `BaseProblemConfiguration` and its subclasses
+  have been replaced by `doe_settings` of type `BaseDOESettings`.
 - The arguments `algorithm_name` and `**algorithm_options` of `AlgorithmConfiguration`
   have been replaced by `algorithm_settings` of type `BaseSettings`.
 - The `to_dict` method of `AlgorithmConfiguration` returns a dictionary

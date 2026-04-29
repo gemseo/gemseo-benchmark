@@ -23,6 +23,10 @@ from unittest import mock
 import matplotlib.pyplot
 import numpy
 import pytest
+from gemseo.algos.doe.custom_doe.settings.custom_doe_settings import CustomDOE_Settings
+from gemseo.algos.doe.diagonal_doe.settings.diagonal_doe_settings import (
+    DiagonalDOE_Settings,
+)
 from numpy import zeros
 from numpy.testing import assert_equal
 
@@ -86,11 +90,14 @@ def check_inconsistent_starting_points(
     with pytest.raises(
         ValueError,
         match=re.escape(
-            "A starting point must be a 1-dimensional NumPy array of size 2."
+            "Dimension mismatch between the variables space (2) and the samples (3)."
         ),
     ):
         problem_configuration_class(
-            "Problem", create_problem, *args, starting_points=[numpy.zeros(3)]
+            "Problem",
+            create_problem,
+            *args,
+            doe_settings=CustomDOE_Settings(samples=zeros((1, 3))),
         )
 
 
@@ -124,14 +131,17 @@ def __check_starting_points_generation(
         actual_doe_size: The actual number of starting points.
         *args: Positional arguments for the class initialization.
     """
+    if input_doe_size is None:
+        settings = DiagonalDOE_Settings()
+    else:
+        settings = DiagonalDOE_Settings(n_samples=input_doe_size)
     assert (
         len(
             problem_configuration_class(
                 "Problem",
                 create_problem,
                 *args,
-                doe_algo_name="DiagonalDOE",
-                doe_size=input_doe_size,
+                doe_settings=settings,
             ).starting_points
         )
         == actual_doe_size
@@ -223,7 +233,7 @@ def check_set_starting_points_with_wrong_dimension(
             "dimension (2)."
         ),
     ):
-        problem_configuration.starting_points = numpy.zeros((3, 1))
+        problem_configuration.starting_points = zeros((3, 1))
 
 
 test_description_parametrize = pytest.mark.parametrize(
@@ -280,7 +290,10 @@ def check_starting_points_saving(
     starting_points = numpy.ones((3, 2))
     path = tmp_path / "starting_points.npy"
     problem_configuration_class(
-        "Problem", create_problem, *args, starting_points=starting_points
+        "Problem",
+        create_problem,
+        *args,
+        doe_settings=CustomDOE_Settings(samples=starting_points),
     ).save_starting_points(path)
     assert_equal(numpy.load(path), starting_points)
 
@@ -303,7 +316,10 @@ def check_starting_point_loading(
     path = tmp_path / "starting_points.npy"
     numpy.save(path, starting_points)
     problem = problem_configuration_class(
-        "problem", create_problem, *args, starting_points=starting_points
+        "problem",
+        create_problem,
+        *args,
+        doe_settings=CustomDOE_Settings(samples=starting_points),
     )
     problem.load_starting_point(path)
     assert_equal(problem.starting_points, starting_points)
