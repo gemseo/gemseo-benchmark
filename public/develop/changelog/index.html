@@ -2131,8 +2131,26 @@ Changelog titles are:
 <a href="https://keepachangelog.com/en/1.0.0">Keep a Changelog</a>
 and this project adheres to
 <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
-<h1 id="version-401-october-2025">Version 4.0.1 (October 2025)<a class="headerlink" href="#version-401-october-2025" title="Permanent link">&para;</a></h1>
+<h1 id="develop">Develop<a class="headerlink" href="#develop" title="Permanent link">&para;</a></h1>
 <h2 id="added">Added<a class="headerlink" href="#added" title="Permanent link">&para;</a></h2>
+<ul>
+<li>The attribute <code>algorithm_settings</code> of <code>AlgorithmConfiguration</code>
+  is the <code>algorithm_settings</code> argument passed at instantiation.</li>
+</ul>
+<h2 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h2>
+<ul>
+<li>The arguments <code>doe_name</code>, <code>doe_options</code> and <code>doe_size</code> of <code>BaseProblemConfiguration</code> and its subclasses
+  have been replaced by <code>doe_settings</code> of type <code>BaseDOESettings</code>.</li>
+<li>The arguments <code>algorithm_name</code> and <code>**algorithm_options</code> of <code>AlgorithmConfiguration</code>
+  have been replaced by <code>algorithm_settings</code> of type <code>BaseSettings</code>.</li>
+<li>The <code>to_dict</code> method of <code>AlgorithmConfiguration</code> returns a dictionary
+  containing
+  the configuration name,
+  the absolute path of the algorithm settings class
+  and the explicitly-set algorithm settings.</li>
+</ul>
+<h1 id="version-401-october-2025">Version 4.0.1 (October 2025)<a class="headerlink" href="#version-401-october-2025" title="Permanent link">&para;</a></h1>
+<h2 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Support for Python 3.13.</li>
 </ul>
@@ -2141,7 +2159,7 @@ and this project adheres to
 <li>Support for Python 3.9.</li>
 </ul>
 <h1 id="version-400-august-2025">Version 4.0.0 (August 2025)<a class="headerlink" href="#version-400-august-2025" title="Permanent link">&para;</a></h1>
-<h2 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h2>
+<h2 id="added_2">Added<a class="headerlink" href="#added_2" title="Permanent link">&para;</a></h2>
 <h3 id="problems">Problems<a class="headerlink" href="#problems" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Multidisciplinary analysis problem configurations
@@ -2171,7 +2189,7 @@ and this project adheres to
 <li>The scale of the axis showing the number of function evaluations
   can now be made logarithmic.</li>
 </ul>
-<h2 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h2>
+<h2 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h2>
 <ul>
 <li>The phrasing "problem configuration" is now used instead of "benchmarking problem".
   Thus the two main types of inputs to be defined by the user
@@ -2184,7 +2202,7 @@ and this project adheres to
 </ul>
 <h4 id="benchmarker">Benchmarker<a class="headerlink" href="#benchmarker" title="Permanent link">&para;</a></h4>
 <ul>
-<li>Argument <code>databases_path</code> of <code>Benchmarker.__init__</code> is renamed into <code>hdf_path</code>
+<li>Argument <code>databases_path</code> of <code>Benchmarker</code> is renamed into <code>hdf_path</code>
   as the saved files could represent caches rather than databases.</li>
 <li>Arguments <code>problems</code> and <code>algorithm</code> of <code>Benchmarker.execute</code> are renamed into
   <code>problem_configurations</code> and <code>algorithm_configurations</code>
@@ -2312,7 +2330,7 @@ and this project adheres to
 <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">plot_all</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="version-300-november-2024">Version 3.0.0 (November 2024)<a class="headerlink" href="#version-300-november-2024" title="Permanent link">&para;</a></h2>
-<h3 id="added_2">Added<a class="headerlink" href="#added_2" title="Permanent link">&para;</a></h3>
+<h3 id="added_3">Added<a class="headerlink" href="#added_3" title="Permanent link">&para;</a></h3>
 <h4 id="benchmarker_2">Benchmarker<a class="headerlink" href="#benchmarker_2" title="Permanent link">&para;</a></h4>
 <ul>
 <li>The option <code>log_gemseo_to_file</code> has been added to <code>Benchmarker.execute</code>
@@ -2327,12 +2345,12 @@ and this project adheres to
 <h4 id="results_2">Results<a class="headerlink" href="#results_2" title="Permanent link">&para;</a></h4>
 <ul>
 <li>The distribution of a collection of performance histories can be plotted in terms of
-  performance measure (<code>PerformanceHistories.plot_performance_measure_distribution``),
-  infeasibility measure (</code>PerformanceHistories.plot_infeasibility_measure_distribution<code>)
+  performance measure (<code>PerformanceHistories.plot_performance_measure_distribution</code>),
+  infeasibility measure (<code>PerformanceHistories.plot_infeasibility_measure_distribution</code>)
   and number of unsatisfied constraints
-  (```PerformanceHistories.plot_number_of_unsatisfied_constraints_distribution</code>).</li>
+  (<code>PerformanceHistories.plot_number_of_unsatisfied_constraints_distribution</code>).</li>
 </ul>
-<h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
+<h3 id="changed_2">Changed<a class="headerlink" href="#changed_2" title="Permanent link">&para;</a></h3>
 <h4 id="results_3">Results<a class="headerlink" href="#results_3" title="Permanent link">&para;</a></h4>
 <ul>
 <li>Methods
@@ -2343,7 +2361,7 @@ and this project adheres to
   preserve the attributes other than <code>PerformanceHistory.items</code>.</li>
 </ul>
 <h2 id="version-200-december-2023">Version 2.0.0 (December 2023)<a class="headerlink" href="#version-200-december-2023" title="Permanent link">&para;</a></h2>
-<h3 id="changed_2">Changed<a class="headerlink" href="#changed_2" title="Permanent link">&para;</a></h3>
+<h3 id="changed_3">Changed<a class="headerlink" href="#changed_3" title="Permanent link">&para;</a></h3>
 <h4 id="benchmarker_3">Benchmarker<a class="headerlink" href="#benchmarker_3" title="Permanent link">&para;</a></h4>
 <ul>
 <li>The option to automatically save the logs of pSeven has been removed
@@ -2364,7 +2382,7 @@ and this project adheres to
   The user can still set the value of <code>PerformanceHistory.doe_size</code>
   by themselves since it is a public attribute.</li>
 </ul>
-<h3 id="added_3">Added<a class="headerlink" href="#added_3" title="Permanent link">&para;</a></h3>
+<h3 id="added_4">Added<a class="headerlink" href="#added_4" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Support for Python 3.11.</li>
 </ul>
@@ -2382,11 +2400,11 @@ and this project adheres to
 <li>Support for Python 3.8.</li>
 </ul>
 <h2 id="version-110-september-2023">Version 1.1.0 (September 2023)<a class="headerlink" href="#version-110-september-2023" title="Permanent link">&para;</a></h2>
-<h3 id="added_4">Added<a class="headerlink" href="#added_4" title="Permanent link">&para;</a></h3>
+<h3 id="added_5">Added<a class="headerlink" href="#added_5" title="Permanent link">&para;</a></h3>
 <h4 id="results_4">Results<a class="headerlink" href="#results_4" title="Permanent link">&para;</a></h4>
 <ul>
 <li>The names of functions and the number of variables are stored in the
-    performance history files.</li>
+  performance history files.</li>
 </ul>
 <h4 id="report_3">Report<a class="headerlink" href="#report_3" title="Permanent link">&para;</a></h4>
 <ul>
@@ -2395,16 +2413,16 @@ and this project adheres to
 <h4 id="scenario_2">Scenario<a class="headerlink" href="#scenario_2" title="Permanent link">&para;</a></h4>
 <ul>
 <li>The options <code>custom_algos_descriptions</code> and
-    <code>max_eval_number_per_group</code> of <code>Report</code>{.interpreted-text
-    role="class"} can be passed through <code>Scenario</code>{.interpreted-text
-    role="class"}.</li>
+  <code>max_eval_number_per_group</code> of <code>Report</code>{.interpreted-text
+  role="class"} can be passed through <code>Scenario</code>{.interpreted-text
+  role="class"}.</li>
 </ul>
 <h3 id="fixed_1">Fixed<a class="headerlink" href="#fixed_1" title="Permanent link">&para;</a></h3>
 <h4 id="report_4">Report<a class="headerlink" href="#report_4" title="Permanent link">&para;</a></h4>
 <ul>
 <li>The sections of the PDF report are correctly numbered.</li>
 <li>The graphs of the PDF report are anchored to their expected
-    locations.</li>
+  locations.</li>
 </ul>
 <h2 id="version-100-june-2023">Version 1.0.0 (June 2023)<a class="headerlink" href="#version-100-june-2023" title="Permanent link">&para;</a></h2>
 <p>First version.</p>

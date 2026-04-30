@@ -2654,7 +2654,10 @@ and if the infeasibility measure is positive it will be set to None.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
-            <b><code>number_of_disicpline_executions</code></b>
+            <b><code>number_of_discipline_executions</code></b>
+              (<code><span title="int">int</span></code>, default:
+                  <code>0</code>
+)
           –
           <div class="doc-md-description">
             <p>The number of discipline executions.</p>
@@ -2710,10 +2713,10 @@ and if the infeasibility measure is positive it will be set to None.</p>
 <span class="sd">        infeasibility_measure: The infeasibility measure of the item.</span>
 <span class="sd">        n_unsatisfied_constraints: The number of unsatisfied constraints of the</span>
 <span class="sd">            item.</span>
-<span class="sd">            If ``None``, it will be set to 0 if the infeasibility measure is zero,</span>
+<span class="sd">            If `None`, it will be set to 0 if the infeasibility measure is zero,</span>
 <span class="sd">            and if the infeasibility measure is positive it will be set to None.</span>
 <span class="sd">        elapsed_time: The elapsed time of the item.</span>
-<span class="sd">        number_of_disicpline_executions: The number of discipline executions.</span>
+<span class="sd">        number_of_discipline_executions: The number of discipline executions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D205, D212, D415</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__elapsed_time</span> <span class="o">=</span> <span class="n">elapsed_time</span>
     <span class="p">(</span>

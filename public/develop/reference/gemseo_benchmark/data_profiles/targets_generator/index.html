@@ -2561,16 +2561,16 @@ passed, or if both are passed.</p>
 
 <span class="sd">    Args:</span>
 <span class="sd">        performance_measures: A history of performance measures.</span>
-<span class="sd">            If ``None``, a performance history must be passed.</span>
+<span class="sd">            If `None`, a performance history must be passed.</span>
 <span class="sd">            N.B. the value at index i is assumed to have been obtained with i+1</span>
 <span class="sd">            evaluations.</span>
 <span class="sd">        infeasibility_measures: A history of infeasibility measures.</span>
-<span class="sd">            If ``None`` then measures are set to zero in case of feasibility and set</span>
+<span class="sd">            If `None` then measures are set to zero in case of feasibility and set</span>
 <span class="sd">            to infinity otherwise.</span>
 <span class="sd">        feasibility_statuses: A history of (boolean) feasibility statuses.</span>
-<span class="sd">            If ``None`` then feasibility is always assumed.</span>
+<span class="sd">            If `None` then feasibility is always assumed.</span>
 <span class="sd">        history: A performance history.</span>
-<span class="sd">            If ``None``, objective values must be passed.</span>
+<span class="sd">            If `None`, objective values must be passed.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If neither a performance history nor objective values are</span>
@@ -2807,7 +2807,7 @@ feasible.</p>
 <span class="sd">        targets_number: The number of targets to compute.</span>
 <span class="sd">        budget_min: The number of functions evaluations to be used to define the</span>
 <span class="sd">            first target.</span>
-<span class="sd">            If argument ``feasible`` is set to ``True``, this argument will be</span>
+<span class="sd">            If argument `feasible` is set to `True`, this argument will be</span>
 <span class="sd">            disregarded and the evaluation budget defining the easiest target</span>
 <span class="sd">            will be the budget of the first item in the histories reaching the</span>
 <span class="sd">            best target value.</span>
@@ -2816,7 +2816,7 @@ feasible.</p>
 <span class="sd">        file_path: The file path to save the plot.</span>
 <span class="sd">            If empty, the plot is not saved.</span>
 <span class="sd">        best_target_objective: The objective value of the best target value.</span>
-<span class="sd">            If ``None``, it will be inferred from the performance histories.</span>
+<span class="sd">            If `None`, it will be inferred from the performance histories.</span>
 <span class="sd">        best_target_tolerance: The relative tolerance for comparison with the</span>
 <span class="sd">            best target value.</span>
 
@@ -2995,7 +2995,7 @@ If empty, the figure will not be saved.</p>
 <span class="sd">    Args:</span>
 <span class="sd">        best_target_value: The best target value</span>
 <span class="sd">            to be represented with a horizontal line.</span>
-<span class="sd">            If ``None``, no best target value will be plotted.</span>
+<span class="sd">            If `None`, no best target value will be plotted.</span>
 <span class="sd">        show: Whether to show the figure.</span>
 <span class="sd">        file_path: The path where to save the figure.</span>
 <span class="sd">            If empty, the figure will not be saved.</span>

@@ -2482,9 +2482,9 @@ If <code>None</code>, no HDF file will be saved.</p>
 <span class="sd">        results_path: The path to the file for saving the performance histories</span>
 <span class="sd">            paths.</span>
 <span class="sd">            If exists, the file is updated with the new performance histories paths.</span>
-<span class="sd">            If ``None``, no performance history path will be saved.</span>
+<span class="sd">            If `None`, no performance history path will be saved.</span>
 <span class="sd">        hdf_path: The path to the destination directory for the HDF files.</span>
-<span class="sd">            If ``None``, no HDF file will be saved.</span>
+<span class="sd">            If `None`, no HDF file will be saved.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D205, D212, D415</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__hdf_path</span> <span class="o">=</span> <span class="n">hdf_path</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__histories_path</span> <span class="o">=</span> <span class="n">histories_path</span>
@@ -2715,7 +2715,7 @@ next to each performance history file.</p>
 <span class="sd">        use_threading: Whether to use threads instead of processes</span>
 <span class="sd">            to parallelize the execution.</span>
 <span class="sd">        save_log: Whether to save the log to a file.</span>
-<span class="sd">            If ``use_threading`` is ``True``, a single global file will be saved</span>
+<span class="sd">            If `use_threading` is `True`, a single global file will be saved</span>
 <span class="sd">            in the performance histories directory.</span>
 <span class="sd">            Otherwise, one file per optimization will be saved</span>
 <span class="sd">            next to each performance history file.</span>
@@ -2853,9 +2853,7 @@ next to each performance history file.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/gemseo_benchmark/benchmarker/benchmarker.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">332</span>
-<span class="normal">333</span>
-<span class="normal">334</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">334</span>
 <span class="normal">335</span>
 <span class="normal">336</span>
 <span class="normal">337</span>
@@ -2878,7 +2876,9 @@ next to each performance history file.</p>
 <span class="normal">354</span>
 <span class="normal">355</span>
 <span class="normal">356</span>
-<span class="normal">357</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_history_path</span><span class="p">(</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_history_path</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">algorithm_configuration</span><span class="p">:</span> <span class="n">AlgorithmConfiguration</span><span class="p">,</span>
     <span class="n">problem_configuration_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>

@@ -2478,7 +2478,8 @@ definition of the problem, as an [OptimizationProblem][gemseo.algos.optimization
 <ul>
 <li>
 <p>5 starting points are computed by Latin hypercube sampling (LHS),</p>
-<div class="highlight"><pre><span></span><code><span class="n">doe_settings</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;doe_size&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;doe_algo_name&quot;</span><span class="p">:</span> <span class="s2">&quot;LHS&quot;</span><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">gemseo.algos.doe.openturns.settings.ot_opt_lhs</span><span class="w"> </span><span class="kn">import</span> <span class="n">OT_OPT_LHS_Settings</span>
+<span class="n">doe_settings</span> <span class="o">=</span> <span class="n">OT_OPT_LHS_Settings</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 </code></pre></div>
 </li>
 <li>
@@ -2494,7 +2495,7 @@ presented <a href="#target-values">further down</a>.)</p>
     <span class="s2">&quot;Rastrigin&quot;</span><span class="p">,</span>
     <span class="n">Rastrigin</span><span class="p">,</span>
     <span class="n">target_values</span><span class="o">=</span><span class="n">target_values</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">doe_settings</span><span class="p">,</span>
+    <span class="n">doe_settings</span><span class="o">=</span><span class="n">doe_settings</span><span class="p">,</span>
     <span class="n">optimum</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -2502,7 +2503,7 @@ presented <a href="#target-values">further down</a>.)</p>
     <span class="s2">&quot;Rosenbrock&quot;</span><span class="p">,</span>
     <span class="n">Rosenbrock</span><span class="p">,</span>
     <span class="n">target_values</span><span class="o">=</span><span class="n">target_values</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">doe_settings</span><span class="p">,</span>
+    <span class="n">doe_settings</span><span class="o">=</span><span class="n">doe_settings</span><span class="p">,</span>
     <span class="n">optimum</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>

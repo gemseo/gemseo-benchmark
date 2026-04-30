@@ -1119,6 +1119,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration.algorithm_settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;algorithm_settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration.instance_algorithm_options" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2352,6 +2363,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration.algorithm_settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-attribute"></code>&nbsp;algorithm_settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration.instance_algorithm_options" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2508,10 +2530,9 @@
 
 <a href="#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">AlgorithmConfiguration</span><span class="p">(</span>
-    <span class="n">algorithm_name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span>
+    <span class="n">algorithm_settings</span><span class="p">:</span> <span class="n"><span title="gemseo.settings.base_settings.BaseSettings">BaseSettings</span></span><span class="p">,</span>
     <span class="n">configuration_name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">instance_algorithm_options</span><span class="p">:</span> <span class="n"><span title="gemseo_benchmark.algorithms.algorithm_configuration.InstanceAlgorithmOptions">InstanceAlgorithmOptions</span></span> <span class="o">=</span> <span class="n"><span title="gemseo.utils.constants.READ_ONLY_EMPTY_DICT">READ_ONLY_EMPTY_DICT</span></span><span class="p">,</span>
-    <span class="o">**</span><span class="n">algorithm_options</span><span class="p">:</span> <span class="n"><span title="typing.Any">Any</span></span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -2528,11 +2549,11 @@ A value set defines a configuration of the algorithm.</p>
 <p><span class="doc-section-title">Parameters:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-            <b><code>algorithm_name</code></b>
-              (<code><span title="str">str</span></code>)
+            <b><code>algorithm_settings</code></b>
+              (<code><span title="gemseo.settings.base_settings.BaseSettings">BaseSettings</span></code>)
           –
           <div class="doc-md-description">
-            <p>The name of the algorithm.</p>
+            <p>The settings of the algorithm.</p>
           </div>
         </li>
         <li class="doc-section-item field-body">
@@ -2563,16 +2584,6 @@ to a callable that takes the 0-based index of the instance as argument
 and returns the value of the option.</p>
           </div>
         </li>
-        <li class="doc-section-item field-body">
-            <b><code>**algorithm_options</code></b>
-              (<code><span title="typing.Any">Any</span></code>, default:
-                  <code>{}</code>
-)
-          –
-          <div class="doc-md-description">
-            <p>The options of the algorithm.</p>
-          </div>
-        </li>
     </ul>
 
 
@@ -2584,10 +2595,7 @@ and returns the value of the option.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>src/gemseo_benchmark/algorithms/algorithm_configuration.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">55</span>
 <span class="normal">56</span>
 <span class="normal">57</span>
 <span class="normal">58</span>
@@ -2611,32 +2619,33 @@ and returns the value of the option.</p>
 <span class="normal">76</span>
 <span class="normal">77</span>
 <span class="normal">78</span>
-<span class="normal">79</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
-    <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">algorithm_settings</span><span class="p">:</span> <span class="n">BaseSettings</span><span class="p">,</span>
     <span class="n">configuration_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">instance_algorithm_options</span><span class="p">:</span> <span class="n">InstanceAlgorithmOptions</span> <span class="o">=</span> <span class="n">READ_ONLY_EMPTY_DICT</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">algorithm_options</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Args:</span>
-<span class="sd">        algorithm_name: The name of the algorithm.</span>
+<span class="sd">        algorithm_settings: The settings of the algorithm.</span>
 <span class="sd">        configuration_name: The name of the configuration of the algorithm.</span>
 <span class="sd">            If empty, a name will be generated based on the algorithm name and</span>
 <span class="sd">            its options, based on the pattern</span>
-<span class="sd">            ``&quot;algorithm_name[option_name=option_value, ...]&quot;``.</span>
+<span class="sd">            `&quot;algorithm_name[option_name=option_value, ...]&quot;`.</span>
 <span class="sd">        instance_algorithm_options: The options of the algorithm specific to</span>
 <span class="sd">            instances of a problem.</span>
 <span class="sd">            They shall be passed as a mapping</span>
 <span class="sd">            that links the name of an algorithm option</span>
 <span class="sd">            to a callable that takes the 0-based index of the instance as argument</span>
 <span class="sd">            and returns the value of the option.</span>
-<span class="sd">        **algorithm_options: The options of the algorithm.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D205, D212, D415</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">__algorithm_name</span> <span class="o">=</span> <span class="n">algorithm_name</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">__algorithm_options</span> <span class="o">=</span> <span class="n">algorithm_options</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">__algorithm_settings</span> <span class="o">=</span> <span class="n">algorithm_settings</span>
+    <span class="n">algorithm_name</span> <span class="o">=</span> <span class="n">algorithm_settings</span><span class="o">.</span><span class="n">_TARGET_CLASS_NAME</span>
+    <span class="n">non_default_opts</span> <span class="o">=</span> <span class="n">algorithm_settings</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude_unset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__configuration_name</span> <span class="o">=</span> <span class="n">configuration_name</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_configuration_name</span><span class="p">(</span>
-        <span class="n">algorithm_name</span><span class="p">,</span> <span class="o">**</span><span class="n">algorithm_options</span>
+        <span class="n">algorithm_name</span><span class="p">,</span> <span class="n">non_default_opts</span>
     <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">__instance_algorithm_options</span> <span class="o">=</span> <span class="n">instance_algorithm_options</span>
 </code></pre></div></td></tr></table></div>
@@ -2694,7 +2703,31 @@ and returns the value of the option.</p>
 
     <div class="doc doc-contents ">
 
-        <p>The options of the algorithm.</p>
+        <p>The explicitly-set options of the algorithm.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h6 id="gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration.algorithm_settings" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">algorithm_settings</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration.algorithm_settings" class="headerlink" title="Permanent link">&para;</a></h6>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">algorithm_settings</span><span class="p">:</span> <span class="n"><span title="gemseo.settings.base_settings.BaseSettings">BaseSettings</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The settings of the algorithm.</p>
 
     </div>
 
@@ -2781,28 +2814,26 @@ and returns the value of the option.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/gemseo_benchmark/algorithms/algorithm_configuration.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">184</span>
-<span class="normal">185</span>
-<span class="normal">186</span>
-<span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span>
-<span class="normal">192</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">192</span>
 <span class="normal">193</span>
 <span class="normal">194</span>
-<span class="normal">195</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfiguration</span><span class="p">:</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfiguration</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a copy of the algorithm configuration.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A copy of the algorithm configuration.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">AlgorithmConfiguration</span><span class="p">(</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">algorithm_name</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__algorithm_settings</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(),</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">instance_algorithm_options</span><span class="p">,</span>
-        <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">algorithm_options</span><span class="p">,</span>
+        <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance_algorithm_options</span><span class="p">),</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -2823,9 +2854,7 @@ and returns the value of the option.</p>
 
 <a href="#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration.from_dict" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_dict</span><span class="p">(</span>
-    <span class="n">algorithm_configuration</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span>
-        <span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span>
-    <span class="p">],</span>
+    <span class="n">algorithm_configuration</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="            AlgorithmConfiguration (gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration)" href="#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration">AlgorithmConfiguration</a></span>
 </code></pre></div>
 
@@ -2838,7 +2867,7 @@ and returns the value of the option.</p>
     <ul>
         <li class="doc-section-item field-body">
             <b><code>algorithm_configuration</code></b>
-              (<code><span title="dict">dict</span>[<span title="str">str</span>, <span title="str">str</span> | <span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]]</code>)
+              (<code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>)
           –
           <div class="doc-md-description">
             <p>The algorithm configuration.</p>
@@ -2861,12 +2890,7 @@ and returns the value of the option.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/gemseo_benchmark/algorithms/algorithm_configuration.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">170</span>
 <span class="normal">171</span>
 <span class="normal">172</span>
 <span class="normal">173</span>
@@ -2878,9 +2902,17 @@ and returns the value of the option.</p>
 <span class="normal">179</span>
 <span class="normal">180</span>
 <span class="normal">181</span>
-<span class="normal">182</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span>
-    <span class="bp">cls</span><span class="p">,</span> <span class="n">algorithm_configuration</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+    <span class="bp">cls</span><span class="p">,</span> <span class="n">algorithm_configuration</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlgorithmConfiguration</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load an algorithm configuration from a dictionary.</span>
 
@@ -2890,11 +2922,14 @@ and returns the value of the option.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        The algorithm configuration.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">AlgorithmConfiguration</span><span class="p">(</span>
-        <span class="n">algorithm_configuration</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">__ALGORITHM_NAME</span><span class="p">],</span>
+    <span class="n">fqn</span> <span class="o">=</span> <span class="n">algorithm_configuration</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">__ALGORITHM_SETTINGS_CLASS</span><span class="p">]</span>
+    <span class="n">module_name</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">class_name</span> <span class="o">=</span> <span class="n">fqn</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+    <span class="n">settings_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">),</span> <span class="n">class_name</span><span class="p">)</span>
+    <span class="n">settings</span> <span class="o">=</span> <span class="n">settings_class</span><span class="p">(</span><span class="o">**</span><span class="n">algorithm_configuration</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">__ALGORITHM_SETTINGS</span><span class="p">])</span>
+    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+        <span class="n">settings</span><span class="p">,</span>
         <span class="n">algorithm_configuration</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">__CONFIGURATION_NAME</span><span class="p">],</span>
         <span class="n">algorithm_configuration</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">__INSTANCE_ALGORITHM_OPTIONS</span><span class="p">,</span> <span class="p">{}),</span>
-        <span class="o">**</span><span class="n">algorithm_configuration</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">__ALGORITHM_OPTIONS</span><span class="p">],</span>
     <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -2912,7 +2947,7 @@ and returns the value of the option.</p>
 <a href="#gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration.to_dict" class="headerlink" title="Permanent link">&para;</a></h6>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">to_dict</span><span class="p">(</span>
     <span class="n">skip_instance_algorithm_options</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2939,7 +2974,7 @@ specific to problem instances.</p>
 <p><span class="doc-section-title">Returns:</span></p>
     <ul>
         <li class="doc-section-item field-body">
-              <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="str">str</span> | <span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]]</code>
+              <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
           –
           <div class="doc-md-description">
             <p>The algorithm configuration as a dictionary.</p>
@@ -2950,11 +2985,7 @@ specific to problem instances.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/gemseo_benchmark/algorithms/algorithm_configuration.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">122</span>
-<span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">126</span>
 <span class="normal">127</span>
 <span class="normal">128</span>
 <span class="normal">129</span>
@@ -2974,9 +3005,12 @@ specific to problem instances.</p>
 <span class="normal">143</span>
 <span class="normal">144</span>
 <span class="normal">145</span>
-<span class="normal">146</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">skip_instance_algorithm_options</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">skip_instance_algorithm_options</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the algorithm configuration as a dictionary.</span>
 
 <span class="sd">    Args:</span>
@@ -2986,11 +3020,14 @@ specific to problem instances.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        The algorithm configuration as a dictionary.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">settings_class</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__algorithm_settings</span><span class="p">)</span>
     <span class="n">dictionary</span> <span class="o">=</span> <span class="p">{</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__CONFIGURATION_NAME</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__configuration_name</span><span class="p">,</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__ALGORITHM_NAME</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__algorithm_name</span><span class="p">,</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__ALGORITHM_OPTIONS</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__make_json_serializable</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__algorithm_options</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ALGORITHM_SETTINGS_CLASS</span><span class="p">:</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">settings_class</span><span class="o">.</span><span class="vm">__module__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">settings_class</span><span class="o">.</span><span class="vm">__qualname__</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">),</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ALGORITHM_SETTINGS</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__make_json_serializable</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">algorithm_options</span>
         <span class="p">),</span>
     <span class="p">}</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_instance_algorithm_options</span><span class="p">:</span>

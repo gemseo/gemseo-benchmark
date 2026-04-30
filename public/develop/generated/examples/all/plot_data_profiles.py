@@ -30,6 +30,9 @@ import tempfile
 from pathlib import Path
 
 from gemseo import configure
+from gemseo.algos.doe.openturns.settings.ot_opt_lhs import OT_OPT_LHS_Settings
+from gemseo.algos.opt.scipy_local.settings.lbfgsb import L_BFGS_B_Settings
+from gemseo.algos.opt.scipy_local.settings.slsqp import SLSQP_Settings
 from gemseo.problems.optimization.rastrigin import Rastrigin
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
 
@@ -55,9 +58,8 @@ from gemseo_benchmark.scenario import Scenario
 # with a number of Hessian corrections limited to 2.
 # (This option is called `maxcor`.)
 lbfgsb_2_corrections = AlgorithmConfiguration(
-    "L-BFGS-B",
+    L_BFGS_B_Settings(maxcor=2),
     "L-BFGS-B with 2 Hessian corrections",
-    maxcor=2,
 )
 # %%
 # Note:
@@ -68,16 +70,15 @@ lbfgsb_2_corrections = AlgorithmConfiguration(
 # let us consider a different configuration of L-BFGS-B
 # with up to 20 Hessian corrections.
 lbfgsb_20_corrections = AlgorithmConfiguration(
-    "L-BFGS-B",
+    L_BFGS_B_Settings(maxcor=20),
     "L-BFGS-B with 20 Hessian corrections",
-    maxcor=20,
 )
 # %%
 # Additionally,
 # let us choose the SLSQP algorithm,
 # with all its options set to their default values,
 # to compare it against L-BFGS-B.
-slsqp_default = AlgorithmConfiguration("SLSQP")
+slsqp_default = AlgorithmConfiguration(SLSQP_Settings())
 # %%
 # Finally, we gather our selection of algorithms configurations in a group.
 algorithms_configurations = AlgorithmsConfigurations(
@@ -108,16 +109,14 @@ rastrigin = OptimizationProblemConfiguration(
     "Rastrigin",
     Rastrigin,
     optimum=optimum,
-    doe_size=5,
-    doe_algo_name="OT_OPT_LHS",
+    doe_settings=OT_OPT_LHS_Settings(n_samples=5),
     target_values=target_values,
 )
 rosenbrock = OptimizationProblemConfiguration(
     "Rosenbrock",
     Rosenbrock,
     optimum=optimum,
-    doe_size=5,
-    doe_algo_name="OT_OPT_LHS",
+    doe_settings=OT_OPT_LHS_Settings(n_samples=5),
     target_values=target_values,
 )
 # %%
