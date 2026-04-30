@@ -27,6 +27,7 @@ from __future__ import annotations
 
 from gemseo import compute_doe
 from gemseo import configure
+from gemseo.algos.opt.nlopt.settings.nlopt_cobyla_settings import NLOPT_COBYLA_Settings
 from gemseo.problems.optimization.power_2 import Power2
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -54,14 +55,15 @@ problem.starting_points = compute_doe(
 # Let use the optimizer COBYLA to generate performance histories on the problem.
 algorithms_configurations = AlgorithmsConfigurations(
     AlgorithmConfiguration(
-        "NLOPT_COBYLA",
-        max_iter=65,
-        eq_tolerance=1e-4,
-        ineq_tolerance=0.0,
-        xtol_abs=0,
-        xtol_rel=0,
-        ftol_abs=0,
-        ftol_rel=0,
+        NLOPT_COBYLA_Settings(
+            max_iter=65,
+            eq_tolerance=1e-4,
+            ineq_tolerance=0.0,
+            xtol_abs=0,
+            xtol_rel=0,
+            ftol_abs=0,
+            ftol_rel=0,
+        )
     )
 )
 # %%

@@ -50,10 +50,10 @@ class HistoryItem:
             infeasibility_measure: The infeasibility measure of the item.
             n_unsatisfied_constraints: The number of unsatisfied constraints of the
                 item.
-                If ``None``, it will be set to 0 if the infeasibility measure is zero,
+                If `None`, it will be set to 0 if the infeasibility measure is zero,
                 and if the infeasibility measure is positive it will be set to None.
             elapsed_time: The elapsed time of the item.
-            number_of_disicpline_executions: The number of discipline executions.
+            number_of_discipline_executions: The number of discipline executions.
         """  # noqa: D205, D212, D415
         self.__elapsed_time = elapsed_time
         (

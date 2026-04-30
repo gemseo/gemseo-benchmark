@@ -87,7 +87,7 @@ class ReportPlot(metaclass=ABCGoogleDocstringInheritanceMeta):
                 to enable the computation of centiles.
         """
         median = numpy.median(numpy.nan_to_num(data, nan=nan_replacement), 0)
-        # Skip infinite values to support the ``markevery`` option.
+        # Skip infinite values to support the `markevery` option.
         first_index = next(
             (index for index, value in enumerate(median) if numpy.isfinite(value)),
             data.shape[1],

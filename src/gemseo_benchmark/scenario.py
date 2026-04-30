@@ -116,7 +116,7 @@ class Scenario:
                 on the graphs of each group.
                 The keys are the groups names and the values are the maximum
                 evaluations numbers for the graphs of the group.
-                If ``None``, all the evaluations are displayed.
+                If `None`, all the evaluations are displayed.
                 If the key of a group is missing, all the evaluations are displayed
                 for the group.
             plot_all_histories: Whether to plot all the performance histories.
@@ -250,7 +250,7 @@ class Scenario:
                 on the graphs of each group.
                 The keys are the groups names and the values are the maximum
                 evaluations numbers for the graphs of the group.
-                If ``None``, all the evaluations are displayed.
+                If `None`, all the evaluations are displayed.
                 If the key of a group is missing, all the evaluations are displayed
                 for the group.
             plot_all_histories: Whether to plot all the performance histories.

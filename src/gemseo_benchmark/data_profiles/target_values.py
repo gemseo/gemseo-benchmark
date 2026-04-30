@@ -141,10 +141,10 @@ class TargetValues(PerformanceHistory):
         Args:
             axes: The axes of the plot.
             axhline_settings: Keyword arguments
-                for ``matplotlib.axes.Axes.axhline``.
+                for `matplotlib.axes.Axes.axhline`.
             yticklabels_format: The string format for the target values labels.
             set_ylabel_settings: Keyword arguments
-                for ``matplotlib.axes.Axes.set_ylabel``.
+                for `matplotlib.axes.Axes.set_ylabel`.
         """
         twin_axes = axes.twinx()
         twin_axes.set_yscale(axes.get_yscale())

@@ -108,7 +108,7 @@ class Report:
                 on the graphs of each group.
                 The keys are the groups names and the values are the maximum
                 evaluations numbers for the graphs of the group.
-                If ``None``, all the evaluations are displayed.
+                If `None`, all the evaluations are displayed.
                 If the key of a group is missing, all the evaluations are displayed
                 for the group.
             plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`

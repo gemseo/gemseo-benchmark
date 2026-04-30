@@ -121,7 +121,8 @@ For example, we define below problem configurations based on
 -   5 starting points are computed by Latin hypercube sampling (LHS),
 
     ```python
-    doe_settings = {"doe_size": 5, "doe_algo_name": "LHS"}
+    from gemseo.algos.doe.openturns.settings.ot_opt_lhs import OT_OPT_LHS_Settings
+    doe_settings = OT_OPT_LHS_Settings(n_samples=5)
     ```
 
 -   and the target values are passed directly as an exponential scale
@@ -139,7 +140,7 @@ rastrigin = OptimizationProblemConfiguration(
     "Rastrigin",
     Rastrigin,
     target_values=target_values,
-    **doe_settings,
+    doe_settings=doe_settings,
     optimum=0.0,
 )
 
@@ -147,7 +148,7 @@ rosenbrock = OptimizationProblemConfiguration(
     "Rosenbrock",
     Rosenbrock,
     target_values=target_values,
-    **doe_settings,
+    doe_settings=doe_settings,
     optimum=0.0,
 )
 ```
