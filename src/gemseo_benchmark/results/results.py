@@ -32,7 +32,7 @@ class Results:
         """
         Args:
             path: The path to the JSON file from which to load the paths.
-                If ``None``, the collection is initially empty.
+                If `None`, the collection is initially empty.
         """  # noqa: D205, D212, D415
         self.__dict = {}
         if path:

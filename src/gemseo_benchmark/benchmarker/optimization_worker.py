@@ -73,8 +73,7 @@ class OptimizationWorker(BaseWorker):
         execute_algo(
             problem,
             "opt",
-            algo_name=algorithm_configuration.algorithm_name,
-            **algorithm_configuration.algorithm_options,
+            settings_model=algorithm_configuration.algorithm_settings,
         )
 
     @staticmethod

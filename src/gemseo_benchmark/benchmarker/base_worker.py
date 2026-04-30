@@ -94,10 +94,10 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
             starting_point: The starting point of the algorithm.
             gemseo_log_message: The message to log before benchmarking.
             log_path: The file path to save the log.
-                If ``None``, the log is not saved.
+                If `None`, the log is not saved.
             performance_history_path: The file path to save the performance history.
             hdf_file_path: The HDF file path.
-                If ``None``, no HDF file will be written.
+                If `None`, no HDF file will be written.
             benchmarking_logger: The benchmarking logger.
         """
         # Start writing in the log file.
@@ -156,7 +156,7 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
             problem_configuration: The problem configuration.
             starting_point: The starting point of the algorithm.
             hdf_file_path: The HDF file path.
-                If ``None``, no HDF file will be written.
+                If `None`, no HDF file will be written.
 
         Return:
             A problem ready for execution.
@@ -221,5 +221,5 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
         Args:
             problem: A problem.
             hdf_file_path: The HDF file path.
-                If ``None``, no HDF file will be written.
+                If `None`, no HDF file will be written.
         """

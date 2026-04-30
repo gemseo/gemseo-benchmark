@@ -24,6 +24,8 @@ from __future__ import annotations
 import re
 
 import pytest
+from gemseo.algos.doe.custom_doe.settings.custom_doe_settings import CustomDOE_Settings
+from gemseo.algos.opt.scipy_local.settings.lbfgsb import L_BFGS_B_Settings
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
 from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
@@ -39,12 +41,16 @@ from gemseo_benchmark.problems.optimization_problem_configuration import (
 )
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
 
-algorithms_configurations = AlgorithmsConfigurations(AlgorithmConfiguration("L-BFGS-B"))
+algorithms_configurations = AlgorithmsConfigurations(
+    AlgorithmConfiguration(L_BFGS_B_Settings())
+)
 
 
 def test_compute_target_values():
     """Check the computation of target values."""
-    rosenbrock = OptimizationProblemConfiguration("Rosenbrock", Rosenbrock, [zeros(2)])
+    rosenbrock = OptimizationProblemConfiguration(
+        "Rosenbrock", Rosenbrock, doe_settings=CustomDOE_Settings(samples=zeros((1, 2)))
+    )
     with pytest.raises(
         ValueError, match=re.escape("The problem configuration has no target value.")
     ):

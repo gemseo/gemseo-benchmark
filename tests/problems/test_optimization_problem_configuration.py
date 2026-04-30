@@ -25,11 +25,11 @@ from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
+from gemseo.algos.doe.custom_doe.settings.custom_doe_settings import CustomDOE_Settings
 from gemseo.algos.optimization_problem import OptimizationProblem
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
 from matplotlib.testing.decorators import image_comparison
-from numpy import ones
-from numpy import zeros
+from numpy import array
 from numpy.testing import assert_allclose
 
 from gemseo_benchmark.benchmarker.optimization_worker import OptimizationWorker
@@ -109,9 +109,11 @@ def test_inconsistent_starting_points(minimization_problem_creator):
 
 def test_starting_points_iteration(minimization_problem_creator):
     """Check the iteration on starting points."""
-    starting_points = [zeros(2), ones(2)]
+    starting_points = array([[0.0, 0.0], [1.0, 1.0]])
     problem = OptimizationProblemConfiguration(
-        "problem", minimization_problem_creator, starting_points
+        "problem",
+        minimization_problem_creator,
+        doe_settings=CustomDOE_Settings(samples=starting_points),
     )
     problem_instances = list(problem)
     assert len(problem_instances) == 2
@@ -261,8 +263,7 @@ def test_target_values_maximization_initial(maximization_problem_creator) -> Non
     problem = OptimizationProblemConfiguration(
         "Rosenbrock maximization",
         maximization_problem_creator,
-        [],
-        TargetValues([1, 2], [3, 4]),
+        target_values=TargetValues([1, 2], [3, 4]),
     )
     assert problem.target_values.performance_measures == [1, 2]
     assert problem.target_values.infeasibility_measures == [3, 4]

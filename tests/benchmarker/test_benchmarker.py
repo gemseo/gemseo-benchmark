@@ -27,6 +27,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
+from gemseo.algos.opt.scipy_local.settings.lbfgsb import L_BFGS_B_Settings
 from gemseo.utils.platform import PLATFORM_IS_WINDOWS
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -50,7 +51,7 @@ if TYPE_CHECKING:
 @pytest.fixture(scope="module")
 def optimization_algorithm_configuration() -> AlgorithmConfiguration:
     """An algorithm configuration for optimization."""
-    return AlgorithmConfiguration("L-BFGS-B")
+    return AlgorithmConfiguration(L_BFGS_B_Settings())
 
 
 def get_results(
@@ -271,11 +272,12 @@ def test_problem_specific_algorithm_options(
     """Check problem-specific algorithm options."""
     algo_config = request.getfixturevalue(algorithm_configuration)
     pb_config = request.getfixturevalue(problem_configuration)
+    settings_class = type(algo_config.algorithm_settings)
     Benchmarker(results_root).execute(
         [pb_config],
         AlgorithmsConfigurations(
             AlgorithmConfiguration(
-                algo_config.algorithm_name,
+                settings_class(),
                 instance_algorithm_options={
                     option_name: lambda config, index: config.dimension + index
                 },
@@ -290,7 +292,7 @@ def test_problem_specific_algorithm_options(
     )
     with path_base.with_suffix(".1.json").open("r") as json_file_1:
         assert (
-            json.load(json_file_1)["algorithm_configuration"]["algorithm_options"][
+            json.load(json_file_1)["algorithm_configuration"]["algorithm_settings"][
                 option_name
             ]
             == 2
@@ -298,7 +300,7 @@ def test_problem_specific_algorithm_options(
 
     with path_base.with_suffix(".2.json").open("r") as json_file_2:
         assert (
-            json.load(json_file_2)["algorithm_configuration"]["algorithm_options"][
+            json.load(json_file_2)["algorithm_configuration"]["algorithm_settings"][
                 option_name
             ]
             == 3
