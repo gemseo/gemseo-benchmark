@@ -26,8 +26,6 @@ import matplotlib.axes
 import numpy
 from gemseo.utils.metaclasses import ABCGoogleDocstringInheritanceMeta
 
-from gemseo_benchmark.results.performance_histories import PerformanceHistories
-
 if TYPE_CHECKING:
     from gemseo.typing import IntegerArray
     from gemseo.typing import RealArray

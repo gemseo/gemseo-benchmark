@@ -16,12 +16,10 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
 import matplotlib
 
-from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.report.report_plot import ReportPlot
 
 if TYPE_CHECKING:

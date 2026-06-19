@@ -100,11 +100,7 @@ class Results:
 
     @property
     def algorithms(self) -> list[str]:
-        """Return the names of the algorithms configurations.
-
-        Returns:
-            The names of the algorithms configurations.
-        """
+        """The names of the algorithms configurations."""
         return list(self.__dict)
 
     def get_problems(self, algo_name: str) -> list[str]:

@@ -1,0 +1,329 @@
+{
+  "config": {
+    "lang": [
+      "en"
+    ],
+    "separator": "[\\s\\-]+",
+    "pipeline": [
+      "stopWordFilter"
+    ],
+    "fields": {
+      "title": {
+        "boost": 1000.0
+      },
+      "text": {
+        "boost": 1.0
+      },
+      "tags": {
+        "boost": 1000000.0
+      }
+    }
+  },
+  "docs": [
+    {
+      "location": "index.html",
+      "title": "Benchmarking report",
+      "text": ""
+    },
+    {
+      "location": "algorithms.html",
+      "title": "Algorithms",
+      "text": "<p>The following algorithms are considered in this benchmarking report.</p>"
+    },
+    {
+      "location": "algorithms.html#l-bfgs-b",
+      "title": "L-BFGS-B",
+      "text": "<p>Limited-memory BFGS algorithm implemented in the SciPy library</p>"
+    },
+    {
+      "location": "algorithms.html#slsqp",
+      "title": "SLSQP",
+      "text": "<p>Sequential Least-Squares Quadratic Programming (SLSQP) implemented in the SciPy library</p>"
+    },
+    {
+      "location": "problems_list.html",
+      "title": "Problem configurations",
+      "text": "<p>The benchmarking reference problems are listed below.</p> <ul> <li>Rastrigin</li> <li>Rosenbrock</li> <li>Rosenbrock 5D</li> </ul>"
+    },
+    {
+      "location": "results.html",
+      "title": "Results",
+      "text": "<p>The results of each group of algorithms configurations on each group of problem configurations.</p> <ul> <li>L-BFGS-B_configurations</li> <li>SLSQP</li> </ul>"
+    },
+    {
+      "location": "problems/Rastrigin.html",
+      "title": "Rastrigin",
+      "text": ""
+    },
+    {
+      "location": "problems/Rastrigin.html#description",
+      "title": "Description",
+      "text": "<p>No description available.</p> <p>Optimal feasible objective value: 0.</p>"
+    },
+    {
+      "location": "problems/Rastrigin.html#target-values",
+      "title": "Target values",
+      "text": "<ul> <li>0.0001 (feasible)</li> <li>1e-05 (feasible)</li> <li>1e-06 (feasible)</li> <li>0.0 (feasible)</li> </ul>"
+    },
+    {
+      "location": "problems/Rosenbrock%205D.html",
+      "title": "Rosenbrock 5D",
+      "text": ""
+    },
+    {
+      "location": "problems/Rosenbrock%205D.html#description",
+      "title": "Description",
+      "text": "<p>No description available.</p> <p>Optimal feasible objective value: 0.</p>"
+    },
+    {
+      "location": "problems/Rosenbrock%205D.html#target-values",
+      "title": "Target values",
+      "text": "<ul> <li>0.0001 (feasible)</li> <li>1e-05 (feasible)</li> <li>1e-06 (feasible)</li> <li>0.0 (feasible)</li> </ul>"
+    },
+    {
+      "location": "problems/Rosenbrock.html",
+      "title": "Rosenbrock",
+      "text": ""
+    },
+    {
+      "location": "problems/Rosenbrock.html#description",
+      "title": "Description",
+      "text": "<p>No description available.</p> <p>Optimal feasible objective value: 0.</p>"
+    },
+    {
+      "location": "problems/Rosenbrock.html#target-values",
+      "title": "Target values",
+      "text": "<ul> <li>0.0001 (feasible)</li> <li>1e-05 (feasible)</li> <li>1e-06 (feasible)</li> <li>0.0 (feasible)</li> </ul>"
+    },
+    {
+      "location": "results/L-BFGS-B_configurations.html",
+      "title": "L-BFGS-B configurations",
+      "text": "<ul> <li>2D_problems</li> </ul>"
+    },
+    {
+      "location": "results/SLSQP.html",
+      "title": "SLSQP",
+      "text": "<ul> <li>2D_problems</li> </ul>"
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems.html",
+      "title": "2D problems",
+      "text": "<p>The results of the group of algorithms configurations \"L-BFGS-B configurations\" on the group of problems \"2D problems\".</p>"
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems.html#the-algorithms-configurations",
+      "title": "The algorithms configurations",
+      "text": "<ul> <li>L-BFGS-B with 2 Hessian corrections</li> <li>L-BFGS-B with 20 Hessian corrections</li> </ul>"
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems.html#the-problems",
+      "title": "The problems",
+      "text": "<ul> <li>Rastrigin</li> <li>Rosenbrock</li> </ul>"
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems.html#benchmarking-results",
+      "title": "Benchmarking results",
+      "text": ""
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems.html#global-results",
+      "title": "Global results",
+      "text": "<p>The performances of the algorithms on the reference problems of the group \"2D problems\" are represented in the following data profile.</p> <p></p>"
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems.html#results-for-each-problem",
+      "title": "Results for each problem",
+      "text": "<p>The results of the algorithms configurations for each problem are linked below.</p> <ul> <li>Rastrigin</li> <li>Rosenbrock</li> </ul>"
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems/Rastrigin.html",
+      "title": "Rastrigin",
+      "text": "<p>The results of the group of algorithms configurations 'L-BFGS-B configurations' for problem configuration 'Rastrigin'.</p>"
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems/Rastrigin.html#data-profiles",
+      "title": "Data profiles",
+      "text": ""
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems/Rastrigin.html#best-feasible-objective-value",
+      "title": "Best feasible objective value",
+      "text": "minimum 25th centile median 75th centile maximum L-BFGS-B with 2 Hessian corrections 0 0 0 3.55271e-15 5.32907e-15 L-BFGS-B with 20 Hessian corrections 0 0 0 1.77636e-15 5.32907e-15"
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems/Rastrigin.html#execution-time",
+      "title": "Execution time",
+      "text": ""
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems/Rastrigin.html#results-for-each-algorithm-configuration",
+      "title": "Results for each algorithm configuration",
+      "text": "<ul> <li>L-BFGS-B_with_2_Hessian_corrections</li> <li>L-BFGS-B_with_20_Hessian_corrections</li> </ul>"
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems/Rosenbrock.html",
+      "title": "Rosenbrock",
+      "text": "<p>The results of the group of algorithms configurations 'L-BFGS-B configurations' for problem configuration 'Rosenbrock'.</p>"
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems/Rosenbrock.html#data-profiles",
+      "title": "Data profiles",
+      "text": ""
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems/Rosenbrock.html#best-feasible-objective-value",
+      "title": "Best feasible objective value",
+      "text": "minimum 25th centile median 75th centile maximum L-BFGS-B with 2 Hessian corrections 1.74156e-20 1.19054e-17 1.13779e-15 3.3576e-15 4.68664e-13 L-BFGS-B with 20 Hessian corrections 3.39836e-20 2.33591e-19 1.4195e-18 1.76694e-18 6.79141e-14"
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems/Rosenbrock.html#execution-time",
+      "title": "Execution time",
+      "text": ""
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems/Rosenbrock.html#results-for-each-algorithm-configuration",
+      "title": "Results for each algorithm configuration",
+      "text": "<ul> <li>L-BFGS-B_with_2_Hessian_corrections</li> <li>L-BFGS-B_with_20_Hessian_corrections</li> </ul>"
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems/Rastrigin/L-BFGS-B_with_20_Hessian_corrections.html",
+      "title": "L-BFGS-B with 20 Hessian corrections on Rastrigin",
+      "text": ""
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems/Rastrigin/L-BFGS-B_with_20_Hessian_corrections.html#performance-measure",
+      "title": "Performance measure",
+      "text": "L-BFGS-B with 20 Hessian corrections maximum 5.32907e-15 75th centile 1.77636e-15 median 0 25th centile 0 minimum 0"
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems/Rastrigin/L-BFGS-B_with_2_Hessian_corrections.html",
+      "title": "L-BFGS-B with 2 Hessian corrections on Rastrigin",
+      "text": ""
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems/Rastrigin/L-BFGS-B_with_2_Hessian_corrections.html#performance-measure",
+      "title": "Performance measure",
+      "text": "L-BFGS-B with 2 Hessian corrections maximum 5.32907e-15 75th centile 3.55271e-15 median 0 25th centile 0 minimum 0"
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems/Rosenbrock/L-BFGS-B_with_20_Hessian_corrections.html",
+      "title": "L-BFGS-B with 20 Hessian corrections on Rosenbrock",
+      "text": ""
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems/Rosenbrock/L-BFGS-B_with_20_Hessian_corrections.html#performance-measure",
+      "title": "Performance measure",
+      "text": "L-BFGS-B with 20 Hessian corrections maximum 6.79141e-14 75th centile 1.76694e-18 median 1.4195e-18 25th centile 2.33591e-19 minimum 3.39836e-20"
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems/Rosenbrock/L-BFGS-B_with_2_Hessian_corrections.html",
+      "title": "L-BFGS-B with 2 Hessian corrections on Rosenbrock",
+      "text": ""
+    },
+    {
+      "location": "results/L-BFGS-B_configurations/2D_problems/Rosenbrock/L-BFGS-B_with_2_Hessian_corrections.html#performance-measure",
+      "title": "Performance measure",
+      "text": "L-BFGS-B with 2 Hessian corrections maximum 4.68664e-13 75th centile 3.3576e-15 median 1.13779e-15 25th centile 1.19054e-17 minimum 1.74156e-20"
+    },
+    {
+      "location": "results/SLSQP/2D_problems.html",
+      "title": "2D problems",
+      "text": "<p>The results of the group of algorithms configurations \"SLSQP\" on the group of problems \"2D problems\".</p>"
+    },
+    {
+      "location": "results/SLSQP/2D_problems.html#the-algorithms-configurations",
+      "title": "The algorithms configurations",
+      "text": "<ul> <li>SLSQP</li> </ul>"
+    },
+    {
+      "location": "results/SLSQP/2D_problems.html#the-problems",
+      "title": "The problems",
+      "text": "<ul> <li>Rastrigin</li> <li>Rosenbrock</li> </ul>"
+    },
+    {
+      "location": "results/SLSQP/2D_problems.html#benchmarking-results",
+      "title": "Benchmarking results",
+      "text": ""
+    },
+    {
+      "location": "results/SLSQP/2D_problems.html#global-results",
+      "title": "Global results",
+      "text": "<p>The performances of the algorithms on the reference problems of the group \"2D problems\" are represented in the following data profile.</p> <p></p>"
+    },
+    {
+      "location": "results/SLSQP/2D_problems.html#results-for-each-problem",
+      "title": "Results for each problem",
+      "text": "<p>The results of the algorithms configurations for each problem are linked below.</p> <ul> <li>Rastrigin</li> <li>Rosenbrock</li> </ul>"
+    },
+    {
+      "location": "results/SLSQP/2D_problems/Rastrigin.html",
+      "title": "Rastrigin",
+      "text": "<p>The results of the group of algorithms configurations 'SLSQP' for problem configuration 'Rastrigin'.</p>"
+    },
+    {
+      "location": "results/SLSQP/2D_problems/Rastrigin.html#data-profiles",
+      "title": "Data profiles",
+      "text": ""
+    },
+    {
+      "location": "results/SLSQP/2D_problems/Rastrigin.html#best-feasible-objective-value",
+      "title": "Best feasible objective value",
+      "text": "minimum 25th centile median 75th centile maximum SLSQP 0 0 0 0 0"
+    },
+    {
+      "location": "results/SLSQP/2D_problems/Rastrigin.html#execution-time",
+      "title": "Execution time",
+      "text": ""
+    },
+    {
+      "location": "results/SLSQP/2D_problems/Rastrigin.html#results-for-each-algorithm-configuration",
+      "title": "Results for each algorithm configuration",
+      "text": "<ul> <li>SLSQP</li> </ul>"
+    },
+    {
+      "location": "results/SLSQP/2D_problems/Rosenbrock.html",
+      "title": "Rosenbrock",
+      "text": "<p>The results of the group of algorithms configurations 'SLSQP' for problem configuration 'Rosenbrock'.</p>"
+    },
+    {
+      "location": "results/SLSQP/2D_problems/Rosenbrock.html#data-profiles",
+      "title": "Data profiles",
+      "text": ""
+    },
+    {
+      "location": "results/SLSQP/2D_problems/Rosenbrock.html#best-feasible-objective-value",
+      "title": "Best feasible objective value",
+      "text": "minimum 25th centile median 75th centile maximum SLSQP 1.1824e-20 4.23227e-20 2.01609e-17 3.74191e-17 5.45617e-14"
+    },
+    {
+      "location": "results/SLSQP/2D_problems/Rosenbrock.html#execution-time",
+      "title": "Execution time",
+      "text": ""
+    },
+    {
+      "location": "results/SLSQP/2D_problems/Rosenbrock.html#results-for-each-algorithm-configuration",
+      "title": "Results for each algorithm configuration",
+      "text": "<ul> <li>SLSQP</li> </ul>"
+    },
+    {
+      "location": "results/SLSQP/2D_problems/Rastrigin/SLSQP.html",
+      "title": "SLSQP on Rastrigin",
+      "text": ""
+    },
+    {
+      "location": "results/SLSQP/2D_problems/Rastrigin/SLSQP.html#performance-measure",
+      "title": "Performance measure",
+      "text": "SLSQP maximum 0 75th centile 0 median 0 25th centile 0 minimum 0"
+    },
+    {
+      "location": "results/SLSQP/2D_problems/Rosenbrock/SLSQP.html",
+      "title": "SLSQP on Rosenbrock",
+      "text": ""
+    },
+    {
+      "location": "results/SLSQP/2D_problems/Rosenbrock/SLSQP.html#performance-measure",
+      "title": "Performance measure",
+      "text": "SLSQP maximum 5.45617e-14 75th centile 3.74191e-17 median 2.01609e-17 25th centile 4.23227e-20 minimum 1.1824e-20"
+    }
+  ]
+}

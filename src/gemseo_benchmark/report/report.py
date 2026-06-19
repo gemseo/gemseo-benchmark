@@ -22,11 +22,10 @@
 
 from __future__ import annotations
 
+import csv
 import enum
-import os
 from pathlib import Path
-from shutil import copy
-from subprocess import call
+from subprocess import check_call
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Final
@@ -41,6 +40,26 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
 from gemseo_benchmark.report._figures import Figures
+
+
+def csv_to_md_table(csv_path: Path) -> str:
+    """Render a CSV file as a Markdown table.
+
+    Args:
+        csv_path: The path to the CSV file.
+
+    Returns:
+        The Markdown table, or an empty string if the CSV file is empty.
+    """
+    with csv_path.open() as f:
+        rows = list(csv.reader(f))
+    if not rows:
+        return ""
+    header = "| " + " | ".join(rows[0]) + " |"
+    sep = "| " + " | ".join(["---"] * len(rows[0])) + " |"
+    body = "\n".join("| " + " | ".join(row) + " |" for row in rows[1:])
+    return "\n".join(x for x in [header, sep, body] if x)
+
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -57,15 +76,15 @@ if TYPE_CHECKING:
 class FileName(enum.Enum):
     """The name of a report file."""
 
-    ALGORTIHM_CONFIGURATION_RESULTS = "algorithm_configuration_results.rst"
-    ALGORITHMS = "algorithms.rst"
-    ALGORITHMS_CONFIGURATIONS_GROUP = "algorithms_configurations_group.rst"
-    INDEX = "index.rst"
-    PROBLEM = "problem.rst"
-    PROBLEMS_LIST = "problems_list.rst"
-    PROBLEM_RESULTS = "problem_results.rst"
-    RESULTS = "results.rst"
-    SUB_RESULTS = "sub_results.rst"
+    ALGORTIHM_CONFIGURATION_RESULTS = "algorithm_configuration_results.md"
+    ALGORITHMS = "algorithms.md"
+    ALGORITHMS_CONFIGURATIONS_GROUP = "algorithms_configurations_group.md"
+    INDEX = "index.md"
+    PROBLEM = "problem.md"
+    PROBLEMS_LIST = "problems_list.md"
+    PROBLEM_RESULTS = "problem_results.md"
+    RESULTS = "results.md"
+    SUB_RESULTS = "sub_results.md"
 
 
 class DirectoryName(enum.Enum):
@@ -81,7 +100,6 @@ class Report:
     """A benchmarking report."""
 
     __FILE_DIRECTORY: Final[Path] = Path(__file__).parent
-    __CONF_PATH: Final[Path] = __FILE_DIRECTORY / "conf.py"
     __NOT_AVAILABLE: Final[str] = "N/A"
     __TEMPLATES_DIR_PATH: Final[Path] = __FILE_DIRECTORY / "templates"
 
@@ -119,6 +137,7 @@ class Report:
         """  # noqa: D205, D212, D415
         self.__plot_settings = plot_settings
         self.__root_directory = Path(root_directory_path)
+        self.__docs_directory = self.__root_directory / "docs"
         self.__algorithms_configurations_groups = algos_configurations_groups
         self.__problems_groups = problems_groups
         self.__histories_paths = histories_paths
@@ -182,16 +201,12 @@ class Report:
     def __create_root_directory(self) -> None:
         """Create the source directory and basic files."""
         self.__root_directory.mkdir(exist_ok=True)
-        # Create the subdirectories
-        (self.__root_directory / "_static").mkdir(exist_ok=True)
+        self.__docs_directory.mkdir(exist_ok=True)
         for directory in [DirectoryName.RESULTS.value, DirectoryName.IMAGES.value]:
-            (self.__root_directory / directory).mkdir(exist_ok=True)
-        # Create the configuration file
-        copy(str(self.__CONF_PATH), str(self.__root_directory / self.__CONF_PATH.name))
+            (self.__docs_directory / directory).mkdir(exist_ok=True)
 
     def __create_algos_file(self) -> None:
         """Create the file describing the algorithms."""
-        # Get the descriptions of the algorithms
         algos_descriptions = dict(self.__custom_algos_descriptions)
         for algo_name in set().union(*[
             algos_configs_group.algorithms
@@ -201,31 +216,27 @@ class Report:
                 try:
                     library = OptimizationLibraryFactory().create(algo_name)
                 except ValueError:
-                    # The algorithm is unavailable
                     algos_descriptions[algo_name] = self.__NOT_AVAILABLE
                 else:
                     algos_descriptions[algo_name] = library.ALGORITHM_INFOS[
                         algo_name
                     ].description
 
-        # Create the file
         self.__fill_template(
-            self.__root_directory / FileName.ALGORITHMS.value,
+            self.__docs_directory / FileName.ALGORITHMS.value,
             FileName.ALGORITHMS.value,
             algorithms=dict(sorted(algos_descriptions.items())),
         )
 
     def __create_problems_files(self) -> None:
         """Create the files describing the problem configurations."""
-        problems_dir = self.__root_directory / DirectoryName.PROBLEMS.value
+        problems_dir = self.__docs_directory / DirectoryName.PROBLEMS.value
         problems_dir.mkdir()
 
-        # Create a file for each problem
         problems_paths = []
         problems = [problem for group in self.__problems_groups for problem in group]
         problems = sorted(problems, key=lambda pb: pb.name.lower())
         for problem in problems:
-            # Create the problem file
             file_path = self.__get_problem_path(problem)
             self.__fill_template(
                 file_path,
@@ -238,12 +249,11 @@ class Report:
                 target_values=problem.target_values,
             )
             problems_paths.append(
-                file_path.relative_to(self.__root_directory).as_posix()
+                file_path.relative_to(self.__docs_directory).as_posix()
             )
 
-        # Create the list of problems
         self.__fill_template(
-            file_path=self.__root_directory / FileName.PROBLEMS_LIST.value,
+            file_path=self.__docs_directory / FileName.PROBLEMS_LIST.value,
             template_name=FileName.PROBLEMS_LIST.value,
             problems_paths=problems_paths,
         )
@@ -258,7 +268,7 @@ class Report:
             The path to the problem file.
         """
         return (
-            self.__root_directory / DirectoryName.PROBLEMS.value / f"{problem.name}.rst"
+            self.__docs_directory / DirectoryName.PROBLEMS.value / f"{problem.name}.md"
         )
 
     def __create_results_files(
@@ -283,7 +293,7 @@ class Report:
                 for the abscissa axis.
         """
         self.__fill_template(
-            self.__root_directory / FileName.RESULTS.value,
+            self.__docs_directory / FileName.RESULTS.value,
             FileName.RESULTS.value,
             documents=[
                 self.__create_algorithms_group_files(
@@ -325,13 +335,12 @@ class Report:
         Returns:
             The path to the main file.
         """
-        results_root = self.__root_directory / DirectoryName.RESULTS.value
+        results_root = self.__docs_directory / DirectoryName.RESULTS.value
         configurations_dirname = join_substrings(algorithm_configurations.name)
         configurations_dir = results_root / configurations_dirname
         configurations_dir.mkdir()
         paths = []
         for group in self.__problems_groups:
-            # Get the configurations with results for all the problems of the group
             actual_configurations = AlgorithmsConfigurations(
                 *[
                     configuration
@@ -342,7 +351,6 @@ class Report:
                 name=algorithm_configurations.name,
             )
             if not actual_configurations:
-                # There is no configuration to display for the group
                 continue
 
             problems_dirname = join_substrings(group.name)
@@ -352,7 +360,7 @@ class Report:
                     group,
                     actual_configurations,
                     configurations_dir,
-                    self.__root_directory
+                    self.__docs_directory
                     / DirectoryName.IMAGES.value
                     / configurations_dirname
                     / problems_dirname,
@@ -367,15 +375,14 @@ class Report:
                 .as_posix()
             )
 
-        # Create the file of the group of algorithm configurations
-        configurations_path = configurations_dir.with_suffix(".rst")
+        configurations_path = configurations_dir.with_suffix(".md")
         self.__fill_template(
             configurations_path,
             FileName.ALGORITHMS_CONFIGURATIONS_GROUP.value,
             name=algorithm_configurations.name,
             documents=paths,
         )
-        return configurations_path.relative_to(self.__root_directory).as_posix()
+        return configurations_path.relative_to(self.__docs_directory).as_posix()
 
     def __create_problems_group_files(
         self,
@@ -409,7 +416,6 @@ class Report:
         Returns:
             The path to the main file.
         """
-        # Generate the figures
         figures_dir.mkdir(parents=True, exist_ok=False)
         plotter = Figures(
             algorithm_configurations,
@@ -428,8 +434,7 @@ class Report:
             use_abscissa_log_scale,
         )
 
-        # Create the file dedicated to the group of problems
-        file_path = directory_path / f"{join_substrings(problems.name)}.rst"
+        file_path = directory_path / f"{join_substrings(problems.name)}.md"
         problems_dir = directory_path / join_substrings(problems.name)
         problems_dir.mkdir()
         self.__fill_template(
@@ -485,14 +490,13 @@ class Report:
         Returns:
             The path to the main file.
         """
-        # Create the files that present the results of each algorithm configuration.
         problem_path = directory_path / join_substrings(problem.name)
         problem_path.mkdir()
         algorithm_configurations_results = []
         for algorithm_configuration in algorithm_configurations:
             file_path = (
                 problem_path / join_substrings(algorithm_configuration.name)
-            ).with_suffix(".rst")
+            ).with_suffix(".md")
             self.__fill_template(
                 file_path,
                 FileName.ALGORTIHM_CONFIGURATION_RESULTS.value,
@@ -515,8 +519,7 @@ class Report:
                 file_path.relative_to(directory_path).as_posix()
             )
 
-        # Create the file that presents the results of all the algorithm configurations.
-        file_path = problem_path.with_suffix(".rst")
+        file_path = problem_path.with_suffix(".md")
         self.__fill_template(
             file_path,
             FileName.PROBLEM_RESULTS.value,
@@ -537,41 +540,65 @@ class Report:
         return file_path
 
     def __get_relative_path(self, file_path: Path) -> str:
-        """Return a POSIX path relative to the root directory."""
-        return file_path.relative_to(self.__root_directory).as_posix()
+        """Return a POSIX path relative to the docs directory."""
+        return file_path.relative_to(self.__docs_directory).as_posix()
 
     def __create_index(self) -> None:
-        """Create the index file of the reST report."""
-        # Create the table of contents tree
-        toctree_contents = [
-            FileName.ALGORITHMS.value,
-            FileName.PROBLEMS_LIST.value,
-            FileName.RESULTS.value,
-        ]
+        """Create the index file of the Markdown report."""
+        index_path = self.__docs_directory / FileName.INDEX.value
+        self.__fill_template(index_path, FileName.INDEX.value)
 
-        # Create the file
-        index_path = self.__root_directory / FileName.INDEX.value
-        self.__fill_template(
-            index_path, FileName.INDEX.value, documents=toctree_contents
-        )
-
-    @staticmethod
-    def __fill_template(file_path: Path, template_name: str, **kwargs: Any) -> None:
+    def __fill_template(
+        self, file_path: Path, template_name: str, **kwargs: Any
+    ) -> None:
         """Fill a file template.
 
         Args:
             file_path: The path to the file to be written.
             template_name: The name of the file template.
-
-        Returns:
-            The filled file template.
         """
+        docs_dir = self.__docs_directory
         file_loader = FileSystemLoader(Report.__TEMPLATES_DIR_PATH)
-        environment = Environment(loader=file_loader)
+        environment = Environment(
+            loader=file_loader,
+            trim_blocks=True,
+            lstrip_blocks=True,
+        )
+        environment.filters["stem"] = lambda p: Path(p).stem
+        environment.filters["csv_to_md_table"] = lambda rel_path: csv_to_md_table(
+            docs_dir / rel_path
+        )
         template = environment.get_template(template_name)
         file_contents = template.render(**kwargs)
         with file_path.open("w") as file:
             file.write(file_contents)
+
+    @staticmethod
+    def __generate_properdocs_yml(to_pdf: bool) -> str:
+        """Generate the content of the properdocs.yml configuration file.
+
+        Args:
+            to_pdf: Whether to include the to-pdf plugin for PDF generation.
+
+        Returns:
+            The YAML content as a string.
+        """
+        lines = [
+            "site_name: Benchmarking Report",
+            "docs_dir: docs",
+            "site_dir: _build/html",
+            "use_directory_urls: false",
+            "theme:",
+            "  name: material",
+            "plugins:",
+            "  - search",
+        ]
+        if to_pdf:
+            lines += [
+                "  - to-pdf:",
+                "      output_path: ../benchmarking_report.pdf",
+            ]
+        return "\n".join(lines) + "\n"
 
     def __build_report(self, to_html: bool = True, to_pdf: bool = False) -> None:
         """Build the benchmarking report.
@@ -580,18 +607,8 @@ class Report:
             to_html: Whether to generate the report in HTML format.
             to_pdf: Whether to generate the report in PDF format.
         """
-        initial_dir = Path.cwd()
-        os.chdir(str(self.__root_directory))
-        builders = []
-        if to_html:
-            builders.append("html")
-        if to_pdf:
-            builders.append("latexpdf")
-        try:
-            for builder in builders:
-                call(
-                    f"sphinx-build -M {builder} {self.__root_directory} "
-                    f"{DirectoryName.BUILD.value}".split()
-                )
-        finally:
-            os.chdir(initial_dir)
+        if not to_html and not to_pdf:
+            return
+        properdocs_yml_path = self.__root_directory / "properdocs.yml"
+        properdocs_yml_path.write_text(self.__generate_properdocs_yml(to_pdf))
+        check_call(["properdocs", "build", "--config-file", str(properdocs_yml_path)])

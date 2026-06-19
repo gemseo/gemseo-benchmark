@@ -29,6 +29,7 @@ import pytest
 from gemseo.algos.opt.scipy_local.scipy_local import ScipyOpt
 
 from gemseo_benchmark.report.report import Report
+from gemseo_benchmark.report.report import csv_to_md_table
 
 
 @pytest.fixture(scope="module")
@@ -67,28 +68,29 @@ def report(tmp_path, algorithms_configurations, problems_groups, results) -> Rep
 
 def test_generate_report_sources(tmp_path, report, algorithms_configurations, group):
     """Check the generation of the report sources."""
-    report.generate(to_pdf=True)
-    assert (tmp_path / "index.rst").is_file()
-    assert (tmp_path / "algorithms.rst").is_file()
-    assert (tmp_path / "results.rst").is_file()
-    results_dir = tmp_path / "results"
+    report.generate()
+    docs_dir = tmp_path / "docs"
+    assert (docs_dir / "index.md").is_file()
+    assert (docs_dir / "algorithms.md").is_file()
+    assert (docs_dir / "results.md").is_file()
+    results_dir = docs_dir / "results"
     algorithms_configurations_name = algorithms_configurations.name.replace(" ", "_")
-    assert (results_dir / f"{algorithms_configurations_name}.rst").is_file()
+    assert (results_dir / f"{algorithms_configurations_name}.md").is_file()
     assert (
         results_dir
         / algorithms_configurations_name
-        / f"{group.name.replace(' ', '_')}.rst"
+        / f"{group.name.replace(' ', '_')}.md"
     ).is_file()
     assert (tmp_path / "_build" / "html" / "index.html").is_file()
 
 
 @pytest.mark.skip(
-    reason="The CI runner cannot execute the command `sphinx-build -M latexpdf`.",
+    reason="The CI runner cannot install mkdocs-to-pdf system dependencies."
 )
 def test_generate_pdf(tmp_path, report):
     """Check the generation of the report in PDF."""
     report.generate(to_pdf=True)
-    assert (tmp_path / "_build" / "latex" / "benchmarking_report.pdf").is_file()
+    assert (tmp_path / "_build" / "html" / "benchmarking_report.pdf").is_file()
 
 
 @pytest.mark.parametrize(
@@ -109,20 +111,23 @@ def test_algorithm_descriptions(
         results,
         custom_algos_descriptions,
     )
+    description = "Description" if custom_algos_descriptions else "N/A"
+    slsqp_description = ScipyOpt.ALGORITHM_INFOS["SLSQP"].description
     ref_contents = [
-        "Algorithms\n",
-        "==========\n",
+        "# Algorithms\n",
         "\n",
         "The following algorithms are considered in this benchmarking report.\n",
         "\n",
-        "Algorithm\n",
-        f"   {'Description' if custom_algos_descriptions else 'N/A'}\n",
+        "## Algorithm\n",
         "\n",
-        "SLSQP\n",
-        f"   {ScipyOpt.ALGORITHM_INFOS['SLSQP'].description}\n",
+        f"{description}\n",
+        "\n",
+        "## SLSQP\n",
+        "\n",
+        f"{slsqp_description}\n",
     ]
     report.generate()
-    with open(tmp_path / "algorithms.rst") as file:
+    with open(tmp_path / "docs" / "algorithms.md") as file:
         contents = file.readlines()
 
     assert contents == ref_contents
@@ -131,9 +136,10 @@ def test_algorithm_descriptions(
 def test_problems_descriptions_files(tmp_path, report, problem_a, problem_b):
     """Check the generation of the files describing the problems."""
     report.generate(to_html=False)
-    assert (tmp_path / "problems_list.rst").is_file()
-    assert (tmp_path / "problems" / f"{problem_a.name}.rst").is_file()
-    assert (tmp_path / "problems" / f"{problem_b.name}.rst").is_file()
+    docs_dir = tmp_path / "docs"
+    assert (docs_dir / "problems_list.md").is_file()
+    assert (docs_dir / "problems" / f"{problem_a.name}.md").is_file()
+    assert (docs_dir / "problems" / f"{problem_b.name}.md").is_file()
 
 
 def test_figures(
@@ -143,6 +149,7 @@ def test_figures(
     report.generate(to_html=False)
     group_dir = (
         tmp_path
+        / "docs"
         / "images"
         / algorithms_configurations.name.replace(" ", "_")
         / problems_groups[0].name.replace(" ", "_")
@@ -182,27 +189,14 @@ def test_problem_files(tmp_path, report, fixture_name, optimum, request) -> None
     report.generate()
     problem = request.getfixturevalue(fixture_name)
     name = problem.name
-    with (tmp_path / "problems" / name).with_suffix(".rst").open("r") as file:
-        assert (
-            file.read()
-            == f""".. _{name}:
-
-{name}
-=========
-
-
-Description
------------
-
-{problem.description}
-
-Optimal feasible objective value: {optimum}.
-
-
-Target values
--------------
-* {problem.target_values[0].performance_measure} (feasible)
-"""
+    with (tmp_path / "docs" / "problems" / name).with_suffix(".md").open("r") as file:
+        assert file.read() == (
+            f"# {name}\n\n"
+            f"## Description\n\n"
+            f"{problem.description}\n\n"
+            f"Optimal feasible objective value: {optimum}.\n\n"
+            f"## Target values\n\n"
+            f"- {problem.target_values[0].performance_measure} (feasible)\n"
         )
 
 
@@ -232,11 +226,39 @@ def test_incomplete_results(
     algorithms_configurations_name = algorithms_configurations.name.replace(" ", "_")
     group_name = group.name.replace(" ", "_")
     assert not (
-        tmp_path / "images" / algorithms_configurations_name / group_name
+        tmp_path / "docs" / "images" / algorithms_configurations_name / group_name
     ).is_dir()
     assert not (
         tmp_path
+        / "docs"
         / "results"
         / algorithms_configurations.name.replace(" ", "_")
-        / f"{group_name}.rst"
+        / f"{group_name}.md"
     ).is_file()
+
+
+@pytest.mark.parametrize(
+    ("contents", "expected"),
+    [
+        ("", ""),
+        ("a,b\n", "| a | b |\n| --- | --- |"),
+        ("a,b\n1,2\n3,4\n", "| a | b |\n| --- | --- |\n| 1 | 2 |\n| 3 | 4 |"),
+    ],
+)
+def test_csv_to_md_table(tmp_path, contents, expected):
+    """Check the rendering of a CSV file as a Markdown table."""
+    csv_path = tmp_path / "table.csv"
+    csv_path.write_text(contents)
+    assert csv_to_md_table(csv_path) == expected
+
+
+def test_build_failure_propagates(report, monkeypatch):
+    """Check that a report build failure raises instead of passing silently."""
+    from subprocess import CalledProcessError
+
+    def fail(cmd, *args, **kwargs):
+        raise CalledProcessError(1, cmd)
+
+    monkeypatch.setattr("gemseo_benchmark.report.report.check_call", fail)
+    with pytest.raises(CalledProcessError):
+        report.generate()
