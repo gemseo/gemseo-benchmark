@@ -47,6 +47,7 @@ def csv_to_md_table(csv_path: Path) -> str:
 
     Args:
         csv_path: The path to the CSV file.
+            The file must not contain a pipe character (`|`).
 
     Returns:
         The Markdown table, or an empty string if the CSV file is empty.
