@@ -36,7 +36,7 @@ and this project adheres to
 ### Changed
 
 - The documentation and the HTML report are generated using `properdocs` instead of `sphinx`.
-- The PDF report is generated using `properdocs` and `mdocs-to-pdf` instead of `sphinx`;
+- The PDF report is generated using `properdocs` and `mkdocs-to-pdf` instead of `sphinx`;
   you must install
   the dependency [weasyprint](https://mkdocs-to-pdf.readthedocs.io/en/stable/installation/#requirements)
   to use this feature.

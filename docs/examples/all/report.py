@@ -169,5 +169,5 @@ configure(
 scenario.execute([problems_2d, problems_5d], generate_pdf_report=True)
 
 # %%
-# The HTML report path is [`current_dir/report/_build/index.html`](../../../../report/html/index.html)
+# The HTML report path is [`current_dir/report/_build/html/index.html`](../../../../report/html/index.html)
 # while the PDF report path is [`current_dir/report/_build/benchmarking_report.pdf`](../../../../report/benchmarking_report.pdf).
