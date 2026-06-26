@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import csv
 import enum
+import os
 from pathlib import Path
 from subprocess import check_call
 from typing import TYPE_CHECKING
@@ -447,8 +448,8 @@ class Report:
             ],
             problems_group_name=problems.name,
             problems_group_description=problems.description,
-            data_profile=self.__get_relative_path(
-                plotter.plot_data_profiles(use_abscissa_log_scale)
+            data_profile=self.__get_link_path(
+                plotter.plot_data_profiles(use_abscissa_log_scale), file_path
             ),
             problems_names=[problem.name for problem in problems],
             group_problems_paths=[
@@ -504,8 +505,8 @@ class Report:
                 algorithm_configuration=algorithm_configuration,
                 problem=problem,
                 figures={
-                    name.value: self.__get_relative_path(
-                        figures[algorithm_configuration.name][name]
+                    name.value: self.__get_link_path(
+                        figures[algorithm_configuration.name][name], file_path
                     )
                     for name in figures[algorithm_configuration.name]
                 },
@@ -528,7 +529,7 @@ class Report:
             algorithm_configurations_results=algorithm_configurations_results,
             problem=problem,
             figures={
-                name.value: self.__get_relative_path(figures[name])
+                name.value: self.__get_link_path(figures[name], file_path)
                 for name in Figures._FigureFileName
                 if name in figures
             },
@@ -543,6 +544,22 @@ class Report:
     def __get_relative_path(self, file_path: Path) -> str:
         """Return a POSIX path relative to the docs directory."""
         return file_path.relative_to(self.__docs_directory).as_posix()
+
+    @staticmethod
+    def __get_link_path(target_path: Path, source_path: Path) -> str:
+        """Return a POSIX path to a target relative to a source file's directory.
+
+        Used for links and image sources, so that templates need not hardcode a
+        `../` prefix matching their own nesting depth.
+
+        Args:
+            target_path: The path to the linked file (e.g. a figure).
+            source_path: The path to the Markdown file holding the link.
+
+        Returns:
+            The POSIX path from the source file's directory to the target.
+        """
+        return Path(os.path.relpath(target_path, source_path.parent)).as_posix()
 
     def __create_index(self) -> None:
         """Create the index file of the Markdown report."""
