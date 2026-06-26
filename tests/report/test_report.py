@@ -93,6 +93,16 @@ def test_generate_pdf(tmp_path, report):
     assert (tmp_path / "_build" / "html" / "benchmarking_report.pdf").is_file()
 
 
+@pytest.mark.parametrize(("to_pdf", "expected"), [(False, False), (True, True)])
+def test_generate_properdocs_yml(to_pdf, expected):
+    """Check the generation of the properdocs.yml content."""
+    yml = Report._Report__generate_properdocs_yml(to_pdf)
+    assert yml.startswith("site_name: Benchmarking Report\n")
+    assert ("  - to-pdf:" in yml) is expected
+    assert ("      output_path: ../benchmarking_report.pdf" in yml) is expected
+    assert yml.endswith("\n")
+
+
 @pytest.mark.parametrize(
     "custom_algos_descriptions", [None, {"Algorithm": "Description"}]
 )
