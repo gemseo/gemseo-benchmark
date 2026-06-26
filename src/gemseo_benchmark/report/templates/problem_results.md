@@ -24,7 +24,7 @@ The {{ problem.performance_measure_label | lower }} of group {{ algorithm_config
 
 {{ tables["performance_measure.csv"] | csv_to_md_table }}
 /// caption
-The *final* {{ problem.performance_measure_label.lower() }} of group {{ algorithm_configurations.name }} for problem configuration {{ problem.name }}.
+The *final* {{ problem.performance_measure_label | lower }} of group {{ algorithm_configurations.name }} for problem configuration {{ problem.name }}.
 ///
 
 {% if problem.number_of_scalar_constraints %}
