@@ -608,6 +608,8 @@ class Report:
             "use_directory_urls: false",
             "theme:",
             "  name: material",
+            "markdown_extensions:",
+            "- pymdownx.blocks.caption",
             "plugins:",
             "  - search",
         ]

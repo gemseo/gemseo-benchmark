@@ -22,7 +22,10 @@ on the group of problems "{{ problems_group_name }}".
 The performances of the algorithms on the reference problems of the group
 "{{ problems_group_name }}" are represented in the following data profile.
 
-![The data profiles for group "{{ problems_group_name }}".]({{ data_profile }})
+![data_profile]({{ data_profile }})
+/// caption
+The data profiles for group "{{ problems_group_name }}".
+///
 
 ### Results for each problem
 
