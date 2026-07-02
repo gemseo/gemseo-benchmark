@@ -42,6 +42,8 @@ ignore = [
     "PLW1641",
     # `__init__` module should only contain docstrings and re-exports.
     "RUF067",
+    # Unreliable floating point equality comparison.
+    "RUF069",
     # Checks for noqa directives that are no longer applicable.
     "RUF100",
     # Checks for long exception messages that are not defined in the exception class itself.
@@ -50,19 +52,19 @@ ignore = [
 
 select = [
     "A",
-#    "ANN",
+    #    "ANN",
     "ASYNC",
     "B",
     "BLE",
-#    "C",
+    #    "C",
     "C4",
     "D",
-#    "DOC",
+    #    "DOC",
     "E",
     "EM",
     "F",
-#    "FA",
-#    "FBT",
+    #    "FA",
+    #    "FBT",
     "FLY",
     "FURB",
     "G",
@@ -73,8 +75,8 @@ select = [
     "Q",
     "N",
     "NPY",
-#    "PL",
-#    "PD",
+    #    "PL",
+    #    "PD",
     "PT",
     "PIE",
     "PGH",
@@ -84,9 +86,9 @@ select = [
     "RET",
     "RSE",
     "RUF",
-#    "S",
+    #    "S",
     "SIM",
-#    "SLF",
+    #    "SLF",
     "SLOT",
     "T",
     "T10",
@@ -141,15 +143,15 @@ convention = "google"
 "*.ipynb" = ["RET504"]
 "tests/*.py" = ["D", "PT009", "PT011", "PT027", "PTH"]
 "docs/*.py" = [
-  "T",
-  "D",
-  "B018",
-  "PTH",
-  "E501",
-  "PERF",
-  "A001",
-  "RET504",
-  "INP001",
+    "T",
+    "D",
+    "B018",
+    "PTH",
+    "E501",
+    "PERF",
+    "A001",
+    "RET504",
+    "INP001",
 ]
 
 [format]

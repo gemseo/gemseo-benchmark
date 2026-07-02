@@ -26,15 +26,21 @@ The format is based on
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-# Develop
+## Develop
 
-## Added
+### Added
 
 - The attribute `algorithm_settings` of `AlgorithmConfiguration`
   is the `algorithm_settings` argument passed at instantiation.
 
-## Changed
+### Changed
 
+- The documentation and the HTML report are generated using `properdocs` instead of `sphinx`.
+- The PDF report is generated using `properdocs` and `mkdocs-to-pdf` instead of `sphinx`;
+  you must install
+  the dependency [weasyprint](https://mkdocs-to-pdf.readthedocs.io/en/stable/installation/#requirements)
+  to use this feature.
+- Examples of HTML and PDF reports are available in the examples.
 - The arguments `doe_name`, `doe_options` and `doe_size` of `BaseProblemConfiguration` and its subclasses
   have been replaced by `doe_settings` of type `BaseDOESettings`.
 - The arguments `algorithm_name` and `**algorithm_options` of `AlgorithmConfiguration`
@@ -45,28 +51,28 @@ and this project adheres to
   the absolute path of the algorithm settings class
   and the explicitly-set algorithm settings.
 
-# Version 4.0.1 (October 2025)
+## Version 4.0.1 (October 2025)
 
-## Added
+### Added
 
 - Support for Python 3.13.
 
-## Removed
+### Removed
 
 - Support for Python 3.9.
 
-# Version 4.0.0 (August 2025)
+## Version 4.0.0 (August 2025)
 
-## Added
+### Added
 
-### Problems
+#### Problems
 
 - Multidisciplinary analysis problem configurations
   can now be implemented with `MDAProblemConfiguration`.
 - Multidisciplinary optimization problem configurations
   can now be implemented with `MDOProblemConfiguration`.
 
-#### Report
+##### Report
 
 - The plot options (ex: color, marker) of each algorithm configuration
   can now be customized at the execution of a `Scenario`
@@ -88,7 +94,7 @@ and this project adheres to
 - The scale of the axis showing the number of function evaluations
   can now be made logarithmic.
 
-## Changed
+### Changed
 
 - The phrasing "problem configuration" is now used instead of "benchmarking problem".
   Thus the two main types of inputs to be defined by the user
@@ -99,7 +105,7 @@ and this project adheres to
 - The class to implement optimization benchmarking problems is now called
   `OptimizationBenchmarkingProblem` (rather than `Problem` formerly).
 
-#### Benchmarker
+##### Benchmarker
 
 - Argument `databases_path` of `Benchmarker` is renamed into `hdf_path`
   as the saved files could represent caches rather than databases.
@@ -112,7 +118,7 @@ and this project adheres to
   The user is now free to disable (or not) the stopping criteria of their choice
   in the options of the algorithm configurations.
 
-#### Report
+##### Report
 
 - The results on each problem are now displayed on separate pages
   rather than on the page of the problems group.
@@ -121,12 +127,12 @@ and this project adheres to
   and `PerformanceHistory.extend` now contain copies of history items
   rather than replications of the same objects.
 
-### Scenario
+#### Scenario
 
 - Argument `number_of_processes` of `Scenario.execute` is renamed into
   `n_processes` for consistency with GEMSEO.
 
-## Fixed
+### Fixed
 
 #### Results
 
@@ -204,7 +210,7 @@ and this project adheres to
   feasibility_statuses = [item.is_feasible for item in performance_history]
   ```
 
-### Results
+#### Results
 
 - Methods `PerformanceHistories.plot_algorithm_histories`
   and `PerformanceHistory.plot` were removed
