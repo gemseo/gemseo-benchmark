@@ -29,10 +29,10 @@ from pydantic import Field
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 
 
-class DummySettings(BaseSettings):
+class Dummy_Settings(BaseSettings):  # noqa: N801
     """Minimal settings for a fake algorithm used in tests."""
 
-    _TARGET_CLASS_NAME = "Algorithm"
+    _TARGET_CLASS_NAME = "Dummy"
 
     max_iter: int = Field(default=100)
 
@@ -100,8 +100,8 @@ def test_from_dict():
 def test_copy(algorithm_configuration):
     """Check the copy an algorithm configuration."""
     algorithm_configuration = AlgorithmConfiguration(
-        DummySettings(max_iter=9), "Algorithm configuration"
+        Dummy_Settings(max_iter=9), "Algorithm configuration"
     ).copy()
-    assert algorithm_configuration.algorithm_name == "Algorithm"
+    assert algorithm_configuration.algorithm_name == "Dummy"
     assert algorithm_configuration.name == "Algorithm configuration"
     assert algorithm_configuration.algorithm_options == {"max_iter": 9}

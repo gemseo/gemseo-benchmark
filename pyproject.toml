@@ -1,7 +1,7 @@
 [project]
 name = "gemseo-benchmark"
 authors = [
-    {name = "Benoit Pauwels", email = "contact@gemseo.org"}
+    { name = "Benoit Pauwels", email = "contact@gemseo.org" }
 ]
 description = "A GEMSEO-based package to benchmark optimization algorithms."
 readme = "README.md"
@@ -24,8 +24,10 @@ requires-python = ">=3.10, <3.14"
 dependencies = [
     "gemseo[all] >=6.3,<7",
     "matplotlib",
+    "properdocs",
+    "mkdocs-material",
+    "mkdocs-to-pdf",
     "numpy",
-    "sphinx <8",
 ]
 
 [dependency-groups]

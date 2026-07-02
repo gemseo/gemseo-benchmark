@@ -1,2 +1,10 @@
 include:
   - remote: "https://gitlab.com/gemseo/dev/ci-includes/-/raw/5/main.yml"
+
+# Smoke-test the benchmarking report example, which mkdocs-gallery does not execute
+# (its filename is not prefixed by `plot_`), so nothing else in CI runs it.
+report-smoke:
+  stage: test
+  image: $TEST_IMAGE
+  script:
+    - tox -e report-smoke
