@@ -22,7 +22,7 @@ from typing import ClassVar
 from typing import Final
 
 from gemseo.core.discipline.discipline import Discipline
-from gemseo.scenarios.mdo_scenario import MDOScenario
+from gemseo.scenarios.mdo import MDOScenario
 
 from gemseo_benchmark.benchmarker.mdo_worker import MDOWorker
 from gemseo_benchmark.problems.base_problem_configuration import (
@@ -67,7 +67,7 @@ class MDOProblemConfiguration(BaseProblemConfiguration):
         Args:
             minimize_objective_value: Whether the objective function of the scenario
                 is to be minimized.
-        """  # noqa: D205, D212
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line]
         self.__minimize_objective_value = minimize_objective_value
         super().__init__(
             name,

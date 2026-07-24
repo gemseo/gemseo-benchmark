@@ -46,7 +46,7 @@ class AxisData(metaclass=ABCGoogleDocstringInheritanceMeta):
         """
         Args:
             axes: The axes of the plot.
-        """  # noqa: D205, D212
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line]
         self._axes = axes
 
     @property
@@ -79,11 +79,11 @@ class AxisData(metaclass=ABCGoogleDocstringInheritanceMeta):
 class OrdinateData(AxisData):
     """The data of an ordinate axis."""
 
-    def __init__(self, axes: matplotlib.axes.Axes) -> None:  # noqa:D107
+    def __init__(self, axes: matplotlib.axes.Axes) -> None:  # ruff: ignore[undocumented-public-init]
         super().__init__(axes)
         self._axes.set_ylabel(self._label)
 
-    def get(  # noqa: D102
+    def get(  # ruff: ignore[undocumented-public-method]
         self, performance_histories: PerformanceHistories
     ) -> IntegerArray | RealArray:
         return numpy.array([
@@ -124,7 +124,7 @@ class PerformanceData(OrdinateData):
         Args:
             infeasible_performance_measure: The performance measure
                 for infeasible history items.
-        """  # noqa: D205, D212
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line]
         self.__label = label
         super().__init__(axes)
         self.__infeasible_performance_mesasure = infeasible_performance_measure
@@ -155,7 +155,7 @@ class ConstraintData(OrdinateData):
 
     _label: ClassVar[str] = "Number of unsatisfied constraints"
 
-    def __init__(self, axes: matplotlib.axes.Axes) -> None:  # noqa: D107
+    def __init__(self, axes: matplotlib.axes.Axes) -> None:  # ruff: ignore[undocumented-public-init]
         super().__init__(axes)
         self._format_linear_integer_ticks()
 
@@ -169,7 +169,7 @@ class TimeOrdinateData(OrdinateData):
 
     _label: ClassVar[str] = "Elapsed time"
 
-    def __init__(self, axes: matplotlib.axes.Axes) -> None:  # noqa:D107
+    def __init__(self, axes: matplotlib.axes.Axes) -> None:  # ruff: ignore[undocumented-public-init]
         super().__init__(axes)
         self._format_linear_time_ticks()
 
@@ -191,7 +191,7 @@ class AbscissaData(AxisData):
             number_of_scalar_constraints: The number of scalar constraints
                 of the underlying problem.
             use_log_scale: Whether to use a logarithmic scale for the axis.
-        """  # noqa: D205, D212
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line]
         super().__init__(axes)
         self._axes.set_xlabel(self._label)
         self._axes.tick_params(axis="x", labelrotation=90)
@@ -228,10 +228,10 @@ class DisciplineData(AbscissaData):
     def _format_linear_ticks(self) -> None:
         self._format_linear_integer_ticks()
 
-    def get(self, performance_histories: PerformanceHistories) -> IntegerArray:  # noqa: D102
+    def get(self, performance_histories: PerformanceHistories) -> IntegerArray:  # ruff: ignore[undocumented-public-method]
         return numpy.array(performance_histories.get_numbers_of_discipline_executions())
 
-    def spread(  # noqa: D102
+    def spread(  # ruff: ignore[undocumented-public-method]
         self, performance_histories: PerformanceHistories
     ) -> PerformanceHistories:
         return performance_histories.spread_over_numbers_of_discipline_executions(
@@ -247,10 +247,10 @@ class IterationData(AbscissaData):
     def _format_linear_ticks(self) -> None:
         self._format_linear_integer_ticks()
 
-    def get(self, performance_histories: PerformanceHistories) -> IntegerArray:  # noqa: D102
+    def get(self, performance_histories: PerformanceHistories) -> IntegerArray:  # ruff: ignore[undocumented-public-method]
         return numpy.arange(1, performance_histories.maximum_size + 1)
 
-    def spread(  # noqa: D102
+    def spread(  # ruff: ignore[undocumented-public-method]
         self, performance_histories: PerformanceHistories
     ) -> PerformanceHistories:
         return performance_histories.get_equal_size_histories()
@@ -264,12 +264,12 @@ class TimeAbscissaData(AbscissaData):
     def _format_linear_ticks(self) -> None:
         self._format_linear_time_ticks()
 
-    def get(self, performance_histories: PerformanceHistories) -> RealArray:  # noqa: D102
+    def get(self, performance_histories: PerformanceHistories) -> RealArray:  # ruff: ignore[undocumented-public-method]
         return numpy.array([
             time.total_seconds() for time in performance_histories.get_elapsed_times()
         ])
 
-    def spread(  # noqa: D102
+    def spread(  # ruff: ignore[undocumented-public-method]
         self, performance_histories: PerformanceHistories
     ) -> PerformanceHistories:
         return performance_histories.spread_over_time(

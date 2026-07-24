@@ -54,8 +54,7 @@ class Scenario:
         algorithms_configurations_groups: Iterable[AlgorithmsConfigurations],
         outputs_path: str | Path,
     ) -> None:
-        """
-        Args:
+        """Args:
             algorithms_configurations_groups: The groups of algorithms configurations
                 to be benchmarked.
             outputs_path: The path to the directory where to save the output files
@@ -63,7 +62,7 @@ class Scenario:
 
         Raises:
             ValueError: If the path to outputs directory does not exist.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary]
         if not Path(outputs_path).is_dir():
             msg = f"The path to the outputs directory does not exist: {outputs_path}."
             raise NotADirectoryError(msg)

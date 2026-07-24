@@ -48,6 +48,7 @@ ignore = [
     "RUF100",
     # Checks for long exception messages that are not defined in the exception class itself.
     "TRY003",
+    "noqa-comments"
 ]
 
 select = [

@@ -39,7 +39,7 @@ from gemseo.disciplines.analytic import AnalyticDiscipline
 from gemseo.mda.jacobi_settings import MDAJacobi_Settings
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
 from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
-from gemseo.utils.testing.pytest_conftest import *  # noqa: F401,F403
+from gemseo.utils.testing.pytest_conftest import *  # ruff: ignore[undefined-local-with-import-star]
 from numpy import array
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -377,7 +377,7 @@ def problems_group(rosenbrock) -> ProblemsGroup:
 
 @pytest.fixture(scope="module")
 def results_root(tmp_path_factory) -> Path:
-    """The root the L-BFGS-B results file tree."""
+    """The root the L_BFGS_B results file tree."""
     return tmp_path_factory.mktemp("results")
 
 
@@ -450,8 +450,7 @@ def mdo_create_problem(
         disciplines, "y1", variable_space, formulation_name="MDF"
     )
     scenario.set_algorithm(
-        algo_name=algorithm_configuration.algorithm_name,
-        **algorithm_configuration.algorithm_options,
+        algorithm_settings=algorithm_configuration.algorithm_settings
     )
     return scenario, disciplines
 

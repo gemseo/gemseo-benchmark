@@ -35,7 +35,7 @@ from gemseo.utils.string_tools import pretty_repr
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-    from gemseo.settings.base_settings import BaseSettings
+    from gemseo.utils.pydantic import BaseSettings
 
 InstanceAlgorithmOptions = MutableMapping[str, Callable[[int], Any]]
 
@@ -73,7 +73,7 @@ class AlgorithmConfiguration:
                 and returns the value of the option.
         """  # noqa: D205, D212, D415
         self.__algorithm_settings = algorithm_settings
-        algorithm_name = algorithm_settings._TARGET_CLASS_NAME
+        algorithm_name = algorithm_settings.target_class_name
         non_default_opts = algorithm_settings.model_dump(exclude_unset=True)
         self.__configuration_name = configuration_name or self.__get_configuration_name(
             algorithm_name, non_default_opts
@@ -111,7 +111,7 @@ class AlgorithmConfiguration:
     @property
     def algorithm_name(self) -> str:
         """The name of the algorithm."""
-        return self.__algorithm_settings._TARGET_CLASS_NAME
+        return self.__algorithm_settings.target_class_name
 
     @property
     def algorithm_options(self) -> dict[str, Any]:

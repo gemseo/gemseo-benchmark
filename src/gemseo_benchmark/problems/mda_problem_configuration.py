@@ -22,7 +22,7 @@ from typing import ClassVar
 from typing import Final
 
 from gemseo.core.discipline.discipline import Discipline
-from gemseo.mda.base_mda_solver import BaseMDASolver
+from gemseo.mda.base import BaseMDA
 
 from gemseo_benchmark.benchmarker.mda_worker import MDAWorker
 from gemseo_benchmark.problems.base_problem_configuration import (
@@ -41,7 +41,7 @@ if TYPE_CHECKING:
     )
     from gemseo_benchmark.data_profiles.target_values import TargetValues
 
-MDAProblemType = tuple[BaseMDASolver, Sequence[Discipline]]
+MDAProblemType = tuple[BaseMDA, Sequence[Discipline]]
 
 
 class MDAProblemConfiguration(BaseProblemConfiguration):
@@ -51,7 +51,7 @@ class MDAProblemConfiguration(BaseProblemConfiguration):
     performance_measure_label: ClassVar[str] = "Best residual norm"
     worker: ClassVar[type[MDAWorker]] = MDAWorker
 
-    def __init__(  # noqa: D107
+    def __init__(  # ruff: ignore[undocumented-public-init]
         self,
         name: str,
         create_problem: Callable[[AlgorithmConfiguration], MDAProblemType],

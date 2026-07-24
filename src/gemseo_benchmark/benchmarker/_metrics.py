@@ -21,7 +21,7 @@ from abc import abstractmethod
 from typing import TYPE_CHECKING
 
 from gemseo import configure
-from gemseo.mda.base_mda_solver import BaseMDASolver
+from gemseo.mda.base import BaseMDA
 from gemseo.typing import RealArray
 from gemseo.utils.metaclasses import ABCGoogleDocstringInheritanceMeta
 
@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from gemseo.core.discipline.discipline import Discipline
     from gemseo.utils.timer import Timer
 
-MetricsDataType = RealArray | BaseMDASolver
+MetricsDataType = RealArray | BaseMDA
 
 
 class BaseMetrics(metaclass=ABCGoogleDocstringInheritanceMeta):
@@ -71,7 +71,7 @@ class ElapsedTime(BaseMetrics):
         """
         Args:
             timer: The timer of the execution.
-        """  # noqa: D205, D212
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line]
         start_datetime = timer.entering_timestamp
         return [end_datetime - start_datetime for end_datetime in self._metrics]
 
@@ -83,7 +83,7 @@ class DisciplineExecutions(BaseMetrics):
         """
         Args:
             disciplines: The disciplines.
-        """  # noqa: D205, D212
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line]
         configure(enable_discipline_statistics=True)
         super().__init__()
         self.__disciplines = disciplines

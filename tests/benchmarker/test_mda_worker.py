@@ -21,10 +21,10 @@ from pathlib import Path
 
 import numpy
 import pytest
-from gemseo.caches.hdf5_cache import HDF5Cache
+from gemseo.caches.hdf5 import HDF5Cache
 from gemseo.mda.factory import MDAFactory
 from gemseo.mda.jacobi import MDAJacobi
-from gemseo.utils.testing.pytest_conftest import tmp_wd  # noqa: F401
+from gemseo.utils.testing.pytest_conftest import tmp_wd  # ruff: ignore[unused-import]
 from gemseo.utils.timer import Timer
 
 from gemseo_benchmark.benchmarker.mda_worker import MDAWorker
@@ -47,7 +47,7 @@ def test_check_algorithm_availability() -> None:
 @pytest.mark.parametrize("save_gemseo_log", [False, True])
 @pytest.mark.parametrize("save_data", [False, True])
 def test_execution(
-    tmp_wd,  # noqa: F811
+    tmp_wd,  # ruff: ignore[redefined-while-unused]
     mda_algorithm_configuration,
     mda_problem_configuration,
     save_gemseo_log,
@@ -67,7 +67,7 @@ def test_execution(
 
 @pytest.mark.parametrize("save_data", [False, True])
 def test_get_problem(
-    tmp_wd,  # noqa: F811
+    tmp_wd,  # ruff: ignore[redefined-while-unused]
     mda_algorithm_configuration,
     mda_problem_configuration,
     save_data,

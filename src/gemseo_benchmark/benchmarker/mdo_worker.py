@@ -56,16 +56,14 @@ class MDOWorker(BaseWorker):
         scenario, disciplines = problem_configuration.create_problem(
             algorithm_configuration
         )
-        scenario.formulation.optimization_problem.design_space.set_current_value(
-            starting_point
-        )
+        scenario.formulation.problem.design_space.set_current_value(starting_point)
         return scenario, disciplines
 
     @classmethod
     def _add_metrics_listeners(
         cls, problem: MDOProblemType
     ) -> tuple[ElapsedTime, DisciplineExecutions]:
-        optimization_problem = problem[0].formulation.optimization_problem
+        optimization_problem = problem[0].formulation.problem
         elapsed_time = ElapsedTime()
         optimization_problem.add_listener(elapsed_time.add_metrics)
         discipline_executions = DisciplineExecutions(problem[1])
@@ -91,7 +89,7 @@ class MDOWorker(BaseWorker):
     ) -> PerformanceHistory:
         time_listener, discipline_listener = metrics_listeners
         performance_history = PerformanceHistory.from_problem(
-            problem[0].formulation.optimization_problem,
+            problem[0].formulation.problem,
             problem_configuration.name,
             elapsed_times=time_listener.get_metrics(timer),
             number_of_discipline_executions=discipline_listener.get_metrics(),
@@ -103,4 +101,4 @@ class MDOWorker(BaseWorker):
     @staticmethod
     def _post_execute(problem: MDOProblemType, hdf_file_path: Path | None) -> None:
         if hdf_file_path is not None:
-            problem[0].formulation.optimization_problem.database.to_hdf(hdf_file_path)
+            problem[0].formulation.problem.database.to_hdf(hdf_file_path)

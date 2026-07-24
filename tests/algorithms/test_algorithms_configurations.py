@@ -141,4 +141,4 @@ def test_unnamed_collection(configuration_b, configuration_c, configuration_a):
         ValueError,
         match=re.escape("The collection of algorithms configurations has no name."),
     ):
-        algorithms_configurations.name  # noqa: B018
+        algorithms_configurations.name  # ruff: ignore[useless-expression]

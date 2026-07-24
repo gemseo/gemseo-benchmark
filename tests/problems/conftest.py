@@ -59,7 +59,7 @@ def check_no_starting_point(
     with pytest.raises(
         ValueError, match=re.escape("The problem configuration has no starting point.")
     ):
-        problem_configuration.starting_points  # noqa: B018
+        problem_configuration.starting_points  # ruff: ignore[useless-expression]
 
 
 def check_default_starting_point(
@@ -112,7 +112,7 @@ def check_undefined_target_values(
     with pytest.raises(
         ValueError, match=re.escape("The problem configuration has no target value.")
     ):
-        problem_configuration.target_values  # noqa: B018
+        problem_configuration.target_values  # ruff: ignore[useless-expression]
 
 
 def __check_starting_points_generation(

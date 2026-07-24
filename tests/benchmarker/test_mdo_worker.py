@@ -22,8 +22,8 @@ from pathlib import Path
 import numpy
 import pytest
 from gemseo.algos.opt.factory import OptimizationLibraryFactory
-from gemseo.scenarios.mdo_scenario import MDOScenario
-from gemseo.utils.testing.pytest_conftest import tmp_wd  # noqa: F401
+from gemseo.scenarios.mdo import MDOScenario
+from gemseo.utils.testing.pytest_conftest import tmp_wd  # ruff: ignore[unused-import]
 from gemseo.utils.timer import Timer
 
 from gemseo_benchmark.benchmarker.mdo_worker import MDOWorker
@@ -46,7 +46,7 @@ def test_check_algorithm_availability() -> None:
 @pytest.mark.parametrize("save_gemseo_log", [False, True])
 @pytest.mark.parametrize("save_data", [False, True])
 def test_execution(
-    tmp_wd,  # noqa: F811
+    tmp_wd,  # ruff: ignore[redefined-while-unused]
     algorithm_configuration,
     mdo_problem_configuration,
     save_gemseo_log,
@@ -66,7 +66,7 @@ def test_execution(
 
 @pytest.mark.parametrize("save_data", [False, True])
 def test_get_problem(
-    tmp_wd,  # noqa: F811
+    tmp_wd,  # ruff: ignore[redefined-while-unused]
     algorithm_configuration,
     mdo_problem_configuration,
     save_data,
@@ -111,7 +111,7 @@ def test_create_performance_history(
     with Timer() as timer:
         scenario.execute()
 
-    optimization_problem = scenario.formulation.optimization_problem
+    optimization_problem = scenario.formulation.problem
     database = optimization_problem.database
     database_size = len(database)
     check_create_performance_history(

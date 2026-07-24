@@ -23,13 +23,13 @@ from __future__ import annotations
 
 import pytest
 from gemseo.algos.opt.scipy_local.settings.slsqp import SLSQP_Settings
-from gemseo.settings.base_settings import BaseSettings
+from gemseo.utils.pydantic import BaseSettings
 from pydantic import Field
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 
 
-class Dummy_Settings(BaseSettings):  # noqa: N801
+class Dummy_Settings(BaseSettings):  # ruff: ignore[invalid-class-name]
     """Minimal settings for a fake algorithm used in tests."""
 
     _TARGET_CLASS_NAME = "Dummy"
