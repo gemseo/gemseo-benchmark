@@ -123,6 +123,22 @@ class AlgorithmConfiguration:
         """The instance-specific options of the algorithm."""
         return self.__instance_algorithm_options
 
+    def __repr__(self):
+        rpr = f"Configuration {self.name}:\nAlgorithm name : {self.algorithm_name}\n"
+        if self.algorithm_options:
+            rpr += "Options :\n"
+            for key, val in self.algorithm_options.items():
+                rpr += f"\t- {key}: {val}\n"
+        else:
+            rpr += "Default options.\n"
+        if self.instance_algorithm_options:
+            rpr += "Instancewise options :\n"
+            for key, val in self.instance_algorithm_options.items():
+                rpr += f"\t- {key}: {val}\n"
+        else:
+            rpr += "No instancewise options."
+        return rpr
+
     def to_dict(self, skip_instance_algorithm_options: bool = False) -> dict[str, Any]:
         """Return the algorithm configuration as a dictionary.
 
