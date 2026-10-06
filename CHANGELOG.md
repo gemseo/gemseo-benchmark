@@ -41,6 +41,16 @@ and this project adheres to
   they raise a `BenchmarkingError` that lists the failures,
   and the report is not generated.
   The failures are logged at the `ERROR` level, with their traceback, as they occur.
+- `Benchmarker.execute` and `Scenario.execute` check the algorithms
+  for all the combinations of algorithm configuration and problem configuration
+  before any of them is executed:
+  a `ValueError` lists the algorithms that are not available
+  and, for an optimization problem configuration,
+  the algorithms that are not adapted to the problem (e.g. an algorithm
+  that does not handle constraints).
+  Before, an unavailable algorithm raised an error after the execution
+  of the preceding algorithm configurations,
+  and an unsuited algorithm made its executions fail.
 - The documentation and the HTML report are generated using `properdocs` instead of `sphinx`.
 - The PDF report is generated using `properdocs` and `mkdocs-to-pdf` instead of `sphinx`;
   you must install
