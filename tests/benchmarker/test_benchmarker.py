@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -35,6 +36,7 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
 from gemseo_benchmark.benchmarker.benchmarker import Benchmarker
+from gemseo_benchmark.benchmarker.benchmarker import BenchmarkingError
 from gemseo_benchmark.problems.mda_problem_configuration import MDAProblemConfiguration
 from gemseo_benchmark.problems.mdo_problem_configuration import MDOProblemConfiguration
 from gemseo_benchmark.problems.optimization_problem_configuration import (
@@ -489,10 +491,28 @@ def test_worker_raised_exception(
     """Check the case where a worker raised an exception."""
     algo_config = request.getfixturevalue(algorithm_configuration)
     pb_config = request.getfixturevalue(ill_problem_configuration)
-    Benchmarker(tmp_path).execute([pb_config], AlgorithmsConfigurations(algo_config))
+    with pytest.raises(
+        BenchmarkingError,
+        match=re.escape("1 of 1 executions raised an exception"),
+    ) as error_info:
+        Benchmarker(tmp_path).execute(
+            [pb_config], AlgorithmsConfigurations(algo_config)
+        )
+
+    # The error lists the execution that failed, and is caused by its exception.
+    (description, exception) = next(iter(error_info.value.exceptions.items()))
+    assert description == (
+        f"Solving problem 1 of problem configuration {pb_config.name} "
+        f"for algorithm configuration {algo_config.name}"
+    )
+    assert f"- {description} raised: " in str(error_info.value)
+    assert error_info.value.__cause__ is exception
+
+    # The failure is also logged as an error, with its traceback, when it occurs.
     ((module, level, message),) = caplog.record_tuples
     assert module == "gemseo_benchmark.benchmarker.benchmarker"
-    assert level == logging.WARNING
+    assert level == logging.ERROR
+    assert caplog.records[0].exc_info[1] is exception
     assert message in {
         (
             f"Solving problem 1 of problem configuration {pb_config.name} "
@@ -502,3 +522,30 @@ def test_worker_raised_exception(
         )
         for verb in {"get", "pickle"}
     }
+
+
+def test_results_saved_when_a_worker_raised(
+    tmp_path, rosenbrock, optimization_algorithm_configuration
+) -> None:
+    """Check that the executions go on and are saved when a worker raised."""
+    ill_problem_configuration = OptimizationProblemConfiguration(
+        "Ill problem", lambda: rosenbrock.create_problem()
+    )
+    results_path = tmp_path / "results.json"
+    with pytest.raises(
+        BenchmarkingError, match=re.escape("1 of 3 executions raised an exception")
+    ) as error_info:
+        Benchmarker(tmp_path, results_path).execute(
+            [ill_problem_configuration, rosenbrock],
+            AlgorithmsConfigurations(optimization_algorithm_configuration),
+        )
+
+    assert len(error_info.value.exceptions) == 1
+
+    # The performance histories of the executions that succeeded are saved.
+    with results_path.open() as results_file:
+        data = json.load(results_file)
+
+    algorithm_name = optimization_algorithm_configuration.name
+    assert data[algorithm_name].keys() == {rosenbrock.name}
+    assert len(data[algorithm_name][rosenbrock.name]) == 2

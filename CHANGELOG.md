@@ -35,6 +35,12 @@ and this project adheres to
 
 ### Changed
 
+- When executions of a benchmarking raise exceptions,
+  `Benchmarker.execute` and `Scenario.execute` no longer only log a warning:
+  once all the executions are over and the performance histories are saved,
+  they raise a `BenchmarkingError` that lists the failures,
+  and the report is not generated.
+  The failures are logged at the `ERROR` level, with their traceback, as they occur.
 - The documentation and the HTML report are generated using `properdocs` instead of `sphinx`.
 - The PDF report is generated using `properdocs` and `mkdocs-to-pdf` instead of `sphinx`;
   you must install

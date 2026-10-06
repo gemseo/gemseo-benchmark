@@ -50,6 +50,39 @@ if TYPE_CHECKING:
 LOGGER = logging.getLogger(__name__)
 
 
+class BenchmarkingError(Exception):
+    """The error raised when executions of a benchmarking raised exceptions.
+
+    The other executions have run to the end and their results are saved.
+    The exception raised by the first execution that failed is the cause of this error.
+    """
+
+    exceptions: dict[str, BaseException]
+    """The exceptions raised by the executions, bound to the description of each."""
+
+    def __init__(
+        self, exceptions: dict[str, BaseException], number_of_executions: int
+    ) -> None:
+        """
+        Args:
+            exceptions: The exceptions raised by the executions,
+                bound to the description of each.
+            number_of_executions: The number of executions.
+        """  # noqa: D205, D212, D415
+        self.exceptions = exceptions
+        lines = [
+            (
+                f"{len(exceptions)} of {number_of_executions} executions raised "
+                "an exception; the results of the other executions are saved."
+            )
+        ]
+        lines.extend(
+            f"- {description} raised: {type(exception).__name__}: {exception}"
+            for description, exception in exceptions.items()
+        )
+        super().__init__("\n".join(lines))
+
+
 class Benchmarker:
     """A class to benchmark algorithm configurations on problem configurations."""
 
@@ -118,6 +151,11 @@ class Benchmarker:
 
         Returns:
             The results of the benchmarking.
+
+        Raises:
+            BenchmarkingError: If some executions raised exceptions.
+                The other executions are not interrupted,
+                and the results are saved before the error is raised.
         """
         if save_log and use_threading:
             # Set one file handler for all threads.
@@ -150,13 +188,16 @@ class Benchmarker:
                             use_threading,
                         )
                     )
+        failures: dict[str, BaseException] = {}
         for future in as_completed(future_to_path):
             exception = future.exception()
             if exception is None:
                 self._results.add_path(*future_to_path[future][1:])
             else:
-                LOGGER.warning(
-                    "%s raised: %s", future_to_path[future][0][:-1], exception
+                description = future_to_path[future][0][:-1]
+                failures[description] = exception
+                LOGGER.error(
+                    "%s raised: %s", description, exception, exc_info=exception
                 )
 
         if save_log and use_threading:
@@ -167,6 +208,11 @@ class Benchmarker:
 
         if future_to_path and self.__results_path:
             self._results.to_file(self.__results_path, 4)
+
+        if failures:
+            raise BenchmarkingError(failures, len(future_to_path)) from next(
+                iter(failures.values())
+            )
 
         return self._results
 

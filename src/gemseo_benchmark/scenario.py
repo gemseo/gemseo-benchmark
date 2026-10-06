@@ -133,6 +133,12 @@ class Scenario:
 
         Returns:
             The performance histories.
+
+        Raises:
+            BenchmarkingError: If some executions of the solvers raised exceptions.
+                The other executions are not interrupted
+                and their performance histories are saved,
+                but the report is not generated.
         """
         if not skip_solvers:
             LOGGER.info("Run the solvers on the problem configurations")
