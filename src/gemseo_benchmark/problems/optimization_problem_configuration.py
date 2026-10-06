@@ -37,6 +37,7 @@ from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from collections.abc import Iterator
 
     from gemseo.algos.doe.base_doe_settings import BaseDOESettings
     from gemseo.algos.optimization_problem import OptimizationProblem
@@ -127,7 +128,7 @@ class OptimizationProblemConfiguration(BaseProblemConfiguration):
         return self.__targets_generator
 
     # TODO: Remove after refactoring the Benchmarker.
-    def __iter__(self) -> OptimizationProblem:
+    def __iter__(self) -> Iterator[OptimizationProblem]:
         """Iterate on the problem instances with respect to the starting points."""
         for starting_point in self.starting_points:
             problem = self.create_problem()
