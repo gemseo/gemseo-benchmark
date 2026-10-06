@@ -21,6 +21,11 @@ import os
 
 import pytest
 
+from gemseo_benchmark.benchmarker.benchmarker import BenchmarkingError
+from gemseo_benchmark.problems.optimization_problem_configuration import (
+    OptimizationProblemConfiguration,
+)
+from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.scenario import Scenario
 
 
@@ -81,3 +86,30 @@ def test_overlapping_algorithm_configurations(
 
     # Check that only two result files have been generated.
     assert len(data[algorithm_configuration.name][problems_group.name]) == 2
+
+
+@pytest.mark.parametrize("skip_report", [False, True])
+def test_worker_raised(
+    algorithms_configurations, tmp_path, problems_group, rosenbrock, skip_report
+) -> None:
+    """Check that the failure of a worker is raised, whether the report is skipped."""
+    ill_problems_group = ProblemsGroup(
+        "Ill problems",
+        [
+            OptimizationProblemConfiguration(
+                "Ill problem", lambda: rosenbrock.create_problem()
+            )
+        ],
+    )
+    with pytest.raises(BenchmarkingError, match="executions raised an exception"):
+        Scenario([algorithms_configurations], tmp_path).execute(
+            [problems_group, ill_problems_group], skip_report=skip_report
+        )
+
+    # The performance histories of the executions that succeeded are saved,
+    # but no report is generated from partial results.
+    with (tmp_path / "results.json").open() as file:
+        data = json.load(file)
+
+    assert problems_group.name in next(iter(data.values()))
+    assert not (tmp_path / "report").exists()
