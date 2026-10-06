@@ -96,7 +96,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
     __target_values: TargetValues | None
     """"The target values to compute data profiles."""
 
-    __variable_space: DesignSpace | None
+    __variable_space: DesignSpace
     """The space of the variables of the problem configuration."""
 
     def __init__(
@@ -182,8 +182,11 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
         return self.__name
 
     @property
-    def optimum(self) -> float:
-        """The best feasible performance measure known for the problem configuration."""
+    def optimum(self) -> float | None:
+        """The best feasible performance measure known for the problem configuration.
+
+        `None` if it is unknown.
+        """
         return self.__optimum
 
     @property
@@ -281,7 +284,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
     @target_values.setter
     def target_values(self, target_values: TargetValues) -> None:
         self.__target_values = target_values
-        self.__set_minimization_target_values()
+        self.__set_minimization_target_values(target_values)
 
     def save_starting_points(self, path: Path) -> None:
         """Save the starting points as a NumPy binary.
@@ -358,7 +361,15 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
 
     @property
     def minimization_target_values(self) -> TargetValues:
-        """The target values for the minimization of the performance measure."""
+        """The target values for the minimization of the performance measure.
+
+        Raises:
+            ValueError: If the problem configuration has no target value.
+        """
+        if self.__minimization_target_values is None:
+            msg = "The problem configuration has no target value."
+            raise ValueError(msg)
+
         return self.__minimization_target_values
 
     @property
@@ -366,12 +377,16 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
     def minimize_performance_measure(self) -> bool:
         """Whether the performance measure of the problem is to be minimized."""
 
-    def __set_minimization_target_values(self) -> None:
-        """Set the target values for the minimization of the performance measure."""
+    def __set_minimization_target_values(self, target_values: TargetValues) -> None:
+        """Set the target values for the minimization of the performance measure.
+
+        Args:
+            target_values: The target values of the problem configuration.
+        """
         if self.minimize_performance_measure:
-            self.__minimization_target_values = self.__target_values
+            self.__minimization_target_values = target_values
         else:
-            self.__minimization_target_values = deepcopy(self.__target_values)
+            self.__minimization_target_values = deepcopy(target_values)
             self.__minimization_target_values.switch_performance_measure_sign()
 
     @property

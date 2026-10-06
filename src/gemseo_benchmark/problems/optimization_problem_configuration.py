@@ -123,8 +123,11 @@ class OptimizationProblemConfiguration(BaseProblemConfiguration):
         return super().create_problem
 
     @property
-    def targets_generator(self) -> TargetsGenerator:
-        """The generator for target values."""
+    def targets_generator(self) -> TargetsGenerator | None:
+        """The generator for target values.
+
+        `None` if the target values have not been computed.
+        """
         return self.__targets_generator
 
     # TODO: Remove after refactoring the Benchmarker.
