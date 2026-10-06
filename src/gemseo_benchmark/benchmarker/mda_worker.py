@@ -42,7 +42,7 @@ if TYPE_CHECKING:
     from gemseo_benchmark.problems.mda_problem_configuration import MDAProblemType
 
 
-class MDAWorker(BaseWorker):
+class MDAWorker(BaseWorker["MDAProblemConfiguration", "MDAProblemType"]):
     """A benchmarking worker for multidisciplinary analysis."""
 
     _algorithm_factory: MDAFactory = MDAFactory()

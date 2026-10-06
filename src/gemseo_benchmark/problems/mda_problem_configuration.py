@@ -44,7 +44,7 @@ if TYPE_CHECKING:
 MDAProblemType = tuple[BaseMDASolver, Sequence[Discipline]]
 
 
-class MDAProblemConfiguration(BaseProblemConfiguration):
+class MDAProblemConfiguration(BaseProblemConfiguration[MDAProblemType]):
     """Problem configuration for multidisciplinary analysis."""
 
     abscissa_data_type: Final[type[DisciplineData]] = DisciplineData

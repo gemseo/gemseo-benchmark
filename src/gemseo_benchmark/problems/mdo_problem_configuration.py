@@ -44,7 +44,7 @@ if TYPE_CHECKING:
 MDOProblemType = tuple[MDOScenario, Sequence[Discipline]]
 
 
-class MDOProblemConfiguration(BaseProblemConfiguration):
+class MDOProblemConfiguration(BaseProblemConfiguration[MDOProblemType]):
     """Problem configuration for multidisciplinary optimization."""
 
     abscissa_data_type: Final[type[DisciplineData]] = DisciplineData

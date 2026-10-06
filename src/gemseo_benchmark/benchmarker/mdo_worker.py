@@ -41,7 +41,7 @@ if TYPE_CHECKING:
     from gemseo_benchmark.problems.mdo_problem_configuration import MDOProblemType
 
 
-class MDOWorker(BaseWorker):
+class MDOWorker(BaseWorker["MDOProblemConfiguration", "MDOProblemType"]):
     """A benchmarking worker for multidisciplinary optimization."""
 
     _algorithm_factory: OptimizationLibraryFactory = OptimizationLibraryFactory()

@@ -21,6 +21,8 @@ from collections.abc import Iterable
 from copy import deepcopy
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import Generic
+from typing import TypeVar
 
 from gemseo import compute_doe
 from gemseo.algos.doe.base_n_samples_based_doe_settings import (
@@ -56,8 +58,11 @@ if TYPE_CHECKING:
 
 InputStartingPointsType = ndarray | Iterable[ndarray]
 
+ProblemT = TypeVar("ProblemT")
+"""The type of the problems created by a problem configuration."""
 
-class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
+
+class BaseProblemConfiguration(Generic[ProblemT], metaclass=ABCGoogleDocstringInheritanceMeta):
     """Base class for problem configurations.
 
     A *problem configuration* is a problem of reference
@@ -72,7 +77,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
     (refer to the [target_values module][gemseo_benchmark.data_profiles.target_values]).
     """
 
-    __create_problem: Callable[..., Any]
+    __create_problem: Callable[..., ProblemT]
     """The function to create a problem of the configuration.
 
     Its arguments and its return type depend on the type of problem configuration.
@@ -102,7 +107,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
     def __init__(
         self,
         name: str,
-        create_problem: Callable[..., Any],
+        create_problem: Callable[..., ProblemT],
         target_values: TargetValues | None,
         variable_space: DesignSpace,
         doe_settings: BaseDOESettings | None,
@@ -163,7 +168,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
             self.target_values = target_values
 
     @property
-    def create_problem(self) -> Callable[..., Any]:
+    def create_problem(self) -> Callable[..., ProblemT]:
         """The function to create a problem of the configuration.
 
         The arguments and the return type of this function depend on the type of
