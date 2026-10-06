@@ -34,7 +34,6 @@ from gemseo.utils.metaclasses import ABCGoogleDocstringInheritanceMeta
 from gemseo.utils.timer import Timer
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
     from pathlib import Path
 
     from gemseo.algos.base_algo_factory import BaseAlgoFactory
@@ -61,9 +60,12 @@ ProblemConfigurationT = TypeVar(
 ProblemT = TypeVar("ProblemT")
 """The type of the problems that a worker executes."""
 
+MetricsT = TypeVar("MetricsT", bound="tuple[BaseMetrics, ...]")
+"""The type of the metrics listeners of a worker."""
+
 
 class BaseWorker(
-    Generic[ProblemConfigurationT, ProblemT],
+    Generic[ProblemConfigurationT, ProblemT, MetricsT],
     metaclass=ABCGoogleDocstringInheritanceMeta,
 ):
     """Base class for benchmarking workers."""
@@ -177,7 +179,7 @@ class BaseWorker(
 
     @classmethod
     @abstractmethod
-    def _add_metrics_listeners(cls, problem: ProblemT) -> tuple[BaseMetrics, ...]:
+    def _add_metrics_listeners(cls, problem: ProblemT) -> MetricsT:
         """Add the listeners for the metrics of an execution.
 
         Args:
@@ -211,7 +213,7 @@ class BaseWorker(
         problem_configuration: ProblemConfigurationT,
         problem: ProblemT,
         timer: Timer,
-        metrics_listeners: Iterable[BaseMetrics],
+        metrics_listeners: MetricsT,
     ) -> PerformanceHistory:
         """Create a performance history from a solved problem.
 

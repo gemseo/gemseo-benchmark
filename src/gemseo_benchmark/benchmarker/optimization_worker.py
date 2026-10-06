@@ -27,7 +27,6 @@ from gemseo_benchmark.benchmarker.base_worker import BaseWorker
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
     from pathlib import Path
 
     from gemseo.typing import RealArray
@@ -42,7 +41,9 @@ if TYPE_CHECKING:
 
 
 class OptimizationWorker(
-    BaseWorker["OptimizationProblemConfiguration", OptimizationProblem]
+    BaseWorker[
+        "OptimizationProblemConfiguration", OptimizationProblem, tuple[ElapsedTime]
+    ]
 ):
     """A benchmarking worker for optimization."""
 
@@ -84,7 +85,7 @@ class OptimizationWorker(
         problem_configuration: OptimizationProblemConfiguration,
         problem: OptimizationProblem,
         timer: Timer,
-        metrics_listeners: Iterable[ElapsedTime],
+        metrics_listeners: tuple[ElapsedTime],
     ) -> PerformanceHistory:
         (time_listener,) = metrics_listeners
         performance_history = PerformanceHistory.from_problem(
