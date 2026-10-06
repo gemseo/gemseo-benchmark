@@ -75,6 +75,26 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
             raise ValueError(msg)
 
     @classmethod
+    def check_algorithms_suitability(
+        cls,
+        algorithm_names: Iterable[str],
+        problem_configuration: BaseProblemConfiguration,
+    ) -> None:
+        """Check whether algorithms are suited to a problem configuration.
+
+        By default, any algorithm is considered suited.
+        A worker for which GEMSEO can tell it before the execution
+        overrides this method.
+
+        Args:
+            algorithm_names: The names of the algorithms.
+            problem_configuration: The problem configuration.
+
+        Raises:
+            ValueError: If an algorithm is not suited to the problem configuration.
+        """
+
+    @classmethod
     def execute(
         cls,
         algorithm_configuration: AlgorithmConfiguration,

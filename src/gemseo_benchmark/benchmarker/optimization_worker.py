@@ -36,6 +36,9 @@ if TYPE_CHECKING:
     from gemseo_benchmark.algorithms.algorithm_configuration import (
         AlgorithmConfiguration,
     )
+    from gemseo_benchmark.problems.base_problem_configuration import (
+        BaseProblemConfiguration,
+    )
     from gemseo_benchmark.problems.optimization_problem_configuration import (
         OptimizationProblemConfiguration,
     )
@@ -45,6 +48,41 @@ class OptimizationWorker(BaseWorker):
     """A benchmarking worker for optimization."""
 
     _algorithm_factory: OptimizationLibraryFactory = OptimizationLibraryFactory()
+
+    @classmethod
+    def check_algorithms_suitability(
+        cls,
+        algorithm_names: Iterable[str],
+        problem_configuration: BaseProblemConfiguration,
+    ) -> None:
+        """Check whether algorithms are suited to an optimization problem.
+
+        An algorithm is suited if GEMSEO says that it is for a problem created by
+        the problem configuration, e.g. an algorithm that does not handle constraints
+        is not suited to a problem that has some.
+        """
+        problem = problem_configuration.create_problem()
+        unsuited_names = []
+        for algorithm_name in algorithm_names:
+            library = cls._algorithm_factory.create(algorithm_name)
+            if not library.is_algorithm_suited(
+                library.ALGORITHM_INFOS[algorithm_name], problem
+            ):
+                unsuited_names.append(repr(algorithm_name))
+
+        if len(unsuited_names) == 1:
+            msg = (
+                f"The algorithm {unsuited_names[0]} is not adapted "
+                f"to the problem configuration {problem_configuration.name!r}."
+            )
+            raise ValueError(msg)
+
+        if unsuited_names:
+            msg = (
+                f"The algorithms {', '.join(unsuited_names)} are not adapted "
+                f"to the problem configuration {problem_configuration.name!r}."
+            )
+            raise ValueError(msg)
 
     @staticmethod
     def _get_problem(

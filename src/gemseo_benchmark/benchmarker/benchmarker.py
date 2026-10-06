@@ -26,6 +26,7 @@ from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import as_completed
 from typing import TYPE_CHECKING
+from typing import Any
 
 from gemseo import LOGGER as GEMSEO_LOGGER
 
@@ -34,6 +35,7 @@ from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfigu
 from gemseo_benchmark.results.results import Results
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from collections.abc import Iterable
     from concurrent.futures import Executor
     from concurrent.futures import Future
@@ -153,10 +155,18 @@ class Benchmarker:
             The results of the benchmarking.
 
         Raises:
+            ValueError: If an algorithm is not available,
+                or is not suited to a problem configuration when this can be told
+                before the execution.
+                This is checked for all the combinations
+                of algorithm configuration and problem configuration
+                before any of them is executed.
             BenchmarkingError: If some executions raised exceptions.
                 The other executions are not interrupted,
                 and the results are saved before the error is raised.
         """
+        problem_configurations = tuple(problem_configurations)
+        self.__check_algorithms(problem_configurations, algorithm_configurations)
         if save_log and use_threading:
             # Set one file handler for all threads.
             file_handler = logging.FileHandler(
@@ -173,14 +183,10 @@ class Benchmarker:
             for original_algorithm_configuration in algorithm_configurations:
                 algorithm_configuration = original_algorithm_configuration.copy()
                 for problem_configuration in problem_configurations:
-                    worker = problem_configuration.worker
-                    worker.check_algorithm_availability(
-                        algorithm_configuration.algorithm_name
-                    )
                     future_to_path.update(
                         self.__execute(
                             executor,
-                            worker,
+                            problem_configuration.worker,
                             algorithm_configuration,
                             problem_configuration,
                             overwrite_histories,
@@ -215,6 +221,74 @@ class Benchmarker:
             )
 
         return self._results
+
+    @staticmethod
+    def __check_algorithms(
+        problem_configurations: Iterable[BaseProblemConfiguration],
+        algorithm_configurations: AlgorithmsConfigurations,
+    ) -> None:
+        """Check the algorithms for all the problem configurations.
+
+        Nothing is executed if an algorithm is unavailable
+        or not suited to a problem configuration,
+        so that a mistake in the last algorithm configuration
+        does not come after the execution of the other ones.
+        All the mistakes are reported at once.
+
+        Args:
+            problem_configurations: The problem configurations.
+            algorithm_configurations: The algorithms configurations.
+
+        Raises:
+            ValueError: If an algorithm is not available,
+                or is not suited to a problem configuration.
+        """
+        algorithm_names = tuple({
+            configuration.algorithm_name: None
+            for configuration in algorithm_configurations
+        })
+        messages = {}
+        for problem_configuration in problem_configurations:
+            worker = problem_configuration.worker
+            available_names = []
+            for algorithm_name in algorithm_names:
+                message = Benchmarker.__get_error_message(
+                    worker.check_algorithm_availability, algorithm_name
+                )
+                if message:
+                    messages[message] = None
+                else:
+                    available_names.append(algorithm_name)
+
+            message = Benchmarker.__get_error_message(
+                worker.check_algorithms_suitability,
+                available_names,
+                problem_configuration,
+            )
+            if message:
+                messages[message] = None
+
+        if messages:
+            raise ValueError("\n".join(messages))
+
+    @staticmethod
+    def __get_error_message(check: Callable[..., None], *args: Any) -> str:
+        """Return the message of the error raised by a check.
+
+        Args:
+            check: The function that checks something and raises a `ValueError`
+                if the check fails.
+            *args: The arguments of the function.
+
+        Returns:
+            The message of the error, or an empty string if the check passed.
+        """
+        try:
+            check(*args)
+        except ValueError as error:
+            return str(error)
+
+        return ""
 
     def __execute(
         self,

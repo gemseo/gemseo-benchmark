@@ -26,9 +26,12 @@ import logging
 import re
 from pathlib import Path
 from typing import TYPE_CHECKING
+from unittest import mock
 
 import pytest
 from gemseo.algos.opt.scipy_local.settings.lbfgsb import L_BFGS_B_Settings
+from gemseo.algos.opt.scipy_local.settings.nelder_mead import NELDER_MEAD_Settings
+from gemseo.problems.optimization.power_2 import Power2
 from gemseo.utils.platform import PLATFORM_IS_WINDOWS
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -549,3 +552,94 @@ def test_results_saved_when_a_worker_raised(
     algorithm_name = optimization_algorithm_configuration.name
     assert data[algorithm_name].keys() == {rosenbrock.name}
     assert len(data[algorithm_name][rosenbrock.name]) == 2
+
+
+def create_unknown_algorithm_configuration(algorithm_name: str, name: str) -> mock.Mock:
+    """Create the configuration of an algorithm unknown to GEMSEO.
+
+    Args:
+        algorithm_name: The name of the algorithm.
+        name: The name of the configuration.
+
+    Returns:
+        The algorithm configuration.
+    """
+    algorithm_configuration = mock.Mock()
+    algorithm_configuration.algorithm_name = algorithm_name
+    algorithm_configuration.name = name
+    algorithm_configuration.copy = mock.Mock(return_value=algorithm_configuration)
+    return algorithm_configuration
+
+
+def test_unavailable_algorithm_before_any_execution(
+    tmp_path, rosenbrock, optimization_algorithm_configuration
+) -> None:
+    """Check that nothing is executed when the last algorithm is unavailable."""
+    # The algorithm configurations are sorted by name:
+    # the unknown algorithm comes after the available one.
+    unknown_algorithm_configuration = create_unknown_algorithm_configuration(
+        "Algorithm", "Z configuration"
+    )
+    algorithm_configurations = AlgorithmsConfigurations(
+        optimization_algorithm_configuration, unknown_algorithm_configuration
+    )
+    assert list(algorithm_configurations)[-1] is unknown_algorithm_configuration
+    with pytest.raises(
+        ValueError, match=re.escape("The algorithm 'Algorithm' is not available.")
+    ):
+        Benchmarker(tmp_path, tmp_path / "results.json").execute(
+            [rosenbrock], algorithm_configurations
+        )
+
+    assert not list(tmp_path.rglob("*.json"))
+
+
+def test_all_unavailable_algorithms_reported(tmp_path, rosenbrock) -> None:
+    """Check that all the unavailable algorithms are reported at once."""
+    with pytest.raises(ValueError) as error_info:
+        Benchmarker(tmp_path).execute(
+            [rosenbrock],
+            AlgorithmsConfigurations(
+                create_unknown_algorithm_configuration("Algorithm", "Configuration"),
+                create_unknown_algorithm_configuration("Other algorithm", "Other"),
+            ),
+        )
+
+    assert str(error_info.value) == (
+        "The algorithm 'Algorithm' is not available.\n"
+        "The algorithm 'Other algorithm' is not available."
+    )
+
+
+@pytest.mark.parametrize(
+    ("settings", "message"),
+    [
+        (
+            (L_BFGS_B_Settings(),),
+            (
+                "The algorithm 'L-BFGS-B' is not adapted to the problem configuration "
+                "'Power2'."
+            ),
+        ),
+        (
+            (L_BFGS_B_Settings(), NELDER_MEAD_Settings()),
+            (
+                "The algorithms 'L-BFGS-B', 'NELDER-MEAD' are not adapted "
+                "to the problem configuration 'Power2'."
+            ),
+        ),
+    ],
+)
+def test_unsuited_algorithm_before_any_execution(
+    tmp_path, rosenbrock, settings, message
+) -> None:
+    """Check that nothing is executed when an algorithm is unsuited to a problem."""
+    # Power2 has constraints, which neither L-BFGS-B nor Nelder-Mead handles.
+    power_2 = OptimizationProblemConfiguration("Power2", Power2)
+    with pytest.raises(ValueError, match=re.escape(message)):
+        Benchmarker(tmp_path, tmp_path / "results.json").execute(
+            [rosenbrock, power_2],
+            AlgorithmsConfigurations(*(AlgorithmConfiguration(s) for s in settings)),
+        )
+
+    assert not list(tmp_path.rglob("*.json"))
