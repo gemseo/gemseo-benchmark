@@ -20,7 +20,6 @@ from abc import abstractmethod
 from collections.abc import Iterable
 from copy import deepcopy
 from typing import TYPE_CHECKING
-from typing import Any
 from typing import Generic
 from typing import TypeVar
 
@@ -62,7 +61,9 @@ ProblemT = TypeVar("ProblemT")
 """The type of the problems created by a problem configuration."""
 
 
-class BaseProblemConfiguration(Generic[ProblemT], metaclass=ABCGoogleDocstringInheritanceMeta):
+class BaseProblemConfiguration(
+    Generic[ProblemT], metaclass=ABCGoogleDocstringInheritanceMeta
+):
     """Base class for problem configurations.
 
     A *problem configuration* is a problem of reference

@@ -63,7 +63,8 @@ ProblemT = TypeVar("ProblemT")
 
 
 class BaseWorker(
-    Generic[ProblemConfigurationT, ProblemT], metaclass=ABCGoogleDocstringInheritanceMeta
+    Generic[ProblemConfigurationT, ProblemT],
+    metaclass=ABCGoogleDocstringInheritanceMeta,
 ):
     """Base class for benchmarking workers."""
 

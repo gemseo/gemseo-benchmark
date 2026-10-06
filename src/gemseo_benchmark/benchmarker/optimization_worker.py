@@ -41,7 +41,9 @@ if TYPE_CHECKING:
     )
 
 
-class OptimizationWorker(BaseWorker["OptimizationProblemConfiguration", OptimizationProblem]):
+class OptimizationWorker(
+    BaseWorker["OptimizationProblemConfiguration", OptimizationProblem]
+):
     """A benchmarking worker for optimization."""
 
     _algorithm_factory: OptimizationLibraryFactory = OptimizationLibraryFactory()
