@@ -72,11 +72,11 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
     (refer to the [target_values module][gemseo_benchmark.data_profiles.target_values]).
     """
 
-    __create_problem: Callable[[], Any]
+    __create_problem: Callable[..., Any]
     """The function to create a problem of the configuration.
-    (ex:
-    an [OptimizationProblem][gemseo.algos.optimization_problem.OptimizationProblem],
-    a [BaseMDA][gemseo.mda.base_mda])."""
+
+    Its arguments and its return type depend on the type of problem configuration.
+    """
 
     __description: str
     """The description of the problem configuration."""
@@ -102,7 +102,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
     def __init__(
         self,
         name: str,
-        create_problem: Callable[[], Any],
+        create_problem: Callable[..., Any],
         target_values: TargetValues | None,
         variable_space: DesignSpace,
         doe_settings: BaseDOESettings | None,
@@ -163,14 +163,11 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
             self.target_values = target_values
 
     @property
-    def create_problem(self) -> Callable[[], Any]:
+    def create_problem(self) -> Callable[..., Any]:
         """The function to create a problem of the configuration.
 
-        The return type of this function depends on the type of the underlying
-        |g| object (ex:
-        [OptimizationProblem][gemseo.algos.optimization_problem.OptimizationProblem],
-        [BaseMDA][gemseo.mda.base_mda]
-        ).
+        The arguments and the return type of this function depend on the type of
+        problem configuration: refer to the subclasses.
         """
         return self.__create_problem
 

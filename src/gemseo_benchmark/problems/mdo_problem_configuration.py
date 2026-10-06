@@ -81,6 +81,16 @@ class MDOProblemConfiguration(BaseProblemConfiguration):
         )
 
     @property
+    def create_problem(self) -> Callable[[AlgorithmConfiguration], MDOProblemType]:
+        """The function to create an MDO problem of the configuration.
+
+        It takes the algorithm configuration as argument,
+        because the algorithm is set on the scenario when it is created.
+        It returns the scenario and its disciplines.
+        """
+        return super().create_problem
+
+    @property
     def minimize_performance_measure(self) -> bool:
         """Whether the performance measure is to be minimized."""
         return self.__minimize_objective_value

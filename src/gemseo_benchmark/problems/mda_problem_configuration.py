@@ -72,6 +72,16 @@ class MDAProblemConfiguration(BaseProblemConfiguration):
         )
 
     @property
+    def create_problem(self) -> Callable[[AlgorithmConfiguration], MDAProblemType]:
+        """The function to create an MDA problem of the configuration.
+
+        It takes the algorithm configuration as argument,
+        because the algorithm is the class of the MDA that is created.
+        It returns the MDA and its disciplines.
+        """
+        return super().create_problem
+
+    @property
     def minimize_performance_measure(self) -> bool:
         """Whether the performance measure is to be minimized."""
         return True

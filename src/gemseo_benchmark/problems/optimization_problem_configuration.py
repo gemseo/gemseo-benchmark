@@ -113,6 +113,15 @@ class OptimizationProblemConfiguration(BaseProblemConfiguration):
             )
 
     @property
+    def create_problem(self) -> Callable[[], OptimizationProblem]:
+        """The function to create an optimization problem of the configuration.
+
+        The problem does not depend on the algorithm:
+        the latter is applied to the problem afterwards.
+        """
+        return super().create_problem
+
+    @property
     def targets_generator(self) -> TargetsGenerator:
         """The generator for target values."""
         return self.__targets_generator
