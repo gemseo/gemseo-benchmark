@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import logging
+import pickle
 import re
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -677,3 +678,13 @@ def test_unsuited_algorithm_before_any_execution(
         )
 
     assert not list(tmp_path.rglob("*.json"))
+
+
+def test_benchmarking_error_pickle() -> None:
+    """Check that a benchmarking error survives a pickle round trip."""
+    error = BenchmarkingError({"x": RuntimeError("boom")}, 2)
+    unpickled = pickle.loads(pickle.dumps(error))  # noqa: S301
+    assert str(unpickled) == str(error)
+    assert unpickled.number_of_executions == 2
+    assert list(unpickled.exceptions) == ["x"]
+    assert str(unpickled.exceptions["x"]) == "boom"
