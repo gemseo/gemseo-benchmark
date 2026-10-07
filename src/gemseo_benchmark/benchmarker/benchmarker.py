@@ -133,6 +133,7 @@ class Benchmarker:
         n_processes: int = 1,
         use_threading: bool = False,
         save_log: bool = False,
+        raise_errors: bool = False,
     ) -> Results:
         """Execute algorithm configurations on problem configurations.
 
@@ -150,6 +151,12 @@ class Benchmarker:
                 in the performance histories directory.
                 Otherwise, one file per optimization will be saved
                 next to each performance history file.
+            raise_errors: Whether to raise a `BenchmarkingError`
+                when some executions raised exceptions,
+                once all the executions are over and the results are saved.
+                If `False`, the failures are only logged,
+                at the `ERROR` level, with their traceback,
+                followed by a summary.
 
         Returns:
             The results of the benchmarking.
@@ -161,7 +168,8 @@ class Benchmarker:
                 This is checked for all the combinations
                 of algorithm configuration and problem configuration
                 before any of them is executed.
-            BenchmarkingError: If some executions raised exceptions.
+            BenchmarkingError: If `raise_errors` is `True`
+                and some executions raised exceptions.
                 The other executions are not interrupted,
                 and the results are saved before the error is raised.
         """
@@ -216,9 +224,11 @@ class Benchmarker:
             self._results.to_file(self.__results_path, 4)
 
         if failures:
-            raise BenchmarkingError(failures, len(future_to_path)) from next(
-                iter(failures.values())
-            )
+            error = BenchmarkingError(failures, len(future_to_path))
+            if raise_errors:
+                raise error from next(iter(failures.values()))
+
+            LOGGER.error("%s", error)
 
         return self._results
 

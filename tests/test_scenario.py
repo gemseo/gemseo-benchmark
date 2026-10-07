@@ -103,7 +103,9 @@ def test_worker_raised(
     )
     with pytest.raises(BenchmarkingError, match="executions raised an exception"):
         Scenario([algorithms_configurations], tmp_path).execute(
-            [problems_group, ill_problems_group], skip_report=skip_report
+            [problems_group, ill_problems_group],
+            skip_report=skip_report,
+            raise_errors=True,
         )
 
     # The performance histories of the executions that succeeded are saved,
@@ -113,3 +115,24 @@ def test_worker_raised(
 
     assert problems_group.name in next(iter(data.values()))
     assert not (tmp_path / "report").exists()
+
+
+def test_worker_raised_not_raised(
+    algorithms_configurations, tmp_path, problems_group, rosenbrock, caplog
+) -> None:
+    """Check that the failure of a worker is only logged by default."""
+    ill_problems_group = ProblemsGroup(
+        "Ill problems",
+        [
+            OptimizationProblemConfiguration(
+                "Ill problem", lambda: rosenbrock.create_problem()
+            )
+        ],
+    )
+    results = Scenario([algorithms_configurations], tmp_path).execute(
+        [problems_group, ill_problems_group], skip_report=True
+    )
+
+    # The performance histories of the executions that succeeded are returned.
+    assert problems_group.name in results.get_problems(results.algorithms[0])
+    assert "executions raised an exception" in caplog.records[-1].getMessage()

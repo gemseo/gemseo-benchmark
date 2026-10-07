@@ -32,15 +32,18 @@ and this project adheres to
 
 - The attribute `algorithm_settings` of `AlgorithmConfiguration`
   is the `algorithm_settings` argument passed at instantiation.
+- The argument `raise_errors` of `Benchmarker.execute` and `Scenario.execute`
+  (`False` by default) raises a `BenchmarkingError` that lists the failures
+  when executions of a benchmarking raised exceptions,
+  once all the executions are over and the performance histories are saved;
+  `Scenario.execute` then does not generate the report from partial results.
 
 ### Changed
 
 - When executions of a benchmarking raise exceptions,
-  `Benchmarker.execute` and `Scenario.execute` no longer only log a warning:
-  once all the executions are over and the performance histories are saved,
-  they raise a `BenchmarkingError` that lists the failures,
-  and the report is not generated.
-  The failures are logged at the `ERROR` level, with their traceback, as they occur.
+  `Benchmarker.execute` and `Scenario.execute` log the failures
+  at the `ERROR` level, with their traceback, as they occur,
+  and a summary at the end, instead of a warning.
 - `Benchmarker.execute` and `Scenario.execute` check the algorithms
   for all the combinations of algorithm configuration and problem configuration
   before any of them is executed:
