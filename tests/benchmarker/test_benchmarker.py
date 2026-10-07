@@ -477,7 +477,7 @@ def ill_mdo_problem_configuration(
     )
 
 
-@pytest.mark.parametrize(
+ill_configurations = pytest.mark.parametrize(
     ("algorithm_configuration", "ill_problem_configuration"),
     [
         (
@@ -488,10 +488,13 @@ def ill_mdo_problem_configuration(
         ("mdo_algorithm_configuration", "ill_mdo_problem_configuration"),
     ],
 )
+
+
+@ill_configurations
 def test_worker_raised_exception(
     tmp_path, algorithm_configuration, ill_problem_configuration, caplog, request
 ) -> None:
-    """Check the case where a worker raised an exception."""
+    """Check the case where a worker raised an exception, with the error raised."""
     algo_config = request.getfixturevalue(algorithm_configuration)
     pb_config = request.getfixturevalue(ill_problem_configuration)
     with pytest.raises(
@@ -499,7 +502,7 @@ def test_worker_raised_exception(
         match=re.escape("1 of 1 executions raised an exception"),
     ) as error_info:
         Benchmarker(tmp_path).execute(
-            [pb_config], AlgorithmsConfigurations(algo_config)
+            [pb_config], AlgorithmsConfigurations(algo_config), raise_errors=True
         )
 
     # The error lists the execution that failed, and is caused by its exception.
@@ -527,23 +530,54 @@ def test_worker_raised_exception(
     }
 
 
+@ill_configurations
+def test_worker_raised_exception_not_raised(
+    tmp_path, algorithm_configuration, ill_problem_configuration, caplog, request
+) -> None:
+    """Check the case where a worker raised an exception, without raising the error."""
+    algo_config = request.getfixturevalue(algorithm_configuration)
+    pb_config = request.getfixturevalue(ill_problem_configuration)
+    results = Benchmarker(tmp_path).execute(
+        [pb_config], AlgorithmsConfigurations(algo_config)
+    )
+    assert results.algorithms == []
+
+    # The failure is logged as an error, with its traceback, then summarized.
+    (record, summary) = caplog.records
+    assert record.levelno == summary.levelno == logging.ERROR
+    assert record.exc_info is not None
+    assert record.getMessage().startswith(
+        f"Solving problem 1 of problem configuration {pb_config.name} "
+        f"for algorithm configuration {algo_config.name} raised: "
+    )
+    assert summary.getMessage().startswith("1 of 1 executions raised an exception")
+
+
+@pytest.mark.parametrize("raise_errors", [False, True])
 def test_results_saved_when_a_worker_raised(
-    tmp_path, rosenbrock, optimization_algorithm_configuration
+    tmp_path, rosenbrock, optimization_algorithm_configuration, raise_errors
 ) -> None:
     """Check that the executions go on and are saved when a worker raised."""
     ill_problem_configuration = OptimizationProblemConfiguration(
         "Ill problem", lambda: rosenbrock.create_problem()
     )
     results_path = tmp_path / "results.json"
-    with pytest.raises(
-        BenchmarkingError, match=re.escape("1 of 3 executions raised an exception")
-    ) as error_info:
-        Benchmarker(tmp_path, results_path).execute(
-            [ill_problem_configuration, rosenbrock],
-            AlgorithmsConfigurations(optimization_algorithm_configuration),
-        )
+    benchmarker = Benchmarker(tmp_path, results_path)
+    problem_configurations = [ill_problem_configuration, rosenbrock]
+    algorithm_configurations = AlgorithmsConfigurations(
+        optimization_algorithm_configuration
+    )
+    if raise_errors:
+        with pytest.raises(
+            BenchmarkingError, match=re.escape("1 of 3 executions raised an exception")
+        ) as error_info:
+            benchmarker.execute(
+                problem_configurations, algorithm_configurations, raise_errors=True
+            )
 
-    assert len(error_info.value.exceptions) == 1
+        assert len(error_info.value.exceptions) == 1
+    else:
+        benchmarker.execute(problem_configurations, algorithm_configurations)
 
     # The performance histories of the executions that succeeded are saved.
     with results_path.open() as results_file:

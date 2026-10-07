@@ -94,6 +94,7 @@ class Scenario:
         plot_only_median: bool = False,
         use_abscissa_log_scale: bool = False,
         plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        raise_errors: bool = False,
     ) -> Results:
         """Execute the benchmarking scenario.
 
@@ -130,12 +131,20 @@ class Scenario:
                 for the abscissa axis.
             plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
+            raise_errors: Whether to raise a `BenchmarkingError`
+                when some executions of the solvers raised exceptions,
+                once all the executions are over and their performance histories
+                are saved, so that the report is not generated from partial results.
+                If `False`, the failures are only logged,
+                at the `ERROR` level, with their traceback,
+                followed by a summary.
 
         Returns:
             The performance histories.
 
         Raises:
-            BenchmarkingError: If some executions of the solvers raised exceptions.
+            BenchmarkingError: If `raise_errors` is `True`
+                and some executions of the solvers raised exceptions.
                 The other executions are not interrupted
                 and their performance histories are saved,
                 but the report is not generated.
@@ -149,6 +158,7 @@ class Scenario:
                 n_processes,
                 use_threading,
                 log_gemseo_to_file,
+                raise_errors,
             )
 
         if not skip_report:
@@ -178,6 +188,7 @@ class Scenario:
         n_processes: int,
         use_threading: bool,
         log_gemseo_to_file: bool,
+        raise_errors: bool,
     ) -> None:
         """Run the solvers on the problem configurations.
 
@@ -191,6 +202,8 @@ class Scenario:
                 to parallelize the execution.
             log_gemseo_to_file: Whether to save the GEMSEO log to a file
                 next to the performance history file.
+            raise_errors: Whether to raise a `BenchmarkingError`
+                when some executions raised exceptions.
         """
         algorithms_configurations = AlgorithmsConfigurations()
         for group in self._algorithms_configurations_groups:
@@ -209,6 +222,7 @@ class Scenario:
             n_processes,
             use_threading,
             log_gemseo_to_file,
+            raise_errors,
         )
 
     def _get_dir_path(self, name: str, overwrite: bool = False) -> Path:
