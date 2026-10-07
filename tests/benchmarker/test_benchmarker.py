@@ -30,7 +30,7 @@ from unittest import mock
 
 import pytest
 from gemseo.algos.opt.scipy_local.settings.lbfgsb import L_BFGS_B_Settings
-from gemseo.algos.opt.scipy_local.settings.nelder_mead import NELDER_MEAD_Settings
+from gemseo.algos.opt.scipy_local.settings.tnc import TNC_Settings
 from gemseo.problems.optimization.power_2 import Power2
 from gemseo.utils.platform import PLATFORM_IS_WINDOWS
 
@@ -622,9 +622,9 @@ def test_all_unavailable_algorithms_reported(tmp_path, rosenbrock) -> None:
             ),
         ),
         (
-            (L_BFGS_B_Settings(), NELDER_MEAD_Settings()),
+            (L_BFGS_B_Settings(), TNC_Settings()),
             (
-                "The algorithms 'L-BFGS-B', 'NELDER-MEAD' are not adapted "
+                "The algorithms 'L-BFGS-B', 'TNC' are not adapted "
                 "to the problem configuration 'Power2'."
             ),
         ),
@@ -634,7 +634,7 @@ def test_unsuited_algorithm_before_any_execution(
     tmp_path, rosenbrock, settings, message
 ) -> None:
     """Check that nothing is executed when an algorithm is unsuited to a problem."""
-    # Power2 has constraints, which neither L-BFGS-B nor Nelder-Mead handles.
+    # Power2 has constraints, which neither L-BFGS-B nor TNC handles.
     power_2 = OptimizationProblemConfiguration("Power2", Power2)
     with pytest.raises(ValueError, match=re.escape(message)):
         Benchmarker(tmp_path, tmp_path / "results.json").execute(
