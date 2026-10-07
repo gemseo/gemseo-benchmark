@@ -37,6 +37,9 @@ and this project adheres to
   when executions of a benchmarking raised exceptions,
   once all the executions are over and the performance histories are saved;
   `Scenario.execute` then does not generate the report from partial results.
+- The class method `BaseWorker.check_algorithms_suitability` checks
+  whether algorithms are suited to a problem configuration before any execution;
+  it does nothing by default and `OptimizationWorker` overrides it.
 
 ### Changed
 
@@ -191,16 +194,16 @@ and this project adheres to
 
   ```python
   problem.plot_histories(
-    algos_configurations,
-    results,
-    False,
-    file_path,
-    plot_all_histories,
-    alpha,
-    markevery,
-    infeasibility_tolerance,
-    max_eval_number,
-    use_log_scale
+      algos_configurations,
+      results,
+      False,
+      file_path,
+      plot_all_histories,
+      alpha,
+      markevery,
+      infeasibility_tolerance,
+      max_eval_number,
+      use_log_scale,
   )
   ```
 
@@ -208,13 +211,13 @@ and this project adheres to
 
   ```python
   Figures(
-    algos_configurations,
-    ProblemsGroup(problem.name, [problem]),
-    results,
-    file_path.parent,
-    infeasibility_tolerance,
-    max_eval_number,
-    {"alpha": alpha, "markevery": markevery}
+      algos_configurations,
+      ProblemsGroup(problem.name, [problem]),
+      results,
+      file_path.parent,
+      infeasibility_tolerance,
+      max_eval_number,
+      {"alpha": alpha, "markevery": markevery},
   ).plot(plot_all_histories, use_log_scale, False, False, False)
   ```
 
@@ -222,7 +225,9 @@ and this project adheres to
   To obtain values similar to the former
 
   ```python
-  objective_values, infeasibility_measures, feasibility_statuses = Problem.compute_performance(problem)
+  objective_values, infeasibility_measures, feasibility_statuses = (
+      Problem.compute_performance(problem)
+  )
   ```
 
   one can use the following instructions instead:
@@ -243,14 +248,14 @@ and this project adheres to
 
   ```python
   performance_histories.plot_algorithm_histories(
-    axes,
-    algorithm_name,
-    max_feasible_objective,
-    plot_all,
-    color,
-    marker,
-    alpha,
-    markevery
+      axes,
+      algorithm_name,
+      max_feasible_objective,
+      plot_all,
+      color,
+      marker,
+      alpha,
+      markevery,
   )
   ```
 
@@ -259,18 +264,18 @@ and this project adheres to
   ```python
   results = Results()
   for index, performance_history in enumerate(performance_histories):
-    path = f"{index}.json"
-    performance_history.to_file(path)
-    results.add_path(algorithm_name, problem.name, path)
+      path = f"{index}.json"
+      performance_history.to_file(path)
+      results.add_path(algorithm_name, problem.name, path)
 
   Figures(
-    AlgorithmsConfigurations(AlgorithmConfiguration(algorithm_name)),
-    ProblemsGroup(problem.name, [problem]),
-    results,
-    ".",
-    0,
-    0,
-    {"color": color, "marker": marker, "alpha": alpha, "markevery": markevery}
+      AlgorithmsConfigurations(AlgorithmConfiguration(algorithm_name)),
+      ProblemsGroup(problem.name, [problem]),
+      results,
+      ".",
+      0,
+      0,
+      {"color": color, "marker": marker, "alpha": alpha, "markevery": markevery},
   ).plot(plot_all, False, False, False, False)
   ```
 
