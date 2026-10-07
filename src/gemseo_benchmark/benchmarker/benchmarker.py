@@ -55,7 +55,8 @@ LOGGER = logging.getLogger(__name__)
 class BenchmarkingError(Exception):
     """The error raised when executions of a benchmarking raised exceptions.
 
-    The other executions have run to the end and their results are saved.
+    The other executions have run to the end
+    and their performance histories are saved.
     The exception raised by the first execution that failed is the cause of this error.
     """
 
@@ -79,7 +80,8 @@ class BenchmarkingError(Exception):
         lines = [
             (
                 f"{len(exceptions)} of {number_of_executions} executions raised "
-                "an exception; the results of the other executions are saved."
+                "an exception; the performance histories of the other executions "
+                "are saved."
             )
         ]
         lines.extend(
@@ -183,7 +185,7 @@ class Benchmarker:
             BenchmarkingError: If `raise_errors` is `True`
                 and some executions raised exceptions.
                 The other executions are not interrupted,
-                and the results are saved before the error is raised.
+                and their performance histories are saved before the error is raised.
         """
         problem_configurations = tuple(problem_configurations)
         self.__check_algorithms(problem_configurations, algorithm_configurations)
