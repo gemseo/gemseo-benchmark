@@ -24,7 +24,6 @@ from __future__ import annotations
 import logging
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
-from concurrent.futures import as_completed
 from typing import TYPE_CHECKING
 from typing import Any
 
@@ -57,7 +56,8 @@ class BenchmarkingError(Exception):
 
     The other executions have run to the end
     and their performance histories are saved.
-    The exception raised by the first execution that failed is the cause of this error.
+    The exception raised by the first execution that failed,
+    in the order of submission, is the cause of this error.
     """
 
     exceptions: dict[str, BaseException]
@@ -219,7 +219,9 @@ class Benchmarker:
                         )
                     )
         failures: dict[str, BaseException] = {}
-        for future in as_completed(future_to_path):
+        # All the futures are done, as the executor has been shut down.
+        # They are read in the order of submission, for a reproducible error.
+        for future in future_to_path:
             exception = future.exception()
             if exception is None:
                 self._results.add_path(*future_to_path[future][1:])
