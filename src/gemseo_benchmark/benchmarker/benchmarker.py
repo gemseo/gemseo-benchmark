@@ -31,6 +31,7 @@ from gemseo import LOGGER as GEMSEO_LOGGER
 
 from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
+from gemseo_benchmark.benchmarker.benchmarking_error import BenchmarkingError
 from gemseo_benchmark.results.results import Results
 
 if TYPE_CHECKING:
@@ -49,54 +50,6 @@ if TYPE_CHECKING:
     )
 
 LOGGER = logging.getLogger(__name__)
-
-
-class BenchmarkingError(Exception):
-    """The error raised when executions of a benchmarking raised exceptions.
-
-    The other executions have run to the end
-    and their performance histories are saved.
-    The exception raised by the first execution that failed,
-    in the order of submission, is the cause of this error.
-    """
-
-    exceptions: dict[str, BaseException]
-    """The exceptions raised by the executions, bound to the description of each."""
-
-    number_of_executions: int
-    """The number of executions."""
-
-    def __init__(
-        self, exceptions: dict[str, BaseException], number_of_executions: int
-    ) -> None:
-        """
-        Args:
-            exceptions: The exceptions raised by the executions,
-                bound to the description of each.
-            number_of_executions: The number of executions.
-        """  # noqa: D205, D212, D415
-        self.exceptions = exceptions
-        self.number_of_executions = number_of_executions
-        lines = [
-            (
-                f"{len(exceptions)} of {number_of_executions} executions raised "
-                "an exception; the performance histories of the other executions "
-                "are saved."
-            )
-        ]
-        lines.extend(
-            f"- {description} raised: {type(exception).__name__}: {exception}"
-            for description, exception in exceptions.items()
-        )
-        super().__init__("\n".join(lines))
-
-    def __reduce__(self) -> tuple[type[BenchmarkingError], tuple[Any, ...]]:
-        """Return the arguments to rebuild the error when unpickling.
-
-        Returns:
-            The class of the error and the arguments of its constructor.
-        """
-        return type(self), (self.exceptions, self.number_of_executions)
 
 
 class Benchmarker:

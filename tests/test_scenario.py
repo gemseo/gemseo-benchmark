@@ -21,7 +21,7 @@ import os
 
 import pytest
 
-from gemseo_benchmark.benchmarker.benchmarker import BenchmarkingError
+from gemseo_benchmark.benchmarker.benchmarking_error import BenchmarkingError
 from gemseo_benchmark.problems.optimization_problem_configuration import (
     OptimizationProblemConfiguration,
 )
