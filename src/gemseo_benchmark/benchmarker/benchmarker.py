@@ -62,6 +62,9 @@ class BenchmarkingError(Exception):
     exceptions: dict[str, BaseException]
     """The exceptions raised by the executions, bound to the description of each."""
 
+    number_of_executions: int
+    """The number of executions."""
+
     def __init__(
         self, exceptions: dict[str, BaseException], number_of_executions: int
     ) -> None:
@@ -72,6 +75,7 @@ class BenchmarkingError(Exception):
             number_of_executions: The number of executions.
         """  # noqa: D205, D212, D415
         self.exceptions = exceptions
+        self.number_of_executions = number_of_executions
         lines = [
             (
                 f"{len(exceptions)} of {number_of_executions} executions raised "
@@ -83,6 +87,14 @@ class BenchmarkingError(Exception):
             for description, exception in exceptions.items()
         )
         super().__init__("\n".join(lines))
+
+    def __reduce__(self) -> tuple[type[BenchmarkingError], tuple[Any, ...]]:
+        """Return the arguments to rebuild the error when unpickling.
+
+        Returns:
+            The class of the error and the arguments of its constructor.
+        """
+        return type(self), (self.exceptions, self.number_of_executions)
 
 
 class Benchmarker:
