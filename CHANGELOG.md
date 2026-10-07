@@ -50,6 +50,7 @@ and this project adheres to
   the configuration name,
   the absolute path of the algorithm settings class
   and the explicitly-set algorithm settings.
+- `BaseProblemConfiguration.minimization_target_values` raises a `ValueError` when the problem configuration has no target value, as `target_values` does; it used to return `None`.
 
 ## Version 4.0.1 (October 2025)
 
