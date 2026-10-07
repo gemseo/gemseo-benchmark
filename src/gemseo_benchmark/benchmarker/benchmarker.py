@@ -188,7 +188,9 @@ class Benchmarker:
                 and their performance histories are saved before the error is raised.
         """
         problem_configurations = tuple(problem_configurations)
-        self.__check_algorithms(problem_configurations, algorithm_configurations)
+        self.__check_algorithms(
+            problem_configurations, algorithm_configurations, overwrite_histories
+        )
         if save_log and use_threading:
             # Set one file handler for all threads.
             file_handler = logging.FileHandler(
@@ -246,10 +248,11 @@ class Benchmarker:
 
         return self._results
 
-    @staticmethod
     def __check_algorithms(
+        self,
         problem_configurations: Iterable[BaseProblemConfiguration],
         algorithm_configurations: AlgorithmsConfigurations,
+        overwrite_histories: bool,
     ) -> None:
         """Check the algorithms for all the problem configurations.
 
@@ -258,22 +261,30 @@ class Benchmarker:
         so that a mistake in the last algorithm configuration
         does not come after the execution of the other ones.
         All the mistakes are reported at once.
+        The combinations that will not be executed,
+        because all their performance histories already exist,
+        are not checked.
 
         Args:
             problem_configurations: The problem configurations.
             algorithm_configurations: The algorithms configurations.
+            overwrite_histories: Whether to overwrite the existing performance
+                histories.
 
         Raises:
             ValueError: If an algorithm is not available,
                 or is not suited to a problem configuration.
         """
-        algorithm_names = tuple({
-            configuration.algorithm_name: None
-            for configuration in algorithm_configurations
-        })
         messages = {}
         for problem_configuration in problem_configurations:
             worker = problem_configuration.worker
+            algorithm_names = tuple({
+                configuration.algorithm_name: None
+                for configuration in algorithm_configurations
+                if self.__has_unsolved_problem(
+                    configuration, problem_configuration, overwrite_histories
+                )
+            })
             available_names = []
             for algorithm_name in algorithm_names:
                 message = Benchmarker.__get_error_message(
@@ -408,6 +419,33 @@ class Benchmarker:
             )
 
         return future_to_path
+
+    def __has_unsolved_problem(
+        self,
+        algorithm_configuration: AlgorithmConfiguration,
+        problem_configuration: BaseProblemConfiguration,
+        overwrite_histories: bool,
+    ) -> bool:
+        """Check whether an algorithm configuration has problems left to solve.
+
+        Args:
+            algorithm_configuration: The algorithm configuration.
+            problem_configuration: The problem configuration.
+            overwrite_histories: Whether to overwrite existing histories.
+
+        Returns:
+            Whether at least one execution will not be skipped.
+        """
+        return overwrite_histories or any(
+            not self._results.contains(
+                algorithm_configuration.name,
+                problem_configuration.name,
+                self.get_history_path(
+                    algorithm_configuration, problem_configuration.name, index
+                ),
+            )
+            for index in range(len(problem_configuration.starting_points))
+        )
 
     def __is_problem_unsolved(
         self,

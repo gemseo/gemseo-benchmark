@@ -688,3 +688,27 @@ def test_benchmarking_error_pickle() -> None:
     assert unpickled.number_of_executions == 2
     assert list(unpickled.exceptions) == ["x"]
     assert str(unpickled.exceptions["x"]) == "boom"
+
+
+def test_unsuited_algorithm_with_existing_histories(tmp_path, rosenbrock) -> None:
+    """Check that an unsuited algorithm whose histories exist is not checked."""
+    power_2 = OptimizationProblemConfiguration("Power2", Power2)
+    algorithm_configuration = AlgorithmConfiguration(L_BFGS_B_Settings())
+    benchmarker = Benchmarker(tmp_path)
+    for index in range(len(power_2.starting_points)):
+        path = benchmarker.get_history_path(
+            algorithm_configuration, power_2.name, index, True
+        )
+        path.touch()
+        benchmarker._results.add_path(algorithm_configuration.name, power_2.name, path)
+
+    # The histories exist, so the algorithm is not checked against Power2.
+    benchmarker.execute([power_2], AlgorithmsConfigurations(algorithm_configuration))
+
+    # With the histories overwritten, the algorithm is checked.
+    with pytest.raises(ValueError, match="not adapted"):
+        benchmarker.execute(
+            [power_2],
+            AlgorithmsConfigurations(algorithm_configuration),
+            overwrite_histories=True,
+        )
