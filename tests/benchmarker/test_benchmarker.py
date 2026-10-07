@@ -40,7 +40,7 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
 from gemseo_benchmark.benchmarker.benchmarker import Benchmarker
-from gemseo_benchmark.benchmarker.benchmarker import BenchmarkingError
+from gemseo_benchmark.benchmarker.benchmarking_error import BenchmarkingError
 from gemseo_benchmark.problems.mda_problem_configuration import MDAProblemConfiguration
 from gemseo_benchmark.problems.mdo_problem_configuration import MDOProblemConfiguration
 from gemseo_benchmark.problems.optimization_problem_configuration import (
