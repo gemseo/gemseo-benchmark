@@ -22,6 +22,7 @@ from copy import deepcopy
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Generic
+from typing import NoReturn
 from typing import TypeVar
 
 from gemseo import compute_doe
@@ -275,6 +276,11 @@ class BaseProblemConfiguration(
             )
             raise ValueError(msg)
 
+    def __raise_target_values_error(self) -> NoReturn:
+        """Raise an error if the problem configuration has no target value."""
+        msg = "The problem configuration has no target value."
+        raise ValueError(msg)
+
     @property
     def target_values(self) -> TargetValues:
         """The target values of the problem configuration.
@@ -283,8 +289,7 @@ class BaseProblemConfiguration(
             ValueError: If the problem configuration has no target value.
         """
         if self.__target_values is None:
-            msg = "The problem configuration has no target value."
-            raise ValueError(msg)
+            self.__raise_target_values_error()
 
         return self.__target_values
 
@@ -374,8 +379,7 @@ class BaseProblemConfiguration(
             ValueError: If the problem configuration has no target value.
         """
         if self.__minimization_target_values is None:
-            msg = "The problem configuration has no target value."
-            raise ValueError(msg)
+            self.__raise_target_values_error()
 
         return self.__minimization_target_values
 
