@@ -24,6 +24,7 @@ from typing import Final
 from gemseo.core.discipline.discipline import Discipline
 from gemseo.mda.base_mda_solver import BaseMDASolver
 
+from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.benchmarker.mda_worker import MDAWorker
 from gemseo_benchmark.problems.base_problem_configuration import (
     BaseProblemConfiguration,
@@ -36,16 +37,21 @@ if TYPE_CHECKING:
     from gemseo.algos.design_space import DesignSpace
     from gemseo.algos.doe.base_doe_settings import BaseDOESettings
 
-    from gemseo_benchmark.algorithms.algorithm_configuration import (
-        AlgorithmConfiguration,
-    )
     from gemseo_benchmark.data_profiles.target_values import TargetValues
 
 MDAProblemType = tuple[BaseMDASolver, Sequence[Discipline]]
 
 
-class MDAProblemConfiguration(BaseProblemConfiguration[MDAProblemType]):
-    """Problem configuration for multidisciplinary analysis."""
+class MDAProblemConfiguration(
+    BaseProblemConfiguration[[AlgorithmConfiguration], MDAProblemType]
+):
+    """Problem configuration for multidisciplinary analysis.
+
+    The function to create an MDA problem of the configuration
+    takes the algorithm configuration as argument,
+    because the algorithm is the class of the MDA that is created.
+    It returns the MDA and its disciplines.
+    """
 
     abscissa_data_type: Final[type[DisciplineData]] = DisciplineData
     performance_measure_label: ClassVar[str] = "Best residual norm"
@@ -70,16 +76,6 @@ class MDAProblemConfiguration(BaseProblemConfiguration[MDAProblemType]):
             0,
             0,
         )
-
-    @property
-    def create_problem(self) -> Callable[[AlgorithmConfiguration], MDAProblemType]:
-        """The function to create an MDA problem of the configuration.
-
-        It takes the algorithm configuration as argument,
-        because the algorithm is the class of the MDA that is created.
-        It returns the MDA and its disciplines.
-        """
-        return super().create_problem
 
     @property
     def minimize_performance_measure(self) -> bool:

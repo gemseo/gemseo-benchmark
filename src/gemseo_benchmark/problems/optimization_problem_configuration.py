@@ -48,7 +48,9 @@ if TYPE_CHECKING:
     from gemseo_benchmark.data_profiles.target_values import TargetValues
 
 
-class OptimizationProblemConfiguration(BaseProblemConfiguration[OptimizationProblem]):
+class OptimizationProblemConfiguration(
+    BaseProblemConfiguration[[], OptimizationProblem]
+):
     """Problem configuration for optimization.
 
     An *optimization* problem configuration is a problem of reference
@@ -57,6 +59,10 @@ class OptimizationProblemConfiguration(BaseProblemConfiguration[OptimizationProb
     its objective and constraint functions,
     its starting points (the optimization trajectories will start from each of them),
     and its target values (refer to :mod:`.data_profiles.target_values`).
+
+    The function to create an optimization problem of the configuration
+    does not depend on the algorithm:
+    the latter is applied to the problem afterwards.
     """
 
     abscissa_data_type: Final[type[IterationData]] = IterationData
@@ -112,15 +118,6 @@ class OptimizationProblemConfiguration(BaseProblemConfiguration[OptimizationProb
             self.compute_target_values(
                 target_values_number, target_values_algorithms_configurations
             )
-
-    @property
-    def create_problem(self) -> Callable[[], OptimizationProblem]:
-        """The function to create an optimization problem of the configuration.
-
-        The problem does not depend on the algorithm:
-        the latter is applied to the problem afterwards.
-        """
-        return super().create_problem
 
     @property
     def targets_generator(self) -> TargetsGenerator | None:

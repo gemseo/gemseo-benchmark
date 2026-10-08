@@ -23,6 +23,7 @@ from typing import TYPE_CHECKING
 from typing import Any
 from typing import Generic
 from typing import NoReturn
+from typing import ParamSpec
 from typing import TypeVar
 
 from gemseo import compute_doe
@@ -59,12 +60,15 @@ if TYPE_CHECKING:
 
 InputStartingPointsType = ndarray | Iterable[ndarray]
 
+P = ParamSpec("P")
+"""The signature of the function that creates a problem of a configuration."""
+
 ProblemT = TypeVar("ProblemT")
 """The type of the problems created by a problem configuration."""
 
 
 class BaseProblemConfiguration(
-    Generic[ProblemT], metaclass=ABCGoogleDocstringInheritanceMeta
+    Generic[P, ProblemT], metaclass=ABCGoogleDocstringInheritanceMeta
 ):
     """Base class for problem configurations.
 
@@ -80,10 +84,11 @@ class BaseProblemConfiguration(
     (refer to the [target_values module][gemseo_benchmark.data_profiles.target_values]).
     """
 
-    __create_problem: Callable[..., ProblemT]
+    __create_problem: Callable[P, ProblemT]
     """The function to create a problem of the configuration.
 
-    Its arguments and its return type depend on the type of problem configuration.
+    Its arguments and its return type depend on the type of problem configuration:
+    refer to the subclasses.
     """
 
     __description: str
@@ -110,7 +115,7 @@ class BaseProblemConfiguration(
     def __init__(
         self,
         name: str,
-        create_problem: Callable[..., ProblemT],
+        create_problem: Callable[P, ProblemT],
         target_values: TargetValues | None,
         variable_space: DesignSpace,
         doe_settings: BaseDOESettings | None,
@@ -171,7 +176,7 @@ class BaseProblemConfiguration(
             self.target_values = target_values
 
     @property
-    def create_problem(self) -> Callable[..., ProblemT]:
+    def create_problem(self) -> Callable[P, ProblemT]:
         """The function to create a problem of the configuration.
 
         The arguments and the return type of this function depend on the type of

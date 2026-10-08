@@ -53,7 +53,7 @@ ProblemType = Any
 """The type of problem."""
 
 ProblemConfigurationT = TypeVar(
-    "ProblemConfigurationT", bound="BaseProblemConfiguration[Any]"
+    "ProblemConfigurationT", bound="BaseProblemConfiguration[..., Any]"
 )
 """The type of problem configuration of a worker."""
 
