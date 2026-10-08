@@ -62,11 +62,14 @@ class OptimizationWorker(BaseWorker):
         is not suited to a problem that has some.
         """
         problem = problem_configuration.create_problem()
+        factory = cls._algorithm_factory
         unsuited_names = []
         for algorithm_name in algorithm_names:
-            library = cls._algorithm_factory.create(algorithm_name)
-            if not library.is_algorithm_suited(
-                library.ALGORITHM_INFOS[algorithm_name], problem
+            library_class = factory.get_class(
+                factory.algo_names_to_libraries[algorithm_name]
+            )
+            if not library_class.is_algorithm_suited(
+                library_class.ALGORITHM_INFOS[algorithm_name], problem
             ):
                 unsuited_names.append(repr(algorithm_name))
 
