@@ -73,16 +73,13 @@ class OptimizationWorker(BaseWorker):
             ):
                 unsuited_names.append(repr(algorithm_name))
 
-        if len(unsuited_names) == 1:
-            msg = (
-                f"The algorithm {unsuited_names[0]} is not adapted "
-                f"to the problem configuration {problem_configuration.name!r}."
-            )
-            raise ValueError(msg)
-
         if unsuited_names:
+            if len(unsuited_names) == 1:
+                subject = f"The algorithm {unsuited_names[0]} is"
+            else:
+                subject = f"The algorithms {', '.join(unsuited_names)} are"
             msg = (
-                f"The algorithms {', '.join(unsuited_names)} are not adapted "
+                f"{subject} not adapted "
                 f"to the problem configuration {problem_configuration.name!r}."
             )
             raise ValueError(msg)
