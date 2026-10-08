@@ -52,6 +52,10 @@ and this project adheres to
   and the explicitly-set algorithm settings.
 - `BaseProblemConfiguration.minimization_target_values` raises a `ValueError` when the problem configuration has no target value, as `target_values` does; it used to return `None`.
 
+### Removed
+
+- The type alias `ProblemType` of the module `gemseo_benchmark.benchmarker.base_worker`.
+
 ## Version 4.0.1 (October 2025)
 
 ### Added

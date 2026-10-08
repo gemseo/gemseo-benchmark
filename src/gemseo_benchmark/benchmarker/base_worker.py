@@ -49,9 +49,6 @@ if TYPE_CHECKING:
     from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 
-ProblemType = Any
-"""The type of problem."""
-
 ProblemConfigurationT = TypeVar(
     "ProblemConfigurationT", bound="BaseProblemConfiguration[..., Any]"
 )
