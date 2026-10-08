@@ -20,6 +20,7 @@ from abc import abstractmethod
 from collections.abc import Iterable
 from copy import deepcopy
 from typing import TYPE_CHECKING
+from typing import Any
 from typing import Generic
 from typing import TypeVar
 
@@ -402,7 +403,7 @@ class BaseProblemConfiguration(
 
     @property
     @abstractmethod
-    def worker(self) -> type[BaseWorker]:
+    def worker(self) -> type[BaseWorker[Any, ProblemT, Any]]:
         """The type of benchmarking worker."""
 
     @property
