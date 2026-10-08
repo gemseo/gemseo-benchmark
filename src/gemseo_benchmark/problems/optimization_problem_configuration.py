@@ -26,7 +26,6 @@ from typing import ClassVar
 from typing import Final
 
 from gemseo import execute_algo
-from gemseo.algos.optimization_problem import OptimizationProblem
 
 from gemseo_benchmark.benchmarker.optimization_worker import OptimizationWorker
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
@@ -41,6 +40,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
     from gemseo.algos.doe.base_doe_settings import BaseDOESettings
+    from gemseo.algos.optimization_problem import OptimizationProblem
 
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
@@ -49,7 +49,7 @@ if TYPE_CHECKING:
 
 
 class OptimizationProblemConfiguration(
-    BaseProblemConfiguration[[], OptimizationProblem]
+    BaseProblemConfiguration[[], "OptimizationProblem"]
 ):
     """Problem configuration for optimization.
 

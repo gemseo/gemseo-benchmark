@@ -20,7 +20,6 @@ from typing import TYPE_CHECKING
 
 from gemseo import execute_algo
 from gemseo.algos.opt.factory import OptimizationLibraryFactory
-from gemseo.algos.optimization_problem import OptimizationProblem
 
 from gemseo_benchmark.benchmarker._metrics import ElapsedTime
 from gemseo_benchmark.benchmarker.base_worker import BaseWorker
@@ -29,6 +28,7 @@ from gemseo_benchmark.results.performance_history import PerformanceHistory
 if TYPE_CHECKING:
     from pathlib import Path
 
+    from gemseo.algos.optimization_problem import OptimizationProblem
     from gemseo.typing import RealArray
     from gemseo.utils.timer import Timer
 
@@ -42,7 +42,7 @@ if TYPE_CHECKING:
 
 class OptimizationWorker(
     BaseWorker[
-        "OptimizationProblemConfiguration", OptimizationProblem, tuple[ElapsedTime]
+        "OptimizationProblemConfiguration", "OptimizationProblem", tuple[ElapsedTime]
     ]
 ):
     """A benchmarking worker for optimization."""
