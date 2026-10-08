@@ -554,39 +554,85 @@ def test_worker_raised_exception_not_raised(
     assert summary.getMessage().startswith("1 of 1 executions raised an exception")
 
 
-@pytest.mark.parametrize("raise_errors", [False, True])
-def test_results_saved_when_a_worker_raised(
-    tmp_path, rosenbrock, optimization_algorithm_configuration, raise_errors
-) -> None:
-    """Check that the executions go on and are saved when a worker raised."""
+def create_failing_benchmarking(
+    tmp_path: Path, rosenbrock, algorithm_configuration
+) -> tuple[Benchmarker, list, AlgorithmsConfigurations, Path]:
+    """Create a benchmarking where the execution on one problem configuration fails.
+
+    Args:
+        tmp_path: The path to the working directory.
+        rosenbrock: The problem configuration that succeeds.
+        algorithm_configuration: The algorithm configuration.
+
+    Returns:
+        The benchmarker, the problem configurations,
+        the algorithm configurations and the path to the results file.
+    """
     ill_problem_configuration = OptimizationProblemConfiguration(
         "Ill problem", lambda: rosenbrock.create_problem()
     )
     results_path = tmp_path / "results.json"
-    benchmarker = Benchmarker(tmp_path, results_path)
-    problem_configurations = [ill_problem_configuration, rosenbrock]
-    algorithm_configurations = AlgorithmsConfigurations(
-        optimization_algorithm_configuration
+    return (
+        Benchmarker(tmp_path, results_path),
+        [ill_problem_configuration, rosenbrock],
+        AlgorithmsConfigurations(algorithm_configuration),
+        results_path,
     )
-    if raise_errors:
-        with pytest.raises(
-            BenchmarkingError, match=re.escape("1 of 3 executions raised an exception")
-        ) as error_info:
-            benchmarker.execute(
-                problem_configurations, algorithm_configurations, raise_errors=True
-            )
 
-        assert len(error_info.value.exceptions) == 1
-    else:
-        benchmarker.execute(problem_configurations, algorithm_configurations)
 
-    # The performance histories of the executions that succeeded are saved.
+def assert_succeeded_executions_saved(
+    results_path: Path, rosenbrock, algorithm_configuration
+) -> None:
+    """Check that the performance histories of the executions that succeeded are saved.
+
+    Args:
+        results_path: The path to the results file.
+        rosenbrock: The problem configuration that succeeded.
+        algorithm_configuration: The algorithm configuration.
+    """
     with results_path.open() as results_file:
         data = json.load(results_file)
 
-    algorithm_name = optimization_algorithm_configuration.name
+    algorithm_name = algorithm_configuration.name
     assert data[algorithm_name].keys() == {rosenbrock.name}
     assert len(data[algorithm_name][rosenbrock.name]) == 2
+
+
+def test_results_saved_when_a_worker_raised(
+    tmp_path, rosenbrock, optimization_algorithm_configuration
+) -> None:
+    """Check that the executions go on and are saved when a worker raised."""
+    benchmarker, problem_configurations, algorithm_configurations, results_path = (
+        create_failing_benchmarking(
+            tmp_path, rosenbrock, optimization_algorithm_configuration
+        )
+    )
+    benchmarker.execute(problem_configurations, algorithm_configurations)
+    assert_succeeded_executions_saved(
+        results_path, rosenbrock, optimization_algorithm_configuration
+    )
+
+
+def test_results_saved_when_a_worker_raised_and_errors_raised(
+    tmp_path, rosenbrock, optimization_algorithm_configuration
+) -> None:
+    """Check that the executions are saved when errors are raised."""
+    benchmarker, problem_configurations, algorithm_configurations, results_path = (
+        create_failing_benchmarking(
+            tmp_path, rosenbrock, optimization_algorithm_configuration
+        )
+    )
+    with pytest.raises(
+        BenchmarkingError, match=re.escape("1 of 3 executions raised an exception")
+    ) as error_info:
+        benchmarker.execute(
+            problem_configurations, algorithm_configurations, raise_errors=True
+        )
+
+    assert len(error_info.value.exceptions) == 1
+    assert_succeeded_executions_saved(
+        results_path, rosenbrock, optimization_algorithm_configuration
+    )
 
 
 def create_unknown_algorithm_configuration(algorithm_name: str, name: str) -> mock.Mock:
