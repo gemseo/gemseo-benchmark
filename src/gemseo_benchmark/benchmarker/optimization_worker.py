@@ -63,24 +63,33 @@ class OptimizationWorker(BaseWorker):
         """
         problem = problem_configuration.create_problem()
         factory = cls._algorithm_factory
-        unsuited_names = []
+        reasons = {}
         for algorithm_name in algorithm_names:
             library_class = factory.get_class(
                 factory.algo_names_to_libraries[algorithm_name]
             )
-            if not library_class.is_algorithm_suited(
-                library_class.ALGORITHM_INFOS[algorithm_name], problem
-            ):
-                unsuited_names.append(repr(algorithm_name))
+            description = library_class.ALGORITHM_INFOS[algorithm_name]
+            if not library_class.is_algorithm_suited(description, problem):
+                # There is no public accessor to the reason in GEMSEO.
+                reasons[repr(algorithm_name)] = library_class._get_unsuitability_reason(  # noqa: SLF001
+                    description, problem
+                )
 
-        if unsuited_names:
-            if len(unsuited_names) == 1:
-                subject = f"The algorithm {unsuited_names[0]} is"
+        if reasons:
+            if len(reasons) == 1:
+                ((algorithm_name, reason),) = reasons.items()
+                subject = f"The algorithm {algorithm_name} is"
+                details = f" {reason}."
             else:
-                subject = f"The algorithms {', '.join(unsuited_names)} are"
+                subject = f"The algorithms {', '.join(reasons)} are"
+                details = "".join(
+                    f"\n- {name}: {reason}" for name, reason in reasons.items()
+                )
+
             msg = (
                 f"{subject} not adapted "
-                f"to the problem configuration {problem_configuration.name!r}."
+                f"to the problem configuration {problem_configuration.name!r}:"
+                f"{details}"
             )
             raise ValueError(msg)
 
