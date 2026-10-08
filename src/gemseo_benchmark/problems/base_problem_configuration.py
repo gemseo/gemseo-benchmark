@@ -282,7 +282,7 @@ class BaseProblemConfiguration(
             raise ValueError(msg)
 
     def __raise_target_values_error(self) -> NoReturn:
-        """Raise an error if the problem configuration has no target value."""
+        """Raise the error of a problem configuration without target value."""
         msg = "The problem configuration has no target value."
         raise ValueError(msg)
 
