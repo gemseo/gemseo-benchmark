@@ -28,6 +28,8 @@ from gemseo_benchmark.problems.optimization_problem_configuration import (
 )
 
 if TYPE_CHECKING:
+    from typing import Any
+
     from gemseo.core.base_factory import BaseFactory
     from gemseo.utils.timer import Timer
 
@@ -35,7 +37,6 @@ if TYPE_CHECKING:
         AlgorithmConfiguration,
     )
     from gemseo_benchmark.benchmarker.base_worker import BaseWorker
-    from gemseo_benchmark.benchmarker.base_worker import ProblemType
     from gemseo_benchmark.problems.base_problem_configuration import (
         BaseProblemConfiguration,
     )
@@ -116,7 +117,7 @@ def check_execution(
 def check_create_performance_history(
     algorithm_configuration: AlgorithmConfiguration,
     problem_configuration: BaseProblemConfiguration,
-    problem: ProblemType,
+    problem: Any,
     worker_type: type[BaseWorker],
     timer: Timer,
     performance_measures: list[float],

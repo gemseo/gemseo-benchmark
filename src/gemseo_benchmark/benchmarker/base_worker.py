@@ -26,13 +26,14 @@ import logging
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import Generic
+from typing import TypeVar
 
 from gemseo import LOGGER as GEMSEO_LOGGER
 from gemseo.utils.metaclasses import ABCGoogleDocstringInheritanceMeta
 from gemseo.utils.timer import Timer
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
     from pathlib import Path
 
     from gemseo.algos.base_algo_factory import BaseAlgoFactory
@@ -48,11 +49,22 @@ if TYPE_CHECKING:
     from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 
-ProblemType = Any
-"""The type of problem."""
+ProblemConfigurationT = TypeVar(
+    "ProblemConfigurationT", bound="BaseProblemConfiguration[..., Any]"
+)
+"""The type of problem configuration of a worker."""
+
+ProblemT = TypeVar("ProblemT")
+"""The type of the problems that a worker executes."""
+
+MetricsT = TypeVar("MetricsT", bound="tuple[BaseMetrics, ...]")
+"""The type of the metrics listeners of a worker."""
 
 
-class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
+class BaseWorker(
+    Generic[ProblemConfigurationT, ProblemT, MetricsT],
+    metaclass=ABCGoogleDocstringInheritanceMeta,
+):
     """Base class for benchmarking workers."""
 
     @property
@@ -78,7 +90,7 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
     def execute(
         cls,
         algorithm_configuration: AlgorithmConfiguration,
-        problem_configuration: BaseProblemConfiguration,
+        problem_configuration: ProblemConfigurationT,
         starting_point: RealArray,
         gemseo_log_message: str,
         log_path: Path | None,
@@ -145,10 +157,10 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
     @abstractmethod
     def _get_problem(
         algorithm_configuration: AlgorithmConfiguration,
-        problem_configuration: BaseProblemConfiguration,
+        problem_configuration: ProblemConfigurationT,
         starting_point: RealArray,
         hdf_file_path: Path | None,
-    ) -> ProblemType:
+    ) -> ProblemT:
         """Return a problem ready for execution.
 
         Args:
@@ -164,7 +176,7 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
 
     @classmethod
     @abstractmethod
-    def _add_metrics_listeners(cls, problem: ProblemType) -> tuple[BaseMetrics, ...]:
+    def _add_metrics_listeners(cls, problem: ProblemT) -> MetricsT:
         """Add the listeners for the metrics of an execution.
 
         Args:
@@ -178,27 +190,27 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
     @abstractmethod
     def _execute(
         algorithm_configuration: AlgorithmConfiguration,
-        problem_configuration: BaseProblemConfiguration,
-        problem: ProblemType,
+        problem_configuration: ProblemConfigurationT,
         starting_point: RealArray,
+        problem: ProblemT,
     ) -> None:
         """Execute an algorithm on a problem configuration from a starting point.
 
         Args:
             algorithm_configuration: The algorithm configuration.
             problem_configuration: The problem configuration.
-            problem: A problem.
             starting_point: The starting point of the algorithm.
+            problem: A problem.
         """
 
     @staticmethod
     @abstractmethod
     def _create_performance_history(
         algorithm_configuration: AlgorithmConfiguration,
-        problem_configuration: BaseProblemConfiguration,
-        problem: ProblemType,
+        problem_configuration: ProblemConfigurationT,
+        problem: ProblemT,
         timer: Timer,
-        metrics_listeners: Iterable[BaseMetrics],
+        metrics_listeners: MetricsT,
     ) -> PerformanceHistory:
         """Create a performance history from a solved problem.
 
@@ -215,7 +227,7 @@ class BaseWorker(metaclass=ABCGoogleDocstringInheritanceMeta):
 
     @staticmethod
     @abstractmethod
-    def _post_execute(problem: ProblemType, hdf_file_path: Path | None) -> None:
+    def _post_execute(problem: ProblemT, hdf_file_path: Path | None) -> None:
         """Run instructions after the execution of the worker.
 
         Args:
