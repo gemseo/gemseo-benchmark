@@ -24,6 +24,7 @@ from typing import Final
 from gemseo.core.discipline.discipline import Discipline
 from gemseo.scenarios.mdo_scenario import MDOScenario
 
+from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.benchmarker.mdo_worker import MDOWorker
 from gemseo_benchmark.problems.base_problem_configuration import (
     BaseProblemConfiguration,
@@ -36,16 +37,21 @@ if TYPE_CHECKING:
     from gemseo.algos.design_space import DesignSpace
     from gemseo.algos.doe.base_doe_settings import BaseDOESettings
 
-    from gemseo_benchmark.algorithms.algorithm_configuration import (
-        AlgorithmConfiguration,
-    )
     from gemseo_benchmark.data_profiles.target_values import TargetValues
 
 MDOProblemType = tuple[MDOScenario, Sequence[Discipline]]
 
 
-class MDOProblemConfiguration(BaseProblemConfiguration):
-    """Problem configuration for multidisciplinary optimization."""
+class MDOProblemConfiguration(
+    BaseProblemConfiguration[[AlgorithmConfiguration], MDOProblemType]
+):
+    """Problem configuration for multidisciplinary optimization.
+
+    The function to create an MDO problem of the configuration
+    takes the algorithm configuration as argument,
+    because the algorithm is set on the scenario when it is created.
+    It returns the scenario and its disciplines.
+    """
 
     abscissa_data_type: Final[type[DisciplineData]] = DisciplineData
     performance_measure_label: ClassVar[str] = "Best feasible objective value"

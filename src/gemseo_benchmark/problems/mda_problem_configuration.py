@@ -44,14 +44,22 @@ if TYPE_CHECKING:
 MDAProblemType = tuple[BaseMDASolver, Sequence[Discipline]]
 
 
-class MDAProblemConfiguration(BaseProblemConfiguration):
-    """Problem configuration for multidisciplinary analysis."""
+class MDAProblemConfiguration(
+    BaseProblemConfiguration[["AlgorithmConfiguration"], MDAProblemType]
+):
+    """Problem configuration for multidisciplinary analysis.
+
+    The function to create an MDA problem of the configuration
+    takes the algorithm configuration as argument,
+    because the algorithm is the class of the MDA that is created.
+    It returns the MDA and its disciplines.
+    """
 
     abscissa_data_type: Final[type[DisciplineData]] = DisciplineData
     performance_measure_label: ClassVar[str] = "Best residual norm"
     worker: ClassVar[type[MDAWorker]] = MDAWorker
 
-    def __init__(  # noqa: D107
+    def __init__(  # ruff: ignore[undocumented-public-init]
         self,
         name: str,
         create_problem: Callable[[AlgorithmConfiguration], MDAProblemType],

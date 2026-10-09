@@ -21,6 +21,10 @@ from collections.abc import Iterable
 from copy import deepcopy
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import Generic
+from typing import NoReturn
+from typing import ParamSpec
+from typing import TypeVar
 
 from gemseo import compute_doe
 from gemseo.algos.doe.base_n_samples_based_doe_settings import (
@@ -56,8 +60,16 @@ if TYPE_CHECKING:
 
 InputStartingPointsType = ndarray | Iterable[ndarray]
 
+P = ParamSpec("P")
+"""The signature of the function that creates a problem of a configuration."""
 
-class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
+ProblemT = TypeVar("ProblemT")
+"""The type of the problems created by a problem configuration."""
+
+
+class BaseProblemConfiguration(
+    Generic[P, ProblemT], metaclass=ABCGoogleDocstringInheritanceMeta
+):
     """Base class for problem configurations.
 
     A *problem configuration* is a problem of reference
@@ -72,11 +84,12 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
     (refer to the [target_values module][gemseo_benchmark.data_profiles.target_values]).
     """
 
-    __create_problem: Callable[[], Any]
+    __create_problem: Callable[P, ProblemT]
     """The function to create a problem of the configuration.
-    (ex:
-    an [OptimizationProblem][gemseo.algos.optimization_problem.OptimizationProblem],
-    a [BaseMDA][gemseo.mda.base_mda])."""
+
+    Its arguments and its return type depend on the type of problem configuration:
+    refer to the subclasses.
+    """
 
     __description: str
     """The description of the problem configuration."""
@@ -96,13 +109,13 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
     __target_values: TargetValues | None
     """"The target values to compute data profiles."""
 
-    __variable_space: DesignSpace | None
+    __variable_space: DesignSpace
     """The space of the variables of the problem configuration."""
 
     def __init__(
         self,
         name: str,
-        create_problem: Callable[[], Any],
+        create_problem: Callable[P, ProblemT],
         target_values: TargetValues | None,
         variable_space: DesignSpace,
         doe_settings: BaseDOESettings | None,
@@ -163,14 +176,11 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
             self.target_values = target_values
 
     @property
-    def create_problem(self) -> Callable[[], Any]:
+    def create_problem(self) -> Callable[P, ProblemT]:
         """The function to create a problem of the configuration.
 
-        The return type of this function depends on the type of the underlying
-        |g| object (ex:
-        [OptimizationProblem][gemseo.algos.optimization_problem.OptimizationProblem],
-        [BaseMDA][gemseo.mda.base_mda]
-        ).
+        The arguments and the return type of this function depend on the type of
+        problem configuration: refer to the subclasses.
         """
         return self.__create_problem
 
@@ -185,8 +195,11 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
         return self.__name
 
     @property
-    def optimum(self) -> float:
-        """The best feasible performance measure known for the problem configuration."""
+    def optimum(self) -> float | None:
+        """The best feasible performance measure known for the problem configuration.
+
+        `None` if it is unknown.
+        """
         return self.__optimum
 
     @property
@@ -268,6 +281,11 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
             )
             raise ValueError(msg)
 
+    def __raise_target_values_error(self) -> NoReturn:
+        """Raise the error of a problem configuration without target value."""
+        msg = "The problem configuration has no target value."
+        raise ValueError(msg)
+
     @property
     def target_values(self) -> TargetValues:
         """The target values of the problem configuration.
@@ -276,15 +294,14 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
             ValueError: If the problem configuration has no target value.
         """
         if self.__target_values is None:
-            msg = "The problem configuration has no target value."
-            raise ValueError(msg)
+            self.__raise_target_values_error()
 
         return self.__target_values
 
     @target_values.setter
     def target_values(self, target_values: TargetValues) -> None:
         self.__target_values = target_values
-        self.__set_minimization_target_values()
+        self.__set_minimization_target_values(target_values)
 
     def save_starting_points(self, path: Path) -> None:
         """Save the starting points as a NumPy binary.
@@ -361,7 +378,14 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
 
     @property
     def minimization_target_values(self) -> TargetValues:
-        """The target values for the minimization of the performance measure."""
+        """The target values for the minimization of the performance measure.
+
+        Raises:
+            ValueError: If the problem configuration has no target value.
+        """
+        if self.__minimization_target_values is None:
+            self.__raise_target_values_error()
+
         return self.__minimization_target_values
 
     @property
@@ -369,12 +393,16 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
     def minimize_performance_measure(self) -> bool:
         """Whether the performance measure of the problem is to be minimized."""
 
-    def __set_minimization_target_values(self) -> None:
-        """Set the target values for the minimization of the performance measure."""
+    def __set_minimization_target_values(self, target_values: TargetValues) -> None:
+        """Set the target values for the minimization of the performance measure.
+
+        Args:
+            target_values: The target values of the problem configuration.
+        """
         if self.minimize_performance_measure:
-            self.__minimization_target_values = self.__target_values
+            self.__minimization_target_values = target_values
         else:
-            self.__minimization_target_values = deepcopy(self.__target_values)
+            self.__minimization_target_values = deepcopy(target_values)
             self.__minimization_target_values.switch_performance_measure_sign()
 
     @property
@@ -384,7 +412,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
 
     @property
     @abstractmethod
-    def worker(self) -> type[BaseWorker]:
+    def worker(self) -> type[BaseWorker[Any, ProblemT, Any]]:
         """The type of benchmarking worker."""
 
     @property

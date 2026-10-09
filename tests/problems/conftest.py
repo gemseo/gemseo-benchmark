@@ -104,7 +104,7 @@ def check_inconsistent_starting_points(
 def check_undefined_target_values(
     problem_configuration: BaseProblemConfiguration,
 ) -> None:
-    """Check that there is no target value.
+    """Check that there is no target value, nor target value for minimization.
 
     Args:
         problem_configuration: The problem configuration.
@@ -113,6 +113,11 @@ def check_undefined_target_values(
         ValueError, match=re.escape("The problem configuration has no target value.")
     ):
         problem_configuration.target_values  # noqa: B018
+
+    with pytest.raises(
+        ValueError, match=re.escape("The problem configuration has no target value.")
+    ):
+        problem_configuration.minimization_target_values  # noqa: B018
 
 
 def __check_starting_points_generation(
