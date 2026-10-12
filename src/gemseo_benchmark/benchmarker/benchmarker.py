@@ -251,13 +251,14 @@ class Benchmarker:
                 else:
                     available_names.append(algorithm_name)
 
-            message = Benchmarker.__get_error_message(
-                worker.check_algorithms_suitability,
-                available_names,
-                problem_configuration,
-            )
-            if message:
-                messages[message] = None
+            if available_names:
+                message = Benchmarker.__get_error_message(
+                    worker.check_algorithms_suitability,
+                    available_names,
+                    problem_configuration,
+                )
+                if message:
+                    messages[message] = None
 
         if messages:
             raise ValueError("\n".join(messages))
