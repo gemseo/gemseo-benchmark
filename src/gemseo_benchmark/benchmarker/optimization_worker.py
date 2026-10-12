@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING
 
 from gemseo import execute_algo
@@ -41,6 +42,8 @@ if TYPE_CHECKING:
     from gemseo_benchmark.problems.optimization_problem_configuration import (
         OptimizationProblemConfiguration,
     )
+
+LOGGER = logging.getLogger(__name__)
 
 
 class OptimizationWorker(
@@ -69,7 +72,13 @@ class OptimizationWorker(
         """
         try:
             problem = problem_configuration.create_problem()
-        except Exception:  # noqa: BLE001
+        except Exception as error:  # noqa: BLE001
+            LOGGER.warning(
+                "The suitability of the algorithms to the problem configuration %r "
+                "is not checked, as the problem cannot be created: %s",
+                problem_configuration.name,
+                error,
+            )
             return
 
         factory = cls._algorithm_factory

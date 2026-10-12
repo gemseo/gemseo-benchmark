@@ -771,6 +771,14 @@ def test_problem_creation_failure_not_raised_by_check(
             )
             assert "Cannot create the problem." in caplog.text
 
+    # The skipped check is logged as a warning.
+    assert any(
+        record.levelno == logging.WARNING
+        and "is not checked, as the problem cannot be created" in record.getMessage()
+        and "Cannot create the problem." in record.getMessage()
+        for record in caplog.records
+    )
+
 
 def test_benchmarking_error_pickle() -> None:
     """Check that a benchmarking error survives a pickle round trip."""
