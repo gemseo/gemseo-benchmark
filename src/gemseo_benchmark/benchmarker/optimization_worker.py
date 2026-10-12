@@ -63,8 +63,15 @@ class OptimizationWorker(
         An algorithm is suited if GEMSEO says that it is for a problem created by
         the problem configuration, e.g. an algorithm that does not handle constraints
         is not suited to a problem that has some.
+
+        If the problem cannot be created, the check is skipped:
+        the exception is raised and reported by the execution that needs the problem.
         """
-        problem = problem_configuration.create_problem()
+        try:
+            problem = problem_configuration.create_problem()
+        except Exception:  # noqa: BLE001
+            return
+
         factory = cls._algorithm_factory
         reasons = {}
         for algorithm_name in algorithm_names:

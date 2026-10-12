@@ -737,6 +737,41 @@ def test_unsuited_algorithm_before_any_execution(
     assert not list(tmp_path.rglob("*.json"))
 
 
+@pytest.mark.parametrize("raise_errors", [False, True])
+def test_problem_creation_failure_not_raised_by_check(
+    tmp_path, rosenbrock, optimization_algorithm_configuration, raise_errors, caplog
+) -> None:
+    """Check that a failure to create a problem is handled as an execution failure."""
+    benchmarker = Benchmarker(tmp_path)
+    algorithm_configurations = AlgorithmsConfigurations(
+        optimization_algorithm_configuration
+    )
+    # The problem can be created at instantiation, but not afterwards.
+    with mock.patch.object(
+        OptimizationProblemConfiguration,
+        "create_problem",
+        side_effect=RuntimeError("Cannot create the problem."),
+    ):
+        if raise_errors:
+            with pytest.raises(BenchmarkingError) as error_info:
+                benchmarker.execute(
+                    [rosenbrock],
+                    algorithm_configurations,
+                    use_threading=True,
+                    raise_errors=True,
+                )
+
+            assert all(
+                isinstance(exception, RuntimeError)
+                for exception in error_info.value.exceptions.values()
+            )
+        else:
+            benchmarker.execute(
+                [rosenbrock], algorithm_configurations, use_threading=True
+            )
+            assert "Cannot create the problem." in caplog.text
+
+
 def test_benchmarking_error_pickle() -> None:
     """Check that a benchmarking error survives a pickle round trip."""
     error = BenchmarkingError({"x": RuntimeError("boom")}, 2)
