@@ -45,7 +45,7 @@ and this project adheres to
 
 - When executions of a benchmarking raise exceptions,
   `Benchmarker.execute` and `Scenario.execute` log the failures
-  at the `ERROR` level, with their traceback, as they occur,
+  at the `ERROR` level, with their traceback, once all the executions are over,
   and a summary at the end, instead of a warning.
 - `Benchmarker.execute` and `Scenario.execute` check the algorithms
   for all the combinations of algorithm configuration and problem configuration
