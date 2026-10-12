@@ -46,12 +46,12 @@ from gemseo_benchmark.problems.mdo_problem_configuration import MDOProblemConfig
 from gemseo_benchmark.problems.optimization_problem_configuration import (
     OptimizationProblemConfiguration,
 )
+from gemseo_benchmark.results.results import Results
 
 if TYPE_CHECKING:
     from gemseo_benchmark.problems.base_problem_configuration import (
         BaseProblemConfiguration,
     )
-    from gemseo_benchmark.results.results import Results
 
 
 @pytest.fixture(scope="module")
@@ -738,24 +738,52 @@ def test_benchmarking_error_pickle() -> None:
     assert str(unpickled.exceptions["x"]) == "boom"
 
 
-def test_unsuited_algorithm_with_existing_histories(tmp_path, rosenbrock) -> None:
-    """Check that an unsuited algorithm whose histories exist is not checked."""
+@pytest.fixture
+def unsuited_algorithm_histories(tmp_path) -> tuple[AlgorithmConfiguration, Path]:
+    """The histories of an algorithm unsuited to a problem, saved in a results file.
+
+    The problem configuration is `Power2`, which has constraints
+    that the algorithm L-BFGS-B does not handle.
+
+    Returns:
+        The algorithm configuration and the path to the results file.
+    """
     power_2 = OptimizationProblemConfiguration("Power2", Power2)
     algorithm_configuration = AlgorithmConfiguration(L_BFGS_B_Settings())
     benchmarker = Benchmarker(tmp_path)
+    results = Results()
     for index in range(len(power_2.starting_points)):
         path = benchmarker.get_history_path(
             algorithm_configuration, power_2.name, index, True
         )
         path.touch()
-        benchmarker._results.add_path(algorithm_configuration.name, power_2.name, path)
+        results.add_path(algorithm_configuration.name, power_2.name, path)
 
+    results_path = tmp_path / "results.json"
+    results.to_file(results_path)
+    return algorithm_configuration, results_path
+
+
+def test_unsuited_algorithm_with_existing_histories(
+    tmp_path, unsuited_algorithm_histories
+) -> None:
+    """Check that an unsuited algorithm whose histories exist is not checked."""
+    algorithm_configuration, results_path = unsuited_algorithm_histories
+    power_2 = OptimizationProblemConfiguration("Power2", Power2)
     # The histories exist, so the algorithm is not checked against Power2.
-    benchmarker.execute([power_2], AlgorithmsConfigurations(algorithm_configuration))
+    Benchmarker(tmp_path, results_path).execute(
+        [power_2], AlgorithmsConfigurations(algorithm_configuration)
+    )
 
-    # With the histories overwritten, the algorithm is checked.
+
+def test_unsuited_algorithm_with_overwritten_histories(
+    tmp_path, unsuited_algorithm_histories
+) -> None:
+    """Check that an unsuited algorithm is checked if the histories are overwritten."""
+    algorithm_configuration, results_path = unsuited_algorithm_histories
+    power_2 = OptimizationProblemConfiguration("Power2", Power2)
     with pytest.raises(ValueError, match="not adapted"):
-        benchmarker.execute(
+        Benchmarker(tmp_path, results_path).execute(
             [power_2],
             AlgorithmsConfigurations(algorithm_configuration),
             overwrite_histories=True,
