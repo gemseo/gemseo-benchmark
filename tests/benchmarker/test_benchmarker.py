@@ -555,8 +555,15 @@ def test_worker_raised_exception_not_raised(
 
 
 def create_failing_benchmarking(
-    tmp_path: Path, rosenbrock, algorithm_configuration
-) -> tuple[Benchmarker, list, AlgorithmsConfigurations, Path]:
+    tmp_path: Path,
+    rosenbrock: OptimizationProblemConfiguration,
+    algorithm_configuration: AlgorithmConfiguration,
+) -> tuple[
+    Benchmarker,
+    list[OptimizationProblemConfiguration],
+    AlgorithmsConfigurations,
+    Path,
+]:
     """Create a benchmarking where the execution on one problem configuration fails.
 
     Args:
@@ -581,7 +588,9 @@ def create_failing_benchmarking(
 
 
 def assert_succeeded_executions_saved(
-    results_path: Path, rosenbrock, algorithm_configuration
+    results_path: Path,
+    rosenbrock: OptimizationProblemConfiguration,
+    algorithm_configuration: AlgorithmConfiguration,
 ) -> None:
     """Check that the performance histories of the executions that succeeded are saved.
 
