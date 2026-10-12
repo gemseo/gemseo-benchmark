@@ -719,7 +719,7 @@ def test_unsuited_algorithm_before_any_execution(
     """Check that nothing is executed when an algorithm is unsuited to a problem."""
     # Power2 has constraints, which neither L-BFGS-B nor TNC handles.
     power_2 = OptimizationProblemConfiguration("Power2", Power2)
-    with pytest.raises(ValueError, match=re.escape(message)):
+    with pytest.raises(ValueError, match=f"^{re.escape(message)}$"):
         Benchmarker(tmp_path, tmp_path / "results.json").execute(
             [rosenbrock, power_2],
             AlgorithmsConfigurations(*(AlgorithmConfiguration(s) for s in settings)),

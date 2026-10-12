@@ -72,17 +72,18 @@ class OptimizationWorker(
                 factory.algo_names_to_libraries[algorithm_name]
             )
             description = library_class.ALGORITHM_INFOS[algorithm_name]
-            if not library_class.is_algorithm_suited(description, problem):
-                # There is no public accessor to the reason in GEMSEO.
-                reasons[repr(algorithm_name)] = library_class._get_unsuitability_reason(  # noqa: SLF001
-                    description, problem
-                )
+            # There is no public accessor to the reason in GEMSEO.
+            reason = library_class._get_unsuitability_reason(  # noqa: SLF001
+                description, problem
+            )
+            if reason:
+                reasons[repr(algorithm_name)] = reason
 
         if reasons:
             if len(reasons) == 1:
                 ((algorithm_name, reason),) = reasons.items()
                 subject = f"The algorithm {algorithm_name} is"
-                details = f" {reason}."
+                details = f" {reason}"
             else:
                 subject = f"The algorithms {', '.join(reasons)} are"
                 details = ",".join(
