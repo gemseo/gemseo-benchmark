@@ -822,10 +822,18 @@ def test_unsuited_algorithm_with_existing_histories(
     """Check that an unsuited algorithm whose histories exist is not checked."""
     algorithm_configuration, results_path = unsuited_algorithm_histories
     power_2 = OptimizationProblemConfiguration("Power2", Power2)
-    # The histories exist, so the algorithm is not checked against Power2.
+    # The histories exist, so the algorithm is not checked against Power2,
+    # and no execution is run: an execution would fail and raise an error.
     Benchmarker(tmp_path, results_path).execute(
-        [power_2], AlgorithmsConfigurations(algorithm_configuration)
+        [power_2], AlgorithmsConfigurations(algorithm_configuration), raise_errors=True
     )
+
+    # The histories created by the fixture are still empty.
+    history_paths = [
+        path for path in tmp_path.rglob("*") if path.is_file() and path != results_path
+    ]
+    assert history_paths
+    assert all(path.stat().st_size == 0 for path in history_paths)
 
 
 def test_unsuited_algorithm_with_overwritten_histories(
