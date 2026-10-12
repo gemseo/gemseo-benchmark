@@ -142,10 +142,10 @@ class Scenario:
         Returns:
             The performance histories.
 
+        Raises:
             ValueError: If an algorithm is not available,
                 or is not suited to a problem configuration when this can be told
                 before the execution.
-            ValueError: If the algorithms are not suited to the problems.
             BenchmarkingError: If `raise_errors` is `True`
                 and some executions of the solvers raised exceptions.
                 The other executions are not interrupted
