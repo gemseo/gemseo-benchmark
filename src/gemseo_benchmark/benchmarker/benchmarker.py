@@ -120,7 +120,8 @@ class Benchmarker:
                 next to each performance history file.
             raise_errors: Whether to raise a `BenchmarkingError`
                 when some executions raised exceptions,
-                once all the executions are over and the results are saved.
+                once all the executions are over
+                and their performance histories are saved.
                 If `False`, the failures are only logged,
                 at the `ERROR` level, with their traceback,
                 followed by a summary.
