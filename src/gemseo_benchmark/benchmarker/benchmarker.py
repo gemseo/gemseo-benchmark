@@ -377,6 +377,33 @@ class Benchmarker:
 
         return future_to_path
 
+    def __is_solved(
+        self,
+        algorithm_configuration: AlgorithmConfiguration,
+        problem_configuration: BaseProblemConfiguration,
+        index: int,
+    ) -> bool:
+        """Check whether a problem has already been solved.
+
+        A problem is solved if the results contain
+        the performance history of the algorithm configuration on the problem.
+
+        Args:
+            algorithm_configuration: The algorithm configuration.
+            problem_configuration: The problem configuration.
+            index: The 0-based index of the problem.
+
+        Returns:
+            Whether the performance history of the problem is in the results.
+        """
+        return self._results.contains(
+            algorithm_configuration.name,
+            problem_configuration.name,
+            self.get_history_path(
+                algorithm_configuration, problem_configuration.name, index
+            ),
+        )
+
     def __has_unsolved_problem(
         self,
         algorithm_configuration: AlgorithmConfiguration,
@@ -394,13 +421,7 @@ class Benchmarker:
             Whether at least one execution will not be skipped.
         """
         return overwrite_histories or any(
-            not self._results.contains(
-                algorithm_configuration.name,
-                problem_configuration.name,
-                self.get_history_path(
-                    algorithm_configuration, problem_configuration.name, index
-                ),
-            )
+            not self.__is_solved(algorithm_configuration, problem_configuration, index)
             for index in range(len(problem_configuration.starting_points))
         )
 
@@ -429,12 +450,8 @@ class Benchmarker:
             f"for algorithm configuration {algorithm_configuration.name}"
         )
 
-        if overwrite_histories or not self._results.contains(
-            algorithm_configuration.name,
-            problem_configuration_name,
-            self.get_history_path(
-                algorithm_configuration, problem_configuration_name, index
-            ),
+        if overwrite_histories or not self.__is_solved(
+            algorithm_configuration, problem_configuration, index
         ):
             return f"Solving {execution_info}."
 
