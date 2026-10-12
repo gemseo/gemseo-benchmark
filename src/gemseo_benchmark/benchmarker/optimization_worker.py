@@ -85,14 +85,14 @@ class OptimizationWorker(
                 details = f" {reason}."
             else:
                 subject = f"The algorithms {', '.join(reasons)} are"
-                details = "".join(
+                details = ",".join(
                     f"\n- {name}: {reason}" for name, reason in reasons.items()
                 )
 
             msg = (
                 f"{subject} not adapted "
                 f"to the problem configuration {problem_configuration.name!r}:"
-                f"{details}"
+                f"{details}."
             )
             raise ValueError(msg)
 
