@@ -219,7 +219,9 @@ class Scenario:
             self._results_path,
             self._get_dir_path(self.__DATABASES_DIRNAME) if save_databases else None,
         ).execute(
-            {problem for group in problems_groups for problem in group},
+            tuple(
+                dict.fromkeys(problem for group in problems_groups for problem in group)
+            ),
             algorithms_configurations,
             overwrite_histories,
             n_processes,

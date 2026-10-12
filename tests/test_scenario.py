@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import os
+from unittest import mock
 
 import pytest
 
@@ -136,3 +137,27 @@ def test_worker_raised_not_raised(
     # The performance histories of the executions that succeeded are returned.
     assert problems_group.name in results.get_problems(results.algorithms[0])
     assert "executions raised an exception" in caplog.records[-1].getMessage()
+
+
+def test_problem_configurations_order(
+    algorithms_configurations, tmp_path, rosenbrock
+) -> None:
+    """Check that the problem configurations are executed in a reproducible order."""
+    configurations = [
+        OptimizationProblemConfiguration(f"Problem {i}", rosenbrock.create_problem)
+        for i in range(6)
+    ]
+    groups = [
+        ProblemsGroup("Group 1", configurations[:4]),
+        ProblemsGroup("Group 2", configurations[2:]),
+    ]
+    # The benchmarker is mocked, so it does not create the results file.
+    (tmp_path / "results.json").write_text("{}")
+    with mock.patch("gemseo_benchmark.scenario.Benchmarker") as benchmarker_class:
+        Scenario([algorithms_configurations], tmp_path).execute(
+            groups, skip_report=True
+        )
+
+    # The order of the groups is kept, and the duplicates are removed.
+    execute = benchmarker_class.return_value.execute
+    assert tuple(execute.call_args.args[0]) == tuple(configurations)
