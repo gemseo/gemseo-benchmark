@@ -500,7 +500,7 @@ def test_worker_raised_exception(
     pb_config = request.getfixturevalue(ill_problem_configuration)
     with pytest.raises(
         BenchmarkingError,
-        match=re.escape("1 of 1 executions raised an exception"),
+        match=re.escape("1 of 1 execution raised an exception"),
     ) as error_info:
         Benchmarker(tmp_path).execute(
             [pb_config], AlgorithmsConfigurations(algo_config), raise_errors=True
@@ -551,7 +551,7 @@ def test_worker_raised_exception_not_raised(
         f"Solving problem 1 of problem configuration {pb_config.name} "
         f"for algorithm configuration {algo_config.name} raised: "
     )
-    assert summary.getMessage().startswith("1 of 1 executions raised an exception")
+    assert summary.getMessage().startswith("1 of 1 execution raised an exception")
 
 
 def create_failing_benchmarking(
@@ -848,3 +848,29 @@ def test_unsuited_algorithm_with_overwritten_histories(
             AlgorithmsConfigurations(algorithm_configuration),
             overwrite_histories=True,
         )
+
+
+@pytest.mark.parametrize(
+    ("number_of_executions", "first_line"),
+    [
+        (1, "1 of 1 execution raised an exception."),
+        (
+            2,
+            (
+                "1 of 2 executions raised an exception; "
+                "the performance history of the other execution is saved."
+            ),
+        ),
+        (
+            3,
+            (
+                "1 of 3 executions raised an exception; "
+                "the performance histories of the other executions are saved."
+            ),
+        ),
+    ],
+)
+def test_benchmarking_error_message(number_of_executions, first_line) -> None:
+    """Check the message of a benchmarking error, according to the executions."""
+    error = BenchmarkingError({"x": RuntimeError("boom")}, number_of_executions)
+    assert str(error) == f"{first_line}\n- x raised: RuntimeError: boom"

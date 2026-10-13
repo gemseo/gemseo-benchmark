@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 class BenchmarkingError(Exception):
     """The error raised when executions of a benchmarking raised exceptions.
 
-    The other executions have run to the end
+    The other executions, if any, have run to the end
     and their performance histories are saved.
     The exception raised by the first execution that failed,
     in the order of submission, is the cause of this error.
@@ -50,13 +50,18 @@ class BenchmarkingError(Exception):
         """  # noqa: D205, D212, D415
         self.exceptions = exceptions
         self.number_of_executions = number_of_executions
-        lines = [
-            (
-                f"{len(exceptions)} of {number_of_executions} executions raised "
-                "an exception; the performance histories of the other executions "
-                "are saved."
-            )
-        ]
+        message = (
+            f"{len(exceptions)} of {number_of_executions} "
+            f"{'execution' if number_of_executions == 1 else 'executions'} "
+            "raised an exception"
+        )
+        number_of_others = number_of_executions - len(exceptions)
+        if number_of_others == 1:
+            message += "; the performance history of the other execution is saved"
+        elif number_of_others > 1:
+            message += "; the performance histories of the other executions are saved"
+
+        lines = [f"{message}."]
         lines.extend(
             f"- {description} raised: {type(exception).__name__}: {exception}"
             for description, exception in exceptions.items()
