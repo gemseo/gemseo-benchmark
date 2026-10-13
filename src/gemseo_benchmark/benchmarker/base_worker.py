@@ -34,6 +34,7 @@ from gemseo.utils.metaclasses import ABCGoogleDocstringInheritanceMeta
 from gemseo.utils.timer import Timer
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from pathlib import Path
 
     from gemseo.algos.base_algo_factory import BaseAlgoFactory
@@ -47,7 +48,6 @@ if TYPE_CHECKING:
         BaseProblemConfiguration,
     )
     from gemseo_benchmark.results.performance_history import PerformanceHistory
-
 
 ProblemConfigurationT = TypeVar(
     "ProblemConfigurationT", bound="BaseProblemConfiguration[..., Any]"
