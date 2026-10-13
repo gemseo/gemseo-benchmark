@@ -49,6 +49,8 @@ from gemseo_benchmark.problems.optimization_problem_configuration import (
 from gemseo_benchmark.results.results import Results
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+
     from gemseo_benchmark.problems.base_problem_configuration import (
         BaseProblemConfiguration,
     )
@@ -737,47 +739,67 @@ def test_unsuited_algorithm_before_any_execution(
     assert not list(tmp_path.rglob("*.json"))
 
 
-@pytest.mark.parametrize("raise_errors", [False, True])
-def test_problem_creation_failure_not_raised_by_check(
-    tmp_path, rosenbrock, optimization_algorithm_configuration, raise_errors, caplog
-) -> None:
-    """Check that a failure to create a problem is handled as an execution failure."""
-    benchmarker = Benchmarker(tmp_path)
-    algorithm_configurations = AlgorithmsConfigurations(
-        optimization_algorithm_configuration
-    )
-    # The problem can be created at instantiation, but not afterwards.
+@pytest.fixture
+def failing_problem_creation(
+    rosenbrock,
+) -> Iterator[OptimizationProblemConfiguration]:
+    """A problem configuration that can be created at instantiation, not afterwards.
+
+    Yields:
+        The problem configuration.
+    """
     with mock.patch.object(
         OptimizationProblemConfiguration,
         "create_problem",
         side_effect=RuntimeError("Cannot create the problem."),
     ):
-        if raise_errors:
-            with pytest.raises(BenchmarkingError) as error_info:
-                benchmarker.execute(
-                    [rosenbrock],
-                    algorithm_configurations,
-                    use_threading=True,
-                    raise_errors=True,
-                )
+        yield rosenbrock
 
-            assert all(
-                isinstance(exception, RuntimeError)
-                for exception in error_info.value.exceptions.values()
-            )
-        else:
-            benchmarker.execute(
-                [rosenbrock], algorithm_configurations, use_threading=True
-            )
-            assert "Cannot create the problem." in caplog.text
 
-    # The skipped check is logged as a warning.
+def assert_check_skipped_warning(caplog) -> None:
+    """Check that the skipped check of the algorithms is logged as a warning.
+
+    Args:
+        caplog: The fixture to capture the logs.
+    """
     assert any(
         record.levelno == logging.WARNING
         and "is not checked, as the problem cannot be created" in record.getMessage()
         and "Cannot create the problem." in record.getMessage()
         for record in caplog.records
     )
+
+
+def test_problem_creation_failure_raised(
+    tmp_path, failing_problem_creation, optimization_algorithm_configuration, caplog
+) -> None:
+    """Check that a failure to create a problem is raised as an execution failure."""
+    with pytest.raises(BenchmarkingError) as error_info:
+        Benchmarker(tmp_path).execute(
+            [failing_problem_creation],
+            AlgorithmsConfigurations(optimization_algorithm_configuration),
+            use_threading=True,
+            raise_errors=True,
+        )
+
+    assert all(
+        isinstance(exception, RuntimeError)
+        for exception in error_info.value.exceptions.values()
+    )
+    assert_check_skipped_warning(caplog)
+
+
+def test_problem_creation_failure_not_raised(
+    tmp_path, failing_problem_creation, optimization_algorithm_configuration, caplog
+) -> None:
+    """Check that a failure to create a problem is logged as an execution failure."""
+    Benchmarker(tmp_path).execute(
+        [failing_problem_creation],
+        AlgorithmsConfigurations(optimization_algorithm_configuration),
+        use_threading=True,
+    )
+    assert "Cannot create the problem." in caplog.text
+    assert_check_skipped_warning(caplog)
 
 
 def test_benchmarking_error_pickle() -> None:
