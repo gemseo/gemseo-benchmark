@@ -57,6 +57,8 @@ and this project adheres to
   Before, an unavailable algorithm raised an error after the execution
   of the preceding algorithm configurations,
   and an unsuited algorithm made its executions fail.
+- `Scenario.execute` runs the problem configurations in the order of the groups,
+  without duplicates, instead of in an arbitrary order that changed between runs.
 - The documentation and the HTML report are generated using `properdocs` instead of `sphinx`.
 - The PDF report is generated using `properdocs` and `mkdocs-to-pdf` instead of `sphinx`;
   you must install
