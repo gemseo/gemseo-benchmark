@@ -28,6 +28,7 @@ import pytest
 from gemseo.doe import CustomDOE_Settings
 from gemseo.optimization import OptimizationProblem
 from gemseo.problem.optimization.rosenbrock import Rosenbrock
+from gemseo.space import DesignSpace
 from matplotlib.testing.decorators import image_comparison
 from numpy import array
 from numpy.testing import assert_allclose
@@ -85,8 +86,8 @@ def benchmarking_problem(minimization_problem_creator):
 
 def test_undefined_starting_points() -> None:
     """Check the absence of starting points."""
-    variable_space = mock.Mock()
-    variable_space.has_current_value = False
+    variable_space = DesignSpace()
+    variable_space.add_variable("x", lower_bound=0.0, upper_bound=1.0)
 
     def create_problem() -> OptimizationProblem:
         """Create an optimization problem."""

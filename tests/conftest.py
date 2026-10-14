@@ -78,6 +78,8 @@ def design_space() -> mock.Mock:
     design_space.normalize = {"x": [True]}
     design_space.__iter__.return_value = ["x"]
     design_space.get_size = mock.Mock(return_value=2)
+    design_space.variables.items.return_value = [("x", mock.Mock(size=2))]
+    design_space.variables.has_variables_of_type.return_value = False
     return design_space
 
 
