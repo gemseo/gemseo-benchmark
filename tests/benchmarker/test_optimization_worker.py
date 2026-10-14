@@ -124,8 +124,7 @@ def test_execute(algorithm_configuration, rosenbrock) -> None:
 def test_create_performance_history(algorithm_configuration, rosenbrock) -> None:
     """Check the creation of the performance history."""
     problem = rosenbrock.create_problem()
-    # TODO(bump-gemseo): cannot transform: the type of problem could not be inferred; if it is an instance of EvaluationProblem, use bind_functions to bind the functions to the database and the counters, and create_working_problem to derive a problem whose functions work in the coordinates an algorithm manipulates  # noqa: E501
-    problem.preprocess_functions()
+    problem.bind_functions()
     with Timer() as timer:
         values, _ = problem.evaluate_functions()
 
