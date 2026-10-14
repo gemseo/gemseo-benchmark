@@ -24,9 +24,7 @@ import matplotlib.pyplot
 import numpy
 import pytest
 from gemseo.doe import CustomDOE_Settings
-from gemseo.doe import (
-    DiagonalDOE_Settings,
-)
+from gemseo.doe import DiagonalDOE_Settings
 from numpy import ones
 from numpy import zeros
 from numpy.testing import assert_equal

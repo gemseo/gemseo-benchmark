@@ -45,8 +45,8 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
     from pathlib import Path
 
-    from gemseo.space import DesignSpace
     from gemseo.doe.core.base_doe_settings import BaseDOESettings
+    from gemseo.space import DesignSpace
     from gemseo.util.typing import RealArray
 
     from gemseo_benchmark import ConfigurationPlotOptions

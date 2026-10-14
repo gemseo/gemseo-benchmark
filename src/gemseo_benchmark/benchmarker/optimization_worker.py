@@ -31,8 +31,8 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from gemseo.optimization import OptimizationProblem
-    from gemseo.util.typing import RealArray
     from gemseo.util.timer import Timer
+    from gemseo.util.typing import RealArray
 
     from gemseo_benchmark.algorithms.algorithm_configuration import (
         AlgorithmConfiguration,

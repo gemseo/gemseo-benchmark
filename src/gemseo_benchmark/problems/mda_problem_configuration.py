@@ -33,8 +33,8 @@ from gemseo_benchmark.report.axis_data import DisciplineData
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from gemseo.space import DesignSpace
     from gemseo.doe.core.base_doe_settings import BaseDOESettings
+    from gemseo.space import DesignSpace
 
     from gemseo_benchmark.algorithms.algorithm_configuration import (
         AlgorithmConfiguration,
