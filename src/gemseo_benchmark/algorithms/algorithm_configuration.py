@@ -73,8 +73,7 @@ class AlgorithmConfiguration:
                 and returns the value of the option.
         """  # noqa: D205, D212, D415
         self.__algorithm_settings = algorithm_settings
-        # TODO(bump-gemseo): read it with the target_class_name property of a settings instance; in a settings class, the value is now derived from the name of the class (X_Settings targets X), so remove the assignment if its value is the name of the class without _Settings, else rename the class to <value>_Settings first, or it would target another class  # noqa: E501
-        algorithm_name = algorithm_settings._TARGET_CLASS_NAME
+        algorithm_name = algorithm_settings.target_class_name
         non_default_opts = algorithm_settings.model_dump(exclude_unset=True)
         self.__configuration_name = configuration_name or self.__get_configuration_name(
             algorithm_name, non_default_opts
@@ -112,8 +111,7 @@ class AlgorithmConfiguration:
     @property
     def algorithm_name(self) -> str:
         """The name of the algorithm."""
-        # TODO(bump-gemseo): read it with the target_class_name property of a settings instance; in a settings class, the value is now derived from the name of the class (X_Settings targets X), so remove the assignment if its value is the name of the class without _Settings, else rename the class to <value>_Settings first, or it would target another class  # noqa: E501
-        return self.__algorithm_settings._TARGET_CLASS_NAME
+        return self.__algorithm_settings.target_class_name
 
     @property
     def algorithm_options(self) -> dict[str, Any]:
