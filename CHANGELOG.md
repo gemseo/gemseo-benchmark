@@ -80,6 +80,13 @@ and this project adheres to
 
 - The type alias `ProblemType` of the module `gemseo_benchmark.benchmarker.base_worker`.
 
+### Fixed
+
+- The messages of `Benchmarker.execute` announcing
+  the executions that are solved and those that are skipped
+  are logged again,
+  using the GEMSEO logger like the rest of the logs of a benchmarking.
+
 ## Version 4.0.1 (October 2025)
 
 ### Added
