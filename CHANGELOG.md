@@ -32,9 +32,33 @@ and this project adheres to
 
 - The attribute `algorithm_settings` of `AlgorithmConfiguration`
   is the `algorithm_settings` argument passed at instantiation.
+- The argument `raise_errors` of `Benchmarker.execute` and `Scenario.execute`
+  (`False` by default) raises a `BenchmarkingError` that lists the failures
+  when executions of a benchmarking raised exceptions,
+  once all the executions are over and the performance histories are saved;
+  `Scenario.execute` then does not generate the report from partial results.
+- The class method `BaseWorker.check_algorithms_suitability` checks
+  whether algorithms are suited to a problem configuration before any execution;
+  it does nothing by default and `OptimizationWorker` overrides it.
 
 ### Changed
 
+- When executions of a benchmarking raise exceptions,
+  `Benchmarker.execute` and `Scenario.execute` log the failures
+  at the `ERROR` level, with their traceback, once all the executions are over,
+  and a summary at the end, instead of a warning.
+- `Benchmarker.execute` and `Scenario.execute` check the algorithms
+  for all the combinations of algorithm configuration and problem configuration
+  before any of them is executed:
+  a `ValueError` lists the algorithms that are not available
+  and, for an optimization problem configuration,
+  the algorithms that are not adapted to the problem (e.g. an algorithm
+  that does not handle constraints).
+  Before, an unavailable algorithm raised an error after the execution
+  of the preceding algorithm configurations,
+  and an unsuited algorithm made its executions fail.
+- `Scenario.execute` runs the problem configurations in the order of the groups,
+  without duplicates, instead of in an arbitrary order that changed between runs.
 - The documentation and the HTML report are generated using `properdocs` instead of `sphinx`.
 - The PDF report is generated using `properdocs` and `mkdocs-to-pdf` instead of `sphinx`;
   you must install

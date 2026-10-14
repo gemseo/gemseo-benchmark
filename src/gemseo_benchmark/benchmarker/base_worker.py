@@ -34,6 +34,7 @@ from gemseo.utils.metaclasses import ABCGoogleDocstringInheritanceMeta
 from gemseo.utils.timer import Timer
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from pathlib import Path
 
     from gemseo.algos.base_algo_factory import BaseAlgoFactory
@@ -47,7 +48,6 @@ if TYPE_CHECKING:
         BaseProblemConfiguration,
     )
     from gemseo_benchmark.results.performance_history import PerformanceHistory
-
 
 ProblemConfigurationT = TypeVar(
     "ProblemConfigurationT", bound="BaseProblemConfiguration[..., Any]"
@@ -85,6 +85,26 @@ class BaseWorker(
         if not cls._algorithm_factory.is_available(algorithm_name):
             msg = f"The algorithm {algorithm_name!r} is not available."
             raise ValueError(msg)
+
+    @classmethod
+    def check_algorithms_suitability(
+        cls,
+        algorithm_names: Iterable[str],
+        problem_configuration: BaseProblemConfiguration,
+    ) -> None:
+        """Check whether algorithms are suited to a problem configuration.
+
+        By default, any algorithm is considered suited.
+        A worker for which GEMSEO can tell it before the execution
+        overrides this method.
+
+        Args:
+            algorithm_names: The names of the algorithms.
+            problem_configuration: The problem configuration.
+
+        Raises:
+            ValueError: If an algorithm is not suited to the problem configuration.
+        """
 
     @classmethod
     def execute(

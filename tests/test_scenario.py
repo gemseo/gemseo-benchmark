@@ -18,9 +18,15 @@ from __future__ import annotations
 
 import json
 import os
+from unittest import mock
 
 import pytest
 
+from gemseo_benchmark.benchmarker.benchmarking_error import BenchmarkingError
+from gemseo_benchmark.problems.optimization_problem_configuration import (
+    OptimizationProblemConfiguration,
+)
+from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.scenario import Scenario
 
 
@@ -81,3 +87,77 @@ def test_overlapping_algorithm_configurations(
 
     # Check that only two result files have been generated.
     assert len(data[algorithm_configuration.name][problems_group.name]) == 2
+
+
+@pytest.mark.parametrize("skip_report", [False, True])
+def test_worker_raised(
+    algorithms_configurations, tmp_path, problems_group, rosenbrock, skip_report
+) -> None:
+    """Check that the failure of a worker is raised, whether the report is skipped."""
+    ill_problems_group = ProblemsGroup(
+        "Ill problems",
+        [
+            OptimizationProblemConfiguration(
+                "Ill problem", lambda: rosenbrock.create_problem()
+            )
+        ],
+    )
+    with pytest.raises(BenchmarkingError, match="executions raised an exception"):
+        Scenario([algorithms_configurations], tmp_path).execute(
+            [problems_group, ill_problems_group],
+            skip_report=skip_report,
+            raise_errors=True,
+        )
+
+    # The performance histories of the executions that succeeded are saved,
+    # but no report is generated from partial results.
+    with (tmp_path / "results.json").open() as file:
+        data = json.load(file)
+
+    assert problems_group.name in next(iter(data.values()))
+    assert not (tmp_path / "report").exists()
+
+
+def test_worker_raised_not_raised(
+    algorithms_configurations, tmp_path, problems_group, rosenbrock, caplog
+) -> None:
+    """Check that the failure of a worker is only logged by default."""
+    ill_problems_group = ProblemsGroup(
+        "Ill problems",
+        [
+            OptimizationProblemConfiguration(
+                "Ill problem", lambda: rosenbrock.create_problem()
+            )
+        ],
+    )
+    results = Scenario([algorithms_configurations], tmp_path).execute(
+        [problems_group, ill_problems_group], skip_report=True
+    )
+
+    # The performance histories of the executions that succeeded are returned.
+    assert problems_group.name in results.get_problems(results.algorithms[0])
+    assert "executions raised an exception" in caplog.records[-1].getMessage()
+
+
+def test_problem_configurations_order(
+    algorithms_configurations, tmp_path, rosenbrock
+) -> None:
+    """Check that the problem configurations are executed in a reproducible order."""
+    configurations = [
+        OptimizationProblemConfiguration(f"Problem {i}", rosenbrock.create_problem)
+        for i in range(6)
+    ]
+    groups = [
+        ProblemsGroup("Group 1", configurations[:4]),
+        ProblemsGroup("Group 2", configurations[2:]),
+    ]
+    # The benchmarker is mocked, so it does not create the results file.
+    (tmp_path / "results.json").write_text("{}")
+    with mock.patch("gemseo_benchmark.scenario.Benchmarker") as benchmarker_class:
+        Scenario([algorithms_configurations], tmp_path).execute(
+            groups, skip_report=True
+        )
+
+    # The order of the groups is kept, and the duplicates are removed.
+    execute = benchmarker_class.return_value.execute
+    assert tuple(execute.call_args.args[0]) == tuple(configurations)
