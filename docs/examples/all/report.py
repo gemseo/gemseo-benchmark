@@ -159,6 +159,7 @@ scenario = Scenario([lbfgsb_configurations, slsqp_configurations], scenario_dir)
 # %%
 # Here we choose to deactivate the functions counters, progress bars and bounds check
 # of GEMSEO to accelerate the script.
+configuration.enable_function_statistics = False
 configuration.enable_progress_bar = False
 configuration.check_desvars_bounds = False
 # %%

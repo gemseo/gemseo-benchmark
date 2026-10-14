@@ -50,7 +50,10 @@ and this project adheres to
 - The names of the algorithms are those of GEMSEO 7,
   e.g. `L_BFGS_B` instead of `L-BFGS-B`;
   they name the algorithm configurations created from settings,
-  the results directories and the log files.
+  the results directories and the log files;
+  so the results of such algorithm configurations
+  produced with an earlier version are not found:
+  their executions run again.
 - When executions of a benchmarking raise exceptions,
   `Benchmarker.execute` and `Scenario.execute` log the failures
   at the `ERROR` level, with their traceback, once all the executions are over,
@@ -81,7 +84,10 @@ and this project adheres to
   containing
   the configuration name,
   the absolute path of the algorithm settings class
-  and the explicitly-set algorithm settings.
+  and the explicitly-set algorithm settings;
+  `AlgorithmConfiguration.from_dict` and `PerformanceHistory.from_file`
+  can no longer read the algorithm configurations and the performance histories
+  saved with an earlier version.
 - `BaseProblemConfiguration.minimization_target_values` raises a `ValueError` when the problem configuration has no target value, as `target_values` does; it used to return `None`.
 
 ### Removed

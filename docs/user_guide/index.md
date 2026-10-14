@@ -96,7 +96,7 @@ sub-package handles the problem configurations, on which the performances
 of the algorithms configurations is to be measured.
 
 A [OptimizationProblemConfiguration][gemseo_benchmark.problems.optimization_problem_configuration.OptimizationProblemConfiguration] contains the mathematical
-definition of the problem, as an [OptimizationProblem][gemseo.optimization.OptimizationProblem], and requires three other features.
+definition of the problem, as an [OptimizationProblem][gemseo.optimization.problem.OptimizationProblem], and requires three other features.
 
 1.  The starting points, from which the algorithms configurations should
     be launched on the problem. Indeed, an algorithm may be quite
