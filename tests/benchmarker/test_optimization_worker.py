@@ -22,7 +22,6 @@ from pathlib import Path
 import pytest
 from gemseo.optimization.factory import OptimizationLibraryFactory
 from gemseo.optimization import OptimizationProblem
-# TODO(bump-gemseo): gemseo.utils.testing.pytest_conftest: add syrupy to the test dependencies of the project, as gemseo.util.testing.pytest_conftest imports it  # noqa: E501
 from gemseo.util.testing.pytest_conftest import tmp_wd  # noqa: F401
 from gemseo.util.timer import Timer
 from numpy.testing import assert_equal

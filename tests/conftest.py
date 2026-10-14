@@ -39,7 +39,6 @@ from gemseo.discipline import AnalyticDiscipline
 from gemseo.mda import MDAJacobi_Settings
 from gemseo.problem.optimization.rosenbrock import Rosenbrock
 from gemseo.util.constant import read_only_empty_dict
-# TODO(bump-gemseo): gemseo.utils.testing.pytest_conftest: add syrupy to the test dependencies of the project, as gemseo.util.testing.pytest_conftest imports it  # noqa: E501
 from gemseo.util.testing.pytest_conftest import *  # noqa: F401,F403
 from numpy import array
 
