@@ -62,9 +62,7 @@ class MDOWorker(
         scenario, disciplines = problem_configuration.create_problem(
             algorithm_configuration
         )
-        # TODO(bump-gemseo): cannot transform: the type of scenario.formulation could not be inferred; if it is an instance of BaseFormulation, optimization_problem became problem  # noqa: E501
-        # TODO(bump-gemseo): cannot transform: the type of scenario.formulation.optimization_pro... could not be inferred; if it is an instance of ParameterSpace, a current value is a DesignSpace notion; use nominal_value to read the reference point of a space, which is the mean of the distributions here  # noqa: E501
-        scenario.formulation.optimization_problem.design_space.set_current_value(
+        scenario.formulation.problem.design_space.set_current_value(
             starting_point
         )
         return scenario, disciplines
