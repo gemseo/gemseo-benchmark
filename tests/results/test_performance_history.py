@@ -29,6 +29,7 @@ from unittest import mock
 
 import numpy
 import pytest
+from gemseo.algos.opt.scipy_local.settings.slsqp import SLSQP_Settings
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.results.history_item import HistoryItem
@@ -172,9 +173,7 @@ def test_remove_leading_infeasible_from_infeasible_history() -> None:
 
 def test_to_file(tmp_path):
     """Check the writing of a performance history into a file."""
-    algorithm_configuration = AlgorithmConfiguration(
-        "algorithm", optional_path=Path("path")
-    )
+    algorithm_configuration = AlgorithmConfiguration(SLSQP_Settings(max_iter=10))
     history = PerformanceHistory(
         [-2.0, -3.0],
         [1.0, 0.0],
@@ -220,11 +219,9 @@ def test_from_file():
     assert history._number_of_variables == 4
     assert history._objective_name == "f"
     assert history._constraints_names == ["g", "h"]
-    assert history.algorithm_configuration.algorithm_name == "algorithm"
-    assert history.algorithm_configuration.name == "algorithm_optional_path='path'"
-    assert history.algorithm_configuration.algorithm_options == {
-        "optional_path": "path"
-    }
+    assert history.algorithm_configuration.algorithm_name == "SLSQP"
+    assert history.algorithm_configuration.name == "SLSQP_max_iter=10"
+    assert history.algorithm_configuration.algorithm_options == {"max_iter": 10}
     assert history.doe_size == 7
     assert history.total_time == 123.45
     assert history.items[0].performance_measure == -2.0

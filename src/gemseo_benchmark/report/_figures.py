@@ -238,7 +238,7 @@ class Figures:
             are the corresponding dictionaries of figures or tables.
 
         Raises:
-            ValueError: If ``bypass_unequal_representation`` is ``False`` and at least
+            ValueError: If `bypass_unequal_representation` is `False` and at least
                 one algorithm configuration is represented by fewer performance
                 histories than another on an given problem configuration.
         """

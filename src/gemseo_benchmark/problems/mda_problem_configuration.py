@@ -23,7 +23,6 @@ from typing import Final
 
 from gemseo.core.discipline.discipline import Discipline
 from gemseo.mda.base_mda_solver import BaseMDASolver
-from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 
 from gemseo_benchmark.benchmarker.mda_worker import MDAWorker
 from gemseo_benchmark.problems.base_problem_configuration import (
@@ -33,50 +32,48 @@ from gemseo_benchmark.report.axis_data import DisciplineData
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from collections.abc import Mapping
 
     from gemseo.algos.design_space import DesignSpace
-    from gemseo.algos.doe.base_doe_library import DriverLibraryOptionType
+    from gemseo.algos.doe.base_doe_settings import BaseDOESettings
 
     from gemseo_benchmark.algorithms.algorithm_configuration import (
         AlgorithmConfiguration,
     )
     from gemseo_benchmark.data_profiles.target_values import TargetValues
-    from gemseo_benchmark.problems.base_benchmarking_problem import (
-        InputStartingPointsType,
-    )
 
 MDAProblemType = tuple[BaseMDASolver, Sequence[Discipline]]
 
 
-class MDAProblemConfiguration(BaseProblemConfiguration):
-    """Problem configuration for multidisciplinary analysis."""
+class MDAProblemConfiguration(
+    BaseProblemConfiguration[["AlgorithmConfiguration"], MDAProblemType]
+):
+    """Problem configuration for multidisciplinary analysis.
+
+    The function to create an MDA problem of the configuration
+    takes the algorithm configuration as argument,
+    because the algorithm is the class of the MDA that is created.
+    It returns the MDA and its disciplines.
+    """
 
     abscissa_data_type: Final[type[DisciplineData]] = DisciplineData
     performance_measure_label: ClassVar[str] = "Best residual norm"
     worker: ClassVar[type[MDAWorker]] = MDAWorker
 
-    def __init__(  # noqa: D107
+    def __init__(  # ruff: ignore[undocumented-public-init]
         self,
         name: str,
         create_problem: Callable[[AlgorithmConfiguration], MDAProblemType],
         variable_space: DesignSpace,
         target_values: TargetValues | None = None,
-        starting_points: InputStartingPointsType = (),
-        doe_algo_name: str = "",
-        doe_size: int | None = None,
-        doe_options: Mapping[str, DriverLibraryOptionType] = READ_ONLY_EMPTY_DICT,
+        doe_settings: BaseDOESettings | None = None,
         description: str = "No description available.",
     ) -> None:
         super().__init__(
             name,
             create_problem,
             target_values,
-            starting_points,
             variable_space,
-            doe_algo_name,
-            doe_size,
-            doe_options,
+            doe_settings,
             description,
             0,
             0,

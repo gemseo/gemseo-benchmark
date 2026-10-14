@@ -7,10 +7,10 @@
     "h"
   ],
   "algorithm_configuration": {
-    "configuration_name": "algorithm_optional_path='path'",
-    "algorithm_name": "algorithm",
-    "algorithm_options": {
-      "optional_path": "path"
+    "configuration_name": "SLSQP_max_iter=10",
+    "algorithm_settings_class": "gemseo.algos.opt.scipy_local.settings.slsqp.SLSQP_Settings",
+    "algorithm_settings": {
+      "max_iter": 10
     }
   },
   "DOE_size": 7,

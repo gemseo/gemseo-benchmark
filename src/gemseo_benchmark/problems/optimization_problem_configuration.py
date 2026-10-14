@@ -26,7 +26,6 @@ from typing import ClassVar
 from typing import Final
 
 from gemseo import execute_algo
-from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 
 from gemseo_benchmark.benchmarker.optimization_worker import OptimizationWorker
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
@@ -38,21 +37,20 @@ from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from collections.abc import Mapping
+    from collections.abc import Iterator
 
-    from gemseo.algos.doe.base_doe_library import DriverLibraryOptionType
+    from gemseo.algos.doe.base_doe_settings import BaseDOESettings
     from gemseo.algos.optimization_problem import OptimizationProblem
 
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
     )
     from gemseo_benchmark.data_profiles.target_values import TargetValues
-    from gemseo_benchmark.problems.base_problem_configuration import (
-        InputStartingPointsType,
-    )
 
 
-class OptimizationProblemConfiguration(BaseProblemConfiguration):
+class OptimizationProblemConfiguration(
+    BaseProblemConfiguration[[], "OptimizationProblem"]
+):
     """Problem configuration for optimization.
 
     An *optimization* problem configuration is a problem of reference
@@ -61,6 +59,10 @@ class OptimizationProblemConfiguration(BaseProblemConfiguration):
     its objective and constraint functions,
     its starting points (the optimization trajectories will start from each of them),
     and its target values (refer to :mod:`.data_profiles.target_values`).
+
+    The function to create an optimization problem of the configuration
+    does not depend on the algorithm:
+    the latter is applied to the problem afterwards.
     """
 
     abscissa_data_type: Final[type[IterationData]] = IterationData
@@ -79,11 +81,8 @@ class OptimizationProblemConfiguration(BaseProblemConfiguration):
         self,
         name: str,
         create_problem: Callable[[], OptimizationProblem],
-        starting_points: InputStartingPointsType = (),
         target_values: TargetValues | None = None,
-        doe_algo_name: str = "",
-        doe_size: int | None = None,
-        doe_options: Mapping[str, DriverLibraryOptionType] = READ_ONLY_EMPTY_DICT,
+        doe_settings: BaseDOESettings | None = None,
         description: str = "No description available.",
         target_values_algorithms_configurations: AlgorithmsConfigurations | None = None,
         target_values_number: int | None = None,
@@ -93,9 +92,9 @@ class OptimizationProblemConfiguration(BaseProblemConfiguration):
         Args:
             target_values_algorithms_configurations: The configurations of the
                 optimization algorithms for the computation of target values.
-                If ``None``, the target values will not be computed.
+                If `None`, the target values will not be computed.
             target_values_number: The number of target values to compute.
-                If ``None``, the target values will not be computed.
+                If `None`, the target values will not be computed.
                 N.B. the number of target values shall be the same for all the
                 problem configurations of a same group.
         """  # noqa: D205, D212, D415
@@ -104,11 +103,8 @@ class OptimizationProblemConfiguration(BaseProblemConfiguration):
             name,
             create_problem,
             target_values,
-            starting_points,
             self.__optimization_problem.design_space,
-            doe_algo_name,
-            doe_size,
-            doe_options,
+            doe_settings,
             description,
             optimum,
             len(self.__optimization_problem.scalar_constraint_names),
@@ -124,12 +120,15 @@ class OptimizationProblemConfiguration(BaseProblemConfiguration):
             )
 
     @property
-    def targets_generator(self) -> TargetsGenerator:
-        """The generator for target values."""
+    def targets_generator(self) -> TargetsGenerator | None:
+        """The generator for target values.
+
+        `None` if the target values have not been computed.
+        """
         return self.__targets_generator
 
     # TODO: Remove after refactoring the Benchmarker.
-    def __iter__(self) -> OptimizationProblem:
+    def __iter__(self) -> Iterator[OptimizationProblem]:
         """Iterate on the problem instances with respect to the starting points."""
         for starting_point in self.starting_points:
             problem = self.create_problem()

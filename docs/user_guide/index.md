@@ -95,7 +95,7 @@ The [gemseo_benchmark.problems][gemseo_benchmark.problems]
 sub-package handles the problem configurations, on which the performances
 of the algorithms configurations is to be measured.
 
-A [OptimizationBenchmarkingProblem][gemseo_benchmark.problems.optimization_benchmarking_problem.OptimizationBenchmarkingProblem] contains the mathematical
+A [OptimizationProblemConfiguration][gemseo_benchmark.problems.optimization_problem_configuration.OptimizationProblemConfiguration] contains the mathematical
 definition of the problem, as an [OptimizationProblem][gemseo.algos.optimization_problem.OptimizationProblem], and requires three other features.
 
 1.  The starting points, from which the algorithms configurations should
@@ -121,7 +121,8 @@ For example, we define below problem configurations based on
 -   5 starting points are computed by Latin hypercube sampling (LHS),
 
     ```python
-    doe_settings = {"doe_size": 5, "doe_algo_name": "lhs"}
+    from gemseo.algos.doe.openturns.settings.ot_opt_lhs import OT_OPT_LHS_Settings
+    doe_settings = OT_OPT_LHS_Settings(n_samples=5)
     ```
 
 -   and the target values are passed directly as an exponential scale
@@ -135,31 +136,34 @@ For example, we define below problem configurations based on
 presented [further down](#target-values).)
 
 ```python
-rastrigin = OptimizationBenchmarkingProblem(
+rastrigin = OptimizationProblemConfiguration(
     "Rastrigin",
     Rastrigin,
     target_values=target_values,
-    **doe_settings,
+    doe_settings=doe_settings,
     optimum=0.0,
 )
 
-rosenbrock = OptimizationBenchmarkingProblem(
+rosenbrock = OptimizationProblemConfiguration(
     "Rosenbrock",
     Rosenbrock,
     target_values=target_values,
-    **doe_settings,
+    doe_settings=doe_settings,
     optimum=0.0,
 )
 ```
 
-Note that the second argument of [OptimizationBenchmarkingProblem][gemseo_benchmark.problems.optimization_benchmarking_problem.OptimizationBenchmarkingProblem] must be callable.
+Note that the second argument of [OptimizationProblemConfiguration][gemseo_benchmark.problems.optimization_problem_configuration.OptimizationProblemConfiguration] must be callable.
 For example, a five-variables
 problem configuration based on [Rosenbrock][gemseo.problems.optimization.rosenbrock.Rosenbrock] may be defined as follows.
 
 ```python
-rosenbrock_5d = OptimizationBenchmarkingProblem(
+def create_problem():
+    return Rosenbrock(5)
+
+rosenbrock_5d = OptimizationProblemConfiguration(
     "Rosenbrock 5D",
-    lambda: Rosenbrock(5),
+    create_problem,
     target_values=target_values,
     **doe_settings,
     optimum=0.0,

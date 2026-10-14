@@ -94,6 +94,7 @@ class Scenario:
         plot_only_median: bool = False,
         use_abscissa_log_scale: bool = False,
         plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        raise_errors: bool = False,
     ) -> Results:
         """Execute the benchmarking scenario.
 
@@ -116,7 +117,7 @@ class Scenario:
                 on the graphs of each group.
                 The keys are the groups names and the values are the maximum
                 evaluations numbers for the graphs of the group.
-                If ``None``, all the evaluations are displayed.
+                If `None`, all the evaluations are displayed.
                 If the key of a group is missing, all the evaluations are displayed
                 for the group.
             plot_all_histories: Whether to plot all the performance histories.
@@ -130,9 +131,26 @@ class Scenario:
                 for the abscissa axis.
             plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
+            raise_errors: Whether to raise a `BenchmarkingError`
+                when some executions of the solvers raised exceptions,
+                once all the executions are over and their performance histories
+                are saved, so that the report is not generated from partial results.
+                If `False`, the failures are only logged,
+                at the `ERROR` level, with their traceback,
+                followed by a summary.
 
         Returns:
             The performance histories.
+
+        Raises:
+            ValueError: If an algorithm is not available,
+                or is not suited to a problem configuration when this can be told
+                before the execution.
+            BenchmarkingError: If `raise_errors` is `True`
+                and some executions of the solvers raised exceptions.
+                The other executions are not interrupted
+                and their performance histories are saved,
+                but the report is not generated.
         """
         if not skip_solvers:
             LOGGER.info("Run the solvers on the problem configurations")
@@ -143,6 +161,7 @@ class Scenario:
                 n_processes,
                 use_threading,
                 log_gemseo_to_file,
+                raise_errors,
             )
 
         if not skip_report:
@@ -172,6 +191,7 @@ class Scenario:
         n_processes: int,
         use_threading: bool,
         log_gemseo_to_file: bool,
+        raise_errors: bool,
     ) -> None:
         """Run the solvers on the problem configurations.
 
@@ -185,6 +205,8 @@ class Scenario:
                 to parallelize the execution.
             log_gemseo_to_file: Whether to save the GEMSEO log to a file
                 next to the performance history file.
+            raise_errors: Whether to raise a `BenchmarkingError`
+                when some executions raised exceptions.
         """
         algorithms_configurations = AlgorithmsConfigurations()
         for group in self._algorithms_configurations_groups:
@@ -197,12 +219,15 @@ class Scenario:
             self._results_path,
             self._get_dir_path(self.__DATABASES_DIRNAME) if save_databases else None,
         ).execute(
-            {problem for group in problems_groups for problem in group},
+            tuple(
+                dict.fromkeys(problem for group in problems_groups for problem in group)
+            ),
             algorithms_configurations,
             overwrite_histories,
             n_processes,
             use_threading,
             log_gemseo_to_file,
+            raise_errors,
         )
 
     def _get_dir_path(self, name: str, overwrite: bool = False) -> Path:
@@ -250,7 +275,7 @@ class Scenario:
                 on the graphs of each group.
                 The keys are the groups names and the values are the maximum
                 evaluations numbers for the graphs of the group.
-                If ``None``, all the evaluations are displayed.
+                If `None`, all the evaluations are displayed.
                 If the key of a group is missing, all the evaluations are displayed
                 for the group.
             plot_all_histories: Whether to plot all the performance histories.

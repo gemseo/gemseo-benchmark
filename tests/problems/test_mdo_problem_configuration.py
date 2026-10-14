@@ -14,6 +14,8 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """Tests for MDO problem configurations."""
 
+from __future__ import annotations
+
 from unittest import mock
 
 from matplotlib.testing.decorators import image_comparison

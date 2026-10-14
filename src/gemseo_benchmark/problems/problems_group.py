@@ -112,7 +112,7 @@ class ProblemsGroup:
         Args:
             algos_configurations: The algorithms configurations.
             histories_paths: The paths to the reference histories for each algorithm.
-            show: If ``True``, show the plot.
+            show: If `True`, show the plot.
             plot_path: The path where to save the plot.
                 If empty, the plot is not saved.
             infeasibility_tolerance: The tolerance on the infeasibility measure.

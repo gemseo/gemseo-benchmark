@@ -37,3 +37,4 @@ See the [contributing section of GEMSEO](https://gemseo.readthedocs.io/en/stable
 
 - Benoit Pauwels
 - Antoine Dechaume
+- Charles Thoulon

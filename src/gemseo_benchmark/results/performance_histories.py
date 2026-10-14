@@ -375,7 +375,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
             ),
             0,
         )
-        # Skip infinite values to support the ``markevery`` option.
+        # Skip infinite values to support the `markevery` option.
         first_index = next(
             (index for index, value in enumerate(median) if numpy.isfinite(value)),
             histories.shape[1],

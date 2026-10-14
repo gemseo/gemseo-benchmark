@@ -13,38 +13,21 @@
 # FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION
 # WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-# Copyright 2021 IRT Saint Exupéry, https://www.irt-saintexupery.com
-#
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU Lesser General Public
-# License version 3 as published by the Free Software Foundation.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program; if not, write to the Free Software Foundation,
-# Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-"""
-Generate target values
-======================
-"""
+"""# Generate target values"""
 
 # %%
 # In this example,
 # we generate **target values** for an optimization problem configuration
 # based on the performances of an algorithm configuration.
 #
-# Imports
-# -------
+# ## Imports
+#
 # We start by making the necessary imports.
 from __future__ import annotations
 
 from gemseo import compute_doe
 from gemseo import configure
+from gemseo.algos.opt.nlopt.settings.nlopt_cobyla_settings import NLOPT_COBYLA_Settings
 from gemseo.problems.optimization.power_2 import Power2
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -72,14 +55,15 @@ problem.starting_points = compute_doe(
 # Let use the optimizer COBYLA to generate performance histories on the problem.
 algorithms_configurations = AlgorithmsConfigurations(
     AlgorithmConfiguration(
-        "NLOPT_COBYLA",
-        max_iter=65,
-        eq_tolerance=1e-4,
-        ineq_tolerance=0.0,
-        xtol_abs=0,
-        xtol_rel=0,
-        ftol_abs=0,
-        ftol_rel=0,
+        NLOPT_COBYLA_Settings(
+            max_iter=65,
+            eq_tolerance=1e-4,
+            ineq_tolerance=0.0,
+            xtol_abs=0,
+            xtol_rel=0,
+            ftol_abs=0,
+            ftol_rel=0,
+        )
     )
 )
 # %%
@@ -101,7 +85,7 @@ configure(
 # These target values represent the milestones of the problem resolution.
 problem.compute_target_values(5, algorithms_configurations, best_target_tolerance=1e-5)
 # %%
-# We can plot the performace histories used as reference
+# We can plot the performance histories used as reference
 # for the computation of the target values,
 # with the objective value on the vertical axis
 # and the number of functions evaluations on the horizontal axis.

@@ -32,7 +32,7 @@ class Results:
         """
         Args:
             path: The path to the JSON file from which to load the paths.
-                If ``None``, the collection is initially empty.
+                If `None`, the collection is initially empty.
         """  # noqa: D205, D212, D415
         self.__dict = {}
         if path:
@@ -100,11 +100,7 @@ class Results:
 
     @property
     def algorithms(self) -> list[str]:
-        """Return the names of the algorithms configurations.
-
-        Returns:
-            The names of the algorithms configurations.
-        """
+        """The names of the algorithms configurations."""
         return list(self.__dict)
 
     def get_problems(self, algo_name: str) -> list[str]:

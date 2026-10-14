@@ -24,16 +24,18 @@ from __future__ import annotations
 import logging
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
-from concurrent.futures import as_completed
 from typing import TYPE_CHECKING
+from typing import Any
 
 from gemseo import LOGGER as GEMSEO_LOGGER
 
 from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
+from gemseo_benchmark.benchmarker.benchmarking_error import BenchmarkingError
 from gemseo_benchmark.results.results import Results
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from collections.abc import Iterable
     from concurrent.futures import Executor
     from concurrent.futures import Future
@@ -78,9 +80,9 @@ class Benchmarker:
             results_path: The path to the file for saving the performance histories
                 paths.
                 If exists, the file is updated with the new performance histories paths.
-                If ``None``, no performance history path will be saved.
+                If `None`, no performance history path will be saved.
             hdf_path: The path to the destination directory for the HDF files.
-                If ``None``, no HDF file will be saved.
+                If `None`, no HDF file will be saved.
         """  # noqa: D205, D212, D415
         self.__hdf_path = hdf_path
         self.__histories_path = histories_path
@@ -98,6 +100,7 @@ class Benchmarker:
         n_processes: int = 1,
         use_threading: bool = False,
         save_log: bool = False,
+        raise_errors: bool = False,
     ) -> Results:
         """Execute algorithm configurations on problem configurations.
 
@@ -111,14 +114,37 @@ class Benchmarker:
             use_threading: Whether to use threads instead of processes
                 to parallelize the execution.
             save_log: Whether to save the log to a file.
-                If ``use_threading`` is ``True``, a single global file will be saved
+                If `use_threading` is `True`, a single global file will be saved
                 in the performance histories directory.
                 Otherwise, one file per optimization will be saved
                 next to each performance history file.
+            raise_errors: Whether to raise a `BenchmarkingError`
+                when some executions raised exceptions,
+                once all the executions are over
+                and their performance histories are saved.
+                If `False`, the failures are only logged,
+                at the `ERROR` level, with their traceback,
+                followed by a summary.
 
         Returns:
             The results of the benchmarking.
+
+        Raises:
+            ValueError: If an algorithm is not available,
+                or is not suited to a problem configuration when this can be told
+                before the execution.
+                This is checked for all the combinations
+                of algorithm configuration and problem configuration
+                before any of them is executed.
+            BenchmarkingError: If `raise_errors` is `True`
+                and some executions raised exceptions.
+                The other executions are not interrupted,
+                and their performance histories are saved before the error is raised.
         """
+        problem_configurations = tuple(problem_configurations)
+        self.__check_algorithms(
+            problem_configurations, algorithm_configurations, overwrite_histories
+        )
         if save_log and use_threading:
             # Set one file handler for all threads.
             file_handler = logging.FileHandler(
@@ -135,14 +161,10 @@ class Benchmarker:
             for original_algorithm_configuration in algorithm_configurations:
                 algorithm_configuration = original_algorithm_configuration.copy()
                 for problem_configuration in problem_configurations:
-                    worker = problem_configuration.worker
-                    worker.check_algorithm_availability(
-                        algorithm_configuration.algorithm_name
-                    )
                     future_to_path.update(
                         self.__execute(
                             executor,
-                            worker,
+                            problem_configuration.worker,
                             algorithm_configuration,
                             problem_configuration,
                             overwrite_histories,
@@ -150,14 +172,18 @@ class Benchmarker:
                             use_threading,
                         )
                     )
-
-        for future in as_completed(future_to_path):
+        failures: dict[str, BaseException] = {}
+        # All the futures are done, as the executor has been shut down.
+        # They are read in the order of submission, for a reproducible error.
+        for future in future_to_path:
             exception = future.exception()
             if exception is None:
                 self._results.add_path(*future_to_path[future][1:])
             else:
-                LOGGER.warning(
-                    "%s raised: %s", future_to_path[future][0][:-1], exception
+                description = future_to_path[future][0][:-1]
+                failures[description] = exception
+                LOGGER.error(
+                    "%s raised: %s", description, exception, exc_info=exception
                 )
 
         if save_log and use_threading:
@@ -169,7 +195,92 @@ class Benchmarker:
         if future_to_path and self.__results_path:
             self._results.to_file(self.__results_path, 4)
 
+        if failures:
+            error = BenchmarkingError(failures, len(future_to_path))
+            if raise_errors:
+                raise error from next(iter(failures.values()))
+
+            LOGGER.error("%s", error)
+
         return self._results
+
+    def __check_algorithms(
+        self,
+        problem_configurations: Iterable[BaseProblemConfiguration],
+        algorithm_configurations: AlgorithmsConfigurations,
+        overwrite_histories: bool,
+    ) -> None:
+        """Check the algorithms for all the problem configurations.
+
+        Nothing is executed if an algorithm is unavailable
+        or not suited to a problem configuration,
+        so that a mistake in the last algorithm configuration
+        does not come after the execution of the other ones.
+        All the mistakes are reported at once.
+        The combinations that will not be executed,
+        because all their performance histories already exist,
+        are not checked.
+
+        Args:
+            problem_configurations: The problem configurations.
+            algorithm_configurations: The algorithms configurations.
+            overwrite_histories: Whether to overwrite the existing performance
+                histories.
+
+        Raises:
+            ValueError: If an algorithm is not available,
+                or is not suited to a problem configuration.
+        """
+        messages = {}
+        for problem_configuration in problem_configurations:
+            worker = problem_configuration.worker
+            algorithm_names = tuple({
+                configuration.algorithm_name: None
+                for configuration in algorithm_configurations
+                if self.__has_unsolved_problem(
+                    configuration, problem_configuration, overwrite_histories
+                )
+            })
+            available_names = []
+            for algorithm_name in algorithm_names:
+                message = Benchmarker.__get_error_message(
+                    worker.check_algorithm_availability, algorithm_name
+                )
+                if message:
+                    messages[message] = None
+                else:
+                    available_names.append(algorithm_name)
+
+            if available_names:
+                message = Benchmarker.__get_error_message(
+                    worker.check_algorithms_suitability,
+                    available_names,
+                    problem_configuration,
+                )
+                if message:
+                    messages[message] = None
+
+        if messages:
+            raise ValueError("\n".join(messages))
+
+    @staticmethod
+    def __get_error_message(check: Callable[..., None], *args: Any) -> str:
+        """Return the message of the error raised by a check.
+
+        Args:
+            check: The function that checks something and raises a `ValueError`
+                if the check fails.
+            *args: The arguments of the function.
+
+        Returns:
+            The message of the error, or an empty string if the check passed.
+        """
+        try:
+            check(*args)
+        except ValueError as error:
+            return str(error)
+
+        return ""
 
     def __execute(
         self,
@@ -241,7 +352,6 @@ class Benchmarker:
                 )
             else:
                 hdf_file_path = None
-
             future_to_path[
                 executor.submit(
                     worker.execute,
@@ -256,7 +366,7 @@ class Benchmarker:
                     gemseo_log_path,
                     performance_history_path,
                     hdf_file_path,
-                    LOGGER,
+                    GEMSEO_LOGGER,
                 )
             ] = (
                 gemseo_log_message,
@@ -266,6 +376,54 @@ class Benchmarker:
             )
 
         return future_to_path
+
+    def __is_solved(
+        self,
+        algorithm_configuration: AlgorithmConfiguration,
+        problem_configuration: BaseProblemConfiguration,
+        index: int,
+    ) -> bool:
+        """Check whether a problem has already been solved.
+
+        A problem is solved if the results contain
+        the performance history of the algorithm configuration on the problem.
+
+        Args:
+            algorithm_configuration: The algorithm configuration.
+            problem_configuration: The problem configuration.
+            index: The 0-based index of the problem.
+
+        Returns:
+            Whether the performance history of the problem is in the results.
+        """
+        return self._results.contains(
+            algorithm_configuration.name,
+            problem_configuration.name,
+            self.get_history_path(
+                algorithm_configuration, problem_configuration.name, index
+            ),
+        )
+
+    def __has_unsolved_problem(
+        self,
+        algorithm_configuration: AlgorithmConfiguration,
+        problem_configuration: BaseProblemConfiguration,
+        overwrite_histories: bool,
+    ) -> bool:
+        """Check whether an algorithm configuration has problems left to solve.
+
+        Args:
+            algorithm_configuration: The algorithm configuration.
+            problem_configuration: The problem configuration.
+            overwrite_histories: Whether to overwrite existing histories.
+
+        Returns:
+            Whether at least one execution will not be skipped.
+        """
+        return overwrite_histories or any(
+            not self.__is_solved(algorithm_configuration, problem_configuration, index)
+            for index in range(len(problem_configuration.starting_points))
+        )
 
     def __is_problem_unsolved(
         self,
@@ -292,16 +450,12 @@ class Benchmarker:
             f"for algorithm configuration {algorithm_configuration.name}"
         )
 
-        if overwrite_histories or not self._results.contains(
-            algorithm_configuration.name,
-            problem_configuration_name,
-            self.get_history_path(
-                algorithm_configuration, problem_configuration_name, index
-            ),
+        if overwrite_histories or not self.__is_solved(
+            algorithm_configuration, problem_configuration, index
         ):
             return f"Solving {execution_info}."
 
-        LOGGER.info("Skipping %s.", execution_info)
+        GEMSEO_LOGGER.info("Skipping %s.", execution_info)
         return ""
 
     @staticmethod
@@ -320,15 +474,17 @@ class Benchmarker:
         Returns:
             The algorithm configuration of the problem.
         """
-        algorithm_options = dict(algorithm_configuration.algorithm_options)
-        for name, value in algorithm_configuration.instance_algorithm_options.items():
-            algorithm_options[name] = value(problem_configuration, index)
-
+        instance_options = {
+            name: fn(problem_configuration, index)
+            for name, fn in algorithm_configuration.instance_algorithm_options.items()
+        }
+        updated_settings = algorithm_configuration.algorithm_settings.model_copy(
+            update=instance_options
+        )
         return AlgorithmConfiguration(
-            algorithm_configuration.algorithm_name,
+            updated_settings,
             algorithm_configuration.name,
             {},
-            **algorithm_options,
         )
 
     def get_history_path(
@@ -375,7 +531,7 @@ class Benchmarker:
             problem_configuration_name: The name of the problem configuration.
             index: The index of the problem.
             extension: The extension of the path.
-                If ``None``, the extension is for a JSON file.
+                If `None`, the extension is for a JSON file.
             make_parents: Whether to make the parent directories of the path.
 
         Returns:

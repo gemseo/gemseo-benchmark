@@ -115,13 +115,13 @@ class DataProfile:
             problem_name: The name of the problem.
             algorithm_configuration_name: The name of the algorithm configuration.
             performance_measures: A history of performance measures.
-                N.B. the value at index ``i`` is assumed to have been obtained with
-                ``i+1`` evaluations.
+                N.B. the value at index `i` is assumed to have been obtained with
+                `i+1` evaluations.
             infeasibility_measures: A history of infeasibility measures.
-                If ``None`` then measures are set to zero in case of feasibility and set
+                If `None` then measures are set to zero in case of feasibility and set
                 to infinity otherwise.
             feasibility_statuses: A history of (boolean) feasibility statuses.
-                If ``None`` then feasibility is always assumed.
+                If `None` then feasibility is always assumed.
 
         Raises:
             ValueError: If the problem name is not the name of a reference problem.
@@ -155,7 +155,7 @@ class DataProfile:
 
         Args:
             algo_names: The names of the algorithms.
-                If ``None`` then all the algorithms are considered.
+                If `None` then all the algorithms are considered.
             show: If True, show the plot.
             file_path: The path where to save the plot.
                 If empty, the plot is not saved.
@@ -189,7 +189,7 @@ class DataProfile:
 
         Args:
             algo_names: The names of the algorithms.
-                If ``None`` then all the algorithms are considered.
+                If `None` then all the algorithms are considered.
 
         Returns:
             The data profiles.

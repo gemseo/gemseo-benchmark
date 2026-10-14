@@ -14,6 +14,8 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """Tests of getting data for a plot axis."""
 
+from __future__ import annotations
+
 import matplotlib
 import matplotlib.pyplot
 import pytest

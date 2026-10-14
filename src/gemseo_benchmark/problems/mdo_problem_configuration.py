@@ -23,8 +23,8 @@ from typing import Final
 
 from gemseo.core.discipline.discipline import Discipline
 from gemseo.scenarios.mdo_scenario import MDOScenario
-from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 
+from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.benchmarker.mdo_worker import MDOWorker
 from gemseo_benchmark.problems.base_problem_configuration import (
     BaseProblemConfiguration,
@@ -33,24 +33,25 @@ from gemseo_benchmark.report.axis_data import DisciplineData
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from collections.abc import Mapping
 
     from gemseo.algos.design_space import DesignSpace
-    from gemseo.algos.doe.base_doe_library import DriverLibraryOptionType
+    from gemseo.algos.doe.base_doe_settings import BaseDOESettings
 
-    from gemseo_benchmark.algorithms.algorithm_configuration import (
-        AlgorithmConfiguration,
-    )
     from gemseo_benchmark.data_profiles.target_values import TargetValues
-    from gemseo_benchmark.problems.base_benchmarking_problem import (
-        InputStartingPointsType,
-    )
 
 MDOProblemType = tuple[MDOScenario, Sequence[Discipline]]
 
 
-class MDOProblemConfiguration(BaseProblemConfiguration):
-    """Problem configuration for multidisciplinary optimization."""
+class MDOProblemConfiguration(
+    BaseProblemConfiguration[[AlgorithmConfiguration], MDOProblemType]
+):
+    """Problem configuration for multidisciplinary optimization.
+
+    The function to create an MDO problem of the configuration
+    takes the algorithm configuration as argument,
+    because the algorithm is set on the scenario when it is created.
+    It returns the scenario and its disciplines.
+    """
 
     abscissa_data_type: Final[type[DisciplineData]] = DisciplineData
     performance_measure_label: ClassVar[str] = "Best feasible objective value"
@@ -64,10 +65,7 @@ class MDOProblemConfiguration(BaseProblemConfiguration):
         minimize_objective_value: bool,
         number_of_scalar_constraints: int,
         target_values: TargetValues | None = None,
-        starting_points: InputStartingPointsType = (),
-        doe_algo_name: str = "",
-        doe_size: int | None = None,
-        doe_options: Mapping[str, DriverLibraryOptionType] = READ_ONLY_EMPTY_DICT,
+        doe_settings: BaseDOESettings | None = None,
         description: str = "No description available.",
         optimum: float | None = None,
     ) -> None:
@@ -81,11 +79,8 @@ class MDOProblemConfiguration(BaseProblemConfiguration):
             name,
             create_problem,
             target_values,
-            starting_points,
             variable_space,
-            doe_algo_name,
-            doe_size,
-            doe_options,
+            doe_settings,
             description,
             optimum,
             number_of_scalar_constraints,

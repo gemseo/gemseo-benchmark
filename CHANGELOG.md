@@ -26,35 +26,90 @@ The format is based on
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-# Version 4.0.1 (October 2025)
+## Version 5.0.0 (October 2026)
 
-## Added
+### Added
+
+- The attribute `algorithm_settings` of `AlgorithmConfiguration`
+  is the `algorithm_settings` argument passed at instantiation.
+- The argument `raise_errors` of `Benchmarker.execute` and `Scenario.execute`
+  (`False` by default) raises a `BenchmarkingError` that lists the failures
+  when executions of a benchmarking raised exceptions,
+  once all the executions are over and the performance histories are saved;
+  `Scenario.execute` then does not generate the report from partial results.
+- The class method `BaseWorker.check_algorithms_suitability` checks
+  whether algorithms are suited to a problem configuration before any execution;
+  it does nothing by default and `OptimizationWorker` overrides it.
+
+### Changed
+
+- When executions of a benchmarking raise exceptions,
+  `Benchmarker.execute` and `Scenario.execute` log the failures
+  at the `ERROR` level, with their traceback, once all the executions are over,
+  and a summary at the end, instead of a warning.
+- `Benchmarker.execute` and `Scenario.execute` check the algorithms
+  for all the combinations of algorithm configuration and problem configuration
+  before any of them is executed:
+  a `ValueError` lists the algorithms that are not available
+  and, for an optimization problem configuration,
+  the algorithms that are not adapted to the problem (e.g. an algorithm
+  that does not handle constraints).
+  Before, an unavailable algorithm raised an error after the execution
+  of the preceding algorithm configurations,
+  and an unsuited algorithm made its executions fail.
+- `Scenario.execute` runs the problem configurations in the order of the groups,
+  without duplicates, instead of in an arbitrary order that changed between runs.
+- The documentation and the HTML report are generated using `properdocs` instead of `sphinx`.
+- The PDF report is generated using `properdocs` and `mkdocs-to-pdf` instead of `sphinx`;
+  you must install
+  the dependency [weasyprint](https://mkdocs-to-pdf.readthedocs.io/en/stable/installation/#requirements)
+  to use this feature.
+- Examples of HTML and PDF reports are available in the examples.
+- `BaseProblemConfiguration.minimization_target_values` raises a `ValueError` when the problem configuration has no target value, as `target_values` does; it used to return `None`.
+- API changes:
+  - The arguments `doe_name`, `doe_options` and `doe_size` of `BaseProblemConfiguration` and its subclasses
+    have been replaced by `doe_settings` of type `BaseDOESettings`.
+  - The arguments `algorithm_name` and `**algorithm_options` of `AlgorithmConfiguration`
+    have been replaced by `algorithm_settings` of type `BaseSettings`.
+  - The `to_dict` method of `AlgorithmConfiguration` returns a dictionary
+    containing
+    the configuration name,
+    the absolute path of the algorithm settings class
+    and the explicitly-set algorithm settings.
+
+### Removed
+
+- The type alias `ProblemType` of the module `gemseo_benchmark.benchmarker.base_worker`.
+
+## Version 4.0.1 (October 2025)
+
+### Added
 
 - Support for Python 3.13.
 
-## Removed
+### Removed
 
 - Support for Python 3.9.
 
-# Version 4.0.0 (August 2025)
+## Version 4.0.0 (August 2025)
 
-## Added
+### Added
 
-### Problems
+#### Problems
 
 - Multidisciplinary analysis problem configurations
-  can now be implemented with ``MDAProblemConfiguration``.
+  can now be implemented with `MDAProblemConfiguration`.
 - Multidisciplinary optimization problem configurations
-  can now be implemented with ``MDOProblemConfiguration``.
+  can now be implemented with `MDOProblemConfiguration`.
 
-#### Report
+##### Report
 
 - The plot options (ex: color, marker) of each algorithm configuration
-  can now be customized at the execution of a ``Scenario``
-  thanks to the new argument ``plot_settings``.
-- The user can now request that ``Scenario.execute`` or ``Report.generate``
+  can now be customized at the execution of a `Scenario`
+  thanks to the new argument `plot_settings`.
+- The user can now request that `Scenario.execute` or `Report.generate`
   plot only the median of the performance measure rather than its whole range
-  thanks to the new boolean argument ``plot_only_median``.
+  thanks to the new boolean argument `plot_only_median`.
 - On the page dedicated to the benchmarking problems,
   the infeasibility measure of infeasible target values is now displayed.
 - Graphs and tables have been added to the pages dedicated to each problem:
@@ -69,7 +124,7 @@ and this project adheres to
 - The scale of the axis showing the number of function evaluations
   can now be made logarithmic.
 
-## Changed
+### Changed
 
 - The phrasing "problem configuration" is now used instead of "benchmarking problem".
   Thus the two main types of inputs to be defined by the user
@@ -78,36 +133,36 @@ and this project adheres to
 #### Problems
 
 - The class to implement optimization benchmarking problems is now called
-  ``OptimizationBenchmarkingProblem`` (rather than ``Problem`` formerly).
+  `OptimizationBenchmarkingProblem` (rather than `Problem` formerly).
 
-#### Benchmarker
+##### Benchmarker
 
-- Argument ``databases_path`` of ``Benchmarker.__init__`` is renamed into ``hdf_path``
+- Argument `databases_path` of `Benchmarker` is renamed into `hdf_path`
   as the saved files could represent caches rather than databases.
-- Arguments ``problems`` and ``algorithm`` of ``Benchmarker.execute`` are renamed into
-  ``problem_configurations`` and ``algorithm_configurations``
+- Arguments `problems` and `algorithm` of `Benchmarker.execute` are renamed into
+  `problem_configurations` and `algorithm_configurations`
   to avoid confusion with optimization problems and algorithm names respectively.
-- Argument ``number_of_processes`` of ``Benchmarker.execute`` is renamed into
-  ``n_processes`` for consistency with GEMSEO.
+- Argument `number_of_processes` of `Benchmarker.execute` is renamed into
+  `n_processes` for consistency with GEMSEO.
 - The stopping criteria of the algorithms are no longer automatically disabled.
   The user is now free to disable (or not) the stopping criteria of their choice
   in the options of the algorithm configurations.
 
-#### Report
+##### Report
 
 - The results on each problem are now displayed on separate pages
   rather than on the page of the problems group.
 - Setting the optimum of a problem is no longer mandatory.
-- The performance histories returned by ``PerformanceHistory.compute_cumulated_minimum``
-  and ``PerformanceHistory.extend`` now contain copies of history items
+- The performance histories returned by `PerformanceHistory.compute_cumulated_minimum`
+  and `PerformanceHistory.extend` now contain copies of history items
   rather than replications of the same objects.
 
-### Scenario
+#### Scenario
 
-- Argument ``number_of_processes`` of ``Scenario.execute`` is renamed into
-  ``n_processes`` for consistency with GEMSEO.
+- Argument `number_of_processes` of `Scenario.execute` is renamed into
+  `n_processes` for consistency with GEMSEO.
 
-## Fixed
+### Fixed
 
 #### Results
 
@@ -124,7 +179,7 @@ and this project adheres to
 #### Benchmarker
 
 - When overwriting histories,
-  the paths already in the ``Results`` are now effectively removed.
+  the paths already in the `Results` are now effectively removed.
 - When threading, a log file is written in the performance history directory.
 - When multiprocessing, a log file is written next to each performance history.
 
@@ -137,7 +192,7 @@ and this project adheres to
 
 #### Problems
 
-- Method ``Problem.plot_histories`` was removed as it was redundant with ``Figures.plot``.
+- Method `Problem.plot_histories` was removed as it was redundant with `Figures.plot`.
   To obtain a figure similar to the one formerly returned by
 
   ```python
@@ -169,7 +224,7 @@ and this project adheres to
   ).plot(plot_all_histories, use_log_scale, False, False, False)
   ```
 
-- Method ``Problem.compute_performance`` was removed as is was redundant with ``PerformanceHistory.from_problem``.
+- Method `Problem.compute_performance` was removed as is was redundant with `PerformanceHistory.from_problem`.
   To obtain values similar to the former
 
   ```python
@@ -185,11 +240,11 @@ and this project adheres to
   feasibility_statuses = [item.is_feasible for item in performance_history]
   ```
 
-### Results
+#### Results
 
-- Methods ``PerformanceHistories.plot_algorithm_histories``
-  and ``PerformanceHistory.plot`` were removed
-  as they were redundant with ``Figures.plot``.
+- Methods `PerformanceHistories.plot_algorithm_histories`
+  and `PerformanceHistory.plot` were removed
+  as they were redundant with `Figures.plot`.
   To obtain a figure similar to the one formerly returned by
 
   ```python
@@ -231,33 +286,33 @@ and this project adheres to
 
 #### Benchmarker
 
-- The option ``log_gemseo_to_file`` has been added to ``Benchmarker.execute``
-  and ``Scenario.execute`` to save the GEMSEO log of each algorithm execution
+- The option `log_gemseo_to_file` has been added to `Benchmarker.execute`
+  and `Scenario.execute` to save the GEMSEO log of each algorithm execution
   to a file in the same directory as its performance history file.
 
 #### Data profiles
 
 - Target values can be plotted on existing axes as horizontal lines with
-  ``TargetValues.plot_on_axes``.
+  `TargetValues.plot_on_axes`.
 
 #### Results
 
 - The distribution of a collection of performance histories can be plotted in terms of
-  performance measure (```PerformanceHistories.plot_performance_measure_distribution``),
-  infeasibility measure (```PerformanceHistories.plot_infeasibility_measure_distribution``)
+  performance measure (`PerformanceHistories.plot_performance_measure_distribution`),
+  infeasibility measure (`PerformanceHistories.plot_infeasibility_measure_distribution`)
   and number of unsatisfied constraints
-  (```PerformanceHistories.plot_number_of_unsatisfied_constraints_distribution``).
+  (`PerformanceHistories.plot_number_of_unsatisfied_constraints_distribution`).
 
 ### Changed
 
 #### Results
 
 - Methods
-  ``PerformanceHistory.compute_cumulated_minimum``,
-  ``PerformanceHistory.extend``,
-  ``PerformanceHistory.remove_leading_infeasible``,
-  and ``PerformanceHistory.shorten``
-  preserve the attributes other than ``PerformanceHistory.items``.
+  `PerformanceHistory.compute_cumulated_minimum`,
+  `PerformanceHistory.extend`,
+  `PerformanceHistory.remove_leading_infeasible`,
+  and `PerformanceHistory.shorten`
+  preserve the attributes other than `PerformanceHistory.items`.
 
 ## Version 2.0.0 (December 2023)
 
@@ -266,21 +321,21 @@ and this project adheres to
 #### Benchmarker
 
 - The option to automatically save the logs of pSeven has been removed
-  from classes ``Scenario`` and ``Benchmarker``.
+  from classes `Scenario` and `Benchmarker`.
   However, the user can still save these logs
-  by passing an instance-specific option to ``AlgorithmConfiguration``
+  by passing an instance-specific option to `AlgorithmConfiguration`
   (refer to the "Added" section of the present changelog).
   For example:
-  ``instance_algorithm_options
-  ={"log_path": lambda problem, index: f"my/log/files/{problem.name}.{index}.log"}``.
+  `instance_algorithm_options
+  ={"log_path": lambda problem, index: f"my/log/files/{problem.name}.{index}.log"}`.
   N.B. the user is now responsible for the creation of the parent directories.
-- Class ``Worker`` no longer sets ``PerformanceHistory.doe_size``
-  to the length of the value of the pSeven option ``"sample_x"``.
-  Note that this does not affect the behavior of ``gemseo-benchmark``:
-  ``PerformanceHistory.doe_size`` is only used as convenience
-  when loading/saving a ``PerformanceHistory`` using a file.
-  In particular, the behavior of ``Report`` is not changed.
-  The user can still set the value of ``PerformanceHistory.doe_size``
+- Class `Worker` no longer sets `PerformanceHistory.doe_size`
+  to the length of the value of the pSeven option `"sample_x"`.
+  Note that this does not affect the behavior of `gemseo-benchmark`:
+  `PerformanceHistory.doe_size` is only used as convenience
+  when loading/saving a `PerformanceHistory` using a file.
+  In particular, the behavior of `Report` is not changed.
+  The user can still set the value of `PerformanceHistory.doe_size`
   by themselves since it is a public attribute.
 
 ### Added
@@ -290,11 +345,11 @@ and this project adheres to
 #### Algorithms
 
 - Algorithm options specific to problem instances (e.g. paths for output files)
-  can be passed to ``AlgorithmConfiguration`` in the new argument ``instance_algorithm_options``.
+  can be passed to `AlgorithmConfiguration` in the new argument `instance_algorithm_options`.
 
 #### Benchmarker
 
-- One can get the path to a performance history file with ``Benchmarker.get_history_path``.
+- One can get the path to a performance history file with `Benchmarker.get_history_path`.
 
 ### Removed
 
@@ -307,7 +362,7 @@ and this project adheres to
 #### Results
 
 - The names of functions and the number of variables are stored in the
-    performance history files.
+  performance history files.
 
 #### Report
 
@@ -316,9 +371,9 @@ and this project adheres to
 #### Scenario
 
 - The options `custom_algos_descriptions` and
-    `max_eval_number_per_group` of `Report`{.interpreted-text
-    role="class"} can be passed through `Scenario`{.interpreted-text
-    role="class"}.
+  `max_eval_number_per_group` of `Report`{.interpreted-text
+  role="class"} can be passed through `Scenario`{.interpreted-text
+  role="class"}.
 
 ### Fixed
 
@@ -326,7 +381,7 @@ and this project adheres to
 
 - The sections of the PDF report are correctly numbered.
 - The graphs of the PDF report are anchored to their expected
-    locations.
+  locations.
 
 ## Version 1.0.0 (June 2023)
 

@@ -21,8 +21,15 @@ from collections.abc import Iterable
 from copy import deepcopy
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import Generic
+from typing import NoReturn
+from typing import ParamSpec
+from typing import TypeVar
 
 from gemseo import compute_doe
+from gemseo.algos.doe.base_n_samples_based_doe_settings import (
+    BaseNSamplesBasedDOESettings,
+)
 from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
 from gemseo.utils.metaclasses import ABCGoogleDocstringInheritanceMeta
 from numpy import array
@@ -39,7 +46,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from gemseo.algos.design_space import DesignSpace
-    from gemseo.algos.doe.base_doe_library import DriverLibraryOptionType
+    from gemseo.algos.doe.base_doe_settings import BaseDOESettings
     from gemseo.typing import RealArray
 
     from gemseo_benchmark import ConfigurationPlotOptions
@@ -53,8 +60,16 @@ if TYPE_CHECKING:
 
 InputStartingPointsType = ndarray | Iterable[ndarray]
 
+P = ParamSpec("P")
+"""The signature of the function that creates a problem of a configuration."""
 
-class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
+ProblemT = TypeVar("ProblemT")
+"""The type of the problems created by a problem configuration."""
+
+
+class BaseProblemConfiguration(
+    Generic[P, ProblemT], metaclass=ABCGoogleDocstringInheritanceMeta
+):
     """Base class for problem configurations.
 
     A *problem configuration* is a problem of reference
@@ -69,11 +84,12 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
     (refer to the [target_values module][gemseo_benchmark.data_profiles.target_values]).
     """
 
-    __create_problem: Callable[[], Any]
+    __create_problem: Callable[P, ProblemT]
     """The function to create a problem of the configuration.
-    (ex:
-    an [OptimizationProblem][gemseo.algos.optimization_problem.OptimizationProblem],
-    a [BaseMDA][gemseo.mda.base_mda])."""
+
+    Its arguments and its return type depend on the type of problem configuration:
+    refer to the subclasses.
+    """
 
     __description: str
     """The description of the problem configuration."""
@@ -93,19 +109,16 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
     __target_values: TargetValues | None
     """"The target values to compute data profiles."""
 
-    __variable_space: DesignSpace | None
+    __variable_space: DesignSpace
     """The space of the variables of the problem configuration."""
 
     def __init__(
         self,
         name: str,
-        create_problem: Callable[[], Any],
+        create_problem: Callable[P, ProblemT],
         target_values: TargetValues | None,
-        starting_points: InputStartingPointsType,
         variable_space: DesignSpace,
-        doe_algo_name: str,
-        doe_size: int | None,
-        doe_options: Mapping[str, Any],
+        doe_settings: BaseDOESettings | None,
         description: str,
         optimum: float | None,
         number_of_scalar_constraints: int,
@@ -117,27 +130,21 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
                 !!! warning
                     If multiprocessing is intended when executing
                     algorithm configurations on the problem,
-                    ``create_problem`` has to be pickable.
+                    `create_problem` has to be pickable.
             target_values: The target values of the problem configuration.
-            starting_points: The starting points of the problem configuration.
-                If empty:
-                if ``doe_algo_name`` is not empty
-                then the starting points will be generated as a DOE;
-                otherwise the current value of the optimization problem
-                will be set as the single starting point.
             variable_space: The space of the problem variables.
-            doe_algo_name: The name of the DOE algorithm.
-                If empty and ``starting_points`` is empty,
+            doe_settings: The settings of the DOE algorithm.
+                If `None`,
                 the current point of the variable space
                 is set as the only starting point.
-            doe_size: The number of starting points.
-                If ``None``,
+                If `n_samples` is not set explicitly,
                 this number is set as the problem dimension or 10 if bigger.
-            doe_options: The options of the DOE algorithm.
+                To use custom starting points,
+                pass `CustomDOE_Settings(samples=...)`.
             description: The description of the problem configuration
                 (to appear in a benchmarking report).
             optimum: The best feasible performance measure of the problem configuration.
-                If ``None``, it will not be set.
+                If `None`, it will not be set.
             number_of_scalar_constraints: The number of scalar constraints.
         """  # noqa: D205, D212, D415
         self.__create_problem = create_problem
@@ -150,31 +157,30 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
         self.__target_values = None
         self.__variable_space = variable_space
 
-        if len(starting_points) > 0:
-            self.starting_points = starting_points
-        elif doe_algo_name:
-            self.starting_points = self.__get_starting_points(
-                doe_algo_name, doe_size, doe_options
-            )
+        if doe_settings is None:
+            self.__starting_points = []
+            if self.__variable_space.has_current_value:
+                self.__starting_points.append(self.__variable_space.get_current_value())
         else:
-            default_starting_point = self._get_default_starting_point()
-            if default_starting_point is None:
-                self.starting_points = []
-            else:
-                self.starting_points = [default_starting_point]
+            if (
+                isinstance(doe_settings, BaseNSamplesBasedDOESettings)
+                and "n_samples" not in doe_settings.model_fields_set
+            ):
+                doe_settings.n_samples = min([self.dimension, 10])
+
+            self.starting_points = compute_doe(
+                self.__variable_space, settings_model=doe_settings
+            )
 
         if target_values is not None:
             self.target_values = target_values
 
     @property
-    def create_problem(self) -> Callable[[], Any]:
+    def create_problem(self) -> Callable[P, ProblemT]:
         """The function to create a problem of the configuration.
 
-        The return type of this function depends on the type of the underlying
-        |g| object (ex:
-        [OptimizationProblem][gemseo.algos.optimization_problem.OptimizationProblem],
-        [BaseMDA][gemseo.mda.base_mda]
-        ).
+        The arguments and the return type of this function depend on the type of
+        problem configuration: refer to the subclasses.
         """
         return self.__create_problem
 
@@ -189,8 +195,11 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
         return self.__name
 
     @property
-    def optimum(self) -> float:
-        """The best feasible performance measure known for the problem configuration."""
+    def optimum(self) -> float | None:
+        """The best feasible performance measure known for the problem configuration.
+
+        `None` if it is unknown.
+        """
         return self.__optimum
 
     @property
@@ -272,45 +281,10 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
             )
             raise ValueError(msg)
 
-    def __get_starting_points(
-        self,
-        doe_algo_name: str,
-        doe_size: int | None,
-        doe_options: Mapping[str, DriverLibraryOptionType],
-    ) -> ndarray:
-        """Return the starting points of the problem configuration.
-
-        Args:
-            doe_algo_name: The name of the DOE algorithm.
-            doe_size: The number of starting points.
-                If ``None``, this number is set as the problem dimension or 10 if
-                bigger.
-            doe_options: The options of the DOE algorithm.
-
-        Returns:
-            The starting points.
-        """
-        if doe_size is None:
-            doe_size = min([self.dimension, 10])
-
-        return compute_doe(
-            self.__variable_space,
-            algo_name=doe_algo_name,
-            n_samples=doe_size,
-            **doe_options,
-        )
-
-    def _get_default_starting_point(self) -> RealArray | None:
-        """Return the default starting point of the problem configuration.
-
-        Return:
-            The current value of the design space if it has one,
-            ``None`` otherwise.
-        """
-        if self.__variable_space.has_current_value:
-            return self.__variable_space.get_current_value()
-
-        return None
+    def __raise_target_values_error(self) -> NoReturn:
+        """Raise the error of a problem configuration without target value."""
+        msg = "The problem configuration has no target value."
+        raise ValueError(msg)
 
     @property
     def target_values(self) -> TargetValues:
@@ -320,15 +294,14 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
             ValueError: If the problem configuration has no target value.
         """
         if self.__target_values is None:
-            msg = "The problem configuration has no target value."
-            raise ValueError(msg)
+            self.__raise_target_values_error()
 
         return self.__target_values
 
     @target_values.setter
     def target_values(self, target_values: TargetValues) -> None:
         self.__target_values = target_values
-        self.__set_minimization_target_values()
+        self.__set_minimization_target_values(target_values)
 
     def save_starting_points(self, path: Path) -> None:
         """Save the starting points as a NumPy binary.
@@ -373,7 +346,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
                 If empty, the plot is not saved.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             max_iteration_number: The maximum number of iterations to plot.
-                If ``0``, this value is inferred from the longest history.
+                If `0`, this value is inferred from the longest history.
             plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
             grid_settings: The keyword arguments of `matplotlib.pyplot.grid`.
@@ -405,7 +378,14 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
 
     @property
     def minimization_target_values(self) -> TargetValues:
-        """The target values for the minimization of the performance measure."""
+        """The target values for the minimization of the performance measure.
+
+        Raises:
+            ValueError: If the problem configuration has no target value.
+        """
+        if self.__minimization_target_values is None:
+            self.__raise_target_values_error()
+
         return self.__minimization_target_values
 
     @property
@@ -413,12 +393,16 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
     def minimize_performance_measure(self) -> bool:
         """Whether the performance measure of the problem is to be minimized."""
 
-    def __set_minimization_target_values(self) -> None:
-        """Set the target values for the minimization of the performance measure."""
+    def __set_minimization_target_values(self, target_values: TargetValues) -> None:
+        """Set the target values for the minimization of the performance measure.
+
+        Args:
+            target_values: The target values of the problem configuration.
+        """
         if self.minimize_performance_measure:
-            self.__minimization_target_values = self.__target_values
+            self.__minimization_target_values = target_values
         else:
-            self.__minimization_target_values = deepcopy(self.__target_values)
+            self.__minimization_target_values = deepcopy(target_values)
             self.__minimization_target_values.switch_performance_measure_sign()
 
     @property
@@ -428,7 +412,7 @@ class BaseProblemConfiguration(metaclass=ABCGoogleDocstringInheritanceMeta):
 
     @property
     @abstractmethod
-    def worker(self) -> type[BaseWorker]:
+    def worker(self) -> type[BaseWorker[Any, ProblemT, Any]]:
         """The type of benchmarking worker."""
 
     @property

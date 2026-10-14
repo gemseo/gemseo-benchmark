@@ -111,21 +111,21 @@ class PerformanceHistory(collections.abc.Sequence):
             n_unsatisfied_constraints: The history of the number of unsatisfied
                 constraints.
                 If empty, the entries will be set to 0 for feasible entries
-                and ``None`` for infeasible entries.
+                and `None` for infeasible entries.
             problem_name: The name of the problem.
             objective_name: The name of the objective function.
             constraints_names: The names the scalar constraints.
                 Each name must correspond to a scalar value.
                 If empty, they will not be set.
             doe_size: The size of the initial design of experiments.
-                If ``None``, it will not be set.
+                If `None`, it will not be set.
             total_time: The total time of the optimization, in seconds.
-                If ``None``, it will not be set.
+                If `None`, it will not be set.
             algorithm_configuration: The name of the algorithm which generated the
                 history.
-                If ``None``, it will not be set.
+                If `None`, it will not be set.
             number_of_variables: The number of optimization variables.
-                If ``None``, it will not be set.
+                If `None`, it will not be set.
             elapsed_times: The history of elapsed times.
                 If empty, the elapsed times are set to zero.
             number_of_discipline_executions: The history of the number
@@ -208,7 +208,7 @@ class PerformanceHistory(collections.abc.Sequence):
             n_unsatisfied_constraints: The history of the number of unsatisfied
                 constraints.
                 If empty, the entries will be set to 0 for feasible entries
-                and ``None`` for infeasible entries.
+                and `None` for infeasible entries.
             elapsed_times: The history of elapsed times.
                 If empty, the elapsed times are set to zero.
             number_of_discipline_executions: The history of the number

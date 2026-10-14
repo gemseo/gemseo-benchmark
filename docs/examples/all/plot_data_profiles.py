@@ -13,33 +13,15 @@
 # FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION
 # WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-# Copyright 2021 IRT Saint Exupéry, https://www.irt-saintexupery.com
-#
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU Lesser General Public
-# License version 3 as published by the Free Software Foundation.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program; if not, write to the Free Software Foundation,
-# Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-"""
-Compute data profiles
-=====================
-"""
+"""# Compute data profiles"""
 
 # %%
 # In this example,
 # we compute the **data profiles** of three algorithms configurations
 # based on two reference problems.
 #
-# Imports
-# -------
+# ## Imports
+#
 # We start by making the necessary imports.
 from __future__ import annotations
 
@@ -48,6 +30,9 @@ import tempfile
 from pathlib import Path
 
 from gemseo import configure
+from gemseo.algos.doe.openturns.settings.ot_opt_lhs import OT_OPT_LHS_Settings
+from gemseo.algos.opt.scipy_local.settings.lbfgsb import L_BFGS_B_Settings
+from gemseo.algos.opt.scipy_local.settings.slsqp import SLSQP_Settings
 from gemseo.problems.optimization.rastrigin import Rastrigin
 from gemseo.problems.optimization.rosenbrock import Rosenbrock
 
@@ -63,8 +48,8 @@ from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.scenario import Scenario
 
 # %%
-# Set the algorithms configurations
-# ---------------------------------
+# ## Set the algorithms configurations
+#
 # Let us define the algorithms configurations
 # for which we want to compute data profiles.
 #
@@ -73,9 +58,8 @@ from gemseo_benchmark.scenario import Scenario
 # with a number of Hessian corrections limited to 2.
 # (This option is called `maxcor`.)
 lbfgsb_2_corrections = AlgorithmConfiguration(
-    "L-BFGS-B",
+    L_BFGS_B_Settings(maxcor=2),
     "L-BFGS-B with 2 Hessian corrections",
-    maxcor=2,
 )
 # %%
 # Note:
@@ -86,16 +70,15 @@ lbfgsb_2_corrections = AlgorithmConfiguration(
 # let us consider a different configuration of L-BFGS-B
 # with up to 20 Hessian corrections.
 lbfgsb_20_corrections = AlgorithmConfiguration(
-    "L-BFGS-B",
+    L_BFGS_B_Settings(maxcor=20),
     "L-BFGS-B with 20 Hessian corrections",
-    maxcor=20,
 )
 # %%
 # Additionally,
 # let us choose the SLSQP algorithm,
 # with all its options set to their default values,
 # to compare it against L-BFGS-B.
-slsqp_default = AlgorithmConfiguration("SLSQP")
+slsqp_default = AlgorithmConfiguration(SLSQP_Settings())
 # %%
 # Finally, we gather our selection of algorithms configurations in a group.
 algorithms_configurations = AlgorithmsConfigurations(
@@ -105,8 +88,8 @@ algorithms_configurations = AlgorithmsConfigurations(
     name="Derivative-based algorithms",
 )
 # %%
-# Set the reference problems
-# --------------------------
+# ## Set the reference problems
+#
 # Let us choose two problems already implemented in GEMSEO as references
 # to measure the performances of our selection of algorithms configurations:
 # [Rastrigin][gemseo.problems.optimization.rastrigin.Rastrigin]
@@ -126,16 +109,14 @@ rastrigin = OptimizationProblemConfiguration(
     "Rastrigin",
     Rastrigin,
     optimum=optimum,
-    doe_size=5,
-    doe_algo_name="OT_OPT_LHS",
+    doe_settings=OT_OPT_LHS_Settings(n_samples=5),
     target_values=target_values,
 )
 rosenbrock = OptimizationProblemConfiguration(
     "Rosenbrock",
     Rosenbrock,
     optimum=optimum,
-    doe_size=5,
-    doe_algo_name="OT_OPT_LHS",
+    doe_settings=OT_OPT_LHS_Settings(n_samples=5),
     target_values=target_values,
 )
 # %%
@@ -145,8 +126,8 @@ rosenbrock = OptimizationProblemConfiguration(
 # Finally, we gather our reference problems in a group.
 problems = ProblemsGroup("Reference problems", [rastrigin, rosenbrock])
 # %%
-# Generate the benchmarking results
-# ---------------------------------
+# ## Generate the benchmarking results
+#
 # Now that the algorithms configurations and the reference problems are properly set,
 # we can measure the performances of the former on the latter.
 #
@@ -171,8 +152,8 @@ configure(
 #     as we only intend to compute the data profiles.
 results = scenario.execute([problems], skip_report=True)
 # %%
-# Compute the datas profiles
-# --------------------------
+# ## Compute the datas profiles
+#
 # Now that the performances histories are generated for the reference problems,
 # the data profiles of the algorithms configurations can be computed.
 problems.compute_data_profile(algorithms_configurations, results, show=True)
