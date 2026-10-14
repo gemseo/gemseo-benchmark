@@ -283,7 +283,7 @@ def algorithm_configuration() -> mock.Mock:
         return_value={
             "configuration_name": "SLSQP",
             "algorithm_settings_class": (
-                "gemseo.algos.opt.scipy_local.settings.slsqp.SLSQP_Settings"
+                "gemseo.optimization.scipy_local.settings.slsqp.SLSQP_Settings"
             ),
             "algorithm_settings": {"normalize_design_space": False, "max_iter": 3},
         }

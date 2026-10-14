@@ -59,7 +59,7 @@ def test_to_dict(input_name, output_name, skip_instance_algorithm_options):
     )
     dictionary = algorithm_configuration.to_dict(skip_instance_algorithm_options)
     assert dictionary["algorithm_settings_class"] == (
-        "gemseo.algos.opt.scipy_local.settings.slsqp.SLSQP_Settings"
+        "gemseo.optimization.scipy_local.settings.slsqp.SLSQP_Settings"
     )
     assert dictionary["configuration_name"] == output_name
     assert dictionary["algorithm_settings"] == {"max_iter": 9}
@@ -85,7 +85,7 @@ def test_from_dict():
     algorithm_configuration = AlgorithmConfiguration.from_dict({
         "configuration_name": "SciPy SLSQP",
         "algorithm_settings_class": (
-            "gemseo.algos.opt.scipy_local.settings.slsqp.SLSQP_Settings"
+            "gemseo.optimization.scipy_local.settings.slsqp.SLSQP_Settings"
         ),
         "algorithm_settings": {"max_iter": 9},
         "instance_algorithm_options": {"seed": lambda index: index},
