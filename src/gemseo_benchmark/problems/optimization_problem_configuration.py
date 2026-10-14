@@ -132,7 +132,6 @@ class OptimizationProblemConfiguration(
         """Iterate on the problem instances with respect to the starting points."""
         for starting_point in self.starting_points:
             problem = self.create_problem()
-            # TODO(bump-gemseo): cannot transform: the type of problem.design_space could not be inferred; if it is an instance of ParameterSpace, a current value is a DesignSpace notion; use nominal_value to read the reference point of a space, which is the mean of the distributions here  # noqa: E501
             problem.design_space.set_current_value(starting_point)
             yield problem
 

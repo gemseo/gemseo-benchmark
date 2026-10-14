@@ -122,7 +122,6 @@ class OptimizationWorker(
         hdf_file_path: Path | None,
     ) -> OptimizationProblem:
         problem = problem_configuration.create_problem()
-        # TODO(bump-gemseo): cannot transform: the type of problem.design_space could not be inferred; if it is an instance of ParameterSpace, a current value is a DesignSpace notion; use nominal_value to read the reference point of a space, which is the mean of the distributions here  # noqa: E501
         problem.design_space.set_current_value(starting_point)
         return problem
 
