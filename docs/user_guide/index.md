@@ -121,7 +121,7 @@ For example, we define below problem configurations based on
 -   5 starting points are computed by Latin hypercube sampling (LHS),
 
     ```python
-    from gemseo.algos.doe.openturns.settings.ot_opt_lhs import OT_OPT_LHS_Settings
+    from gemseo.doe import OT_OPT_LHS_Settings
     doe_settings = OT_OPT_LHS_Settings(n_samples=5)
     ```
 
