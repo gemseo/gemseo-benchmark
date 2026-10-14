@@ -178,8 +178,7 @@ class OptimizationProblemConfiguration(
                 execute_algo(
                     instance,
                     "opt",
-                    algo_name=configuration.algorithm_name,
-                    **configuration.algorithm_options,
+                    settings_model=configuration.algorithm_settings,
                 )
                 history = PerformanceHistory.from_problem(instance)
                 self.__targets_generator.add_history(history=history)

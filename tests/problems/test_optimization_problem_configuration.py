@@ -22,19 +22,27 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from typing import Any
+from typing import ClassVar
 from unittest import mock
 
 import pytest
 from gemseo.doe import CustomDOE_Settings
 from gemseo.optimization import OptimizationProblem
+from gemseo.optimization import SLSQP_Settings
 from gemseo.problem.optimization.rosenbrock import Rosenbrock
 from gemseo.space import DesignSpace
 from matplotlib.testing.decorators import image_comparison
 from numpy import array
 from numpy.testing import assert_allclose
 
+from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
+from gemseo_benchmark.algorithms.algorithms_configurations import (
+    AlgorithmsConfigurations,
+)
 from gemseo_benchmark.benchmarker.optimization_worker import OptimizationWorker
 from gemseo_benchmark.data_profiles.target_values import TargetValues
+from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
 from gemseo_benchmark.problems.optimization_problem_configuration import (
     OptimizationProblemConfiguration,
 )
@@ -237,6 +245,29 @@ def test_init_targets_computation(algorithms_configurations, minimize_objective)
         target_values_number=2,
     )
     assert isinstance(problem.target_values, TargetValues)
+
+
+class _ThreeIterationsSLSQPSettings(SLSQP_Settings):
+    """SLSQP settings with three iterations by default."""
+
+    _inherited_field_defaults: ClassVar[dict[str, Any]] = {"max_iter": 3}
+
+
+def test_compute_target_values_settings_defaults() -> None:
+    """Check that the target values use the settings model and its defaults."""
+    problem = OptimizationProblemConfiguration("Rosenbrock", Rosenbrock)
+    configurations = AlgorithmsConfigurations(
+        AlgorithmConfiguration(_ThreeIterationsSLSQPSettings())
+    )
+    add_history = TargetsGenerator.add_history
+    with mock.patch.object(
+        TargetsGenerator, "add_history", autospec=True, side_effect=add_history
+    ) as add_history_mock:
+        problem.compute_target_values(1, configurations)
+
+    histories = [call.kwargs["history"] for call in add_history_mock.call_args_list]
+    assert histories
+    assert all(len(history) == 3 for history in histories)
 
 
 def test_starting_points_non_2d_array(benchmarking_problem):
