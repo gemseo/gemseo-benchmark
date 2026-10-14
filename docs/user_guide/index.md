@@ -96,7 +96,7 @@ sub-package handles the problem configurations, on which the performances
 of the algorithms configurations is to be measured.
 
 A [OptimizationProblemConfiguration][gemseo_benchmark.problems.optimization_problem_configuration.OptimizationProblemConfiguration] contains the mathematical
-definition of the problem, as an [OptimizationProblem][gemseo.algos.optimization_problem.OptimizationProblem], and requires three other features.
+definition of the problem, as an [OptimizationProblem][gemseo.optimization.OptimizationProblem], and requires three other features.
 
 1.  The starting points, from which the algorithms configurations should
     be launched on the problem. Indeed, an algorithm may be quite
@@ -115,8 +115,8 @@ definition of the problem, as an [OptimizationProblem][gemseo.algos.optimization
     directly, or their generation can be configured.
 
 For example, we define below problem configurations based on
-[Rastrigin][gemseo.problems.optimization.rastrigin.Rastrigin] and
-[Rosenbrock][gemseo.problems.optimization.rosenbrock.Rosenbrock] respectively, where
+[Rastrigin][gemseo.problem.optimization.rastrigin.Rastrigin] and
+[Rosenbrock][gemseo.problem.optimization.rosenbrock.Rosenbrock] respectively, where
 
 -   5 starting points are computed by Latin hypercube sampling (LHS),
 
@@ -155,7 +155,7 @@ rosenbrock = OptimizationProblemConfiguration(
 
 Note that the second argument of [OptimizationProblemConfiguration][gemseo_benchmark.problems.optimization_problem_configuration.OptimizationProblemConfiguration] must be callable.
 For example, a five-variables
-problem configuration based on [Rosenbrock][gemseo.problems.optimization.rosenbrock.Rosenbrock] may be defined as follows.
+problem configuration based on [Rosenbrock][gemseo.problem.optimization.rosenbrock.Rosenbrock] may be defined as follows.
 
 ```python
 def create_problem():

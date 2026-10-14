@@ -31,15 +31,16 @@ from unittest import mock
 import pytest
 from gemseo import create_mda
 from gemseo import create_scenario
-from gemseo.algos.design_space import DesignSpace
-from gemseo.algos.doe.custom_doe.settings.custom_doe_settings import CustomDOE_Settings
-from gemseo.algos.opt.scipy_local.settings.slsqp import SLSQP_Settings
-from gemseo.algos.optimization_problem import OptimizationProblem
-from gemseo.disciplines.analytic import AnalyticDiscipline
-from gemseo.mda.jacobi_settings import MDAJacobi_Settings
-from gemseo.problems.optimization.rosenbrock import Rosenbrock
-from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
-from gemseo.utils.testing.pytest_conftest import *  # noqa: F401,F403
+from gemseo.space import DesignSpace
+from gemseo.doe import CustomDOE_Settings
+from gemseo.optimization import SLSQP_Settings
+from gemseo.optimization import OptimizationProblem
+from gemseo.discipline import AnalyticDiscipline
+from gemseo.mda import MDAJacobi_Settings
+from gemseo.problem.optimization.rosenbrock import Rosenbrock
+from gemseo.util.constant import read_only_empty_dict
+# TODO(bump-gemseo): gemseo.utils.testing.pytest_conftest: add syrupy to the test dependencies of the project, as gemseo.util.testing.pytest_conftest imports it  # noqa: E501
+from gemseo.util.testing.pytest_conftest import *  # noqa: F401,F403
 from numpy import array
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -196,8 +197,8 @@ def side_effect(
     infeasibility_tolerance=0.0,
     max_eval_number=None,
     use_log_scale=False,
-    plot_settings=READ_ONLY_EMPTY_DICT,
-    grid_settings=READ_ONLY_EMPTY_DICT,
+    plot_settings=read_only_empty_dict,
+    grid_settings=read_only_empty_dict,
 ):
     """Side effect for the computation of a data profile."""
     shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(file_path))
@@ -252,8 +253,8 @@ def group(problem_a, problem_b) -> mock.Mock:
         plot_path=None,
         infeasibility_tolerance=0.0,
         max_eval_number=None,
-        plot_settings=READ_ONLY_EMPTY_DICT,
-        grid_settings=READ_ONLY_EMPTY_DICT,
+        plot_settings=read_only_empty_dict,
+        grid_settings=read_only_empty_dict,
         use_abscissa_log_scale=False,
     ):
         shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(plot_path))
@@ -403,8 +404,7 @@ def mda_create_problem(
     return create_mda(
         algorithm_configuration.algorithm_name,
         disciplines,
-        **algorithm_configuration.algorithm_options,
-    ), disciplines
+        **algorithm_configuration.algorithm_options), disciplines
 
 
 @pytest.fixture(scope="module")
@@ -449,6 +449,8 @@ def mdo_create_problem(
     scenario = create_scenario(
         disciplines, "y1", variable_space, formulation_name="MDF"
     )
+    # TODO(bump-gemseo): cannot transform: the Settings class is named by algorithm_configuration.algorithm_name, which is not a string literal  # noqa: E501
+    # TODO(bump-gemseo): **kwargs may contain: algo_settings_model -> algorithm_settings  # noqa: E501
     scenario.set_algorithm(
         algo_name=algorithm_configuration.algorithm_name,
         **algorithm_configuration.algorithm_options,

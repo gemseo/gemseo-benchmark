@@ -22,8 +22,8 @@
 from __future__ import annotations
 
 import pytest
-from gemseo.algos.opt.scipy_local.settings.slsqp import SLSQP_Settings
-from gemseo.settings.base_settings import BaseSettings
+from gemseo.optimization import SLSQP_Settings
+from gemseo.util.pydantic import BaseSettings
 from pydantic import Field
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -32,6 +32,7 @@ from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfigu
 class Dummy_Settings(BaseSettings):  # noqa: N801
     """Minimal settings for a fake algorithm used in tests."""
 
+    # TODO(bump-gemseo): read it with the target_class_name property of a settings instance; in a settings class, the value is now derived from the name of the class (X_Settings targets X), so remove the assignment if its value is the name of the class without _Settings, else rename the class to <value>_Settings first, or it would target another class  # noqa: E501
     _TARGET_CLASS_NAME = "Dummy"
 
     max_iter: int = Field(default=100)

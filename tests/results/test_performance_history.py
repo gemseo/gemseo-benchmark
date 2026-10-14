@@ -29,7 +29,7 @@ from unittest import mock
 
 import numpy
 import pytest
-from gemseo.algos.opt.scipy_local.settings.slsqp import SLSQP_Settings
+from gemseo.optimization import SLSQP_Settings
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.results.history_item import HistoryItem

@@ -21,8 +21,8 @@ from typing import TYPE_CHECKING
 from typing import ClassVar
 from typing import Final
 
-from gemseo.core.discipline.discipline import Discipline
-from gemseo.mda.base_mda_solver import BaseMDASolver
+from gemseo.discipline import Discipline
+from gemseo.mda.core.base_solver import BaseMDASolver
 
 from gemseo_benchmark.benchmarker.mda_worker import MDAWorker
 from gemseo_benchmark.problems.base_problem_configuration import (
@@ -33,8 +33,8 @@ from gemseo_benchmark.report.axis_data import DisciplineData
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from gemseo.algos.design_space import DesignSpace
-    from gemseo.algos.doe.base_doe_settings import BaseDOESettings
+    from gemseo.space import DesignSpace
+    from gemseo.doe.core.base_doe_settings import BaseDOESettings
 
     from gemseo_benchmark.algorithms.algorithm_configuration import (
         AlgorithmConfiguration,

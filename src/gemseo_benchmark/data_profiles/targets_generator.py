@@ -25,7 +25,7 @@ from typing import TYPE_CHECKING
 from typing import Final
 
 import matplotlib.pyplot as plt
-from gemseo.utils.matplotlib_figure import save_show_figure
+from gemseo.util.matplotlib_figure import save_show_figure
 from matplotlib.ticker import MaxNLocator
 from numpy import linspace
 

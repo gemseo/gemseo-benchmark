@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Final
 
-from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
+from gemseo.util.constant import read_only_empty_dict
 
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
@@ -93,7 +93,7 @@ class Scenario:
         directory_path: Path | None = None,
         plot_only_median: bool = False,
         use_abscissa_log_scale: bool = False,
-        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = read_only_empty_dict,
         raise_errors: bool = False,
     ) -> Results:
         """Execute the benchmarking scenario.
@@ -260,7 +260,7 @@ class Scenario:
         directory_path: Path | None = None,
         plot_only_median: bool = False,
         use_abscissa_log_scale: bool = False,
-        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = read_only_empty_dict,
     ) -> None:
         """Generate the benchmarking report.
 

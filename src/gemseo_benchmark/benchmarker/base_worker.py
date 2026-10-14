@@ -29,16 +29,15 @@ from typing import Any
 from typing import Generic
 from typing import TypeVar
 
-from gemseo import LOGGER as GEMSEO_LOGGER
-from gemseo.utils.metaclasses import ABCGoogleDocstringInheritanceMeta
-from gemseo.utils.timer import Timer
+from gemseo import logger as GEMSEO_LOGGER  # noqa: N812
+from gemseo.util.metaclass import ABCGoogleDocstringInheritanceMeta
+from gemseo.util.timer import Timer
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from pathlib import Path
-
-    from gemseo.algos.base_algo_factory import BaseAlgoFactory
-    from gemseo.typing import RealArray
+    from gemseo.core.algorithm.base_algorithm_factory import BaseAlgorithmFactory
+    from gemseo.util.typing import RealArray
 
     from gemseo_benchmark.algorithms.algorithm_configuration import (
         AlgorithmConfiguration,
@@ -69,7 +68,7 @@ class BaseWorker(
 
     @property
     @abstractmethod
-    def _algorithm_factory() -> BaseAlgoFactory:
+    def _algorithm_factory() -> BaseAlgorithmFactory:
         """The algorithm factory."""
 
     @classmethod

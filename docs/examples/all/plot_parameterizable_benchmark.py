@@ -31,10 +31,10 @@ import tempfile
 from pathlib import Path
 
 from gemseo import configuration
-from gemseo.algos.doe.openturns.settings.ot_opt_lhs import OT_OPT_LHS_Settings
-from gemseo.algos.opt.scipy_local.settings.lbfgsb import L_BFGS_B_Settings
-from gemseo.algos.opt.scipy_local.settings.slsqp import SLSQP_Settings
-from gemseo.problems.optimization.rosenbrock import Rosenbrock
+from gemseo.doe import OT_OPT_LHS_Settings
+from gemseo.optimization import L_BFGS_B_Settings
+from gemseo.optimization import SLSQP_Settings
+from gemseo.problem.optimization.rosenbrock import Rosenbrock
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.algorithms.algorithms_configurations import (
@@ -49,7 +49,7 @@ from gemseo_benchmark.scenario import Scenario
 
 # %%
 # We use the fast logging configuration of GEMSEO.
-configuration.fast = True
+configuration.enable_fast_mode()
 
 
 # %%

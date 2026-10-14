@@ -29,8 +29,8 @@ from typing import Final
 import matplotlib.pyplot
 import numpy
 import pandas
-from gemseo.utils.matplotlib_figure import save_show_figure
-from gemseo.utils.string_tools import pretty_str
+from gemseo.util.matplotlib_figure import save_show_figure
+from gemseo.util.string import pretty_str
 from matplotlib.ticker import MaxNLocator
 
 from gemseo_benchmark import _get_configuration_plot_options

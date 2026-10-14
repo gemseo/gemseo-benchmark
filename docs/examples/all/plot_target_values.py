@@ -25,10 +25,9 @@
 # We start by making the necessary imports.
 from __future__ import annotations
 
-from gemseo import compute_doe
-from gemseo import configure
-from gemseo.algos.opt.nlopt.settings.nlopt_cobyla_settings import NLOPT_COBYLA_Settings
-from gemseo.problems.optimization.power_2 import Power2
+from gemseo import configuration, compute_doe
+from gemseo.optimization import NLOPT_COBYLA_Settings
+from gemseo.problem.optimization.power_2 import Power2
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.algorithms.algorithms_configurations import (
@@ -40,7 +39,7 @@ from gemseo_benchmark.problems.optimization_problem_configuration import (
 
 # %%
 # Let us consider the optimization problem
-# [Power2][gemseo.problems.optimization.power_2.Power2]
+# [Power2][gemseo.problem.optimization.power_2.Power2]
 # already implemented in GEMSEO.
 problem = OptimizationProblemConfiguration(
     "Power2", Power2, optimum=Power2.get_solution()[1]
@@ -69,11 +68,8 @@ algorithms_configurations = AlgorithmsConfigurations(
 # %%
 # Here we choose to deactivate the functions counters, progress bars and bounds check
 # of GEMSEO to accelerate the script.
-configure(
-    enable_function_statistics=False,
-    enable_progress_bar=False,
-    check_desvars_bounds=False,
-)
+configuration.enable_progress_bar = False
+configuration.check_desvars_bounds = False
 # %%
 # Let us compute five target values for the problem.
 # This automatic procedure has two stages:

@@ -20,10 +20,11 @@ import logging
 from pathlib import Path
 
 import pytest
-from gemseo.algos.opt.factory import OptimizationLibraryFactory
-from gemseo.algos.optimization_problem import OptimizationProblem
-from gemseo.utils.testing.pytest_conftest import tmp_wd  # noqa: F401
-from gemseo.utils.timer import Timer
+from gemseo.optimization.factory import OptimizationLibraryFactory
+from gemseo.optimization import OptimizationProblem
+# TODO(bump-gemseo): gemseo.utils.testing.pytest_conftest: add syrupy to the test dependencies of the project, as gemseo.util.testing.pytest_conftest imports it  # noqa: E501
+from gemseo.util.testing.pytest_conftest import tmp_wd  # noqa: F401
+from gemseo.util.timer import Timer
 from numpy.testing import assert_equal
 
 from gemseo_benchmark.benchmarker.optimization_worker import OptimizationWorker
@@ -60,6 +61,7 @@ def test_execution(
     gemseo_log_path = Path("gemseo.log") if save_gemseo_log else None
     performance_history_path = Path("performance_history.json")
     hdf_file_path = Path("database.h5") if save_data else None
+    # TODO(bump-gemseo): cannot transform: the type of rosenbrock.create_problem().design_space could not be inferred; if it is an instance of ParameterSpace, get_lower_bounds was removed  # noqa: E501
     OptimizationWorker().execute(
         algorithm_configuration,
         rosenbrock,
@@ -99,6 +101,7 @@ def test_execution(
 
 def test_get_problem(algorithm_configuration, rosenbrock) -> None:
     """Check the problem getter."""
+    # TODO(bump-gemseo): cannot transform: the type of rosenbrock.create_problem().design_space could not be inferred; if it is an instance of ParameterSpace, get_lower_bounds was removed  # noqa: E501
     starting_point = rosenbrock.create_problem().design_space.get_lower_bounds()
     problem = OptimizationWorker()._get_problem(
         algorithm_configuration, rosenbrock, starting_point, None
@@ -110,6 +113,7 @@ def test_get_problem(algorithm_configuration, rosenbrock) -> None:
 def test_execute(algorithm_configuration, rosenbrock) -> None:
     """Check the execution of the benchmarking worker."""
     problem = rosenbrock.create_problem()
+    # TODO(bump-gemseo): cannot transform: the type of problem.design_space could not be inferred; if it is an instance of ParameterSpace, get_lower_bounds was removed  # noqa: E501
     starting_point = problem.design_space.get_lower_bounds()
     assert problem.solution is None
     OptimizationWorker()._execute(
@@ -121,6 +125,7 @@ def test_execute(algorithm_configuration, rosenbrock) -> None:
 def test_create_performance_history(algorithm_configuration, rosenbrock) -> None:
     """Check the creation of the performance history."""
     problem = rosenbrock.create_problem()
+    # TODO(bump-gemseo): cannot transform: the type of problem could not be inferred; if it is an instance of EvaluationProblem, use bind_functions to bind the functions to the database and the counters, and create_working_problem to derive a problem whose functions work in the coordinates an algorithm manipulates  # noqa: E501
     problem.preprocess_functions()
     with Timer() as timer:
         values, _ = problem.evaluate_functions()

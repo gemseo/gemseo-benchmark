@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from gemseo.core.discipline.base_discipline import CacheType
+from gemseo.enum import CacheType
 from gemseo.mda.factory import MDAFactory
 
 from gemseo_benchmark.benchmarker._metrics import DisciplineExecutions
@@ -30,8 +30,8 @@ from gemseo_benchmark.results.performance_history import PerformanceHistory
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from gemseo.typing import RealArray
-    from gemseo.utils.timer import Timer
+    from gemseo.util.typing import RealArray
+    from gemseo.util.timer import Timer
 
     from gemseo_benchmark.algorithms.algorithm_configuration import (
         AlgorithmConfiguration,
@@ -72,9 +72,9 @@ class MDAWorker(
     ) -> tuple[ElapsedTime, DisciplineExecutions]:
         mda_solver = problem[0]
         elapsed_time = ElapsedTime()
-        mda_solver.add_iteration_callback(elapsed_time.add_metrics)
+        mda_solver.add_iteration_listener(elapsed_time.add_metrics)
         discipline_executions = DisciplineExecutions(problem[1])
-        mda_solver.add_iteration_callback(discipline_executions.add_metrics)
+        mda_solver.add_iteration_listener(discipline_executions.add_metrics)
         return elapsed_time, discipline_executions
 
     @staticmethod

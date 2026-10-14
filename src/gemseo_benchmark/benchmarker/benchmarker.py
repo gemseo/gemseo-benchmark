@@ -27,7 +27,7 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import TYPE_CHECKING
 from typing import Any
 
-from gemseo import LOGGER as GEMSEO_LOGGER
+from gemseo import logger as GEMSEO_LOGGER  # noqa: N812
 
 from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration

@@ -21,7 +21,7 @@ from typing import TYPE_CHECKING
 from typing import ClassVar
 
 import numpy
-from gemseo.utils.metaclasses import ABCGoogleDocstringInheritanceMeta
+from gemseo.util.metaclass import ABCGoogleDocstringInheritanceMeta
 
 if TYPE_CHECKING:
     from collections.abc import Mapping

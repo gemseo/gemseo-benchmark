@@ -25,8 +25,8 @@ from typing import TYPE_CHECKING
 
 import matplotlib
 import matplotlib.pyplot as plt
-from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
-from gemseo.utils.matplotlib_figure import save_show_figure
+from gemseo.util.constant import read_only_empty_dict
+from gemseo.util.matplotlib_figure import save_show_figure
 from numpy import array
 from numpy import linspace
 from numpy import zeros
@@ -147,8 +147,8 @@ class DataProfile:
         show: bool = True,
         file_path: str | Path = "",
         markevery: MarkeveryType | None = None,
-        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
-        grid_settings: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = read_only_empty_dict,
+        grid_settings: Mapping[str, str] = read_only_empty_dict,
         use_abscissa_log_scale: bool = False,
     ) -> None:
         """Plot the data profiles of the required algorithms.
@@ -267,8 +267,8 @@ class DataProfile:
     @staticmethod
     def _plot_data_profiles(
         data_profiles: Mapping[str, Sequence[Number]],
-        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
-        grid_settings: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = read_only_empty_dict,
+        grid_settings: Mapping[str, str] = read_only_empty_dict,
         use_abscissa_log_scale: bool = False,
     ) -> Figure:
         """Plot the data profiles.

@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from typing import Any
 
     from gemseo.core.base_factory import BaseFactory
-    from gemseo.utils.timer import Timer
+    from gemseo.util.timer import Timer
 
     from gemseo_benchmark.algorithms.algorithm_configuration import (
         AlgorithmConfiguration,

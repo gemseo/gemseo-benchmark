@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
+from gemseo.util.constant import read_only_empty_dict
 
 from gemseo_benchmark.data_profiles.data_profile import DataProfile
 from gemseo_benchmark.results.performance_history import PerformanceHistory
@@ -103,8 +103,8 @@ class ProblemsGroup:
         plot_path: str | Path = "",
         infeasibility_tolerance: float = 0.0,
         max_eval_number: int = 0,
-        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
-        grid_settings: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = read_only_empty_dict,
+        grid_settings: Mapping[str, str] = read_only_empty_dict,
         use_abscissa_log_scale: bool = False,
     ) -> None:
         """Generate the data profiles of given algorithms relative to the problems.

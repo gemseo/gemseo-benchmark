@@ -30,10 +30,10 @@ from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
-from gemseo.algos.opt.scipy_local.settings.lbfgsb import L_BFGS_B_Settings
-from gemseo.algos.opt.scipy_local.settings.tnc import TNC_Settings
-from gemseo.problems.optimization.power_2 import Power2
-from gemseo.utils.platform import PLATFORM_IS_WINDOWS
+from gemseo.optimization import L_BFGS_B_Settings
+from gemseo.optimization import TNC_Settings
+from gemseo.problem.optimization.power_2 import Power2
+from gemseo.util.platform import platform_is_windows
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.algorithms.algorithms_configurations import (
@@ -351,7 +351,7 @@ def test_log_to_file(
             for line in reference2.read().split("\n"):
                 assert line in file_contents
     else:
-        if PLATFORM_IS_WINDOWS:
+        if platform_is_windows:
             # FIXME: Support logging to file when multiprocessing on Windows.
             return
 
