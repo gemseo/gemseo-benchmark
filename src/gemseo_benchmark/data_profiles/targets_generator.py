@@ -57,7 +57,7 @@ class TargetsGenerator:
     __histories: PerformanceHistories
     """A collection of performance histories."""
 
-    def __init__(self) -> None:  # noqa: D107
+    def __init__(self) -> None:  # ruff: ignore[undocumented-public-init]
         self.__histories = PerformanceHistories()
 
     def add_history(

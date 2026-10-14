@@ -167,7 +167,7 @@ class Figures:
                 If 0, all the evaluations are displayed.
             plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self.__algorithm_configurations = algorithm_configurations
         self.__directory_path = directory_path
         self.__group = group

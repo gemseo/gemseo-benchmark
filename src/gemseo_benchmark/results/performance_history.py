@@ -134,7 +134,7 @@ class PerformanceHistory(collections.abc.Sequence):
 
         Raises:
             ValueError: If the lengths of the histories do not match.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self._constraints_names = constraints_names
         self._objective_name = objective_name
         self.algorithm_configuration = algorithm_configuration

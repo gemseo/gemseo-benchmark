@@ -136,7 +136,7 @@ class Report:
 
         Raises:
             ValueError: If an algorithm has no associated histories.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self.__plot_settings = plot_settings
         self.__root_directory = Path(root_directory_path)
         self.__docs_directory = self.__root_directory / "docs"

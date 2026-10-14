@@ -58,7 +58,7 @@ def test_plot_save(tmp_path, converter):
 
     Args:
         converter: The Path converter.
-    """  # noqa: D417
+    """  # ruff: ignore[undocumented-param]
     targets = TargetValues([-2.0, 1.0, -1.0], [1.0, 0.0, 0.0])
     path = tmp_path / "targets.png"
     targets.plot(show=False, file_path=converter(path))

@@ -71,7 +71,7 @@ class ElapsedTime(BaseMetrics):
         """
         Args:
             timer: The timer of the execution.
-        """  # noqa: D205, D212
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line]
         start_datetime = timer.entering_timestamp
         return [end_datetime - start_datetime for end_datetime in self._metrics]
 
@@ -83,7 +83,7 @@ class DisciplineExecutions(BaseMetrics):
         """
         Args:
             disciplines: The disciplines.
-        """  # noqa: D205, D212
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line]
         configuration.enable_discipline_statistics = True
         super().__init__()
         self.__disciplines = disciplines

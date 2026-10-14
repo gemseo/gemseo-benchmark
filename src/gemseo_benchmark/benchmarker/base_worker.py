@@ -29,7 +29,7 @@ from typing import Any
 from typing import Generic
 from typing import TypeVar
 
-from gemseo import logger as GEMSEO_LOGGER  # noqa: N812
+from gemseo import logger as GEMSEO_LOGGER  # ruff: ignore[lowercase-imported-as-non-lowercase]
 from gemseo.util.metaclass import ABCGoogleDocstringInheritanceMeta
 from gemseo.util.timer import Timer
 

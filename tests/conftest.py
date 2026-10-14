@@ -39,7 +39,7 @@ from gemseo.optimization import SLSQP_Settings
 from gemseo.problem.optimization.rosenbrock import Rosenbrock
 from gemseo.space import DesignSpace
 from gemseo.util.constant import read_only_empty_dict
-from gemseo.util.testing.pytest_conftest import *  # noqa: F401,F403
+from gemseo.util.testing.pytest_conftest import *  # ruff: ignore[unused-import, undefined-local-with-import-star]
 from numpy import array
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration

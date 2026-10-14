@@ -97,7 +97,7 @@ class OptimizationProblemConfiguration(
                 If `None`, the target values will not be computed.
                 N.B. the number of target values shall be the same for all the
                 problem configurations of a same group.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self.__optimization_problem = create_problem()
         super().__init__(
             name,

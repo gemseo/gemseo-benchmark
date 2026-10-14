@@ -63,7 +63,7 @@ class Scenario:
 
         Raises:
             ValueError: If the path to outputs directory does not exist.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         if not Path(outputs_path).is_dir():
             msg = f"The path to the outputs directory does not exist: {outputs_path}."
             raise NotADirectoryError(msg)
