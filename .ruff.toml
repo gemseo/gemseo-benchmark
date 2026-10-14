@@ -117,7 +117,7 @@ runtime-evaluated-base-classes = [
     "gemseo.mda.core.base_solver_settings.BaseMDASolverSettings",
     "gemseo.machine_learning.core.model.base_unsupervised_settings.BaseMLUnsupervisedModelSettings",
     "gemseo.machine_learning.regression.core.base_regressor_settings.BaseRegressorSettings",
-    "gemseo.machine_learning.regression.model.linreg_settings.LinearRegressorSettings",
+    "gemseo.machine_learning.regression.model.linreg_settings.LinearRegressor_Settings",
     "gemseo.post.core.base_post_settings.BasePostSettings",
     "gemseo.uncertainty.distribution.core.base_settings.BaseDistributionSettings",
     "gemseo.uncertainty.distribution.core.base_univariate_settings.weibull.BaseWeibullDistributionSettings",
@@ -131,7 +131,7 @@ runtime-evaluated-base-classes = [
     "gemseo.optimization.augmented_lagrangian.settings.base.BaseAugmentedLagrangianSettings",
     "gemseo.optimization.core.base_milp_settings.BaseMILPSettings",
     "gemseo.optimization.core.base_gradient_based_algorithm_settings.BaseGradientBasedAlgorithmSettings",
-    "gemseo.optimization.scipy_milp.settings.scipy_milp_settings.SciPyMILPSettings",
+    "gemseo.optimization.scipy_milp.settings.scipy_milp_settings.MILP_Settings",
 ]
 
 [lint.isort]
