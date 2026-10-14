@@ -37,21 +37,21 @@ cycler==0.12.1
     # via matplotlib
 dill==0.4.1
     # via openturns
-docstring-inheritance==2.2.2
+docstring-inheritance==3.0.0
     # via gemseo
 et-xmlfile==2.0.0
     # via openpyxl
-fastjsonschema==2.21.2
+fastjsonschema==2.22.2
     # via gemseo
 fieldz==0.2.0
     # via griffe-fieldz
-fonttools==4.67.0
+fonttools==4.66.1
     # via
     #   matplotlib
     #   weasyprint
-gemseo==6.3.3
+gemseo @ git+https://gitlab.com/gemseo/dev/gemseo.git@64eed1eb158964eb2f9f72fa55cb078c06338f78
     # via gemseo-benchmark (pyproject.toml)
-genson==1.3.0
+genson==1.4.0
     # via gemseo
 ghp-import==2.1.0
     # via
@@ -68,7 +68,7 @@ griffelib==2.3.2
     #   griffe-fieldz
     #   griffe-inherited-docstrings
     #   mkdocstrings-python
-h5py==3.14.0
+h5py==3.16.0
     # via gemseo
 idna==3.20
     # via requests
@@ -98,7 +98,7 @@ markdown==3.11.1
     #   mkdocstrings
     #   properdocs
     #   pymdown-extensions
-markdown-exec==1.12.5
+markdown-exec==1.12.4
     # via gemseo-benchmark (pyproject.toml:doc)
 markupsafe==3.0.4
     # via
@@ -108,8 +108,9 @@ markupsafe==3.0.4
     #   mkdocs-autorefs
     #   mkdocstrings
     #   properdocs
-matplotlib==3.10.6
+matplotlib==3.10.9
     # via
+    #   -c requirements/test-constraints.in
     #   gemseo-benchmark (pyproject.toml)
     #   gemseo
 mergedeep==1.3.4
@@ -118,7 +119,7 @@ mergedeep==1.3.4
     #   mkdocs-get-deps
 mike==2.2.0
     # via gemseo-benchmark (pyproject.toml:doc)
-minisom==2.3.5
+minisom==2.3.6
     # via gemseo
 mkdocs==1.6.1
     # via
@@ -171,12 +172,14 @@ mpmath==1.3.0
 mypy-extensions==1.1.0
     # via black
 narwhals==2.27.1
-    # via plotly
-networkx==3.5
+    # via
+    #   plotly
+    #   scikit-learn
+networkx==3.7
     # via gemseo
-nlopt==2.9.1
+nlopt==2.11.0
     # via gemseo
-numpy==2.3.3
+numpy==2.4.6
     # via
     #   gemseo-benchmark (pyproject.toml)
     #   contourpy
@@ -185,16 +188,16 @@ numpy==2.3.3
     #   matplotlib
     #   nlopt
     #   pandas
-    #   pydoe3
+    #   pydoe
     #   pyxdsm
     #   scikit-learn
     #   scipy
     #   spgl1
 openpyxl==3.1.5
     # via gemseo
-openturns==1.25
+openturns==1.27.post1
     # via gemseo
-packaging==25.0
+packaging==26.3
     # via
     #   black
     #   gemseo
@@ -205,7 +208,7 @@ packaging==25.0
     #   properdocs
 paginate==0.5.7
     # via mkdocs-material
-pandas==2.3.2
+pandas==2.3.3
     # via gemseo
 pathspec==1.1.1
     # via
@@ -222,9 +225,9 @@ platformdirs==4.13.0
     #   black
     #   mkdocs-get-deps
     #   properdocs
-plotly==6.3.0
+plotly==6.9.0
     # via gemseo
-prettytable==3.16.0
+prettytable==3.18.0
     # via gemseo
 properdocs==1.6.7
     # via
@@ -238,17 +241,17 @@ pybtex==0.26.1
     # via mkdocs-bibtex
 pycparser==3.11
     # via cffi
-pydantic==2.11.9
+pydantic==2.13.5
     # via
     #   gemseo
     #   pydantic-settings
-pydantic-core==2.33.2
+pydantic-core==2.46.5
     # via pydantic
-pydantic-settings==2.11.0
+pydantic-settings==2.15.0
     # via gemseo
-pydoe3==1.4.0
+pydoe==1.5.0
     # via gemseo
-pydyf==0.13.0
+pydyf==0.12.1
     # via
     #   mkdocs-to-pdf
     #   weasyprint
@@ -284,10 +287,11 @@ pytokens==0.4.1
     # via black
 pytz==2026.5
     # via pandas
-pyxdsm==2.3.1
+pyxdsm==2.3.2
     # via gemseo
 pyyaml==6.0.3
     # via
+    #   gemseo
     #   mike
     #   mkdocs
     #   mkdocs-get-deps
@@ -311,12 +315,12 @@ requests==2.34.2
     #   responses
 responses==0.26.3
     # via mkdocs-bibtex
-scikit-learn==1.7.2
+scikit-learn==1.9.1
     # via gemseo
-scipy==1.15.2
+scipy==1.17.1
     # via
     #   gemseo
-    #   pydoe3
+    #   pydoe
     #   scikit-learn
     #   spgl1
 setuptools==84.0.0
@@ -326,8 +330,6 @@ six==1.17.0
 soupsieve==3.0.3
     # via beautifulsoup4
 spgl1==0.0.3
-    # via gemseo
-strenum==0.4.15
     # via gemseo
 sympy==1.14.0
     # via gemseo
@@ -339,15 +341,15 @@ tinycss2==1.5.1
     #   weasyprint
 tinyhtml5==2.1.0
     # via weasyprint
-tqdm==4.67.1
+tqdm==4.70.1
     # via
     #   gemseo
     #   mkdocs-gallery
 typing-extensions==4.16.0
     # via
     #   beautifulsoup4
+    #   docstring-inheritance
     #   fieldz
-    #   gemseo
     #   pydantic
     #   pydantic-core
     #   typing-inspection
@@ -380,9 +382,9 @@ webencodings==0.6.1
     #   cssselect2
     #   tinycss2
     #   tinyhtml5
-xdsmjs==2.0.0
+xdsmjs==2.1.0
     # via gemseo
-xxhash==3.5.0
+xxhash==3.7.1
     # via gemseo
 zopfli==0.4.3
     # via fonttools
