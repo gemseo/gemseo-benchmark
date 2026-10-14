@@ -448,12 +448,7 @@ def mdo_create_problem(
     scenario = create_scenario(
         disciplines, "y1", variable_space, formulation_name="MDF"
     )
-    # TODO(bump-gemseo): cannot transform: the Settings class is named by algorithm_configuration.algorithm_name, which is not a string literal  # noqa: E501
-    # TODO(bump-gemseo): **kwargs may contain: algo_settings_model -> algorithm_settings  # noqa: E501
-    scenario.set_algorithm(
-        algo_name=algorithm_configuration.algorithm_name,
-        **algorithm_configuration.algorithm_options,
-    )
+    scenario.set_algorithm(algorithm_configuration.algorithm_settings)
     return scenario, disciplines
 
 
