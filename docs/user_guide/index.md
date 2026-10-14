@@ -40,40 +40,44 @@ configurations to be investigated in a benchmarking study.
 
 An [AlgorithmConfiguration][gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration] contains:
 
--   the name of an algorithm,
+-   the settings of an algorithm,
+    as an instance of its GEMSEO settings class
+    (default values are used for the unspecified settings),
 -   optionally, a name for the configuration (it will be generated
-    automatically if unspecified),
--   the values passed as its options (default values are used for the
-    unspecified options).
+    automatically if unspecified).
 
 For example, we may consider the L-BFGS-B algorithm with its `maxcor`
-option (the maximum number of corrections of the Hessian approximation)
+setting (the maximum number of corrections of the Hessian approximation)
 set to 2.
 
 ```python
+from gemseo.optimization import L_BFGS_B_Settings
+
+from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
+
 lbfgsb_2_corrections = AlgorithmConfiguration(
-   "L-BFGS-B",
+   L_BFGS_B_Settings(maxcor=2),
    "L-BFGS-B with 2 Hessian corrections",
-   maxcor=2,
 )
 ```
 
-Additionally, we may consider the same algorithm with a different option
+Additionally, we may consider the same algorithm with a different setting
 value, say 20.
 
 ```python
 lbfgsb_20_corrections = AlgorithmConfiguration(
-   "L-BFGS-B",
+   L_BFGS_B_Settings(maxcor=20),
    "L-BFGS-B with 20 Hessian corrections",
-   maxcor=20,
 )
 ```
 
 Of course it is also possible to consider an algorithm with all its
-options set to their default values.
+settings set to their default values.
 
 ```python
-slsqp_default = AlgorithmConfiguration("SLSQP")
+from gemseo.optimization import SLSQP_Settings
+
+slsqp_default = AlgorithmConfiguration(SLSQP_Settings())
 ```
 
 The class [AlgorithmsConfigurations][gemseo_benchmark.algorithms.algorithms_configurations.AlgorithmsConfigurations]
@@ -82,6 +86,10 @@ useful to gather algorithms configurations in groups so that they be
 treated together in a [benchmarking report](#report).
 
 ```python
+from gemseo_benchmark.algorithms.algorithms_configurations import (
+    AlgorithmsConfigurations,
+)
+
 lbfgsb_configurations = AlgorithmsConfigurations(
     lbfgsb_2_corrections,
     lbfgsb_20_corrections,

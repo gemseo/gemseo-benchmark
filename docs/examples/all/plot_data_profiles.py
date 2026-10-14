@@ -137,11 +137,10 @@ problems = ProblemsGroup("Reference problems", [rastrigin, rosenbrock])
 scenario_dir = Path(tempfile.mkdtemp())
 scenario = Scenario([algorithms_configurations], scenario_dir)
 # %%
-# Here we choose to deactivate the functions counters, progress bars and bounds check
-# of GEMSEO to accelerate the script.
-configuration.enable_function_statistics = False
+# Here we use the fast mode of GEMSEO and deactivate its progress bars
+# to accelerate the script.
+configuration.enable_fast_mode()
 configuration.enable_progress_bar = False
-configuration.check_desvars_bounds = False
 # %%
 # Let us execute the benchmarking scenario on our group of reference problems.
 #

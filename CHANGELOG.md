@@ -49,11 +49,13 @@ and this project adheres to
 - The minimum Python version is 3.11.
 - The names of the algorithms are those of GEMSEO 7,
   e.g. `L_BFGS_B` instead of `L-BFGS-B`;
-  they name the algorithm configurations created from settings,
+  they name the algorithm configurations created from settings
+  without a configuration name,
   the results directories and the log files;
-  so the results of such algorithm configurations
-  produced with an earlier version are not found:
-  their executions run again.
+  so, when the name of its algorithm changed,
+  the results of such an algorithm configuration
+  produced with an earlier version are not found
+  and its executions run again.
 - When executions of a benchmarking raise exceptions,
   `Benchmarker.execute` and `Scenario.execute` log the failures
   at the `ERROR` level, with their traceback, once all the executions are over,
