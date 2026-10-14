@@ -45,7 +45,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         """
         Args:
             *histories: The performance histories.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self.__histories = list(histories)
 
     def __getitem__(self, index: int) -> PerformanceHistory:

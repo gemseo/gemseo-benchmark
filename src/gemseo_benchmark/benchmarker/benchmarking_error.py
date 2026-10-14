@@ -47,7 +47,7 @@ class BenchmarkingError(Exception):
             exceptions: The exceptions raised by the executions,
                 bound to the description of each.
             number_of_executions: The number of executions.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self.exceptions = exceptions
         self.number_of_executions = number_of_executions
         message = (

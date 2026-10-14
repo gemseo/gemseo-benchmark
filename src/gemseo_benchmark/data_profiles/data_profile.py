@@ -71,7 +71,7 @@ class DataProfile:
         """
         Args:
             target_values: The target values of each of the reference problems.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self.__targets_number = 0
         self.target_values = target_values
         self.__values_histories = {}

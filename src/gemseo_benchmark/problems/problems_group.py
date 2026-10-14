@@ -68,7 +68,7 @@ class ProblemsGroup:
             name: The name of the group of problem configurations.
             problems: The problem configurations of the group.
             description: The description of the group of problem configurations.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self.name = name
         self.__problems = problems
         self.description = description

@@ -73,7 +73,7 @@ class OptimizationWorker(
         """
         try:
             problem = problem_configuration.create_problem()
-        except Exception as error:  # noqa: BLE001
+        except Exception as error:  # ruff: ignore[blind-except]
             LOGGER.warning(
                 "The suitability of the algorithms to the problem configuration %r "
                 "is not checked, as the problem cannot be created: %s",
@@ -90,7 +90,7 @@ class OptimizationWorker(
             )
             description = library_class.ALGORITHM_INFOS[algorithm_name]
             # There is no public accessor to the reason in GEMSEO.
-            reason = library_class._get_unsuitability_reason(  # noqa: SLF001
+            reason = library_class._get_unsuitability_reason(  # ruff: ignore[private-member-access]
                 description, problem
             )
             if reason:

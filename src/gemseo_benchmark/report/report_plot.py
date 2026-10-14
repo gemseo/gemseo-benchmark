@@ -58,7 +58,7 @@ class ReportPlot(metaclass=ABCGoogleDocstringInheritanceMeta):
                 (Refer to the Matplotlib documentation.)
             matplotlib_log_scale: The Matplotlib value for logarithmic scale.
             time_formatter: The formatter for time tick labels.
-        """  # noqa: D205, D212
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line]
         self._alpha = alpha
         self._grid_kwargs = grid_kwargs
         self._matplotlib_log_scale = matplotlib_log_scale

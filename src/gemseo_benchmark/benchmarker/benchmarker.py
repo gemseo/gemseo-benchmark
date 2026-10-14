@@ -27,7 +27,7 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import TYPE_CHECKING
 from typing import Any
 
-from gemseo import logger as GEMSEO_LOGGER  # noqa: N812
+from gemseo import logger as GEMSEO_LOGGER  # ruff: ignore[lowercase-imported-as-non-lowercase]
 
 from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -83,7 +83,7 @@ class Benchmarker:
                 If `None`, no performance history path will be saved.
             hdf_path: The path to the destination directory for the HDF files.
                 If `None`, no HDF file will be saved.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self.__hdf_path = hdf_path
         self.__histories_path = histories_path
         self.__results_path = results_path

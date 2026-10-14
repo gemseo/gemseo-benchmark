@@ -29,7 +29,7 @@ from pydantic import Field
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 
 
-class Dummy_Settings(BaseSettings):  # noqa: N801
+class Dummy_Settings(BaseSettings):  # ruff: ignore[invalid-class-name]
     """Minimal settings for a fake algorithm used in tests."""
 
     max_iter: int = Field(default=100)

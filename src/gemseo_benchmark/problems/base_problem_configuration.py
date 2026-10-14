@@ -146,7 +146,7 @@ class BaseProblemConfiguration(
             optimum: The best feasible performance measure of the problem configuration.
                 If `None`, it will not be set.
             number_of_scalar_constraints: The number of scalar constraints.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self.__create_problem = create_problem
         self.__description = description
         self.__minimization_target_values = None

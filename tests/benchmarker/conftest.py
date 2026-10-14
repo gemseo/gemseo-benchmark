@@ -67,7 +67,7 @@ def check_algorithm_availability(worker: BaseWorker) -> None:
 
 
 def check_execution(
-    tmp_wd,  # noqa: F811
+    tmp_wd,  # ruff: ignore[redefined-while-unused]
     algorithm_configuration: AlgorithmConfiguration,
     problem_configuration: BaseProblemConfiguration,
     save_gemseo_log: bool,

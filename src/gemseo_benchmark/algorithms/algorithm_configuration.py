@@ -71,7 +71,7 @@ class AlgorithmConfiguration:
                 that links the name of an algorithm option
                 to a callable that takes the 0-based index of the instance as argument
                 and returns the value of the option.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self.__algorithm_settings = algorithm_settings
         algorithm_name = algorithm_settings.target_class_name
         non_default_opts = algorithm_settings.model_dump(exclude_unset=True)

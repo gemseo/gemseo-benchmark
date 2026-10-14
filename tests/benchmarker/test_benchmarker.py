@@ -805,7 +805,7 @@ def test_problem_creation_failure_not_raised(
 def test_benchmarking_error_pickle() -> None:
     """Check that a benchmarking error survives a pickle round trip."""
     error = BenchmarkingError({"x": RuntimeError("boom")}, 2)
-    unpickled = pickle.loads(pickle.dumps(error))  # noqa: S301
+    unpickled = pickle.loads(pickle.dumps(error))  # ruff: ignore[suspicious-pickle-usage]
     assert str(unpickled) == str(error)
     assert unpickled.number_of_executions == 2
     assert list(unpickled.exceptions) == ["x"]

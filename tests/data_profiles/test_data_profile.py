@@ -88,7 +88,7 @@ def test_plot_save(tmp_path, converter):
 
     Args:
         converter: The Path converter.
-    """  # noqa: D417
+    """  # ruff: ignore[undocumented-param]
     data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
     data_profile.add_history("problem", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
     path = tmp_path / "data_profile.png"

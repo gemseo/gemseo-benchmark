@@ -22,7 +22,7 @@ from pathlib import Path
 import pytest
 from gemseo.optimization import OptimizationProblem
 from gemseo.optimization.factory import OptimizationLibraryFactory
-from gemseo.util.testing.pytest_conftest import tmp_wd  # noqa: F401
+from gemseo.util.testing.pytest_conftest import tmp_wd  # ruff: ignore[unused-import]
 from gemseo.util.timer import Timer
 from numpy.testing import assert_equal
 
@@ -46,7 +46,7 @@ def test_check_algorithm_availability() -> None:
 @pytest.mark.parametrize("save_gemseo_log", [False, True])
 @pytest.mark.parametrize("save_data", [False, True])
 def test_execution(
-    tmp_wd,  # noqa: F811
+    tmp_wd,  # ruff: ignore[redefined-while-unused]
     algorithm_configuration,
     rosenbrock,
     save_gemseo_log,

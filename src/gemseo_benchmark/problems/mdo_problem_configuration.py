@@ -73,7 +73,7 @@ class MDOProblemConfiguration(
         Args:
             minimize_objective_value: Whether the objective function of the scenario
                 is to be minimized.
-        """  # noqa: D205, D212
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line]
         self.__minimize_objective_value = minimize_objective_value
         super().__init__(
             name,
