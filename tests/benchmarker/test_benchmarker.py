@@ -709,16 +709,16 @@ def test_all_unavailable_algorithms_reported(tmp_path, rosenbrock) -> None:
         (
             (L_BFGS_B_Settings(),),
             (
-                "The algorithm 'L-BFGS-B' is not adapted to the problem configuration "
+                "The algorithm 'L_BFGS_B' is not adapted to the problem configuration "
                 "'Power2': it does not handle equality constraints."
             ),
         ),
         (
             (L_BFGS_B_Settings(), TNC_Settings()),
             (
-                "The algorithms 'L-BFGS-B', 'TNC' are not adapted "
+                "The algorithms 'L_BFGS_B', 'TNC' are not adapted "
                 "to the problem configuration 'Power2':\n"
-                "- 'L-BFGS-B': it does not handle equality constraints,\n"
+                "- 'L_BFGS_B': it does not handle equality constraints,\n"
                 "- 'TNC': it does not handle equality constraints."
             ),
         ),
