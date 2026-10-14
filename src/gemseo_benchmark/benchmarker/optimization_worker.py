@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING
 
 from gemseo import execute_algo
@@ -26,6 +27,7 @@ from gemseo_benchmark.benchmarker.base_worker import BaseWorker
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from pathlib import Path
 
     from gemseo.algos.optimization_problem import OptimizationProblem
@@ -35,9 +37,14 @@ if TYPE_CHECKING:
     from gemseo_benchmark.algorithms.algorithm_configuration import (
         AlgorithmConfiguration,
     )
+    from gemseo_benchmark.problems.base_problem_configuration import (
+        BaseProblemConfiguration,
+    )
     from gemseo_benchmark.problems.optimization_problem_configuration import (
         OptimizationProblemConfiguration,
     )
+
+LOGGER = logging.getLogger(__name__)
 
 
 class OptimizationWorker(
@@ -48,6 +55,64 @@ class OptimizationWorker(
     """A benchmarking worker for optimization."""
 
     _algorithm_factory: OptimizationLibraryFactory = OptimizationLibraryFactory()
+
+    @classmethod
+    def check_algorithms_suitability(
+        cls,
+        algorithm_names: Iterable[str],
+        problem_configuration: BaseProblemConfiguration,
+    ) -> None:
+        """Check whether algorithms are suited to an optimization problem.
+
+        An algorithm is suited if GEMSEO says that it is for a problem created by
+        the problem configuration, e.g. an algorithm that does not handle constraints
+        is not suited to a problem that has some.
+
+        If the problem cannot be created, the check is skipped:
+        the exception is raised and reported by the execution that needs the problem.
+        """
+        try:
+            problem = problem_configuration.create_problem()
+        except Exception as error:  # noqa: BLE001
+            LOGGER.warning(
+                "The suitability of the algorithms to the problem configuration %r "
+                "is not checked, as the problem cannot be created: %s",
+                problem_configuration.name,
+                error,
+            )
+            return
+
+        factory = cls._algorithm_factory
+        reasons = {}
+        for algorithm_name in algorithm_names:
+            library_class = factory.get_class(
+                factory.algo_names_to_libraries[algorithm_name]
+            )
+            description = library_class.ALGORITHM_INFOS[algorithm_name]
+            # There is no public accessor to the reason in GEMSEO.
+            reason = library_class._get_unsuitability_reason(  # noqa: SLF001
+                description, problem
+            )
+            if reason:
+                reasons[repr(algorithm_name)] = reason
+
+        if reasons:
+            if len(reasons) == 1:
+                ((algorithm_name, reason),) = reasons.items()
+                subject = f"The algorithm {algorithm_name} is"
+                details = f" {reason}"
+            else:
+                subject = f"The algorithms {', '.join(reasons)} are"
+                details = ",".join(
+                    f"\n- {name}: {reason}" for name, reason in reasons.items()
+                )
+
+            msg = (
+                f"{subject} not adapted "
+                f"to the problem configuration {problem_configuration.name!r}:"
+                f"{details}."
+            )
+            raise ValueError(msg)
 
     @staticmethod
     def _get_problem(
