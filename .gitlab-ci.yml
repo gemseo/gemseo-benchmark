@@ -1,5 +1,5 @@
 include:
-  - remote: "https://gitlab.com/gemseo/dev/ci-includes/-/raw/5/main.yml"
+  - remote: "https://gitlab.com/gemseo/dev/ci-includes/-/raw/5.1/main.yml"
 
 # Smoke-test the benchmarking report example, which mkdocs-gallery does not execute
 # (its filename is not prefixed by `plot_`), so nothing else in CI runs it.

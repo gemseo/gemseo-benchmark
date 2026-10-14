@@ -1,7 +1,10 @@
 /build
 /dist
 /.tox
+/.venv
+/.ruff_cache
 *.pyc
+__pycache__/
 /src/gemseo_benchmark.egg-info
 
 /.project
@@ -23,3 +26,4 @@
 !/.coveragerc
 
 /.pytest_cache
+**/result_images
