@@ -27,6 +27,7 @@ from __future__ import annotations
 
 from gemseo import compute_doe
 from gemseo import configuration
+from gemseo.doe import OT_OPT_LHS_Settings
 from gemseo.optimization import NLOPT_COBYLA_Settings
 from gemseo.problem.optimization.power_2 import Power2
 
@@ -49,7 +50,7 @@ problem = OptimizationProblemConfiguration(
 # We define ten starting points by optimized Latin hypercube sampling (LHS).
 design_space = problem.create_problem().design_space
 problem.starting_points = compute_doe(
-    design_space, algo_name="OT_OPT_LHS", n_samples=10
+    design_space, settings_model=OT_OPT_LHS_Settings(n_samples=10)
 )
 # %%
 # Let use the optimizer COBYLA to generate performance histories on the problem.
