@@ -30,6 +30,20 @@ and this project adheres to
 
 ### Changed
 
+- The plugin is compatible with GEMSEO 7 and no longer with GEMSEO 6.
+  Until GEMSEO 7 is released,
+  it uses the `develop` branch of GEMSEO.
+- The minimum Python version is 3.11.
+- The names of the algorithms are those of GEMSEO 7,
+  e.g. `L_BFGS_B` instead of `L-BFGS-B`;
+  they name the algorithm configurations created from settings,
+  the results directories and the log files;
+  so the results of such algorithm configurations
+  produced with an earlier version are not found:
+  their executions run again.
+- `AlgorithmConfiguration.from_dict` and `PerformanceHistory.from_file`
+  can no longer read the algorithm configurations and the performance histories
+  saved with an earlier version.
 - The dependencies `properdocs`, `mkdocs-material` and `mkdocs-to-pdf`
   are bounded: `properdocs >=1.6,<2`, `mkdocs-material >=9.7,<10`
   and `mkdocs-to-pdf >=0.11,<1`.
@@ -58,14 +72,6 @@ and this project adheres to
 
 ### Changed
 
-- The plugin is compatible with GEMSEO 7 and no longer with GEMSEO 6.
-  Until GEMSEO 7 is released,
-  it uses the `develop` branch of GEMSEO.
-- The minimum Python version is 3.11.
-- The names of the algorithms are those of GEMSEO 7,
-  e.g. `L_BFGS_B` instead of `L-BFGS-B`;
-  they name the algorithm configurations created from settings,
-  the results directories and the log files.
 - When executions of a benchmarking raise exceptions,
   `Benchmarker.execute` and `Scenario.execute` log the failures
   at the `ERROR` level, with their traceback, once all the executions are over,
