@@ -36,6 +36,7 @@ from gemseo.util.timer import Timer
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from pathlib import Path
+
     from gemseo.core.algorithm.base_algorithm_factory import BaseAlgorithmFactory
     from gemseo.util.typing import RealArray
 

@@ -25,7 +25,8 @@
 # We start by making the necessary imports.
 from __future__ import annotations
 
-from gemseo import configuration, compute_doe
+from gemseo import compute_doe
+from gemseo import configuration
 from gemseo.optimization import NLOPT_COBYLA_Settings
 from gemseo.problem.optimization.power_2 import Power2
 

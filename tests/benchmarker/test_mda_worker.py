@@ -22,8 +22,8 @@ from pathlib import Path
 import numpy
 import pytest
 from gemseo.core.cache.hdf5 import HDF5Cache
-from gemseo.mda.factory import MDAFactory
 from gemseo.mda import MDAJacobi
+from gemseo.mda.factory import MDAFactory
 from gemseo.util.testing.pytest_conftest import tmp_wd  # noqa: F401
 from gemseo.util.timer import Timer
 

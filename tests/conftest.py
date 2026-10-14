@@ -31,13 +31,13 @@ from unittest import mock
 import pytest
 from gemseo import create_mda
 from gemseo import create_scenario
-from gemseo.space import DesignSpace
-from gemseo.doe import CustomDOE_Settings
-from gemseo.optimization import SLSQP_Settings
-from gemseo.optimization import OptimizationProblem
 from gemseo.discipline import AnalyticDiscipline
+from gemseo.doe import CustomDOE_Settings
 from gemseo.mda import MDAJacobi_Settings
+from gemseo.optimization import OptimizationProblem
+from gemseo.optimization import SLSQP_Settings
 from gemseo.problem.optimization.rosenbrock import Rosenbrock
+from gemseo.space import DesignSpace
 from gemseo.util.constant import read_only_empty_dict
 from gemseo.util.testing.pytest_conftest import *  # noqa: F401,F403
 from numpy import array
@@ -403,7 +403,8 @@ def mda_create_problem(
     return create_mda(
         algorithm_configuration.algorithm_name,
         disciplines,
-        **algorithm_configuration.algorithm_options), disciplines
+        **algorithm_configuration.algorithm_options,
+    ), disciplines
 
 
 @pytest.fixture(scope="module")

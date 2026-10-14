@@ -20,8 +20,8 @@ import logging
 from pathlib import Path
 
 import pytest
-from gemseo.optimization.factory import OptimizationLibraryFactory
 from gemseo.optimization import OptimizationProblem
+from gemseo.optimization.factory import OptimizationLibraryFactory
 from gemseo.util.testing.pytest_conftest import tmp_wd  # noqa: F401
 from gemseo.util.timer import Timer
 from numpy.testing import assert_equal

@@ -22,8 +22,8 @@ from typing import TYPE_CHECKING
 
 from gemseo import configuration
 from gemseo.mda.core.base_solver import BaseMDASolver
-from gemseo.util.typing import RealArray
 from gemseo.util.metaclass import ABCGoogleDocstringInheritanceMeta
+from gemseo.util.typing import RealArray
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
