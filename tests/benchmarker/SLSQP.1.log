@@ -7,12 +7,12 @@ Optimization problem:
    minimize y1(x1, x2)
    with respect to x1, x2
    over the design space:
-      +------+-------------+-------+-------------+-------+
-      | Name | Lower bound | Value | Upper bound | Type  |
-      +------+-------------+-------+-------------+-------+
-      | x1   |      0      |   0   |      10     | float |
-      | x2   |      0      |   1   |      10     | float |
-      +------+-------------+-------+-------------+-------+
+      +------+-------------+-------+-------------+------+
+      | Name | Lower bound | Value | Upper bound | Type |
+      +------+-------------+-------+-------------+------+
+      | x1   |      0      |   0   |      10     | real |
+      | x2   |      0      |   1   |      10     | real |
+      +------+-------------+-------+-------------+------+
 Solving optimization problem with algorithm SLSQP:
 Optimization result:
    Optimizer info:
@@ -21,9 +21,9 @@ Optimization result:
    Solution:
       Objective: 0.0
       Design space:
-         +------+-------------+-------+-------------+-------+
-         | Name | Lower bound | Value | Upper bound | Type  |
-         +------+-------------+-------+-------------+-------+
-         | x1   |      0      |   0   |      10     | float |
-         | x2   |      0      |   0   |      10     | float |
-         +------+-------------+-------+-------------+-------+
+         +------+-------------+-------+-------------+------+
+         | Name | Lower bound | Value | Upper bound | Type |
+         +------+-------------+-------+-------------+------+
+         | x1   |      0      |   0   |      10     | real |
+         | x2   |      0      |   0   |      10     | real |
+         +------+-------------+-------+-------------+------+
