@@ -1,1 +1,3 @@
-gemseo[all]@git+https://gitlab.com/gemseo/dev/gemseo.git@develop
+# gemseo[all]@git+https://gitlab.com/gemseo/dev/gemseo.git@develop
+# The baseline images of the tests were made with matplotlib 3.10; 3.11 renders them differently.
+matplotlib <3.11
