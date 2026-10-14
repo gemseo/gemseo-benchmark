@@ -27,11 +27,11 @@ from typing import ParamSpec
 from typing import TypeVar
 
 from gemseo import compute_doe
-from gemseo.algos.doe.base_n_samples_based_doe_settings import (
+from gemseo.doe.core.base_n_samples_based_doe_settings import (
     BaseNSamplesBasedDOESettings,
 )
-from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
-from gemseo.utils.metaclasses import ABCGoogleDocstringInheritanceMeta
+from gemseo.util.constant import read_only_empty_dict
+from gemseo.util.metaclass import ABCGoogleDocstringInheritanceMeta
 from numpy import array
 from numpy import load
 from numpy import ndarray
@@ -45,9 +45,9 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
     from pathlib import Path
 
-    from gemseo.algos.design_space import DesignSpace
-    from gemseo.algos.doe.base_doe_settings import BaseDOESettings
-    from gemseo.typing import RealArray
+    from gemseo.space import DesignSpace
+    from gemseo.doe.core.base_doe_settings import BaseDOESettings
+    from gemseo.util.typing import RealArray
 
     from gemseo_benchmark import ConfigurationPlotOptions
     from gemseo_benchmark.algorithms.algorithms_configurations import (
@@ -331,8 +331,8 @@ class BaseProblemConfiguration(
         file_path: str | Path = "",
         infeasibility_tolerance: float = 0.0,
         max_iteration_number: int = 0,
-        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
-        grid_settings: Mapping[str, str] = READ_ONLY_EMPTY_DICT,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = read_only_empty_dict,
+        grid_settings: Mapping[str, str] = read_only_empty_dict,
         use_abscissa_log_scale: bool = False,
     ) -> None:
         """Compute the data profiles of given algorithms.

@@ -23,8 +23,8 @@ from unittest import mock
 import matplotlib.pyplot
 import numpy
 import pytest
-from gemseo.algos.doe.custom_doe.settings.custom_doe_settings import CustomDOE_Settings
-from gemseo.algos.doe.diagonal_doe.settings.diagonal_doe_settings import (
+from gemseo.doe import CustomDOE_Settings
+from gemseo.doe import (
     DiagonalDOE_Settings,
 )
 from numpy import ones
@@ -37,7 +37,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from collections.abc import Mapping
 
-    from gemseo.algos.design_space import DesignSpace
+    from gemseo.space import DesignSpace
 
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,

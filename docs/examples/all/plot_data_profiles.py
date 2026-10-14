@@ -29,12 +29,12 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from gemseo import configure
-from gemseo.algos.doe.openturns.settings.ot_opt_lhs import OT_OPT_LHS_Settings
-from gemseo.algos.opt.scipy_local.settings.lbfgsb import L_BFGS_B_Settings
-from gemseo.algos.opt.scipy_local.settings.slsqp import SLSQP_Settings
-from gemseo.problems.optimization.rastrigin import Rastrigin
-from gemseo.problems.optimization.rosenbrock import Rosenbrock
+from gemseo import configuration
+from gemseo.doe import OT_OPT_LHS_Settings
+from gemseo.optimization import L_BFGS_B_Settings
+from gemseo.optimization import SLSQP_Settings
+from gemseo.problem.optimization.rastrigin import Rastrigin
+from gemseo.problem.optimization.rosenbrock import Rosenbrock
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.algorithms.algorithms_configurations import (
@@ -92,8 +92,8 @@ algorithms_configurations = AlgorithmsConfigurations(
 #
 # Let us choose two problems already implemented in GEMSEO as references
 # to measure the performances of our selection of algorithms configurations:
-# [Rastrigin][gemseo.problems.optimization.rastrigin.Rastrigin]
-# and [Rosenbrock][gemseo.problems.optimization.rosenbrock.Rosenbrock].
+# [Rastrigin][gemseo.problem.optimization.rastrigin.Rastrigin]
+# and [Rosenbrock][gemseo.problem.optimization.rosenbrock.Rosenbrock].
 #
 # We define target values as an exponential scale of values decreasing towards zero,
 # the minimum value of both Rastrigin's and Rosenbrock's functions.
@@ -139,11 +139,8 @@ scenario = Scenario([algorithms_configurations], scenario_dir)
 # %%
 # Here we choose to deactivate the functions counters, progress bars and bounds check
 # of GEMSEO to accelerate the script.
-configure(
-    enable_function_statistics=False,
-    enable_progress_bar=False,
-    check_desvars_bounds=False,
-)
+configuration.enable_progress_bar = False
+configuration.check_desvars_bounds = False
 # %%
 # Let us execute the benchmarking scenario on our group of reference problems.
 #

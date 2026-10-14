@@ -25,9 +25,9 @@ from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
-from gemseo.algos.doe.custom_doe.settings.custom_doe_settings import CustomDOE_Settings
-from gemseo.algos.optimization_problem import OptimizationProblem
-from gemseo.problems.optimization.rosenbrock import Rosenbrock
+from gemseo.doe import CustomDOE_Settings
+from gemseo.optimization import OptimizationProblem
+from gemseo.problem.optimization.rosenbrock import Rosenbrock
 from matplotlib.testing.decorators import image_comparison
 from numpy import array
 from numpy.testing import assert_allclose

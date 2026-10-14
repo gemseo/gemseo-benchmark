@@ -24,9 +24,9 @@ from __future__ import annotations
 import re
 
 import pytest
-from gemseo.algos.doe.custom_doe.settings.custom_doe_settings import CustomDOE_Settings
-from gemseo.algos.opt.scipy_local.settings.lbfgsb import L_BFGS_B_Settings
-from gemseo.problems.optimization.rosenbrock import Rosenbrock
+from gemseo.doe import CustomDOE_Settings
+from gemseo.optimization import L_BFGS_B_Settings
+from gemseo.problem.optimization.rosenbrock import Rosenbrock
 from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
 from numpy import zeros

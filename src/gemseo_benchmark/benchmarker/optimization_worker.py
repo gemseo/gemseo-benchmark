@@ -20,7 +20,7 @@ import logging
 from typing import TYPE_CHECKING
 
 from gemseo import execute_algo
-from gemseo.algos.opt.factory import OptimizationLibraryFactory
+from gemseo.optimization.factory import OptimizationLibraryFactory
 
 from gemseo_benchmark.benchmarker._metrics import ElapsedTime
 from gemseo_benchmark.benchmarker.base_worker import BaseWorker
@@ -30,9 +30,9 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from pathlib import Path
 
-    from gemseo.algos.optimization_problem import OptimizationProblem
-    from gemseo.typing import RealArray
-    from gemseo.utils.timer import Timer
+    from gemseo.optimization import OptimizationProblem
+    from gemseo.util.typing import RealArray
+    from gemseo.util.timer import Timer
 
     from gemseo_benchmark.algorithms.algorithm_configuration import (
         AlgorithmConfiguration,
@@ -86,7 +86,7 @@ class OptimizationWorker(
         reasons = {}
         for algorithm_name in algorithm_names:
             library_class = factory.get_class(
-                factory.algo_names_to_libraries[algorithm_name]
+                factory.algo_name_to_library[algorithm_name]
             )
             description = library_class.ALGORITHM_INFOS[algorithm_name]
             # There is no public accessor to the reason in GEMSEO.
@@ -122,6 +122,7 @@ class OptimizationWorker(
         hdf_file_path: Path | None,
     ) -> OptimizationProblem:
         problem = problem_configuration.create_problem()
+        # TODO(bump-gemseo): cannot transform: the type of problem.design_space could not be inferred; if it is an instance of ParameterSpace, a current value is a DesignSpace notion; use nominal_value to read the reference point of a space, which is the mean of the distributions here  # noqa: E501
         problem.design_space.set_current_value(starting_point)
         return problem
 

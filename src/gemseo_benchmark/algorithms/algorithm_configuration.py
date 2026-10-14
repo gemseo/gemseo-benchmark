@@ -29,13 +29,13 @@ from typing import TYPE_CHECKING
 from typing import Any
 from typing import Final
 
-from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
-from gemseo.utils.string_tools import pretty_repr
+from gemseo.util.constant import read_only_empty_dict
+from gemseo.util.string import pretty_repr
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-    from gemseo.settings.base_settings import BaseSettings
+    from gemseo.util.pydantic import BaseSettings
 
 InstanceAlgorithmOptions = MutableMapping[str, Callable[[int], Any]]
 
@@ -56,7 +56,7 @@ class AlgorithmConfiguration:
         self,
         algorithm_settings: BaseSettings,
         configuration_name: str = "",
-        instance_algorithm_options: InstanceAlgorithmOptions = READ_ONLY_EMPTY_DICT,
+        instance_algorithm_options: InstanceAlgorithmOptions = read_only_empty_dict,
     ) -> None:
         """
         Args:
@@ -73,6 +73,7 @@ class AlgorithmConfiguration:
                 and returns the value of the option.
         """  # noqa: D205, D212, D415
         self.__algorithm_settings = algorithm_settings
+        # TODO(bump-gemseo): read it with the target_class_name property of a settings instance; in a settings class, the value is now derived from the name of the class (X_Settings targets X), so remove the assignment if its value is the name of the class without _Settings, else rename the class to <value>_Settings first, or it would target another class  # noqa: E501
         algorithm_name = algorithm_settings._TARGET_CLASS_NAME
         non_default_opts = algorithm_settings.model_dump(exclude_unset=True)
         self.__configuration_name = configuration_name or self.__get_configuration_name(
@@ -111,6 +112,7 @@ class AlgorithmConfiguration:
     @property
     def algorithm_name(self) -> str:
         """The name of the algorithm."""
+        # TODO(bump-gemseo): read it with the target_class_name property of a settings instance; in a settings class, the value is now derived from the name of the class (X_Settings targets X), so remove the assignment if its value is the name of the class without _Settings, else rename the class to <value>_Settings first, or it would target another class  # noqa: E501
         return self.__algorithm_settings._TARGET_CLASS_NAME
 
     @property

@@ -21,10 +21,11 @@ from pathlib import Path
 
 import numpy
 import pytest
-from gemseo.algos.opt.factory import OptimizationLibraryFactory
-from gemseo.scenarios.mdo_scenario import MDOScenario
-from gemseo.utils.testing.pytest_conftest import tmp_wd  # noqa: F401
-from gemseo.utils.timer import Timer
+from gemseo.optimization.factory import OptimizationLibraryFactory
+from gemseo.scenario import MDOScenario
+# TODO(bump-gemseo): gemseo.utils.testing.pytest_conftest: add syrupy to the test dependencies of the project, as gemseo.util.testing.pytest_conftest imports it  # noqa: E501
+from gemseo.util.testing.pytest_conftest import tmp_wd  # noqa: F401
+from gemseo.util.timer import Timer
 
 from gemseo_benchmark.benchmarker.mdo_worker import MDOWorker
 from tests.benchmarker.conftest import check_algorithm_availability
@@ -111,6 +112,7 @@ def test_create_performance_history(
     with Timer() as timer:
         scenario.execute()
 
+    # TODO(bump-gemseo): cannot transform: the type of scenario.formulation could not be inferred; if it is an instance of BaseFormulation, optimization_problem became problem  # noqa: E501
     optimization_problem = scenario.formulation.optimization_problem
     database = optimization_problem.database
     database_size = len(database)

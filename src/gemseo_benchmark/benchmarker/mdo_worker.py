@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from gemseo.algos.opt.factory import OptimizationLibraryFactory
+from gemseo.optimization.factory import OptimizationLibraryFactory
 
 from gemseo_benchmark.benchmarker._metrics import DisciplineExecutions
 from gemseo_benchmark.benchmarker._metrics import ElapsedTime
@@ -29,8 +29,8 @@ from gemseo_benchmark.results.performance_history import PerformanceHistory
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from gemseo.typing import RealArray
-    from gemseo.utils.timer import Timer
+    from gemseo.util.typing import RealArray
+    from gemseo.util.timer import Timer
 
     from gemseo_benchmark.algorithms.algorithm_configuration import (
         AlgorithmConfiguration,
@@ -62,6 +62,8 @@ class MDOWorker(
         scenario, disciplines = problem_configuration.create_problem(
             algorithm_configuration
         )
+        # TODO(bump-gemseo): cannot transform: the type of scenario.formulation could not be inferred; if it is an instance of BaseFormulation, optimization_problem became problem  # noqa: E501
+        # TODO(bump-gemseo): cannot transform: the type of scenario.formulation.optimization_pro... could not be inferred; if it is an instance of ParameterSpace, a current value is a DesignSpace notion; use nominal_value to read the reference point of a space, which is the mean of the distributions here  # noqa: E501
         scenario.formulation.optimization_problem.design_space.set_current_value(
             starting_point
         )
@@ -71,7 +73,7 @@ class MDOWorker(
     def _add_metrics_listeners(
         cls, problem: MDOProblemType
     ) -> tuple[ElapsedTime, DisciplineExecutions]:
-        optimization_problem = problem[0].formulation.optimization_problem
+        optimization_problem = problem[0].formulation.problem
         elapsed_time = ElapsedTime()
         optimization_problem.add_listener(elapsed_time.add_metrics)
         discipline_executions = DisciplineExecutions(problem[1])
@@ -97,7 +99,7 @@ class MDOWorker(
     ) -> PerformanceHistory:
         time_listener, discipline_listener = metrics_listeners
         performance_history = PerformanceHistory.from_problem(
-            problem[0].formulation.optimization_problem,
+            problem[0].formulation.problem,
             problem_configuration.name,
             elapsed_times=time_listener.get_metrics(timer),
             number_of_discipline_executions=discipline_listener.get_metrics(),
@@ -109,4 +111,4 @@ class MDOWorker(
     @staticmethod
     def _post_execute(problem: MDOProblemType, hdf_file_path: Path | None) -> None:
         if hdf_file_path is not None:
-            problem[0].formulation.optimization_problem.database.to_hdf(hdf_file_path)
+            problem[0].formulation.problem.database.to_hdf(hdf_file_path)

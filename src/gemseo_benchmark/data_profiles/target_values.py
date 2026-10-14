@@ -25,7 +25,7 @@ from types import MappingProxyType
 from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
-from gemseo.utils.matplotlib_figure import save_show_figure
+from gemseo.util.matplotlib_figure import save_show_figure
 from numpy import array
 from numpy import linspace
 from numpy import logical_not
