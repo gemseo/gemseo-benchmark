@@ -111,8 +111,7 @@ def test_create_performance_history(
     with Timer() as timer:
         scenario.execute()
 
-    # TODO(bump-gemseo): cannot transform: the type of scenario.formulation could not be inferred; if it is an instance of BaseFormulation, optimization_problem became problem  # noqa: E501
-    optimization_problem = scenario.formulation.optimization_problem
+    optimization_problem = scenario.formulation.problem
     database = optimization_problem.database
     database_size = len(database)
     check_create_performance_history(
