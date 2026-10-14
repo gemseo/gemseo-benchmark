@@ -208,7 +208,6 @@ pytest==8.4.2
     #   gemseo-benchmark (pyproject.toml:dev)
     #   pytest-cov
     #   pytest-xdist
-    #   syrupy
 pytest-cov==7.1.0
     # via gemseo-benchmark (pyproject.toml:dev)
 pytest-xdist==3.8.0
@@ -260,8 +259,6 @@ spgl1==0.0.3
     # via gemseo
 sympy==1.14.0
     # via gemseo
-syrupy==6.1.1
-    # via gemseo-benchmark (pyproject.toml:dev)
 threadpoolctl==3.7.0
     # via scikit-learn
 tinycss2==1.5.1
