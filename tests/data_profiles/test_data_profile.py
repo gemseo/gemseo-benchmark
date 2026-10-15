@@ -21,6 +21,7 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
 from unittest import mock
 
 import pytest
@@ -141,3 +142,112 @@ def test_plot_algo_names():
         data_profile.plot(algo_names=["algo1"], show=False)
 
     assert plot_data_profiles.call_args.args[0].keys() == {"algo1"}
+
+
+def _create_data_profile() -> DataProfile:
+    """Return a data profile with timed histories of two algorithms."""
+    data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
+    data_profile.add_history(
+        "problem",
+        "algo1",
+        [2.0, 1.0, 0.0],
+        elapsed_times=[timedelta(seconds=t) for t in (1.0, 2.0, 4.0)],
+    )
+    data_profile.add_history(
+        "problem",
+        "algo1",
+        [2.0, 0.5],
+        elapsed_times=[timedelta(seconds=t) for t in (0.5, 3.0)],
+    )
+    data_profile.add_history(
+        "problem",
+        "algo2",
+        [1.0, 1.0],
+        elapsed_times=[timedelta(seconds=t) for t in (0.5, 1.5)],
+    )
+    data_profile.add_history(
+        "problem",
+        "algo2",
+        [2.0, 0.0],
+        elapsed_times=[timedelta(seconds=t) for t in (1.0, 2.5)],
+    )
+    return data_profile
+
+
+def test_compute_time_data_profiles():
+    """Check the computation of data profiles relative to the elapsed time."""
+    profiles = _create_data_profile().compute_time_data_profiles()
+    assert profiles == {
+        "algo1": ([0.5, 1.0, 2.0, 3.0, 4.0], [0.0, 0.0, 0.25, 0.5, 0.75]),
+        "algo2": ([0.5, 1.0, 1.5, 2.5], [0.25, 0.25, 0.25, 0.75]),
+    }
+
+
+def test_compute_time_data_profiles_algo_names():
+    """Check the computation of time data profiles of some algorithms."""
+    profiles = _create_data_profile().compute_time_data_profiles("algo2")
+    assert profiles.keys() == {"algo2"}
+
+
+def test_compute_time_data_profiles_end():
+    """Check that time and iteration data profiles end with the same ratios."""
+    data_profile = _create_data_profile()
+    profiles = data_profile.compute_data_profiles()
+    time_profiles = data_profile.compute_time_data_profiles()
+    for name, (_, ratios) in time_profiles.items():
+        assert ratios[-1] == profiles[name][-1]
+
+
+def test_compute_time_data_profiles_without_elapsed_times():
+    """Check the time data profiles of histories without elapsed times."""
+    data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
+    data_profile.add_history("problem", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
+    assert data_profile.compute_time_data_profiles() == {"algo": ([0.0], [1.0])}
+
+
+@pytest.mark.parametrize(
+    "use_time_log_scale", [False, True], ids=["linear_scale", "log_scale"]
+)
+def test_plot_time_data_profiles(use_time_log_scale, snapshot_matplotlib):
+    """Check the figure of the data profiles relative to the elapsed time."""
+    data_profile = _create_data_profile()
+    profiles = data_profile.compute_time_data_profiles()
+    figure = data_profile._plot_time_data_profiles(
+        profiles, use_time_log_scale=use_time_log_scale
+    )
+    assert figure == snapshot_matplotlib
+
+
+def test_plot_combined_figures(snapshot_matplotlib):
+    """Check the figure combining the data profiles."""
+    figures = _create_data_profile().plot(show=False, combine_figures=True)
+    assert len(figures) == 1
+    assert len(figures[0].axes) == 2
+    assert figures[0] == snapshot_matplotlib
+
+
+@pytest.mark.parametrize("show", [False, True])
+def test_plot_figures(show):
+    """Check the figures of the data profiles."""
+    figures = _create_data_profile().plot(show=show)
+    assert [figure.axes[0].get_xlabel() for figure in figures] == [
+        "Number of functions evaluations",
+        "Elapsed time",
+    ]
+
+
+@pytest.mark.parametrize(
+    ("combine_figures", "file_names"),
+    [
+        (False, {"data_profile.png", "data_profile_time.png"}),
+        (True, {"data_profile.png"}),
+    ],
+)
+def test_plot_save_files(tmp_path, combine_figures, file_names):
+    """Check the files of the data profiles."""
+    _create_data_profile().plot(
+        show=False,
+        file_path=tmp_path / "data_profile.png",
+        combine_figures=combine_figures,
+    )
+    assert {path.name for path in tmp_path.iterdir()} == file_names

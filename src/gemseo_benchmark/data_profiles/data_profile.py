@@ -21,7 +21,11 @@
 
 from __future__ import annotations
 
+import datetime
+from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import ClassVar
+from typing import Final
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -29,6 +33,7 @@ from gemseo.util.constant import read_only_empty_dict
 from gemseo.util.matplotlib_figure import save_show_figure
 from numpy import array
 from numpy import linspace
+from numpy import searchsorted
 from numpy import zeros
 
 from gemseo_benchmark import _get_configuration_plot_options
@@ -39,14 +44,21 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
     from collections.abc import Sequence
     from numbers import Number
-    from pathlib import Path
 
+    from matplotlib.axes import Axes
     from matplotlib.figure import Figure
     from numpy import ndarray
 
     from gemseo_benchmark import ConfigurationPlotOptions
     from gemseo_benchmark import MarkeveryType
     from gemseo_benchmark.data_profiles.target_values import TargetValues
+
+TimeDataProfiles = dict[str, tuple[list[float], list[float]]]
+"""The data profiles relative to the elapsed time.
+
+For each algorithm configuration,
+the elapsed times in seconds and the ratios of targets reached at these times.
+"""
 
 
 class DataProfile:
@@ -61,11 +73,20 @@ class DataProfile:
 
     The algorithms will be compared based on the number of targets they reach,
     cumulated over all the reference problems,
-    relative to the number of problems functions evaluations they make.
+    relative to the number of problems functions evaluations they make
+    or relative to the time they take.
 
     The data profile is the empirical cumulated distribution function of the number of
-    functions evaluations made by an algorithm to reach a problem target.
+    functions evaluations (or of the elapsed time)
+    made by an algorithm to reach a problem target.
     """
+
+    __TIME_FILE_NAME_SUFFIX: Final[str] = "_time"
+    """The suffix appended to the file name of the data profiles
+    relative to the elapsed time."""
+
+    __time_label: ClassVar[str] = "Elapsed time"
+    """The label of the time axis."""
 
     def __init__(self, target_values: Mapping[str, TargetValues]) -> None:
         """
@@ -108,6 +129,7 @@ class DataProfile:
         performance_measures: Sequence[float],
         infeasibility_measures: Sequence[float] | None = None,
         feasibility_statuses: Sequence[bool] | None = None,
+        elapsed_times: Sequence[datetime.timedelta] = (),
     ) -> None:
         """Add a history of performance values.
 
@@ -122,6 +144,8 @@ class DataProfile:
                 to infinity otherwise.
             feasibility_statuses: A history of (boolean) feasibility statuses.
                 If `None` then feasibility is always assumed.
+            elapsed_times: A history of elapsed times, in increasing order.
+                If empty, the elapsed times are set to zero.
 
         Raises:
             ValueError: If the problem name is not the name of a reference problem.
@@ -134,7 +158,10 @@ class DataProfile:
                 pb_name: [] for pb_name in self.__target_values
             }
         history = PerformanceHistory(
-            performance_measures, infeasibility_measures, feasibility_statuses
+            performance_measures,
+            infeasibility_measures,
+            feasibility_statuses,
+            elapsed_times=elapsed_times,
         )
         self.__values_histories[algorithm_configuration_name][problem_name].append(
             history
@@ -150,8 +177,14 @@ class DataProfile:
         plot_settings: Mapping[str, ConfigurationPlotOptions] = read_only_empty_dict,
         grid_settings: Mapping[str, str] = read_only_empty_dict,
         use_abscissa_log_scale: bool = False,
-    ) -> None:
+        use_time_log_scale: bool = False,
+        combine_figures: bool = False,
+    ) -> list[Figure]:
         """Plot the data profiles of the required algorithms.
+
+        The data profiles are plotted
+        relative to the number of functions evaluations
+        and relative to the elapsed time.
 
         Args:
             algo_names: The names of the algorithms.
@@ -159,6 +192,12 @@ class DataProfile:
             show: If True, show the plot.
             file_path: The path where to save the plot.
                 If empty, the plot is not saved.
+                Unless `combine_figures` is `True`,
+                this path is the one of the data profiles
+                relative to the number of functions evaluations
+                and the data profiles relative to the elapsed time are saved
+                next to it, with the suffix `_time` appended to the file name,
+                e.g. `data_profile_time.png` for `data_profile.png`.
             markevery: The sampling parameter for the markers of the plot.
                 Refer to the Matplotlib documentation.
             plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
@@ -166,20 +205,92 @@ class DataProfile:
             grid_settings: The keyword arguments of `matplotlib.pyplot.grid`.
             use_abscissa_log_scale: Whether to use a logarithmic scale
                 for the abscissa axis.
+            use_time_log_scale: Whether to use a logarithmic scale
+                for the time axis.
+            combine_figures: Whether to plot the data profiles
+                relative to the number of functions evaluations
+                and relative to the elapsed time
+                side by side in a single figure.
+
+        Returns:
+            The figure of the data profiles
+            relative to the number of functions evaluations
+            and the figure of the data profiles relative to the elapsed time,
+            or the single figure gathering both if `combine_figures` is `True`.
         """
         if algo_names is None:
             algo_names = ()
 
         data_profiles = self.compute_data_profiles(*algo_names)
+        time_data_profiles = self.compute_time_data_profiles(*algo_names)
         plot_settings_copy = plot_settings.copy()
         for settings in plot_settings_copy.values():
             if "markevery" not in settings:
                 settings["markevery"] = markevery
 
-        figure = self._plot_data_profiles(
-            data_profiles, plot_settings_copy, grid_settings, use_abscissa_log_scale
-        )
-        save_show_figure(figure, show, file_path)
+        if combine_figures:
+            figsize = matplotlib.rcParams["figure.figsize"]
+            figure, (axes, time_axes) = plt.subplots(
+                1, 2, sharey="all", figsize=(figsize[0] * 2, figsize[1])
+            )
+            self._plot_data_profiles(
+                data_profiles,
+                plot_settings_copy,
+                grid_settings,
+                use_abscissa_log_scale,
+                axes,
+            )
+            self._plot_time_data_profiles(
+                time_data_profiles,
+                plot_settings_copy,
+                grid_settings,
+                use_time_log_scale,
+                time_axes,
+            )
+            time_axes.set_ylabel("")
+            figure.tight_layout()
+            figures_and_paths = [(figure, file_path)]
+        else:
+            time_file_path = ""
+            if file_path:
+                file_path = Path(file_path)
+                time_file_path = file_path.with_stem(
+                    f"{file_path.stem}{self.__TIME_FILE_NAME_SUFFIX}"
+                )
+
+            figures_and_paths = [
+                (
+                    self._plot_data_profiles(
+                        data_profiles,
+                        plot_settings_copy,
+                        grid_settings,
+                        use_abscissa_log_scale,
+                    ),
+                    file_path,
+                ),
+                (
+                    self._plot_time_data_profiles(
+                        time_data_profiles,
+                        plot_settings_copy,
+                        grid_settings,
+                        use_time_log_scale,
+                    ),
+                    time_file_path,
+                ),
+            ]
+
+        for figure, path in figures_and_paths:
+            save_show_figure(figure, False, path, close=False)
+
+        if show:
+            plt.show()
+
+        figures = [figure for figure, _ in figures_and_paths]
+        if file_path:
+            for figure in figures:
+                plt.close(figure)
+
+        return figures
 
     def compute_data_profiles(self, *algo_names: str) -> dict[str, list[Number]]:
         """Compute the data profiles of the required algorithms.
@@ -200,12 +311,70 @@ class DataProfile:
 
         for name in algo_names:
             total_hits_history = self.__compute_hits_history(name)
-            problems_number = len(self.__target_values)
-            repeat_number = self.__get_repeat_number(name)
-            targets_total = self.__targets_number * problems_number * repeat_number
-            ratios = total_hits_history / targets_total
+            ratios = total_hits_history / self.__get_targets_total(name)
             data_profiles[name] = ratios.tolist()
         return data_profiles
+
+    def compute_time_data_profiles(self, *algo_names: str) -> TimeDataProfiles:
+        """Compute the data profiles of the required algorithms relative to time.
+
+        For each algorithm, compute the cumulative distribution function of the
+        elapsed time required by the algorithm to reach a reference target.
+
+        Args:
+            *algo_names: The names of the algorithms.
+                If empty, all the algorithms are considered.
+
+        Returns:
+            The data profiles relative to the elapsed time.
+        """
+        if not algo_names:
+            algo_names = self.__values_histories.keys()
+
+        data_profiles = {}
+        for name in algo_names:
+            algo_histories = self.__values_histories[name]
+            times = sorted({
+                item.elapsed_time.total_seconds()
+                for pb_histories in algo_histories.values()
+                for pb_history in pb_histories
+                for item in pb_history
+            })
+            total_hits_history = zeros(len(times))
+            for pb_name, targets in self.__target_values.items():
+                for pb_history in algo_histories[pb_name]:
+                    # Prepend 0 for the times preceding the first history item.
+                    hits_history = array([
+                        0,
+                        *targets.compute_target_hits_history(pb_history),
+                    ])
+                    # The number of history items obtained at each time.
+                    numbers_of_items = searchsorted(
+                        [item.elapsed_time.total_seconds() for item in pb_history],
+                        times,
+                        side="right",
+                    )
+                    total_hits_history += hits_history[numbers_of_items]
+
+            ratios = total_hits_history / self.__get_targets_total(name)
+            data_profiles[name] = (times, ratios.tolist())
+
+        return data_profiles
+
+    def __get_targets_total(self, algo_name: str) -> int:
+        """Return the total number of targets to be reached by an algorithm.
+
+        Args:
+            algo_name: The name of the algorithm.
+
+        Returns:
+            The total number of targets.
+        """
+        return (
+            self.__targets_number
+            * len(self.__target_values)
+            * self.__get_repeat_number(algo_name)
+        )
 
     def __compute_hits_history(self, algo_name: str) -> ndarray:
         """Compute the history of the number of target hits of an algorithm.
@@ -270,6 +439,7 @@ class DataProfile:
         plot_settings: Mapping[str, ConfigurationPlotOptions] = read_only_empty_dict,
         grid_settings: Mapping[str, str] = read_only_empty_dict,
         use_abscissa_log_scale: bool = False,
+        axes: Axes | None = None,
     ) -> Figure:
         """Plot the data profiles.
 
@@ -280,48 +450,156 @@ class DataProfile:
             grid_settings: The keyword arguments of `matplotlib.pyplot.grid`.
             use_abscissa_log_scale: Whether to use a logarithmic scale
                 for the abscissa axis.
+            axes: The axes of the plot.
+                If `None`, the data profiles are plotted on a new figure.
 
         Returns:
             The data profiles figure.
         """
-        plot_settings = _get_configuration_plot_options(plot_settings, data_profiles)
-        fig = plt.figure()
-        axes = fig.add_subplot(1, 1, 1)
+        if axes is None:
+            axes = plt.figure().add_subplot(1, 1, 1)
 
-        # Set the title and axes
-        axes.set_title(f"Data profile{'s' if len(data_profiles) > 1 else ''}")
+        DataProfile.__set_title(axes, data_profiles)
         max_profile_size = max(len(profile) for profile in data_profiles.values())
         axes.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
         if use_abscissa_log_scale:
             axes.set_xscale("log")
 
-        plt.xlabel("Number of functions evaluations")
-        plt.xlim([1, max_profile_size])
+        axes.set_xlabel("Number of functions evaluations")
+        axes.set_xlim([1, max_profile_size])
+        DataProfile.__set_ratio_axis(axes)
+        DataProfile.__draw_profiles(
+            axes,
+            {
+                name: (range(1, len(profile) + 1), profile)
+                for name, profile in data_profiles.items()
+            },
+            max_profile_size,
+            _get_configuration_plot_options(plot_settings, data_profiles),
+            grid_settings,
+        )
+        return axes.figure
+
+    @staticmethod
+    def _plot_time_data_profiles(
+        data_profiles: TimeDataProfiles,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = read_only_empty_dict,
+        grid_settings: Mapping[str, str] = read_only_empty_dict,
+        use_time_log_scale: bool = False,
+        axes: Axes | None = None,
+    ) -> Figure:
+        """Plot the data profiles relative to the elapsed time.
+
+        Args:
+            data_profiles: The data profiles relative to the elapsed time.
+            plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
+                for each algorithm configuration.
+            grid_settings: The keyword arguments of `matplotlib.pyplot.grid`.
+            use_time_log_scale: Whether to use a logarithmic scale
+                for the time axis.
+            axes: The axes of the plot.
+                If `None`, the data profiles are plotted on a new figure.
+
+        Returns:
+            The data profiles figure.
+        """
+        create_figure = axes is None
+        if create_figure:
+            axes = plt.figure().add_subplot(1, 1, 1)
+
+        DataProfile.__set_title(axes, data_profiles)
+        if use_time_log_scale:
+            axes.set_xscale("log")
+        else:
+            axes.xaxis.set_major_formatter(
+                matplotlib.ticker.FuncFormatter(
+                    lambda seconds, _: str(datetime.timedelta(seconds=seconds))
+                )
+            )
+
+        axes.tick_params(axis="x", labelrotation=90)
+        axes.set_xlabel(DataProfile.__time_label)
+        min_time = min(times[0] for times, _ in data_profiles.values())
+        max_time = max(times[-1] for times, _ in data_profiles.values())
+        if min_time < max_time:
+            axes.set_xlim([min_time, max_time])
+
+        DataProfile.__set_ratio_axis(axes)
+        DataProfile.__draw_profiles(
+            axes,
+            data_profiles,
+            max_time,
+            {
+                name: {"drawstyle": "steps-post", **settings}
+                for name, settings in _get_configuration_plot_options(
+                    plot_settings, data_profiles
+                ).items()
+            },
+            grid_settings,
+        )
+        if create_figure:
+            # Make room for the rotated time tick labels.
+            axes.figure.tight_layout()
+
+        return axes.figure
+
+    @staticmethod
+    def __set_title(axes: Axes, data_profiles: Mapping[str, object]) -> None:
+        """Set the title of a data profiles plot.
+
+        Args:
+            axes: The axes of the plot.
+            data_profiles: The data profiles.
+        """
+        axes.set_title(f"Data profile{'s' if len(data_profiles) > 1 else ''}")
+
+    @staticmethod
+    def __set_ratio_axis(axes: Axes) -> None:
+        """Set the axis of the ratios of targets reached.
+
+        Args:
+            axes: The axes of the plot.
+        """
         y_ticks = linspace(0.0, 1.0, 11)
-        plt.yticks(y_ticks, (f"{ratio * 100.0:.0f}%" for ratio in y_ticks))
-        plt.ylabel("Ratios of targets reached")
-        plt.ylim([0.0, 1.05])
+        axes.set_yticks(y_ticks, [f"{ratio * 100.0:.0f}%" for ratio in y_ticks])
+        axes.set_ylabel("Ratios of targets reached")
+        axes.set_ylim([0.0, 1.05])
 
-        # Plot the data profiles
-        for name, profile in data_profiles.items():
-            # Plot the data profile
-            profile_size = len(profile)
-            axes.plot(range(1, profile_size + 1), profile, **plot_settings[name])
+    @staticmethod
+    def __draw_profiles(
+        axes: Axes,
+        data_profiles: Mapping[str, tuple[Sequence[float], Sequence[float]]],
+        max_abscissa: float,
+        plot_settings: Mapping[str, ConfigurationPlotOptions],
+        grid_settings: Mapping[str, str],
+    ) -> None:
+        """Draw data profiles.
 
-            # Extend the profile with an horizontal line if necessary
-            if profile_size < max_profile_size:
+        A data profile ending before the maximum abscissa
+        is extended with a horizontal dotted line
+        and its last entry is marked with a star.
+
+        Args:
+            axes: The axes of the plot.
+            data_profiles: The abscissas and the ratios of each data profile.
+            max_abscissa: The maximum abscissa of the data profiles.
+            plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
+                for each algorithm configuration.
+            grid_settings: The keyword arguments of `matplotlib.pyplot.grid`.
+        """
+        for name, (abscissas, profile) in data_profiles.items():
+            axes.plot(abscissas, profile, **plot_settings[name])
+            last_abscissa = abscissas[-1]
+            if last_abscissa < max_abscissa:
                 color = plot_settings[name]["color"]
-                tail_size = max_profile_size - profile_size + 1
                 last_value = profile[-1]
                 axes.plot(
-                    range(profile_size, profile_size + tail_size),
-                    [last_value] * tail_size,
+                    [last_abscissa, max_abscissa],
+                    [last_value, last_value],
                     color=color,
                     linestyle="dotted",
                 )
-                # Mark the last entry of the data profile
-                axes.plot(profile_size, last_value, marker="*", color=color)
+                axes.plot(last_abscissa, last_value, marker="*", color=color)
 
-        plt.legend()
-        plt.grid(**grid_settings)
-        return fig
+        axes.legend()
+        axes.grid(**grid_settings)

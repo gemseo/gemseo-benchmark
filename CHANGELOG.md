@@ -39,6 +39,27 @@ and this project adheres to
   or an error raised by the callable computing an option
   raises a `ValueError` naming the algorithm configuration
   and the instance of the problem.
+- The data profiles can be computed relative to the elapsed time,
+  with the method `DataProfile.compute_time_data_profiles`.
+  `DataProfile.add_history` has an argument `elapsed_times`.
+- `ProblemsGroup.compute_data_profile`,
+  `BaseProblemConfiguration.compute_data_profile` and `DataProfile.plot`
+  plot the data profiles relative to the number of iterations
+  and relative to the elapsed time, in two figures, and return them.
+  When the figures are saved to a file, e.g. `data_profile.png`,
+  the data profiles relative to the elapsed time are saved
+  to `data_profile_time.png`.
+  The argument `combine_figures` (`False` by default) plots both data profiles
+  side by side in a single figure, saved to a single file,
+  and the argument `use_time_log_scale` (`False` by default)
+  uses a logarithmic scale for the time axis.
+- The benchmarking report shows the data profiles relative to the elapsed time
+  next to the data profiles relative to the number of iterations,
+  and the distributions of the performance measure, the infeasibility measure
+  and the number of unsatisfied constraints of each algorithm configuration
+  relative to the elapsed time
+  next to their distributions relative to the number of iterations
+  (or of discipline executions).
 
 ### Changed
 
@@ -76,6 +97,12 @@ and this project adheres to
 - The dependencies `properdocs`, `mkdocs-material` and `mkdocs-to-pdf`
   are bounded: `properdocs >=1.6,<2`, `mkdocs-material >=9.7,<10`
   and `mkdocs-to-pdf >=0.11,<1`.
+- In the benchmarking report,
+  the distributions of the data of an algorithm configuration
+  on an MDO or MDA problem configuration
+  are plotted relative to the number of discipline executions,
+  as the figures that compare the algorithm configurations,
+  instead of the number of iterations.
 
 ### Fixed
 

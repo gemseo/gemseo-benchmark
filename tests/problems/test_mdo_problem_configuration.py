@@ -191,7 +191,7 @@ def test_compute_data_profile(
     snapshot_matplotlib,
 ) -> None:
     """Check the computation of data profiles."""
-    figure = plot_data_profiles(
+    figures = plot_data_profiles(
         MDOProblemConfiguration,
         mdo_create_problem,
         target_values,
@@ -202,7 +202,8 @@ def test_compute_data_profile(
         True,
         0,
     )
-    assert figure == snapshot_matplotlib
+    for figure in figures:
+        assert figure == snapshot_matplotlib
 
 
 def test_compute_data_profile_max_eval_number(
@@ -213,7 +214,7 @@ def test_compute_data_profile_max_eval_number(
     snapshot_matplotlib,
 ) -> None:
     """Check the computation of data profiles when the evaluations number is limited."""
-    figure = plot_data_profiles_with_max_eval_number(
+    figures = plot_data_profiles_with_max_eval_number(
         MDOProblemConfiguration,
         mdo_create_problem,
         target_values,
@@ -223,7 +224,8 @@ def test_compute_data_profile_max_eval_number(
         True,
         0,
     )
-    assert figure == snapshot_matplotlib(remove_text=True)
+    for figure in figures:
+        assert figure == snapshot_matplotlib(remove_text=True)
 
 
 def test_minimize_performance_measure(mdo_problem_configuration) -> None:

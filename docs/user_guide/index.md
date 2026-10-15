@@ -245,7 +245,7 @@ sub-package handles the computation of data profiles.
 
 A *data profile* is a graph that represents the extent to which an
 algorithm solves a problem (or a group of problems) for a given number
-of functions evaluations.
+of functions evaluations or a given elapsed time.
 To
 [clarify this definition](#data-profile) we need to introduce target values.
 
@@ -295,6 +295,17 @@ ratio of target values reached by the algorithm relative to the number
 functions evaluations performed by the algorithm.
 
 ![images/data_profiles.png](images/data_profiles.png)
+
+The data profile can also be computed relative to the elapsed time,
+which accounts for the cost of the iterations of the algorithm.
+The method `compute_data_profile` of a problem configuration
+or of a group of problem configurations
+plots both data profiles in two separate figures.
+When the figures are saved to a file, e.g. `data_profile.png`,
+the data profiles relative to the elapsed time are saved
+to `data_profile_time.png`.
+The argument `combine_figures` plots both data profiles side by side
+in a single figure, saved to a single file.
 
 ## Report
 

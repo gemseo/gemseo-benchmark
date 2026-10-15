@@ -27,7 +27,6 @@ import pytest
 from gemseo.doe import CustomDOE_Settings
 from gemseo.optimization import L_BFGS_B_Settings
 from gemseo.problem.optimization.rosenbrock import Rosenbrock
-from matplotlib import pyplot
 from numpy import zeros
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -68,14 +67,34 @@ def test_compute_data_profile(
 ):
     """Check the computation of data profiles."""
     group = ProblemsGroup("A group", [problem_a, problem_b])
-    group.compute_data_profile(
+    figures = group.compute_data_profile(
         algorithms_configurations,
         results,
         show=False,
         max_eval_number=5,
         use_abscissa_log_scale=use_abscissa_log_scale,
+        use_time_log_scale=use_abscissa_log_scale,
     )
-    assert pyplot.gcf() == snapshot_matplotlib
+    for figure in figures:
+        assert figure == snapshot_matplotlib
+
+
+@pytest.mark.parametrize("combine_figures", [False, True])
+def test_compute_data_profile_files(
+    tmp_path, problem_a, problem_b, results, combine_figures
+):
+    """Check the files of the data profiles of a group of problems."""
+    path = tmp_path / "data_profile.png"
+    figures = ProblemsGroup("A group", [problem_a, problem_b]).compute_data_profile(
+        algorithms_configurations,
+        results,
+        show=False,
+        plot_path=path,
+        combine_figures=combine_figures,
+    )
+    assert len(figures) == 1 if combine_figures else 2
+    assert path.is_file()
+    assert (tmp_path / "data_profile_time.png").is_file() is not combine_figures
 
 
 def test_iter(problem_a, problem_b):

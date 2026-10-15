@@ -48,6 +48,7 @@ if TYPE_CHECKING:
     from gemseo.doe.core.base_doe_settings import BaseDOESettings
     from gemseo.space import DesignSpace
     from gemseo.util.typing import RealArray
+    from matplotlib.figure import Figure
 
     from gemseo_benchmark import ConfigurationPlotOptions
     from gemseo_benchmark.algorithms.algorithms_configurations import (
@@ -334,8 +335,14 @@ class BaseProblemConfiguration(
         plot_settings: Mapping[str, ConfigurationPlotOptions] = read_only_empty_dict,
         grid_settings: Mapping[str, str] = read_only_empty_dict,
         use_abscissa_log_scale: bool = False,
-    ) -> None:
+        use_time_log_scale: bool = False,
+        combine_figures: bool = False,
+    ) -> list[Figure]:
         """Compute the data profiles of given algorithms.
+
+        The data profiles are plotted
+        relative to the number of iterations and relative to the elapsed time,
+        in two separate figures unless `combine_figures` is `True`.
 
         Args:
             algos_configurations: The algorithms configurations.
@@ -343,6 +350,12 @@ class BaseProblemConfiguration(
             show: Whether to display the plot.
             file_path: The path where to save the plot.
                 If empty, the plot is not saved.
+                Unless `combine_figures` is `True`,
+                this path is the one of the data profiles
+                relative to the number of iterations
+                and the data profiles relative to the elapsed time are saved
+                next to it, with the suffix `_time` appended to the file name,
+                e.g. `data_profile_time.png` for `data_profile.png`.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             max_iteration_number: The maximum number of iterations to plot.
                 If `0`, this value is inferred from the longest history.
@@ -351,6 +364,17 @@ class BaseProblemConfiguration(
             grid_settings: The keyword arguments of `matplotlib.pyplot.grid`.
             use_abscissa_log_scale: Whether to use a logarithmic scale
                 for the abscissa axis.
+            use_time_log_scale: Whether to use a logarithmic scale
+                for the time axis.
+            combine_figures: Whether to plot the data profiles
+                relative to the number of iterations
+                and relative to the elapsed time
+                side by side in a single figure.
+
+        Returns:
+            The figure of the data profiles relative to the number of iterations
+            and the figure of the data profiles relative to the elapsed time,
+            or the single figure gathering both if `combine_figures` is `True`.
         """
         data_profile = DataProfile({self.name: self.minimization_target_values})
         for configuration_name in algos_configurations.names:
@@ -365,14 +389,17 @@ class BaseProblemConfiguration(
                     configuration_name,
                     history.performance_measures,
                     history.infeasibility_measures,
+                    elapsed_times=[item.elapsed_time for item in history],
                 )
 
-        data_profile.plot(
+        return data_profile.plot(
             show=show,
             file_path=file_path,
             plot_settings=plot_settings,
             grid_settings=grid_settings,
             use_abscissa_log_scale=use_abscissa_log_scale,
+            use_time_log_scale=use_time_log_scale,
+            combine_figures=combine_figures,
         )
 
     @property
