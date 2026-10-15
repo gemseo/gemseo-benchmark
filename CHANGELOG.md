@@ -28,6 +28,12 @@ and this project adheres to
 
 ## Develop
 
+### Changed
+
+- The dependencies `properdocs`, `mkdocs-material` and `mkdocs-to-pdf`
+  are bounded: `properdocs >=1.6,<2`, `mkdocs-material >=9.7,<10`
+  and `mkdocs-to-pdf >=0.11,<1`.
+
 ### Fixed
 
 - Setting the starting points of a problem configuration
