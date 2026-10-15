@@ -32,6 +32,8 @@ and this project adheres to
 
 - Setting the starting points of a problem configuration
   from a generator of NumPy arrays no longer leaves it without starting points.
+- `AlgorithmsConfigurations.algorithms` lists each algorithm once
+  when several algorithm configurations use it.
 
 ## Version 5.0.0 (October 2026)
 

@@ -118,6 +118,22 @@ def test_discard(configuration_b, configuration_c, configuration_a):
     ]
 
 
+def test_shared_algorithm(configuration_b, configuration_a):
+    """Check the names of the algorithms when configurations share an algorithm."""
+    configuration_d = mock.Mock()
+    configuration_d.name = "Configuration D"
+    configuration_d.algorithm_name = configuration_a.algorithm_name
+    algorithms_configurations = AlgorithmsConfigurations(
+        configuration_b, configuration_a, configuration_d
+    )
+    expected = [configuration_a.algorithm_name, configuration_b.algorithm_name]
+    assert algorithms_configurations.algorithms == expected
+    algorithms_configurations.discard(configuration_a)
+    assert algorithms_configurations.algorithms == expected
+    algorithms_configurations.discard(configuration_d)
+    assert algorithms_configurations.algorithms == [configuration_b.algorithm_name]
+
+
 def test_name(configuration_b, configuration_c, configuration_a):
     """Check the accessor to the name of a collection of algorithms configurations."""
     name = "name of the collection"

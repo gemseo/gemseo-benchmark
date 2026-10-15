@@ -77,7 +77,8 @@ class AlgorithmsConfigurations(MutableSet[AlgorithmConfiguration]):
         index = bisect.bisect(self.__names, algorithm_configuration.name)
         self.__configurations.insert(index, algorithm_configuration)
         bisect.insort(self.__names, algorithm_configuration.name)
-        bisect.insort(self.__algorithms, algorithm_configuration.algorithm_name)
+        if algorithm_configuration.algorithm_name not in self.__algorithms:
+            bisect.insort(self.__algorithms, algorithm_configuration.algorithm_name)
 
     def discard(self, algorithm_configuration: AlgorithmConfiguration) -> None:
         """Remove an algorithm configuration.
