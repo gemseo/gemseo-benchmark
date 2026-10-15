@@ -48,7 +48,7 @@ from gemseo_benchmark.problems.problems_group import ProblemsGroup
 from gemseo_benchmark.scenario import Scenario
 
 # %%
-# We use the fast logging configuration of GEMSEO.
+# We use the fast mode of GEMSEO to accelerate the script.
 configuration.enable_fast_mode()
 
 
