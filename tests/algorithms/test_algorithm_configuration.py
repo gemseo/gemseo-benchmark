@@ -21,6 +21,8 @@
 
 from __future__ import annotations
 
+from unittest import mock
+
 import pytest
 from gemseo.optimization import SLSQP_Settings
 from gemseo.util.pydantic import BaseSettings
@@ -93,6 +95,42 @@ def test_from_dict():
     assert algorithm_configuration.name == "SciPy SLSQP"
     assert algorithm_configuration.algorithm_name == "SLSQP"
     assert algorithm_configuration.algorithm_options == {"max_iter": 9}
+
+
+def test_from_dict_earlier_version():
+    """Check the import of an algorithm configuration saved by gemseo-benchmark 4."""
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"^The algorithm configuration has no 'algorithm_settings_class', "
+            r"'algorithm_settings'; it was probably written by an earlier version "
+            r"of gemseo-benchmark and must be computed again\.$"
+        ),
+    ):
+        AlgorithmConfiguration.from_dict({
+            "configuration_name": "SciPy SLSQP",
+            "algorithm_name": "SLSQP",
+            "algorithm_options": {"max_iter": 9},
+        })
+
+
+def test_get_instance_settings():
+    """Check the settings of the algorithm for an instance of a problem."""
+    settings = SLSQP_Settings(max_iter=9)
+    algorithm_configuration = AlgorithmConfiguration(
+        settings,
+        instance_algorithm_options={
+            "max_iter": lambda problem_configuration, index: (
+                problem_configuration.dimension + index
+            )
+        },
+    )
+    instance_settings = algorithm_configuration.get_instance_settings(
+        mock.Mock(dimension=10), 2
+    )
+    assert isinstance(instance_settings, SLSQP_Settings)
+    assert instance_settings.max_iter == 12
+    assert settings.max_iter == 9
 
 
 def test_copy(algorithm_configuration):

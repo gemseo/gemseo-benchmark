@@ -174,11 +174,11 @@ class OptimizationProblemConfiguration(
         """
         self.__targets_generator = TargetsGenerator()
         for configuration in algorithm_configurations:
-            for instance in self:
+            for index, instance in enumerate(self):
                 execute_algo(
                     instance,
                     "opt",
-                    settings_model=configuration.algorithm_settings,
+                    settings_model=configuration.get_instance_settings(self, index),
                 )
                 history = PerformanceHistory.from_problem(instance)
                 self.__targets_generator.add_history(history=history)

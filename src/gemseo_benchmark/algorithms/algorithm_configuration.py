@@ -37,6 +37,10 @@ if TYPE_CHECKING:
 
     from gemseo.util.pydantic import BaseSettings
 
+    from gemseo_benchmark.problems.base_problem_configuration import (
+        BaseProblemConfiguration,
+    )
+
 InstanceAlgorithmOptions = MutableMapping[str, Callable[[int], Any]]
 
 
@@ -123,6 +127,26 @@ class AlgorithmConfiguration:
         """The instance-specific options of the algorithm."""
         return self.__instance_algorithm_options
 
+    def get_instance_settings(
+        self, problem_configuration: BaseProblemConfiguration, index: int
+    ) -> BaseSettings:
+        """Return the settings of the algorithm for an instance of a problem.
+
+        Args:
+            problem_configuration: The problem configuration.
+            index: The 0-based index of the instance of the problem.
+
+        Returns:
+            The settings of the algorithm
+            updated with the options specific to the instance of the problem.
+        """
+        return self.__algorithm_settings.model_copy(
+            update={
+                name: function(problem_configuration, index)
+                for name, function in self.__instance_algorithm_options.items()
+            }
+        )
+
     def to_dict(self, skip_instance_algorithm_options: bool = False) -> dict[str, Any]:
         """Return the algorithm configuration as a dictionary.
 
@@ -178,7 +202,29 @@ class AlgorithmConfiguration:
 
         Returns:
             The algorithm configuration.
+
+        Raises:
+            ValueError: If the dictionary misses a key,
+                e.g. because it was written by an earlier version of gemseo-benchmark.
         """
+        missing_keys = [
+            key
+            for key in (
+                cls.__CONFIGURATION_NAME,
+                cls.__ALGORITHM_SETTINGS_CLASS,
+                cls.__ALGORITHM_SETTINGS,
+            )
+            if key not in algorithm_configuration
+        ]
+        if missing_keys:
+            msg = (
+                "The algorithm configuration has no "
+                f"{', '.join(repr(key) for key in missing_keys)}; "
+                "it was probably written by an earlier version of gemseo-benchmark "
+                "and must be computed again."
+            )
+            raise ValueError(msg)
+
         fqn = algorithm_configuration[cls.__ALGORITHM_SETTINGS_CLASS]
         module_name, _, class_name = fqn.rpartition(".")
         settings_class = getattr(importlib.import_module(module_name), class_name)

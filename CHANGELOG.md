@@ -40,6 +40,9 @@ and this project adheres to
 - The class method `BaseWorker.check_algorithms_suitability` checks
   whether algorithms are suited to a problem configuration before any execution;
   it does nothing by default and `OptimizationWorker` overrides it.
+- The method `AlgorithmConfiguration.get_instance_settings` returns
+  the settings of the algorithm updated with the options specific
+  to an instance of a problem.
 
 ### Changed
 
@@ -89,8 +92,16 @@ and this project adheres to
   and the explicitly-set algorithm settings;
   `AlgorithmConfiguration.from_dict` and `PerformanceHistory.from_file`
   can no longer read the algorithm configurations and the performance histories
-  saved with an earlier version.
+  saved with an earlier version;
+  they raise a `ValueError` that says these results must be computed again.
 - `BaseProblemConfiguration.minimization_target_values` raises a `ValueError` when the problem configuration has no target value, as `target_values` does; it used to return `None`.
+
+### Fixed
+
+- `OptimizationProblemConfiguration.compute_target_values` applies
+  the `instance_algorithm_options` of the algorithm configurations
+  to each instance of the problem, as the benchmarking does;
+  they were ignored.
 
 ### Removed
 
