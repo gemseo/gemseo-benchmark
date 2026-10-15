@@ -29,7 +29,7 @@ from typing import Any
 from typing import Generic
 from typing import TypeVar
 
-from gemseo import logger as GEMSEO_LOGGER  # ruff: ignore[lowercase-imported-as-non-lowercase]
+from gemseo import logger as gemseo_logger
 from gemseo.util.metaclass import ABCGoogleDocstringInheritanceMeta
 from gemseo.util.timer import Timer
 
@@ -135,7 +135,7 @@ class BaseWorker(
         # Start writing in the log file.
         if log_path is not None:
             file_handler = logging.FileHandler(log_path, "w")
-            loggers = [benchmarking_logger, GEMSEO_LOGGER]
+            loggers = [benchmarking_logger, gemseo_logger]
             for logger in loggers:
                 logger.addHandler(file_handler)
 
