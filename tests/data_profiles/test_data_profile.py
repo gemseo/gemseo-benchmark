@@ -21,6 +21,8 @@
 
 from __future__ import annotations
 
+from unittest import mock
+
 import pytest
 from matplotlib import pyplot
 from matplotlib.testing.decorators import image_comparison
@@ -141,3 +143,14 @@ def test_different_sizes_data_profiles():
     profiles = data_profile.compute_data_profiles()
     pyplot.close("all")
     data_profile._plot_data_profiles(profiles)
+
+
+def test_plot_algo_names():
+    """Check the plotting of the data profiles of some algorithms."""
+    data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
+    data_profile.add_history("problem", "algo1", [2.0, 1.0, 0.0])
+    data_profile.add_history("problem", "algo2", [2.0, 1.0, 0.0])
+    with mock.patch.object(DataProfile, "_plot_data_profiles") as plot_data_profiles:
+        data_profile.plot(algo_names=["algo1"], show=False)
+
+    assert plot_data_profiles.call_args.args[0].keys() == {"algo1"}
