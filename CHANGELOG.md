@@ -51,11 +51,17 @@ and this project adheres to
   the results of such an algorithm configuration
   produced with an earlier version are not found
   and its executions run again.
+- `Benchmarker.execute` and `Scenario.execute` also validate
+  the options specific to the problem instances
+  before any execution, when they check the algorithms:
+  a `ValueError` lists the instances whose options are invalid.
 - `AlgorithmConfiguration.from_dict` and `PerformanceHistory.from_file`
   can no longer read the algorithm configurations and the performance histories
   saved with an earlier version
   or whose algorithm settings class cannot be imported;
-  they raise a `ValueError` that says these results must be computed again.
+  they raise a `ValueError` that says to compute these results again,
+  or to install the plugin providing the algorithm
+  when the algorithm settings class cannot be imported.
 - The dependencies `properdocs`, `mkdocs-material` and `mkdocs-to-pdf`
   are bounded: `properdocs >=1.6,<2`, `mkdocs-material >=9.7,<10`
   and `mkdocs-to-pdf >=0.11,<1`.

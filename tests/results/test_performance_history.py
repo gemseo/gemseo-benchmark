@@ -267,7 +267,9 @@ def test_from_file_unknown_settings_class(tmp_path):
             rf"^The performance history file {re.escape(str(file_path))} "
             r"cannot be read: The class of the algorithm settings "
             r"'gemseo\.algos\.opt\.mma\.settings\.mma_settings\.MMASVanberg_Settings' "
-            r"cannot be imported; .* must be computed again\.$"
+            r"cannot be imported; install the plugin providing the algorithm, "
+            r"or, if the results were written by an earlier version "
+            r"of gemseo-benchmark, compute them again\.$"
         ),
     ):
         PerformanceHistory.from_file(file_path)
