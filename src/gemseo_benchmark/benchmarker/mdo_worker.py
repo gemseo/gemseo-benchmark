@@ -62,9 +62,7 @@ class MDOWorker(
         scenario, disciplines = problem_configuration.create_problem(
             algorithm_configuration
         )
-        scenario.formulation.problem.design_space.set_current_value(
-            starting_point
-        )
+        scenario.formulation.problem.design_space.set_current_value(starting_point)
         return scenario, disciplines
 
     @classmethod
