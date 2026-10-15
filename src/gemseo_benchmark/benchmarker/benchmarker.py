@@ -27,7 +27,7 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import TYPE_CHECKING
 from typing import Any
 
-from gemseo import logger as GEMSEO_LOGGER  # ruff: ignore[lowercase-imported-as-non-lowercase]
+from gemseo import logger as gemseo_logger
 
 from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -151,7 +151,7 @@ class Benchmarker:
                 self.__histories_path / "gemseo.log", "w"
             )
             file_handler.setFormatter(logging.Formatter("%(threadName)s %(message)s"))
-            loggers = [LOGGER, GEMSEO_LOGGER]
+            loggers = [LOGGER, gemseo_logger]
             for logger in loggers:
                 logger.addHandler(file_handler)
 
@@ -366,7 +366,7 @@ class Benchmarker:
                     gemseo_log_path,
                     performance_history_path,
                     hdf_file_path,
-                    GEMSEO_LOGGER,
+                    gemseo_logger,
                 )
             ] = (
                 gemseo_log_message,
@@ -455,7 +455,7 @@ class Benchmarker:
         ):
             return f"Solving {execution_info}."
 
-        GEMSEO_LOGGER.info("Skipping %s.", execution_info)
+        gemseo_logger.info("Skipping %s.", execution_info)
         return ""
 
     @staticmethod
@@ -474,15 +474,8 @@ class Benchmarker:
         Returns:
             The algorithm configuration of the problem.
         """
-        instance_options = {
-            name: fn(problem_configuration, index)
-            for name, fn in algorithm_configuration.instance_algorithm_options.items()
-        }
-        updated_settings = algorithm_configuration.algorithm_settings.model_copy(
-            update=instance_options
-        )
         return AlgorithmConfiguration(
-            updated_settings,
+            algorithm_configuration.get_instance_settings(problem_configuration, index),
             algorithm_configuration.name,
             {},
         )

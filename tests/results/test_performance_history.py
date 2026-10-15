@@ -232,6 +232,26 @@ def test_from_file():
     assert history.items[1].n_unsatisfied_constraints == 0
 
 
+def test_from_file_earlier_version(tmp_path):
+    """Check the reading of a performance history saved by gemseo-benchmark 4."""
+    file_path = tmp_path / "history.json"
+    file_path.write_text(
+        '{"algorithm_configuration": {"configuration_name": "SciPy SLSQP", '
+        '"algorithm_name": "SLSQP", "algorithm_options": {"max_iter": 9}}, '
+        '"history_items": []}'
+    )
+    with pytest.raises(
+        ValueError,
+        match=(
+            rf"^The performance history file {re.escape(str(file_path))} "
+            r"cannot be read: The algorithm configuration has no "
+            r"'algorithm_settings_class', 'algorithm_settings'; .* "
+            r"must be computed again\.$"
+        ),
+    ):
+        PerformanceHistory.from_file(file_path)
+
+
 def test_repr():
     """Check the representation of a performance history."""
     history = PerformanceHistory([-2.0, -3.0], [1.0, 0.0])

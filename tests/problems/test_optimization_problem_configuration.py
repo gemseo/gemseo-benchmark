@@ -42,7 +42,7 @@ from gemseo_benchmark.algorithms.algorithms_configurations import (
 )
 from gemseo_benchmark.benchmarker.optimization_worker import OptimizationWorker
 from gemseo_benchmark.data_profiles.target_values import TargetValues
-from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
+from gemseo_benchmark.problems import optimization_problem_configuration
 from gemseo_benchmark.problems.optimization_problem_configuration import (
     OptimizationProblemConfiguration,
 )
@@ -263,15 +263,42 @@ def test_compute_target_values_settings_defaults() -> None:
     configurations = AlgorithmsConfigurations(
         AlgorithmConfiguration(_ThreeIterationsSLSQPSettings())
     )
-    add_history = TargetsGenerator.add_history
     with mock.patch.object(
-        TargetsGenerator, "add_history", autospec=True, side_effect=add_history
-    ) as add_history_mock:
+        optimization_problem_configuration,
+        "execute_algo",
+        wraps=optimization_problem_configuration.execute_algo,
+    ) as execute_algo:
         problem.compute_target_values(1, configurations)
 
-    histories = [call.kwargs["history"] for call in add_history_mock.call_args_list]
-    assert histories
-    assert all(len(history) == 3 for history in histories)
+    assert execute_algo.call_args_list
+    for call in execute_algo.call_args_list:
+        settings = call.kwargs["settings_model"]
+        assert isinstance(settings, _ThreeIterationsSLSQPSettings)
+        assert settings.max_iter == 3
+
+
+def test_compute_target_values_instance_algorithm_options() -> None:
+    """Check that the target values use the options specific to the instances."""
+    problem = OptimizationProblemConfiguration("Rosenbrock", Rosenbrock)
+    problem.starting_points = [array([0.0, 0.0]), array([0.5, 0.5])]
+    configurations = AlgorithmsConfigurations(
+        AlgorithmConfiguration(
+            SLSQP_Settings(max_iter=10),
+            instance_algorithm_options={
+                "max_iter": lambda configuration, index: configuration.dimension + index
+            },
+        )
+    )
+    with mock.patch.object(
+        optimization_problem_configuration,
+        "execute_algo",
+        wraps=optimization_problem_configuration.execute_algo,
+    ) as execute_algo:
+        problem.compute_target_values(1, configurations)
+
+    assert [
+        call.kwargs["settings_model"].max_iter for call in execute_algo.call_args_list
+    ] == [2, 3]
 
 
 def test_starting_points_non_2d_array(benchmarking_problem):

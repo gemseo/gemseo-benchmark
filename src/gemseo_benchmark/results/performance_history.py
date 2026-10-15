@@ -380,6 +380,12 @@ class PerformanceHistory(collections.abc.Sequence):
 
         Returns:
             The performance history.
+
+        Raises:
+            ValueError: If the algorithm configuration stored in the file
+                cannot be read,
+                e.g. because the file was written
+                by an earlier version of gemseo-benchmark.
         """
         with Path(path).open("r") as file:
             data = json.load(file)
@@ -390,9 +396,13 @@ class PerformanceHistory(collections.abc.Sequence):
         history._objective_name = data.get(cls.__OBJECTIVE_NAME)
         history._constraints_names = data.get(cls.__CONSTRAINTS_NAMES, [])
         if cls.__ALGORITHM_CONFIGURATION in data:
-            history.algorithm_configuration = AlgorithmConfiguration.from_dict(
-                data[cls.__ALGORITHM_CONFIGURATION]
-            )
+            try:
+                history.algorithm_configuration = AlgorithmConfiguration.from_dict(
+                    data[cls.__ALGORITHM_CONFIGURATION]
+                )
+            except ValueError as error:
+                msg = f"The performance history file {path} cannot be read: {error}"
+                raise ValueError(msg) from error
 
         history.doe_size = data.get(cls.__DOE_SIZE)
         history.total_time = data.get(cls.__EXECUTION_TIME)

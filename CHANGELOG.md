@@ -28,6 +28,12 @@ and this project adheres to
 
 ## Develop
 
+### Added
+
+- The method `AlgorithmConfiguration.get_instance_settings` returns
+  the settings of the algorithm updated with the options specific
+  to an instance of a problem.
+
 ### Changed
 
 - The plugin is compatible with GEMSEO 7 and no longer with GEMSEO 6.
@@ -45,7 +51,8 @@ and this project adheres to
   and its executions run again.
 - `AlgorithmConfiguration.from_dict` and `PerformanceHistory.from_file`
   can no longer read the algorithm configurations and the performance histories
-  saved with an earlier version.
+  saved with an earlier version;
+  they raise a `ValueError` that says these results must be computed again.
 - The dependencies `properdocs`, `mkdocs-material` and `mkdocs-to-pdf`
   are bounded: `properdocs >=1.6,<2`, `mkdocs-material >=9.7,<10`
   and `mkdocs-to-pdf >=0.11,<1`.
@@ -56,6 +63,10 @@ and this project adheres to
   from a generator of NumPy arrays no longer leaves it without starting points.
 - `AlgorithmsConfigurations.algorithms` lists each algorithm once
   when several algorithm configurations use it.
+- `OptimizationProblemConfiguration.compute_target_values` applies
+  the `instance_algorithm_options` of the algorithm configurations
+  to each instance of the problem, as the benchmarking does;
+  they were ignored.
 
 ## Version 5.0.0 (October 2026)
 
