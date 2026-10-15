@@ -1,6 +1,6 @@
 /build
 /dist
-/.tox
+/.cache
 /.venv
 /.ruff_cache
 *.pyc
@@ -24,6 +24,8 @@ __pycache__/
 /coverage.xml
 /.coverage*
 !/.coveragerc
+/diff-cover.html
+/figure-report
 
 /.pytest_cache
 **/result_images

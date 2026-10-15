@@ -62,6 +62,8 @@ and this project adheres to
   they raise a `ValueError` that says to compute these results again,
   or to install the plugin providing the algorithm
   when the algorithm settings class cannot be imported.
+- The documentation is generated using `mkdocs` instead of `properdocs`;
+  the HTML and PDF reports are still generated using `properdocs`.
 - The dependencies `properdocs`, `mkdocs-material` and `mkdocs-to-pdf`
   are bounded: `properdocs >=1.6,<2`, `mkdocs-material >=9.7,<10`
   and `mkdocs-to-pdf >=0.11,<1`.
@@ -253,8 +255,8 @@ and this project adheres to
 - Method `Problem.plot_histories` was removed as it was redundant with `Figures.plot`.
   To obtain a figure similar to the one formerly returned by
 
-  ```python
-  problem.plot_histories(
+    ```python
+    problem.plot_histories(
     algos_configurations,
     results,
     False,
@@ -265,13 +267,13 @@ and this project adheres to
     infeasibility_tolerance,
     max_eval_number,
     use_log_scale
-  )
-  ```
+    )
+    ```
 
-  one can make the following call instead:
+    one can make the following call instead:
 
-  ```python
-  Figures(
+    ```python
+    Figures(
     algos_configurations,
     ProblemsGroup(problem.name, [problem]),
     results,
@@ -279,24 +281,24 @@ and this project adheres to
     infeasibility_tolerance,
     max_eval_number,
     {"alpha": alpha, "markevery": markevery}
-  ).plot(plot_all_histories, use_log_scale, False, False, False)
-  ```
+    ).plot(plot_all_histories, use_log_scale, False, False, False)
+    ```
 
 - Method `Problem.compute_performance` was removed as is was redundant with `PerformanceHistory.from_problem`.
   To obtain values similar to the former
 
-  ```python
-  objective_values, infeasibility_measures, feasibility_statuses = Problem.compute_performance(problem)
-  ```
+    ```python
+    objective_values, infeasibility_measures, feasibility_statuses = Problem.compute_performance(problem)
+    ```
 
-  one can use the following instructions instead:
+    one can use the following instructions instead:
 
-  ```python
-  performance_history = PerformanceHistory.from_problem(problem)
-  objective_values = performance_history.objective_values
-  infeasibility_measures = performance_history.infeasibility_measures
-  feasibility_statuses = [item.is_feasible for item in performance_history]
-  ```
+    ```python
+    performance_history = PerformanceHistory.from_problem(problem)
+    objective_values = performance_history.objective_values
+    infeasibility_measures = performance_history.infeasibility_measures
+    feasibility_statuses = [item.is_feasible for item in performance_history]
+    ```
 
 #### Results
 
@@ -305,8 +307,8 @@ and this project adheres to
   as they were redundant with `Figures.plot`.
   To obtain a figure similar to the one formerly returned by
 
-  ```python
-  performance_histories.plot_algorithm_histories(
+    ```python
+    performance_histories.plot_algorithm_histories(
     axes,
     algorithm_name,
     max_feasible_objective,
@@ -315,19 +317,19 @@ and this project adheres to
     marker,
     alpha,
     markevery
-  )
-  ```
+    )
+    ```
 
-  one can use the following instructions instead:
+    one can use the following instructions instead:
 
-  ```python
-  results = Results()
-  for index, performance_history in enumerate(performance_histories):
+    ```python
+    results = Results()
+    for index, performance_history in enumerate(performance_histories):
     path = f"{index}.json"
     performance_history.to_file(path)
     results.add_path(algorithm_name, problem.name, path)
 
-  Figures(
+    Figures(
     AlgorithmsConfigurations(AlgorithmConfiguration(algorithm_name)),
     ProblemsGroup(problem.name, [problem]),
     results,
@@ -335,8 +337,8 @@ and this project adheres to
     0,
     0,
     {"color": color, "marker": marker, "alpha": alpha, "markevery": markevery}
-  ).plot(plot_all, False, False, False, False)
-  ```
+    ).plot(plot_all, False, False, False, False)
+    ```
 
 ## Version 3.0.0 (November 2024)
 

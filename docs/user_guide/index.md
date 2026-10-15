@@ -15,17 +15,17 @@ measure and compare their performances.
 
 A typical use of this package consists of the following steps:
 
-1.  define the
+1. define the
     [algorithms configurations](#algorithms-configurations) to be compared,
-2.  define the
+2. define the
     [problem configurations](#benchmarking-problems)
     that will serve as landmarks for the analysis,
-3.  execute a [benchmarking scenario](#scenario) to produce
-    1.  the [results](#results) of the
-        algorithms configurations on the problem configurations,
-    2.  a benchmarking [report](#report)
-        in HTML or PDF format illustrated with
-        [data profiles](#data-profiles).
+3. execute a [benchmarking scenario](#scenario) to produce
+    1. the [results](#results) of the
+       algorithms configurations on the problem configurations,
+    2. a benchmarking [report](#report)
+       in HTML or PDF format illustrated with
+       [data profiles](#data-profiles).
 
 !!! note
     Other algorithms will be supported in the future (ex: root-finding algorithms).
@@ -40,10 +40,10 @@ configurations to be investigated in a benchmarking study.
 
 An [AlgorithmConfiguration][gemseo_benchmark.algorithms.algorithm_configuration.AlgorithmConfiguration] contains:
 
--   the settings of an algorithm,
+- the settings of an algorithm,
     as an instance of its GEMSEO settings class
     (default values are used for the unspecified settings),
--   optionally, a name for the configuration (it will be generated
+- optionally, a name for the configuration (it will be generated
     automatically if unspecified).
 
 For example, we may consider the L-BFGS-B algorithm with its `maxcor`
@@ -106,15 +106,15 @@ of the algorithms configurations is to be measured.
 A [OptimizationProblemConfiguration][gemseo_benchmark.problems.optimization_problem_configuration.OptimizationProblemConfiguration] contains the mathematical
 definition of the problem, as an [OptimizationProblem][gemseo.optimization.problem.OptimizationProblem], and requires three other features.
 
-1.  The starting points, from which the algorithms configurations should
+1. The starting points, from which the algorithms configurations should
     be launched on the problem. Indeed, an algorithm may be quite
     dependent on the starting point. Therefore, in the context of a
     benchmarking study, it is advised to consider several starting
     points.
-    1.  One can pass the starting points directly,
-    2.  or configure their generation as a design of experiments (DOE).
-2.  The best objective value known for the problem.
-3.  The [target values](#target-values),
+    1. One can pass the starting points directly,
+    2. or configure their generation as a design of experiments (DOE).
+2. The best objective value known for the problem.
+3. The [target values](#target-values),
     necessary to compute
     [data profiles](#data-profiles):
     typically, a scale of objective functions values ranging from a
@@ -126,14 +126,14 @@ For example, we define below problem configurations based on
 [Rastrigin][gemseo.problem.optimization.rastrigin.Rastrigin] and
 [Rosenbrock][gemseo.problem.optimization.rosenbrock.Rosenbrock] respectively, where
 
--   5 starting points are computed by Latin hypercube sampling (LHS),
+- 5 starting points are computed by Latin hypercube sampling (LHS),
 
     ```python
     from gemseo.doe import OT_OPT_LHS_Settings
     doe_settings = OT_OPT_LHS_Settings(n_samples=5)
     ```
 
--   and the target values are passed directly as an exponential scale
+- and the target values are passed directly as an exponential scale
     towards the minimum (zero).
 
     ```python
@@ -201,16 +201,16 @@ problem configuration is stored in a
 [PerformanceHistory][gemseo_benchmark.results.performance_history.PerformanceHistory].
 More precisely:
 
--   A value of interest in the benchmarking of algorithms is defined and
+- A value of interest in the benchmarking of algorithms is defined and
     named *performance value*.
     The most telling performance value is the
     value of the objective function for an optimization problem, or the
     value of a residual for a nonlinear equation.
--   Each performance value is stored in a
+- Each performance value is stored in a
     [HistoryItem][gemseo_benchmark.results.history_item.HistoryItem], along with an
     infeasibility measure (especially for problems subject to
     constraints).
--   A [PerformanceHistory][gemseo_benchmark.results.performance_history.PerformanceHistory] is a
+- A [PerformanceHistory][gemseo_benchmark.results.performance_history.PerformanceHistory] is a
     sequence of [HistoryItem][gemseo_benchmark.results.history_item.HistoryItem]s.
     The index of the sequence is understood as the 0-based number of
     functions evaluations.
@@ -233,9 +233,9 @@ sub-package is responsible for the generation of the results.
 The class [Benchmarker][gemseo_benchmark.benchmarker.benchmarker.Benchmarker] is responsible
 for two tasks:
 
-1.  executing (possibly in parallel) the algorithms configurations on
+1. executing (possibly in parallel) the algorithms configurations on
     the reference problems,
-2.  saving the performance histories to files, and storing their paths
+2. saving the performance histories to files, and storing their paths
     in [Results][gemseo_benchmark.results.results.Results].
 
 ## Datas profiles {#data-profiles}
@@ -258,7 +258,7 @@ example of target value is the optimal value of the objective function.
 Target values can be thought as milestones on the trajectory towards the
 best value known.
 
-```
+```text
 target_values = TargetValues([10**-4, 10**-5, 10**-6, 0.0])
 ```
 
@@ -275,16 +275,16 @@ automatically computed with a generator of target values.
 A [TargetsGenerator][gemseo_benchmark.data_profiles.targets_generator.TargetsGenerator] relies on
 algorithms chosen as references.
 
-1.  The problem is solved with the reference algorithms from each
+1. The problem is solved with the reference algorithms from each
     starting point.
-2.  Instances of [PerformanceHistory][gemseo_benchmark.results.performance_history.PerformanceHistory]
+2. Instances of [PerformanceHistory][gemseo_benchmark.results.performance_history.PerformanceHistory]
     representing the history of the best performance value (which is
     decreasing) are computed, e.g.
     $\{\min_{0\leq i \leq k} f(x_i)\}_{0 \leq k \leq K}$ where $f$ is
     the objective function and $x_k$ are the values of the design
     variables at iteration $k$.
-3.  A notion of *median history* is computed from these histories.
-4.  Performance values are picked at uniform intervals in the median
+3. A notion of *median history* is computed from these histories.
+4. Performance values are picked at uniform intervals in the median
     history: these are the target values.
 
 ### Data profile
@@ -302,9 +302,9 @@ The [gemseo_benchmark.report][gemseo_benchmark.report] sub-package
 manages the automatic generation of a benchmarking report in PDF or HTML
 format describing:
 
--   the algorithms configurations,
--   the problem configurations,
--   the results generated by the algorithms on the problems, especially
+- the algorithms configurations,
+- the problem configurations,
+- the results generated by the algorithms on the problems, especially
     in the form of data profiles.
 
 ## Scenario

@@ -1,27 +1,62 @@
+# commitizen runs at the commit-msg stage,
+# its shim shall be installed too.
+default_install_hook_types: [pre-commit, commit-msg]
+# Without this, a hook runs at every installed stage,
+# the file hooks would run again when checking the commit message.
+default_stages: [pre-commit]
+# For the builtin repository and this very key.
+minimum_prek_version: "0.5.1"
+
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
+  # The hooks bundled with prek: nothing to clone, no environment to create.
+  - repo: builtin
     hooks:
       - id: trailing-whitespace
+        exclude: \.ambr$
       - id: end-of-file-fixer
         exclude: LICENSES/headers
       - id: check-yaml
-        # !reference is specific to gitlab
-        # !! prefix is specific to properdocs
-        exclude: \.gitlab-ci.yml|properdocs.yml
+        exclude: ^mkdocs\.yml$
+      # The !!python/name tag of mkdocs cannot be loaded,
+      # check the syntax only.
+      - id: check-yaml
+        name: check yaml syntax only
+        args: [--unsafe]
+        files: ^mkdocs\.yml$
       - id: check-added-large-files
-        exclude: docs/report
+        # The sample benchmarking report.
+        exclude: ^docs/report/
       - id: check-json
+      - id: check-toml
+      - id: check-symlinks
+      - id: destroyed-symlinks
+      - id: check-case-conflict
+      # The tests are also run on Windows.
+      - id: check-illegal-windows-names
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: fix-byte-order-marker
+
+  # The builtin implementation of pretty-format-json renders the floats
+  # differently (1e-06 becomes 1e-6) and would rewrite the JSON test data.
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
       - id: pretty-format-json
         args: [--autofix, --no-sort-keys]
-        exclude: \.ipynb
-      - id: check-toml
-      - id: destroyed-symlinks
-      - id: check-symlinks
+        exclude: \.ipynb$
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.12.10
+    hooks:
+      - id: uv-lock
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.17.0
     hooks:
+      # The markdown files are handled by rumdl,
+      # which itself delegates the code blocks to ruff,
+      # the default types of ruff-format include markdown.
       - id: ruff-check
         types_or: [python, pyi, jupyter]
         args: [--exit-non-zero-on-fix]
@@ -34,20 +69,11 @@ repos:
       - id: commitizen
         stages: [commit-msg]
 
-  - repo: https://github.com/kynan/nbstripout
-    rev: 0.9.1
+  - repo: https://github.com/rvben/rumdl-pre-commit
+    rev: v0.2.68
     hooks:
-      - id: nbstripout
-
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.49.1
-    hooks:
-      - id: markdownlint
-        args: [
-          --fix,
-          --disable,
-          MD024,
-        ]
+      - id: rumdl-fmt
+        exclude: ^\.gitlab
 
   - repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.5.6
@@ -66,20 +92,17 @@ repos:
           - --license-filepath
           - LICENSES/headers/BSD-0-Clause.txt
       - id: insert-license
-        name: insert CC BY-SA license
-        files: (\.rst|\.rst\.txt)$
-        exclude: ^src
-        args:
-          - --license-filepath
-          - LICENSES/headers/CC-BY-SA-4.0.txt
-          - --comment-style
-          - ..|   |
-      - id: insert-license
         name: insert CC BY-SA license for md files
         files: \.md$
+        # The templates of the benchmarking reports.
         exclude: ^src
         args:
           - --license-filepath
           - LICENSES/headers/CC-BY-SA-4.0.txt
           - --comment-style
           - <!--||-->
+          # Some files use metadata that must be first,
+          # then the license is after the metadata,
+          # offsetting the license header shall be done manually.
+          - --detect-license-in-X-top-lines
+          - "20"
