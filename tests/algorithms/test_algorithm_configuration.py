@@ -21,12 +21,14 @@
 
 from __future__ import annotations
 
+import re
 from unittest import mock
 
 import pytest
 from gemseo.optimization import SLSQP_Settings
 from gemseo.util.pydantic import BaseSettings
 from pydantic import Field
+from pydantic import ValidationError
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 
@@ -57,7 +59,9 @@ def test_name(input_name, output_name):
 def test_to_dict(input_name, output_name, skip_instance_algorithm_options):
     """Check the export of an algorithm configuration as a dictionary."""
     algorithm_configuration = AlgorithmConfiguration(
-        SLSQP_Settings(max_iter=9), input_name, {"seed": lambda index: index}
+        SLSQP_Settings(max_iter=9),
+        input_name,
+        {"seed": lambda problem_configuration, index: index},
     )
     dictionary = algorithm_configuration.to_dict(skip_instance_algorithm_options)
     assert dictionary["algorithm_settings_class"] == (
@@ -79,7 +83,7 @@ def test_to_dict(input_name, output_name, skip_instance_algorithm_options):
             "instance_algorithm_options",
         }
         assert dictionary["instance_algorithm_options"].keys() == {"seed"}
-        assert dictionary["instance_algorithm_options"]["seed"](7) == 7
+        assert dictionary["instance_algorithm_options"]["seed"](mock.Mock(), 7) == 7
 
 
 def test_from_dict():
@@ -90,7 +94,9 @@ def test_from_dict():
             "gemseo.optimization.scipy_local.settings.slsqp.SLSQP_Settings"
         ),
         "algorithm_settings": {"max_iter": 9},
-        "instance_algorithm_options": {"seed": lambda index: index},
+        "instance_algorithm_options": {
+            "seed": lambda problem_configuration, index: index
+        },
     })
     assert algorithm_configuration.name == "SciPy SLSQP"
     assert algorithm_configuration.algorithm_name == "SLSQP"
@@ -102,8 +108,9 @@ def test_from_dict_earlier_version():
     with pytest.raises(
         ValueError,
         match=(
-            r"^The algorithm configuration has no 'algorithm_settings_class', "
-            r"'algorithm_settings'; it was probably written by an earlier version "
+            r"^The algorithm configuration misses the keys "
+            r"'algorithm_settings_class' and 'algorithm_settings'; "
+            r"it was probably written by an earlier version "
             r"of gemseo-benchmark and must be computed again\.$"
         ),
     ):
@@ -112,6 +119,56 @@ def test_from_dict_earlier_version():
             "algorithm_name": "SLSQP",
             "algorithm_options": {"max_iter": 9},
         })
+
+
+@pytest.mark.parametrize(
+    ("dictionary", "keys"),
+    [
+        (
+            {"configuration_name": "SLSQP", "algorithm_settings": {}},
+            "key 'algorithm_settings_class'",
+        ),
+        (
+            {},
+            (
+                "keys 'configuration_name', 'algorithm_settings_class' "
+                "and 'algorithm_settings'"
+            ),
+        ),
+    ],
+)
+def test_from_dict_missing_keys(dictionary, keys):
+    """Check the error message when an algorithm configuration misses keys."""
+    with pytest.raises(
+        ValueError,
+        match=rf"^The algorithm configuration misses the {keys}; ",
+    ):
+        AlgorithmConfiguration.from_dict(dictionary)
+
+
+@pytest.mark.parametrize(
+    "settings_class",
+    [
+        "gemseo.algos.opt.mma.settings.mma_settings.MMASVanberg_Settings",
+        "gemseo.optimization.scipy_local.settings.slsqp.Unknown_Settings",
+    ],
+)
+def test_from_dict_unknown_settings_class(settings_class):
+    """Check the import of an algorithm configuration with an unknown settings class."""
+    with pytest.raises(
+        ValueError,
+        match=(
+            rf"^The class of the algorithm settings '{re.escape(settings_class)}' "
+            r"cannot be imported; .* must be computed again\.$"
+        ),
+    ) as error:
+        AlgorithmConfiguration.from_dict({
+            "configuration_name": "MMA",
+            "algorithm_settings_class": settings_class,
+            "algorithm_settings": {},
+        })
+
+    assert isinstance(error.value.__cause__, (ImportError, AttributeError))
 
 
 def test_get_instance_settings():
@@ -130,7 +187,49 @@ def test_get_instance_settings():
     )
     assert isinstance(instance_settings, SLSQP_Settings)
     assert instance_settings.max_iter == 12
+    assert instance_settings.model_fields_set == {"max_iter"}
     assert settings.max_iter == 9
+
+
+def test_get_instance_settings_without_instance_options():
+    """Check the settings of the algorithm without options specific to instances."""
+    settings = SLSQP_Settings(max_iter=9)
+    instance_settings = AlgorithmConfiguration(settings).get_instance_settings(
+        mock.Mock(), 0
+    )
+    assert instance_settings == settings
+    assert instance_settings.model_fields_set == {"max_iter"}
+
+
+def test_get_instance_settings_coercion():
+    """Check that the options specific to an instance are validated and coerced."""
+    algorithm_configuration = AlgorithmConfiguration(
+        SLSQP_Settings(ftol_rel=0.5),
+        instance_algorithm_options={
+            "max_iter": lambda problem_configuration, index: str(index + 5)
+        },
+    )
+    instance_settings = algorithm_configuration.get_instance_settings(mock.Mock(), 1)
+    assert instance_settings.max_iter == 6
+    assert instance_settings.ftol_rel == 0.5
+    assert instance_settings.model_fields_set == {"max_iter", "ftol_rel"}
+
+
+@pytest.mark.parametrize(
+    ("name", "value", "message"),
+    [
+        ("max_iters", 5, "max_iters"),
+        ("max_iter", "five", "max_iter"),
+    ],
+)
+def test_get_instance_settings_invalid_option(name, value, message):
+    """Check that an invalid option specific to an instance raises an error."""
+    algorithm_configuration = AlgorithmConfiguration(
+        SLSQP_Settings(),
+        instance_algorithm_options={name: lambda problem_configuration, index: value},
+    )
+    with pytest.raises(ValidationError, match=message):
+        algorithm_configuration.get_instance_settings(mock.Mock(), 0)
 
 
 def test_copy(algorithm_configuration):

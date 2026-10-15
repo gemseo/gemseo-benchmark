@@ -41,7 +41,15 @@ if TYPE_CHECKING:
         BaseProblemConfiguration,
     )
 
-InstanceAlgorithmOptions = MutableMapping[str, Callable[[int], Any]]
+InstanceAlgorithmOptions = MutableMapping[
+    str, Callable[["BaseProblemConfiguration", int], Any]
+]
+"""The options of an algorithm specific to the instances of a problem.
+
+The mapping links the name of an algorithm option to a callable
+that takes the problem configuration and the 0-based index of the instance
+and returns the value of the option.
+"""
 
 
 class AlgorithmConfiguration:
@@ -73,7 +81,8 @@ class AlgorithmConfiguration:
                 instances of a problem.
                 They shall be passed as a mapping
                 that links the name of an algorithm option
-                to a callable that takes the 0-based index of the instance as argument
+                to a callable that takes the problem configuration
+                and the 0-based index of the instance as arguments
                 and returns the value of the option.
         """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self.__algorithm_settings = algorithm_settings
@@ -139,13 +148,22 @@ class AlgorithmConfiguration:
         Returns:
             The settings of the algorithm
             updated with the options specific to the instance of the problem.
+
+        Raises:
+            ValidationError: When an option specific to the instance
+                is not an option of the algorithm or has an invalid value.
         """
-        return self.__algorithm_settings.model_copy(
-            update={
+        settings = self.__algorithm_settings
+        if not self.__instance_algorithm_options:
+            return settings.model_copy()
+
+        return type(settings).model_validate({
+            **settings.model_dump(exclude_unset=True),
+            **{
                 name: function(problem_configuration, index)
                 for name, function in self.__instance_algorithm_options.items()
-            }
-        )
+            },
+        })
 
     def to_dict(self, skip_instance_algorithm_options: bool = False) -> dict[str, Any]:
         """Return the algorithm configuration as a dictionary.
@@ -204,7 +222,8 @@ class AlgorithmConfiguration:
             The algorithm configuration.
 
         Raises:
-            ValueError: If the dictionary misses a key,
+            ValueError: If the dictionary misses a key
+                or if the class of the algorithm settings cannot be imported,
                 e.g. because it was written by an earlier version of gemseo-benchmark.
         """
         missing_keys = [
@@ -217,9 +236,14 @@ class AlgorithmConfiguration:
             if key not in algorithm_configuration
         ]
         if missing_keys:
+            quoted_keys = [repr(key) for key in missing_keys]
+            if len(quoted_keys) == 1:
+                keys = f"key {quoted_keys[0]}"
+            else:
+                keys = f"keys {', '.join(quoted_keys[:-1])} and {quoted_keys[-1]}"
+
             msg = (
-                "The algorithm configuration has no "
-                f"{', '.join(repr(key) for key in missing_keys)}; "
+                f"The algorithm configuration misses the {keys}; "
                 "it was probably written by an earlier version of gemseo-benchmark "
                 "and must be computed again."
             )
@@ -227,7 +251,17 @@ class AlgorithmConfiguration:
 
         fqn = algorithm_configuration[cls.__ALGORITHM_SETTINGS_CLASS]
         module_name, _, class_name = fqn.rpartition(".")
-        settings_class = getattr(importlib.import_module(module_name), class_name)
+        try:
+            settings_class = getattr(importlib.import_module(module_name), class_name)
+        except (ImportError, AttributeError, ValueError) as error:
+            msg = (
+                f"The class of the algorithm settings {fqn!r} cannot be imported; "
+                "it was probably written by an earlier version of gemseo-benchmark "
+                "or the plugin providing the algorithm is not installed, "
+                "and the results must be computed again."
+            )
+            raise ValueError(msg) from error
+
         settings = settings_class(**algorithm_configuration[cls.__ALGORITHM_SETTINGS])
         return cls(
             settings,
