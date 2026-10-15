@@ -1,0 +1,3 @@
+,minimum,25th centile,median,75th centile,maximum
+L-BFGS-B with 2 Hessian corrections,0,0,0,3.55271e-15,5.32907e-15
+L-BFGS-B with 20 Hessian corrections,0,0,0,1.77636e-15,5.32907e-15
