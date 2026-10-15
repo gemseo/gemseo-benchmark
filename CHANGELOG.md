@@ -75,6 +75,9 @@ and this project adheres to
   Before, an unavailable algorithm raised an error after the execution
   of the preceding algorithm configurations,
   and an unsuited algorithm made its executions fail.
+  They also validate the options specific to the problem instances
+  before any execution:
+  a `ValueError` lists the instances whose options are invalid.
 - `Scenario.execute` runs the problem configurations in the order of the groups,
   without duplicates, instead of in an arbitrary order that changed between runs.
 - The documentation and the HTML report are generated using `properdocs` instead of `sphinx`.
@@ -96,7 +99,9 @@ and this project adheres to
   can no longer read the algorithm configurations and the performance histories
   saved with an earlier version
   or whose algorithm settings class cannot be imported;
-  they raise a `ValueError` that says these results must be computed again.
+  they raise a `ValueError` that says to compute these results again,
+  or to install the plugin providing the algorithm
+  when the algorithm settings class cannot be imported.
 - `BaseProblemConfiguration.minimization_target_values` raises a `ValueError` when the problem configuration has no target value, as `target_values` does; it used to return `None`.
 
 ### Fixed

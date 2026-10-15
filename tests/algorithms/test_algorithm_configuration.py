@@ -25,6 +25,8 @@ import re
 from unittest import mock
 
 import pytest
+from gemseo.mda import MDAChain_Settings
+from gemseo.mda import MDANewtonRaphson_Settings
 from gemseo.optimization import SLSQP_Settings
 from gemseo.util.pydantic import BaseSettings
 from pydantic import Field
@@ -49,6 +51,14 @@ def test_name(input_name, output_name):
         SLSQP_Settings(max_iter=9), input_name
     )
     assert algorithm_configuration.name == output_name
+
+
+def test_name_several_options():
+    """Check the name of an algorithm configuration with several options."""
+    algorithm_configuration = AlgorithmConfiguration(
+        SLSQP_Settings(max_iter=3, ftol_rel=0.1)
+    )
+    assert algorithm_configuration.name == "SLSQP_ftol_rel=0.1, max_iter=3"
 
 
 @pytest.mark.parametrize(
@@ -159,7 +169,9 @@ def test_from_dict_unknown_settings_class(settings_class):
         ValueError,
         match=(
             rf"^The class of the algorithm settings '{re.escape(settings_class)}' "
-            r"cannot be imported; .* must be computed again\.$"
+            r"cannot be imported; install the plugin providing the algorithm, "
+            r"or, if the results were written by an earlier version "
+            r"of gemseo-benchmark, compute them again\.$"
         ),
     ) as error:
         AlgorithmConfiguration.from_dict({
@@ -199,6 +211,54 @@ def test_get_instance_settings_without_instance_options():
     )
     assert instance_settings == settings
     assert instance_settings.model_fields_set == {"max_iter"}
+
+
+@pytest.mark.parametrize("instance_algorithm_options", [{}, {"max_mda_iter": 3}])
+def test_get_instance_settings_nested_settings(instance_algorithm_options):
+    """Check that the nested settings keep their class and their fields."""
+    settings = MDAChain_Settings(
+        inner_mda_settings=MDANewtonRaphson_Settings(over_relaxation_factor=0.5)
+    )
+    algorithm_configuration = AlgorithmConfiguration(
+        settings,
+        instance_algorithm_options={
+            name: lambda problem_configuration, index, value=value: value
+            for name, value in instance_algorithm_options.items()
+        },
+    )
+    instance_settings = algorithm_configuration.get_instance_settings(mock.Mock(), 0)
+    inner_mda_settings = instance_settings.inner_mda_settings
+    assert isinstance(inner_mda_settings, MDANewtonRaphson_Settings)
+    assert inner_mda_settings.over_relaxation_factor == 0.5
+    assert instance_settings.model_fields_set == {
+        "inner_mda_settings",
+        *instance_algorithm_options,
+    }
+    assert instance_settings.max_mda_iter == instance_algorithm_options.get(
+        "max_mda_iter", settings.max_mda_iter
+    )
+
+
+class Other_Dummy_Settings(Dummy_Settings):  # ruff: ignore[invalid-class-name]
+    """Settings of a fake algorithm with another default value."""
+
+    max_iter: int = Field(default=7)
+    ftol_rel: float = Field(default=0.1)
+
+
+def test_get_instance_settings_subclass_defaults():
+    """Check that the settings of a subclass keep their default values."""
+    algorithm_configuration = AlgorithmConfiguration(
+        Other_Dummy_Settings(ftol_rel=0.2),
+        instance_algorithm_options={
+            "ftol_rel": lambda problem_configuration, index: 0.3
+        },
+    )
+    instance_settings = algorithm_configuration.get_instance_settings(mock.Mock(), 0)
+    assert isinstance(instance_settings, Other_Dummy_Settings)
+    assert instance_settings.max_iter == 7
+    assert instance_settings.ftol_rel == 0.3
+    assert instance_settings.model_fields_set == {"ftol_rel"}
 
 
 def test_get_instance_settings_coercion():

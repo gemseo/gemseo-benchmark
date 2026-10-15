@@ -145,7 +145,9 @@ class Scenario:
         Raises:
             ValueError: If an algorithm is not available,
                 or is not suited to a problem configuration when this can be told
-                before the execution.
+                before the execution,
+                or if an option specific to a problem
+                is not an option of the algorithm or has an invalid value.
             BenchmarkingError: If `raise_errors` is `True`
                 and some executions of the solvers raised exceptions.
                 The other executions are not interrupted

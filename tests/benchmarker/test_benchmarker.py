@@ -315,6 +315,42 @@ def test_problem_specific_algorithm_options(
         )
 
 
+@pytest.mark.parametrize("raise_errors", [False, True])
+def test_invalid_problem_specific_algorithm_option(
+    tmp_path, rosenbrock, raise_errors
+) -> None:
+    """Check that an invalid problem-specific option stops before any execution."""
+    results_path = tmp_path / "results.json"
+    algorithm_configuration = AlgorithmConfiguration(
+        L_BFGS_B_Settings(),
+        "L-BFGS-B",
+        instance_algorithm_options={
+            "max_iter": lambda config, index: "x" if index == 1 else 5
+        },
+    )
+    loggers = (logging.getLogger(Benchmarker.__module__), logging.getLogger("gemseo"))
+    handlers = [list(logger.handlers) for logger in loggers]
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"(?s)^The options of algorithm configuration L-BFGS-B "
+            rf"for problem 2 of problem configuration {rosenbrock.name} "
+            r"are invalid: .*max_iter"
+        ),
+    ):
+        Benchmarker(tmp_path, results_path).execute(
+            [rosenbrock],
+            AlgorithmsConfigurations(algorithm_configuration),
+            use_threading=True,
+            save_log=True,
+            raise_errors=raise_errors,
+        )
+
+    assert not results_path.exists()
+    assert not (tmp_path / "L-BFGS-B").exists()
+    assert [list(logger.handlers) for logger in loggers] == handlers
+
+
 @configurations
 @pytest.mark.parametrize("n_processes", [1, 2])
 @pytest.mark.parametrize("use_threading", [False, True])

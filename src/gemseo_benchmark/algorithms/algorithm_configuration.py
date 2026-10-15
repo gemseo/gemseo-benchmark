@@ -109,7 +109,8 @@ class AlgorithmConfiguration:
         if not options:
             return algorithm_name
 
-        return f"{algorithm_name}_{pretty_repr(cls.__make_json_serializable(options))}"
+        options = pretty_repr(cls.__make_json_serializable(options), use_and=False)
+        return f"{algorithm_name}_{options}"
 
     @property
     def name(self) -> str:
@@ -154,11 +155,10 @@ class AlgorithmConfiguration:
                 is not an option of the algorithm or has an invalid value.
         """
         settings = self.__algorithm_settings
-        if not self.__instance_algorithm_options:
-            return settings.model_copy()
-
+        # The values of the explicitly-set fields are passed as they are,
+        # so that the nested settings keep their class.
         return type(settings).model_validate({
-            **settings.model_dump(exclude_unset=True),
+            **{name: getattr(settings, name) for name in settings.model_fields_set},
             **{
                 name: function(problem_configuration, index)
                 for name, function in self.__instance_algorithm_options.items()
@@ -224,7 +224,8 @@ class AlgorithmConfiguration:
         Raises:
             ValueError: If the dictionary misses a key
                 or if the class of the algorithm settings cannot be imported,
-                e.g. because it was written by an earlier version of gemseo-benchmark.
+                e.g. because the plugin providing the algorithm is not installed
+                or because it was written by an earlier version of gemseo-benchmark.
         """
         missing_keys = [
             key
@@ -236,14 +237,10 @@ class AlgorithmConfiguration:
             if key not in algorithm_configuration
         ]
         if missing_keys:
-            quoted_keys = [repr(key) for key in missing_keys]
-            if len(quoted_keys) == 1:
-                keys = f"key {quoted_keys[0]}"
-            else:
-                keys = f"keys {', '.join(quoted_keys[:-1])} and {quoted_keys[-1]}"
-
+            word = "key" if len(missing_keys) == 1 else "keys"
             msg = (
-                f"The algorithm configuration misses the {keys}; "
+                "The algorithm configuration misses the "
+                f"{word} {pretty_repr(missing_keys, sort=False)}; "
                 "it was probably written by an earlier version of gemseo-benchmark "
                 "and must be computed again."
             )
@@ -256,9 +253,9 @@ class AlgorithmConfiguration:
         except (ImportError, AttributeError, ValueError) as error:
             msg = (
                 f"The class of the algorithm settings {fqn!r} cannot be imported; "
-                "it was probably written by an earlier version of gemseo-benchmark "
-                "or the plugin providing the algorithm is not installed, "
-                "and the results must be computed again."
+                "install the plugin providing the algorithm, "
+                "or, if the results were written by an earlier version "
+                "of gemseo-benchmark, compute them again."
             )
             raise ValueError(msg) from error
 
