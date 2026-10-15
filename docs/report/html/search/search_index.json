@@ -31,8 +31,8 @@
       "text": "<p>The following algorithms are considered in this benchmarking report.</p>"
     },
     {
-      "location": "algorithms.html#l-bfgs-b",
-      "title": "L-BFGS-B",
+      "location": "algorithms.html#l_bfgs_b",
+      "title": "L_BFGS_B",
       "text": "<p>Limited-memory BFGS algorithm implemented in the SciPy library</p>"
     },
     {
@@ -203,7 +203,7 @@
     {
       "location": "results/L-BFGS-B_configurations/2D_problems/Rosenbrock.html#best-feasible-objective-value",
       "title": "Best feasible objective value",
-      "text": "<p>The best feasible objective value of group L-BFGS-B configurations for problem configuration Rosenbrock.</p> <p></p> <p>The best feasible objective value of group L-BFGS-B configurations for problem configuration Rosenbrock.</p> minimum 25th centile median 75th centile maximum L-BFGS-B with 2 Hessian corrections 1.74156e-20 1.19054e-17 1.13779e-15 3.3576e-15 4.68664e-13 L-BFGS-B with 20 Hessian corrections 3.39836e-20 2.33591e-19 1.4195e-18 1.76694e-18 6.79141e-14 <p>The final best feasible objective value of group L-BFGS-B configurations for problem configuration Rosenbrock.</p>"
+      "text": "<p>The best feasible objective value of group L-BFGS-B configurations for problem configuration Rosenbrock.</p> <p></p> <p>The best feasible objective value of group L-BFGS-B configurations for problem configuration Rosenbrock.</p> minimum 25th centile median 75th centile maximum L-BFGS-B with 2 Hessian corrections 1.74144e-20 1.19048e-17 1.13779e-15 3.35761e-15 4.68664e-13 L-BFGS-B with 20 Hessian corrections 3.40838e-20 2.33575e-19 1.4195e-18 1.76694e-18 6.79141e-14 <p>The final best feasible objective value of group L-BFGS-B configurations for problem configuration Rosenbrock.</p>"
     },
     {
       "location": "results/L-BFGS-B_configurations/2D_problems/Rosenbrock.html#execution-time",
@@ -243,7 +243,7 @@
     {
       "location": "results/L-BFGS-B_configurations/2D_problems/Rosenbrock/L-BFGS-B_with_20_Hessian_corrections.html#performance-measure",
       "title": "Performance measure",
-      "text": "<p>The performance measure of algorithm configuration 'L-BFGS-B with 20 Hessian corrections' for problem 'Rosenbrock'.</p> <p></p> <p>The performance measure of algorithm configuration 'L-BFGS-B with 20 Hessian corrections' for problem 'Rosenbrock'.</p> L-BFGS-B with 20 Hessian corrections maximum 6.79141e-14 75th centile 1.76694e-18 median 1.4195e-18 25th centile 2.33591e-19 minimum 3.39836e-20 <p>The final feasible performance measure of algorithm configuration 'L-BFGS-B with 20 Hessian corrections' for problem Rosenbrock.</p>"
+      "text": "<p>The performance measure of algorithm configuration 'L-BFGS-B with 20 Hessian corrections' for problem 'Rosenbrock'.</p> <p></p> <p>The performance measure of algorithm configuration 'L-BFGS-B with 20 Hessian corrections' for problem 'Rosenbrock'.</p> L-BFGS-B with 20 Hessian corrections maximum 6.79141e-14 75th centile 1.76694e-18 median 1.4195e-18 25th centile 2.33575e-19 minimum 3.40838e-20 <p>The final feasible performance measure of algorithm configuration 'L-BFGS-B with 20 Hessian corrections' for problem Rosenbrock.</p>"
     },
     {
       "location": "results/L-BFGS-B_configurations/2D_problems/Rosenbrock/L-BFGS-B_with_2_Hessian_corrections.html",
@@ -253,7 +253,7 @@
     {
       "location": "results/L-BFGS-B_configurations/2D_problems/Rosenbrock/L-BFGS-B_with_2_Hessian_corrections.html#performance-measure",
       "title": "Performance measure",
-      "text": "<p>The performance measure of algorithm configuration 'L-BFGS-B with 2 Hessian corrections' for problem 'Rosenbrock'.</p> <p></p> <p>The performance measure of algorithm configuration 'L-BFGS-B with 2 Hessian corrections' for problem 'Rosenbrock'.</p> L-BFGS-B with 2 Hessian corrections maximum 4.68664e-13 75th centile 3.3576e-15 median 1.13779e-15 25th centile 1.19054e-17 minimum 1.74156e-20 <p>The final feasible performance measure of algorithm configuration 'L-BFGS-B with 2 Hessian corrections' for problem Rosenbrock.</p>"
+      "text": "<p>The performance measure of algorithm configuration 'L-BFGS-B with 2 Hessian corrections' for problem 'Rosenbrock'.</p> <p></p> <p>The performance measure of algorithm configuration 'L-BFGS-B with 2 Hessian corrections' for problem 'Rosenbrock'.</p> L-BFGS-B with 2 Hessian corrections maximum 4.68664e-13 75th centile 3.35761e-15 median 1.13779e-15 25th centile 1.19048e-17 minimum 1.74144e-20 <p>The final feasible performance measure of algorithm configuration 'L-BFGS-B with 2 Hessian corrections' for problem Rosenbrock.</p>"
     },
     {
       "location": "results/L-BFGS-B_configurations/5D_problems/Rosenbrock_5D.html",
@@ -268,7 +268,7 @@
     {
       "location": "results/L-BFGS-B_configurations/5D_problems/Rosenbrock_5D.html#best-feasible-objective-value",
       "title": "Best feasible objective value",
-      "text": "<p>The best feasible objective value of group L-BFGS-B configurations for problem configuration Rosenbrock 5D.</p> <p></p> <p>The best feasible objective value of group L-BFGS-B configurations for problem configuration Rosenbrock 5D.</p> minimum 25th centile median 75th centile maximum L-BFGS-B with 2 Hessian corrections 2.30654e-11 1.2383e-10 1.57684e-10 3.93084 3.93084 L-BFGS-B with 20 Hessian corrections 1.06204e-18 1.70663e-17 5.67235e-15 3.93084 3.93084 <p>The final best feasible objective value of group L-BFGS-B configurations for problem configuration Rosenbrock 5D.</p>"
+      "text": "<p>The best feasible objective value of group L-BFGS-B configurations for problem configuration Rosenbrock 5D.</p> <p></p> <p>The best feasible objective value of group L-BFGS-B configurations for problem configuration Rosenbrock 5D.</p> minimum 25th centile median 75th centile maximum L-BFGS-B with 2 Hessian corrections 2.30683e-11 1.2383e-10 1.5986e-10 3.93084 3.93084 L-BFGS-B with 20 Hessian corrections 1.06233e-18 1.70659e-17 5.67236e-15 3.93084 3.93084 <p>The final best feasible objective value of group L-BFGS-B configurations for problem configuration Rosenbrock 5D.</p>"
     },
     {
       "location": "results/L-BFGS-B_configurations/5D_problems/Rosenbrock_5D.html#execution-time",
@@ -288,7 +288,7 @@
     {
       "location": "results/L-BFGS-B_configurations/5D_problems/Rosenbrock_5D/L-BFGS-B_with_20_Hessian_corrections.html#performance-measure",
       "title": "Performance measure",
-      "text": "<p>The performance measure of algorithm configuration 'L-BFGS-B with 20 Hessian corrections' for problem 'Rosenbrock 5D'.</p> <p></p> <p>The performance measure of algorithm configuration 'L-BFGS-B with 20 Hessian corrections' for problem 'Rosenbrock 5D'.</p> L-BFGS-B with 20 Hessian corrections maximum 3.93084 75th centile 3.93084 median 5.67235e-15 25th centile 1.70663e-17 minimum 1.06204e-18 <p>The final feasible performance measure of algorithm configuration 'L-BFGS-B with 20 Hessian corrections' for problem Rosenbrock 5D.</p>"
+      "text": "<p>The performance measure of algorithm configuration 'L-BFGS-B with 20 Hessian corrections' for problem 'Rosenbrock 5D'.</p> <p></p> <p>The performance measure of algorithm configuration 'L-BFGS-B with 20 Hessian corrections' for problem 'Rosenbrock 5D'.</p> L-BFGS-B with 20 Hessian corrections maximum 3.93084 75th centile 3.93084 median 5.67236e-15 25th centile 1.70659e-17 minimum 1.06233e-18 <p>The final feasible performance measure of algorithm configuration 'L-BFGS-B with 20 Hessian corrections' for problem Rosenbrock 5D.</p>"
     },
     {
       "location": "results/L-BFGS-B_configurations/5D_problems/Rosenbrock_5D/L-BFGS-B_with_2_Hessian_corrections.html",
@@ -298,7 +298,7 @@
     {
       "location": "results/L-BFGS-B_configurations/5D_problems/Rosenbrock_5D/L-BFGS-B_with_2_Hessian_corrections.html#performance-measure",
       "title": "Performance measure",
-      "text": "<p>The performance measure of algorithm configuration 'L-BFGS-B with 2 Hessian corrections' for problem 'Rosenbrock 5D'.</p> <p></p> <p>The performance measure of algorithm configuration 'L-BFGS-B with 2 Hessian corrections' for problem 'Rosenbrock 5D'.</p> L-BFGS-B with 2 Hessian corrections maximum 3.93084 75th centile 3.93084 median 1.57684e-10 25th centile 1.2383e-10 minimum 2.30654e-11 <p>The final feasible performance measure of algorithm configuration 'L-BFGS-B with 2 Hessian corrections' for problem Rosenbrock 5D.</p>"
+      "text": "<p>The performance measure of algorithm configuration 'L-BFGS-B with 2 Hessian corrections' for problem 'Rosenbrock 5D'.</p> <p></p> <p>The performance measure of algorithm configuration 'L-BFGS-B with 2 Hessian corrections' for problem 'Rosenbrock 5D'.</p> L-BFGS-B with 2 Hessian corrections maximum 3.93084 75th centile 3.93084 median 1.5986e-10 25th centile 1.2383e-10 minimum 2.30683e-11 <p>The final feasible performance measure of algorithm configuration 'L-BFGS-B with 2 Hessian corrections' for problem Rosenbrock 5D.</p>"
     },
     {
       "location": "results/SLSQP/2D_problems.html",
@@ -398,7 +398,7 @@
     {
       "location": "results/SLSQP/2D_problems/Rosenbrock.html#best-feasible-objective-value",
       "title": "Best feasible objective value",
-      "text": "<p>The best feasible objective value of group SLSQP for problem configuration Rosenbrock.</p> <p></p> <p>The best feasible objective value of group SLSQP for problem configuration Rosenbrock.</p> minimum 25th centile median 75th centile maximum SLSQP 1.1824e-20 4.23227e-20 2.01609e-17 3.74191e-17 5.45617e-14 <p>The final best feasible objective value of group SLSQP for problem configuration Rosenbrock.</p>"
+      "text": "<p>The best feasible objective value of group SLSQP for problem configuration Rosenbrock.</p> <p></p> <p>The best feasible objective value of group SLSQP for problem configuration Rosenbrock.</p> minimum 25th centile median 75th centile maximum SLSQP 1.18331e-20 4.23227e-20 2.01608e-17 3.74191e-17 5.45617e-14 <p>The final best feasible objective value of group SLSQP for problem configuration Rosenbrock.</p>"
     },
     {
       "location": "results/SLSQP/2D_problems/Rosenbrock.html#execution-time",
@@ -428,7 +428,7 @@
     {
       "location": "results/SLSQP/2D_problems/Rosenbrock/SLSQP.html#performance-measure",
       "title": "Performance measure",
-      "text": "<p>The performance measure of algorithm configuration 'SLSQP' for problem 'Rosenbrock'.</p> <p></p> <p>The performance measure of algorithm configuration 'SLSQP' for problem 'Rosenbrock'.</p> SLSQP maximum 5.45617e-14 75th centile 3.74191e-17 median 2.01609e-17 25th centile 4.23227e-20 minimum 1.1824e-20 <p>The final feasible performance measure of algorithm configuration 'SLSQP' for problem Rosenbrock.</p>"
+      "text": "<p>The performance measure of algorithm configuration 'SLSQP' for problem 'Rosenbrock'.</p> <p></p> <p>The performance measure of algorithm configuration 'SLSQP' for problem 'Rosenbrock'.</p> SLSQP maximum 5.45617e-14 75th centile 3.74191e-17 median 2.01608e-17 25th centile 4.23227e-20 minimum 1.18331e-20 <p>The final feasible performance measure of algorithm configuration 'SLSQP' for problem Rosenbrock.</p>"
     },
     {
       "location": "results/SLSQP/5D_problems/Rosenbrock_5D.html",
@@ -443,7 +443,7 @@
     {
       "location": "results/SLSQP/5D_problems/Rosenbrock_5D.html#best-feasible-objective-value",
       "title": "Best feasible objective value",
-      "text": "<p>The best feasible objective value of group SLSQP for problem configuration Rosenbrock 5D.</p> <p></p> <p>The best feasible objective value of group SLSQP for problem configuration Rosenbrock 5D.</p> minimum 25th centile median 75th centile maximum SLSQP 1.45596e-15 1.85709e-14 1.04435e-12 3.93084 3.93084 <p>The final best feasible objective value of group SLSQP for problem configuration Rosenbrock 5D.</p>"
+      "text": "<p>The best feasible objective value of group SLSQP for problem configuration Rosenbrock 5D.</p> <p></p> <p>The best feasible objective value of group SLSQP for problem configuration Rosenbrock 5D.</p> minimum 25th centile median 75th centile maximum SLSQP 5.16019e-16 1.45728e-15 1.85869e-14 3.93084 3.93084 <p>The final best feasible objective value of group SLSQP for problem configuration Rosenbrock 5D.</p>"
     },
     {
       "location": "results/SLSQP/5D_problems/Rosenbrock_5D.html#execution-time",
@@ -463,7 +463,7 @@
     {
       "location": "results/SLSQP/5D_problems/Rosenbrock_5D/SLSQP.html#performance-measure",
       "title": "Performance measure",
-      "text": "<p>The performance measure of algorithm configuration 'SLSQP' for problem 'Rosenbrock 5D'.</p> <p></p> <p>The performance measure of algorithm configuration 'SLSQP' for problem 'Rosenbrock 5D'.</p> SLSQP maximum 3.93084 75th centile 3.93084 median 1.04435e-12 25th centile 1.85709e-14 minimum 1.45596e-15 <p>The final feasible performance measure of algorithm configuration 'SLSQP' for problem Rosenbrock 5D.</p>"
+      "text": "<p>The performance measure of algorithm configuration 'SLSQP' for problem 'Rosenbrock 5D'.</p> <p></p> <p>The performance measure of algorithm configuration 'SLSQP' for problem 'Rosenbrock 5D'.</p> SLSQP maximum 3.93084 75th centile 3.93084 median 1.85869e-14 25th centile 1.45728e-15 minimum 5.16019e-16 <p>The final feasible performance measure of algorithm configuration 'SLSQP' for problem Rosenbrock 5D.</p>"
     }
   ]
 }
