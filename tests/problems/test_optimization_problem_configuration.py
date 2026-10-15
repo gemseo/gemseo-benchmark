@@ -253,6 +253,14 @@ def test_starting_points_wrong_dimension(benchmarking_problem):
     check_set_starting_points_with_wrong_dimension(benchmarking_problem)
 
 
+def test_starting_points_generator(minimization_problem_creator) -> None:
+    """Check the setting of starting points as a generator of NumPy arrays."""
+    problem = OptimizationProblemConfiguration("Problem", minimization_problem_creator)
+    starting_points = [array([0.0, 0.0]), array([1.0, 1.0])]
+    problem.starting_points = (point for point in starting_points)
+    assert_allclose(problem.starting_points, starting_points)
+
+
 def test_targets_generator_accessor(benchmarking_problem):
     """Check the accessor to the targets generator."""
     assert benchmarking_problem.targets_generator is None

@@ -246,15 +246,14 @@ class BaseProblemConfiguration(
             starting_points_list = list(starting_points)
         else:
             try:
-                iter(starting_points)
+                starting_points_list = list(starting_points)
             except TypeError:
                 msg = (
                     f"{message} The following type was passed: {type(starting_points)}."
                 )
                 raise TypeError(msg) from None
 
-            self.__check_iterable_starting_points(starting_points)
-            starting_points_list = list(starting_points)
+            self.__check_iterable_starting_points(starting_points_list)
 
         for point in starting_points_list:
             self.__variable_space.check_membership(point)

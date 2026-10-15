@@ -26,6 +26,13 @@ The format is based on
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Develop
+
+### Fixed
+
+- Setting the starting points of a problem configuration
+  from a generator of NumPy arrays no longer leaves it without starting points.
+
 ## Version 5.0.0 (October 2026)
 
 ### Added
