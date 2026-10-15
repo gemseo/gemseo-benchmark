@@ -54,7 +54,7 @@ doc = [
 ]
 
 [project.urls]
-Homepage = "https://gemseo.org"
+Homepage = "https://gemseo.gitlab.io/dev/gemseo-benchmark/"
 Source = "https://gitlab.com/gemseo/dev/gemseo-benchmark"
 Issues = "https://gitlab.com/gemseo/dev/gemseo-benchmark/-/issues"
 
