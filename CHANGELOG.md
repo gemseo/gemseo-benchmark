@@ -42,7 +42,9 @@ and this project adheres to
   it does nothing by default and `OptimizationWorker` overrides it.
 - The method `AlgorithmConfiguration.get_instance_settings` returns
   the settings of the algorithm updated with the options specific
-  to an instance of a problem.
+  to an instance of a problem;
+  these options are validated by the settings model,
+  so an unknown option or an invalid value raises a `ValidationError`.
 
 ### Changed
 
@@ -92,7 +94,8 @@ and this project adheres to
   and the explicitly-set algorithm settings;
   `AlgorithmConfiguration.from_dict` and `PerformanceHistory.from_file`
   can no longer read the algorithm configurations and the performance histories
-  saved with an earlier version;
+  saved with an earlier version
+  or whose algorithm settings class cannot be imported;
   they raise a `ValueError` that says these results must be computed again.
 - `BaseProblemConfiguration.minimization_target_values` raises a `ValueError` when the problem configuration has no target value, as `target_values` does; it used to return `None`.
 

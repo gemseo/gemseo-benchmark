@@ -244,9 +244,30 @@ def test_from_file_earlier_version(tmp_path):
         ValueError,
         match=(
             rf"^The performance history file {re.escape(str(file_path))} "
-            r"cannot be read: The algorithm configuration has no "
-            r"'algorithm_settings_class', 'algorithm_settings'; .* "
+            r"cannot be read: The algorithm configuration misses the keys "
+            r"'algorithm_settings_class' and 'algorithm_settings'; .* "
             r"must be computed again\.$"
+        ),
+    ):
+        PerformanceHistory.from_file(file_path)
+
+
+def test_from_file_unknown_settings_class(tmp_path):
+    """Check the reading of a performance history with an unknown settings class."""
+    file_path = tmp_path / "history.json"
+    file_path.write_text(
+        '{"algorithm_configuration": {"configuration_name": "MMA", '
+        '"algorithm_settings_class": '
+        '"gemseo.algos.opt.mma.settings.mma_settings.MMASVanberg_Settings", '
+        '"algorithm_settings": {}}, "history_items": []}'
+    )
+    with pytest.raises(
+        ValueError,
+        match=(
+            rf"^The performance history file {re.escape(str(file_path))} "
+            r"cannot be read: The class of the algorithm settings "
+            r"'gemseo\.algos\.opt\.mma\.settings\.mma_settings\.MMASVanberg_Settings' "
+            r"cannot be imported; .* must be computed again\.$"
         ),
     ):
         PerformanceHistory.from_file(file_path)
