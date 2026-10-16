@@ -145,8 +145,10 @@ class TargetsGenerator:
         if feasible:
             median_history = median_history.remove_leading_infeasible()
 
-        # Truncate the values that stagnate near the best target
-        for index, item in enumerate(median_history):
+        # Truncate the values that stagnate near the best target.
+        # The loop always breaks
+        # as every reference history ends at or below the best target.
+        for index, item in enumerate(median_history):  # pragma: no branch
             if item <= best_target:
                 median_history = median_history[: index + 1]
                 break

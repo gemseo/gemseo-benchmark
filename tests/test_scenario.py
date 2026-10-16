@@ -75,6 +75,17 @@ def test_report_overwrite(algorithms_configurations, tmp_path, problems_group) -
     assert os.path.getmtime(directory_path) > time
 
 
+def test_skip_solvers(algorithms_configurations, tmp_path, problems_group) -> None:
+    """Check the generation of a report from existing performance histories."""
+    scenario = Scenario([algorithms_configurations], tmp_path)
+    scenario.execute([problems_group], skip_report=True)
+    with mock.patch("gemseo_benchmark.scenario.Benchmarker") as benchmarker_class:
+        scenario.execute([problems_group], skip_solvers=True)
+
+    benchmarker_class.assert_not_called()
+    assert (tmp_path / "report").is_dir()
+
+
 def test_overlapping_algorithm_configurations(
     algorithms_configurations, tmp_path, problems_group, algorithm_configuration
 ) -> None:

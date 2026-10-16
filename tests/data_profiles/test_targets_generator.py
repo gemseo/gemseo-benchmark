@@ -179,3 +179,12 @@ def test_plot_histories(feasibility_statuses, baseline_images):
     generator.add_history([3.0, 0.0], feasibility_statuses=feasibility_statuses)
     pyplot.close("all")
     generator.plot_histories(best_target_value=0.0, show=False)
+
+
+def test_plot_histories_without_best_target_value():
+    """Check the plotting of histories without best target value."""
+    generator = TargetsGenerator()
+    generator.add_history([2.0, 1.0])
+    generator.add_history([3.0, 0.0])
+    figure = generator.plot_histories(show=False)
+    assert len(figure.gca().lines) == 2
