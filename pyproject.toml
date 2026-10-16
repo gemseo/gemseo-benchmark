@@ -24,9 +24,9 @@ requires-python = ">=3.10, <3.14"
 dependencies = [
     "gemseo[all] >=6.3,<7",
     "matplotlib",
-    "properdocs",
-    "mkdocs-material",
-    "mkdocs-to-pdf",
+    "properdocs >=1.6,<2",
+    "mkdocs-material >=9.7,<10",
+    "mkdocs-to-pdf >=0.11,<1",
     "numpy",
 ]
 
@@ -48,13 +48,13 @@ doc = [
     "mkdocs-gen-files",
     "mkdocs-include-markdown-plugin",
     "mkdocs-literate-nav",
-    "mkdocs-material",
+    "mkdocs-material >=9.7,<10",
     "mkdocs-section-index",
     "mkdocstrings[python]",
 ]
 
 [project.urls]
-Homepage = "https://gemseo.org"
+Homepage = "https://gemseo.gitlab.io/dev/gemseo-benchmark/"
 Source = "https://gitlab.com/gemseo/dev/gemseo-benchmark"
 Issues = "https://gitlab.com/gemseo/dev/gemseo-benchmark/-/issues"
 

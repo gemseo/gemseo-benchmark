@@ -27,6 +27,7 @@ from gemseo.algos.doe.custom_doe.settings.custom_doe_settings import CustomDOE_S
 from gemseo.algos.doe.diagonal_doe.settings.diagonal_doe_settings import (
     DiagonalDOE_Settings,
 )
+from numpy import ones
 from numpy import zeros
 from numpy.testing import assert_equal
 
@@ -239,6 +240,42 @@ def check_set_starting_points_with_wrong_dimension(
         ),
     ):
         problem_configuration.starting_points = zeros((3, 1))
+
+
+def check_set_starting_points_as_iterable(
+    problem_configuration: BaseProblemConfiguration,
+) -> None:
+    """Check the setting of starting points as an iterable of NumPy arrays.
+
+    Args:
+        problem_configuration: The problem configuration.
+    """
+    initial_starting_points = problem_configuration.starting_points
+    dimension = problem_configuration.dimension
+    starting_points = [zeros(dimension), ones(dimension)]
+    try:
+        problem_configuration.starting_points = starting_points
+        assert_equal(problem_configuration.starting_points, starting_points)
+    finally:
+        problem_configuration.starting_points = initial_starting_points
+
+
+def check_set_starting_points_as_iterable_with_wrong_shape(
+    problem_configuration: BaseProblemConfiguration,
+) -> None:
+    """Check the setting of starting points as an iterable of ill-shaped arrays.
+
+    Args:
+        problem_configuration: The problem configuration.
+    """
+    dimension = problem_configuration.dimension
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            f"A starting point must be a 1-dimensional NumPy array of size {dimension}."
+        ),
+    ):
+        problem_configuration.starting_points = [zeros(dimension + 1)]
 
 
 test_description_parametrize = pytest.mark.parametrize(

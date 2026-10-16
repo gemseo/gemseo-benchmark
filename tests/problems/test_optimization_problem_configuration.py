@@ -44,6 +44,10 @@ from tests.problems.conftest import check_description
 from tests.problems.conftest import check_inconsistent_starting_points
 from tests.problems.conftest import check_no_starting_point
 from tests.problems.conftest import check_number_of_scalar_constraints
+from tests.problems.conftest import check_set_starting_points_as_iterable
+from tests.problems.conftest import (
+    check_set_starting_points_as_iterable_with_wrong_shape,
+)
 from tests.problems.conftest import check_set_starting_points_as_non_2d_array
 from tests.problems.conftest import check_set_starting_points_as_non_iterable
 from tests.problems.conftest import check_set_starting_points_with_wrong_dimension
@@ -251,6 +255,24 @@ def test_starting_points_non_iterable(benchmarking_problem):
 def test_starting_points_wrong_dimension(benchmarking_problem):
     """Check the setting of starting points of the wrong dimension."""
     check_set_starting_points_with_wrong_dimension(benchmarking_problem)
+
+
+def test_starting_points_iterable(benchmarking_problem):
+    """Check the setting of starting points as an iterable of NumPy arrays."""
+    check_set_starting_points_as_iterable(benchmarking_problem)
+
+
+def test_starting_points_iterable_wrong_shape(benchmarking_problem):
+    """Check the setting of starting points as an iterable of ill-shaped arrays."""
+    check_set_starting_points_as_iterable_with_wrong_shape(benchmarking_problem)
+
+
+def test_starting_points_generator(minimization_problem_creator) -> None:
+    """Check the setting of starting points as a generator of NumPy arrays."""
+    problem = OptimizationProblemConfiguration("Problem", minimization_problem_creator)
+    starting_points = [array([0.0, 0.0]), array([1.0, 1.0])]
+    problem.starting_points = (point for point in starting_points)
+    assert_allclose(problem.starting_points, starting_points)
 
 
 def test_targets_generator_accessor(benchmarking_problem):

@@ -72,3 +72,9 @@ def test_plot_on_axes(feasible_target_values) -> None:
     axes.plot(range(1, 6), range(4, -1, -1))
     axes.xaxis.set_major_locator(MaxNLocator(integer=True))
     feasible_target_values.plot_on_axes(axes)
+
+
+def test_plot_infeasible_targets():
+    """Check the plotting of target values that are all infeasible."""
+    figure = TargetValues([2.0, 1.0], [1.0, 1.0]).plot(show=False)
+    assert [line.get_label() for line in figure.gca().lines] == ["infeasible"]

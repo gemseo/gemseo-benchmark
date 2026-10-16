@@ -26,6 +26,21 @@ The format is based on
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Develop
+
+### Changed
+
+- The dependencies `properdocs`, `mkdocs-material` and `mkdocs-to-pdf`
+  are bounded: `properdocs >=1.6,<2`, `mkdocs-material >=9.7,<10`
+  and `mkdocs-to-pdf >=0.11,<1`.
+
+### Fixed
+
+- Setting the starting points of a problem configuration
+  from a generator of NumPy arrays no longer leaves it without starting points.
+- `AlgorithmsConfigurations.algorithms` lists each algorithm once
+  when several algorithm configurations use it.
+
 ## Version 5.0.0 (October 2026)
 
 ### Added
