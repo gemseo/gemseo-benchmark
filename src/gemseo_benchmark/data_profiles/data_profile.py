@@ -81,6 +81,10 @@ class DataProfile:
     for a given number of evaluations or a given elapsed time.
     """
 
+    __EVALUATIONS_FILE_NAME_SUFFIX: Final[str] = "_eval"
+    """The suffix appended to the file name of the data profiles
+    relative to the number of evaluations."""
+
     __TIME_FILE_NAME_SUFFIX: Final[str] = "_time"
     """The suffix appended to the file name of the data profiles
     relative to the elapsed time."""
@@ -192,12 +196,13 @@ class DataProfile:
             show: If True, show the plot.
             file_path: The path where to save the plot.
                 If empty, the plot is not saved.
-                Unless `use_subplots` is `True`,
-                this path is the one of the data profiles
+                When the data profiles
                 relative to the number of evaluations
-                and the data profiles relative to the elapsed time are saved
-                next to it, with the suffix `_time` appended to the file name,
-                e.g. `data_profile_time.png` for `data_profile.png`.
+                and relative to the elapsed time
+                are plotted in two figures,
+                the suffixes `_eval` and `_time` are appended to the file name,
+                e.g. `data_profile_eval.png` and `data_profile_time.png`
+                for `data_profile.png`.
             markevery: The sampling parameter for the markers of the plot.
                 Refer to the Matplotlib documentation.
             plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
@@ -251,9 +256,12 @@ class DataProfile:
             figure.tight_layout()
             figures_and_paths = [(figure, file_path)]
         else:
-            time_file_path = ""
+            evaluations_file_path = time_file_path = ""
             if file_path:
                 file_path = Path(file_path)
+                evaluations_file_path = file_path.with_stem(
+                    f"{file_path.stem}{self.__EVALUATIONS_FILE_NAME_SUFFIX}"
+                )
                 time_file_path = file_path.with_stem(
                     f"{file_path.stem}{self.__TIME_FILE_NAME_SUFFIX}"
                 )
@@ -266,7 +274,7 @@ class DataProfile:
                         grid_settings,
                         use_abscissa_log_scale,
                     ),
-                    file_path,
+                    evaluations_file_path,
                 ),
                 (
                     self._plot_time_data_profiles(

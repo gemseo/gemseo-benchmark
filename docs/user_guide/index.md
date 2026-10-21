@@ -302,8 +302,9 @@ The method `compute_data_profile` of a problem configuration
 or of a group of problem configurations
 plots both data profiles in two separate figures.
 When the figures are saved to a file, e.g. `data_profile.png`,
-the data profiles relative to the elapsed time are saved
-to `data_profile_time.png`.
+the data profiles relative to the number of evaluations
+and relative to the elapsed time are saved
+to `data_profile_eval.png` and `data_profile_time.png`.
 The argument `use_subplots` plots both data profiles side by side
 in a single figure, saved to a single file.
 

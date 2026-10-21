@@ -46,9 +46,6 @@ and this project adheres to
   `BaseProblemConfiguration.compute_data_profile` and `DataProfile.plot`
   plot the data profiles relative to the number of evaluations
   and relative to the elapsed time, in two figures, and return them.
-  When the figures are saved to a file, e.g. `data_profile.png`,
-  the data profiles relative to the elapsed time are saved
-  to `data_profile_time.png`.
   The argument `use_subplots` (`False` by default) plots both data profiles
   side by side in a single figure, saved to a single file,
   and the argument `use_time_log_scale` (`False` by default)
@@ -97,6 +94,11 @@ and this project adheres to
 - The dependencies `properdocs`, `mkdocs-material` and `mkdocs-to-pdf`
   are bounded: `properdocs >=1.6,<2`, `mkdocs-material >=9.7,<10`
   and `mkdocs-to-pdf >=0.11,<1`.
+- When the data profiles are saved to a file, e.g. `data_profile.png`,
+  the data profiles relative to the number of evaluations
+  and relative to the elapsed time
+  are saved to `data_profile_eval.png` and `data_profile_time.png`,
+  unless `use_subplots` is `True`.
 - The horizontal axis of the data profiles is labelled "Number of evaluations"
   instead of "Number of functions evaluations".
 - In the benchmarking report,

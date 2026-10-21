@@ -350,12 +350,13 @@ class BaseProblemConfiguration(
             show: Whether to display the plot.
             file_path: The path where to save the plot.
                 If empty, the plot is not saved.
-                Unless `use_subplots` is `True`,
-                this path is the one of the data profiles
+                When the data profiles
                 relative to the number of evaluations
-                and the data profiles relative to the elapsed time are saved
-                next to it, with the suffix `_time` appended to the file name,
-                e.g. `data_profile_time.png` for `data_profile.png`.
+                and relative to the elapsed time
+                are plotted in two figures,
+                the suffixes `_eval` and `_time` are appended to the file name,
+                e.g. `data_profile_eval.png` and `data_profile_time.png`
+                for `data_profile.png`.
             infeasibility_tolerance: The tolerance on the infeasibility measure.
             max_iteration_number: The maximum number of iterations to plot.
                 If `0`, this value is inferred from the longest history.

@@ -93,8 +93,11 @@ def test_compute_data_profile_files(
         use_subplots=use_subplots,
     )
     assert len(figures) == 1 if use_subplots else 2
-    assert path.is_file()
-    assert (tmp_path / "data_profile_time.png").is_file() is not use_subplots
+    assert {path.name for path in tmp_path.iterdir()} == (
+        {"data_profile.png"}
+        if use_subplots
+        else {"data_profile_eval.png", "data_profile_time.png"}
+    )
 
 
 def test_iter(problem_a, problem_b):

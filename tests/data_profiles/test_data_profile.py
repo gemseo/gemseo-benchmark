@@ -86,7 +86,7 @@ def test_plot_save(tmp_path, converter):
     data_profile.add_history("problem", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
     path = tmp_path / "data_profile.png"
     data_profile.plot(show=False, file_path=converter(path))
-    assert path.is_file()
+    assert (tmp_path / "data_profile_eval.png").is_file()
 
 
 def test_target_values_getter():
@@ -239,7 +239,7 @@ def test_plot_figures(show):
 @pytest.mark.parametrize(
     ("use_subplots", "file_names"),
     [
-        (False, {"data_profile.png", "data_profile_time.png"}),
+        (False, {"data_profile_eval.png", "data_profile_time.png"}),
         (True, {"data_profile.png"}),
     ],
 )
