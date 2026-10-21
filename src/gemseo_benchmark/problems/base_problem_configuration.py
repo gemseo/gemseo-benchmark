@@ -341,7 +341,7 @@ class BaseProblemConfiguration(
         """Compute the data profiles of given algorithms.
 
         The data profiles are plotted
-        relative to the number of iterations and relative to the elapsed time,
+        relative to the number of evaluations and relative to the elapsed time,
         in two separate figures unless `use_subplots` is `True`.
 
         Args:
@@ -352,7 +352,7 @@ class BaseProblemConfiguration(
                 If empty, the plot is not saved.
                 Unless `use_subplots` is `True`,
                 this path is the one of the data profiles
-                relative to the number of iterations
+                relative to the number of evaluations
                 and the data profiles relative to the elapsed time are saved
                 next to it, with the suffix `_time` appended to the file name,
                 e.g. `data_profile_time.png` for `data_profile.png`.
@@ -367,12 +367,12 @@ class BaseProblemConfiguration(
             use_time_log_scale: Whether to use a logarithmic scale
                 for the time axis.
             use_subplots: Whether to plot the data profiles
-                relative to the number of iterations
+                relative to the number of evaluations
                 and relative to the elapsed time
                 side by side in a single figure.
 
         Returns:
-            The figure of the data profiles relative to the number of iterations
+            The figure of the data profiles relative to the number of evaluations
             and the figure of the data profiles relative to the elapsed time,
             or the single figure gathering both if `use_subplots` is `True`.
         """

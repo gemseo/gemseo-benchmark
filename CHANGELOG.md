@@ -44,7 +44,7 @@ and this project adheres to
   `DataProfile.add_history` has an argument `elapsed_times`.
 - `ProblemsGroup.compute_data_profile`,
   `BaseProblemConfiguration.compute_data_profile` and `DataProfile.plot`
-  plot the data profiles relative to the number of iterations
+  plot the data profiles relative to the number of evaluations
   and relative to the elapsed time, in two figures, and return them.
   When the figures are saved to a file, e.g. `data_profile.png`,
   the data profiles relative to the elapsed time are saved
@@ -97,6 +97,8 @@ and this project adheres to
 - The dependencies `properdocs`, `mkdocs-material` and `mkdocs-to-pdf`
   are bounded: `properdocs >=1.6,<2`, `mkdocs-material >=9.7,<10`
   and `mkdocs-to-pdf >=0.11,<1`.
+- The horizontal axis of the data profiles is labelled "Number of evaluations"
+  instead of "Number of functions evaluations".
 - In the benchmarking report,
   the distributions of the data of an algorithm configuration
   on an MDO or MDA problem configuration

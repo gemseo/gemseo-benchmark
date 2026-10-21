@@ -231,7 +231,7 @@ def test_plot_figures(show):
     """Check the figures of the data profiles."""
     figures = _create_data_profile().plot(show=show)
     assert [figure.axes[0].get_xlabel() for figure in figures] == [
-        "Number of functions evaluations",
+        "Number of evaluations",
         "Elapsed time",
     ]
 

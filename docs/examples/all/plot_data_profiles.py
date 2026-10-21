@@ -153,7 +153,7 @@ results = scenario.execute([problems], skip_report=True)
 #
 # Now that the performances histories are generated for the reference problems,
 # the data profiles of the algorithms configurations can be computed,
-# relative to the number of iterations and relative to the elapsed time.
+# relative to the number of evaluations and relative to the elapsed time.
 problems.compute_data_profile(algorithms_configurations, results, show=True)
 # %%
 # The two data profiles can also be plotted side by side in a single figure.

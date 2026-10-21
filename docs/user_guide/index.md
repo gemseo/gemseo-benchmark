@@ -292,7 +292,7 @@ algorithms chosen as references.
 The *data profile* of an algorithm relative to a problem configuration
 (or a group of problem configurations) is the graph representing the
 ratio of target values reached by the algorithm relative to the number
-functions evaluations performed by the algorithm.
+of evaluations performed by the algorithm.
 
 ![images/data_profiles.png](images/data_profiles.png)
 

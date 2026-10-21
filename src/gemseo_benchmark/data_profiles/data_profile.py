@@ -74,7 +74,7 @@ class DataProfile:
 
     The algorithms will be compared based on the number of targets they reach,
     cumulated over all the reference problems,
-    relative to the number of problems functions evaluations they make
+    relative to the number of evaluations they make
     or relative to the time they take.
 
     A data profile is the empirical ratio of targets reached
@@ -183,7 +183,7 @@ class DataProfile:
         """Plot the data profiles of the required algorithms.
 
         The data profiles are plotted
-        relative to the number of functions evaluations
+        relative to the number of evaluations
         and relative to the elapsed time.
 
         Args:
@@ -194,7 +194,7 @@ class DataProfile:
                 If empty, the plot is not saved.
                 Unless `use_subplots` is `True`,
                 this path is the one of the data profiles
-                relative to the number of functions evaluations
+                relative to the number of evaluations
                 and the data profiles relative to the elapsed time are saved
                 next to it, with the suffix `_time` appended to the file name,
                 e.g. `data_profile_time.png` for `data_profile.png`.
@@ -208,13 +208,13 @@ class DataProfile:
             use_time_log_scale: Whether to use a logarithmic scale
                 for the time axis.
             use_subplots: Whether to plot the data profiles
-                relative to the number of functions evaluations
+                relative to the number of evaluations
                 and relative to the elapsed time
                 side by side in a single figure.
 
         Returns:
             The figure of the data profiles
-            relative to the number of functions evaluations
+            relative to the number of evaluations
             and the figure of the data profiles relative to the elapsed time,
             or the single figure gathering both if `use_subplots` is `True`.
         """
@@ -465,7 +465,7 @@ class DataProfile:
         if use_abscissa_log_scale:
             axes.set_xscale("log")
 
-        axes.set_xlabel("Number of functions evaluations")
+        axes.set_xlabel("Number of evaluations")
         axes.set_xlim([1, max_profile_size])
         DataProfile.__set_ratio_axis(axes)
         DataProfile.__draw_profiles(
