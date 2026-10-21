@@ -77,9 +77,8 @@ class DataProfile:
     relative to the number of problems functions evaluations they make
     or relative to the time they take.
 
-    The data profile is the empirical cumulated distribution function of the number of
-    functions evaluations (or of the elapsed time)
-    made by an algorithm to reach a problem target.
+    A data profile is the empirical ratio of targets reached
+    for a given number of evaluations or a given elapsed time.
     """
 
     __TIME_FILE_NAME_SUFFIX: Final[str] = "_time"
