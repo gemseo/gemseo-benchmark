@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import ClassVar
 from typing import Final
+from typing import TypeAlias
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -53,7 +54,7 @@ if TYPE_CHECKING:
     from gemseo_benchmark import MarkeveryType
     from gemseo_benchmark.data_profiles.target_values import TargetValues
 
-TimeDataProfiles = dict[str, tuple[list[float], list[float]]]
+TimeDataProfiles: TypeAlias = dict[str, tuple[list[float], list[float]]]
 """The data profiles relative to the elapsed time.
 
 For each algorithm configuration,
