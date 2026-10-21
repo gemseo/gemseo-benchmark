@@ -149,7 +149,9 @@ class DataProfile:
             feasibility_statuses: A history of (boolean) feasibility statuses.
                 If `None` then feasibility is always assumed.
             elapsed_times: A history of elapsed times, in increasing order.
-                If empty, the elapsed times are set to zero.
+                If empty,
+                the history is ignored
+                by the data profiles relative to the elapsed time.
 
         Raises:
             ValueError: If the problem name is not the name of a reference problem.
@@ -189,6 +191,10 @@ class DataProfile:
         The data profiles are plotted
         relative to the number of evaluations
         and relative to the elapsed time.
+        The algorithm configurations without elapsed times
+        are left out of the data profiles relative to the elapsed time.
+        If no algorithm configuration has elapsed times,
+        only the data profiles relative to the number of evaluations are plotted.
 
         Args:
             algo_names: The names of the algorithms.
@@ -233,7 +239,24 @@ class DataProfile:
             if "markevery" not in settings:
                 settings["markevery"] = markevery
 
-        if use_subplots:
+        # Set the options of all the algorithm configurations
+        # so that they are the same in the figures with and without the elapsed time.
+        plot_settings_copy = _get_configuration_plot_options(
+            plot_settings_copy, data_profiles
+        )
+        if not time_data_profiles:
+            figures_and_paths = [
+                (
+                    self._plot_data_profiles(
+                        data_profiles,
+                        plot_settings_copy,
+                        grid_settings,
+                        use_abscissa_log_scale,
+                    ),
+                    file_path,
+                )
+            ]
+        elif use_subplots:
             figsize = matplotlib.rcParams["figure.figsize"]
             figure, (axes, time_axes) = plt.subplots(
                 1, 2, sharey="all", figsize=(figsize[0] * 2, figsize[1])
@@ -328,6 +351,7 @@ class DataProfile:
 
         For each algorithm, compute the cumulative distribution function of the
         elapsed time required by the algorithm to reach a reference target.
+        The algorithms without elapsed times are left out.
 
         Args:
             *algo_names: The names of the algorithms.
@@ -348,6 +372,9 @@ class DataProfile:
                 for pb_history in pb_histories
                 for item in pb_history
             })
+            if times == [0.0]:
+                continue
+
             total_hits_history = zeros(len(times))
             for pb_name, targets in self.__target_values.items():
                 for pb_history in algo_histories[pb_name]:

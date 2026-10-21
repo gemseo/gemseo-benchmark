@@ -86,7 +86,7 @@ def test_plot_save(tmp_path, converter):
     data_profile.add_history("problem", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
     path = tmp_path / "data_profile.png"
     data_profile.plot(show=False, file_path=converter(path))
-    assert (tmp_path / "data_profile_eval.png").is_file()
+    assert path.is_file()
 
 
 def test_target_values_getter():
@@ -202,7 +202,7 @@ def test_compute_time_data_profiles_without_elapsed_times():
     """Check the time data profiles of histories without elapsed times."""
     data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
     data_profile.add_history("problem", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
-    assert data_profile.compute_time_data_profiles() == {"algo": ([0.0], [1.0])}
+    assert data_profile.compute_time_data_profiles() == {}
 
 
 @pytest.mark.parametrize(
@@ -251,3 +251,35 @@ def test_plot_save_files(tmp_path, use_subplots, file_names):
         use_subplots=use_subplots,
     )
     assert {path.name for path in tmp_path.iterdir()} == file_names
+
+
+@pytest.mark.parametrize("use_subplots", [False, True])
+def test_plot_without_elapsed_times(tmp_path, use_subplots):
+    """Check the data profiles of histories without elapsed times."""
+    data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
+    data_profile.add_history("problem", "algo", [2.0, 1.0, 0.0])
+    figures = data_profile.plot(
+        show=False, file_path=tmp_path / "data_profile.png", use_subplots=use_subplots
+    )
+    assert len(figures) == 1
+    assert len(figures[0].axes) == 1
+    assert {path.name for path in tmp_path.iterdir()} == {"data_profile.png"}
+
+
+def test_plot_options_without_elapsed_times():
+    """Check that a configuration keeps its options when another one has no times."""
+    data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
+    data_profile.add_history("problem", "algo1", [2.0, 1.0])
+    data_profile.add_history(
+        "problem",
+        "algo2",
+        [2.0, 0.0],
+        elapsed_times=[timedelta(seconds=t) for t in (1.0, 2.0)],
+    )
+    figure, time_figure = data_profile.plot(show=False)
+    colors = {line.get_label(): line.get_color() for line in figure.axes[0].lines}
+    time_colors = {
+        line.get_label(): line.get_color() for line in time_figure.axes[0].lines
+    }
+    assert "algo1" not in time_colors
+    assert time_colors["algo2"] == colors["algo2"]

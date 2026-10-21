@@ -305,6 +305,8 @@ When the figures are saved to a file, e.g. `data_profile.png`,
 the data profiles relative to the number of evaluations
 and relative to the elapsed time are saved
 to `data_profile_eval.png` and `data_profile_time.png`.
+The algorithm configurations without elapsed times
+are left out of the data profiles relative to the elapsed time.
 The argument `use_subplots` plots both data profiles side by side
 in a single figure, saved to a single file.
 

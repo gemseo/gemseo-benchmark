@@ -116,6 +116,10 @@ class ProblemsGroup:
         The data profiles are plotted
         relative to the number of evaluations and relative to the elapsed time,
         in two separate figures unless `use_subplots` is `True`.
+        The algorithm configurations without elapsed times
+        are left out of the data profiles relative to the elapsed time.
+        If no algorithm configuration has elapsed times,
+        only the data profiles relative to the number of evaluations are plotted.
 
         Args:
             algos_configurations: The algorithms configurations.

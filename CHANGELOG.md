@@ -46,6 +46,8 @@ and this project adheres to
   `BaseProblemConfiguration.compute_data_profile` and `DataProfile.plot`
   plot the data profiles relative to the number of evaluations
   and relative to the elapsed time, in two figures, and return them.
+  The algorithm configurations without elapsed times
+  are left out of the data profiles relative to the elapsed time.
   The argument `use_subplots` (`False` by default) plots both data profiles
   side by side in a single figure, saved to a single file,
   and the argument `use_time_log_scale` (`False` by default)
@@ -98,7 +100,8 @@ and this project adheres to
   the data profiles relative to the number of evaluations
   and relative to the elapsed time
   are saved to `data_profile_eval.png` and `data_profile_time.png`,
-  unless `use_subplots` is `True`.
+  unless `use_subplots` is `True`
+  or no algorithm configuration has elapsed times.
 - The horizontal axis of the data profiles is labelled "Number of evaluations"
   instead of "Number of functions evaluations".
 - In the benchmarking report,
