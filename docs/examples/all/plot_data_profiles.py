@@ -158,7 +158,7 @@ problems.compute_data_profile(algorithms_configurations, results, show=True)
 # %%
 # The two data profiles can also be plotted side by side in a single figure.
 problems.compute_data_profile(
-    algorithms_configurations, results, show=True, combine_figures=True
+    algorithms_configurations, results, show=True, use_subplots=True
 )
 # %%
 # Here we remove the performances histories as we do not wish to keep them.

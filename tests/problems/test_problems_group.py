@@ -79,9 +79,9 @@ def test_compute_data_profile(
         assert figure == snapshot_matplotlib
 
 
-@pytest.mark.parametrize("combine_figures", [False, True])
+@pytest.mark.parametrize("use_subplots", [False, True])
 def test_compute_data_profile_files(
-    tmp_path, problem_a, problem_b, results, combine_figures
+    tmp_path, problem_a, problem_b, results, use_subplots
 ):
     """Check the files of the data profiles of a group of problems."""
     path = tmp_path / "data_profile.png"
@@ -90,11 +90,11 @@ def test_compute_data_profile_files(
         results,
         show=False,
         plot_path=path,
-        combine_figures=combine_figures,
+        use_subplots=use_subplots,
     )
-    assert len(figures) == 1 if combine_figures else 2
+    assert len(figures) == 1 if use_subplots else 2
     assert path.is_file()
-    assert (tmp_path / "data_profile_time.png").is_file() is not combine_figures
+    assert (tmp_path / "data_profile_time.png").is_file() is not use_subplots
 
 
 def test_iter(problem_a, problem_b):

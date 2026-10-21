@@ -556,14 +556,14 @@ def test_compute_data_profile_max_eval_number(
         assert figure == snapshot_matplotlib(remove_text=True)
 
 
-@pytest.mark.parametrize("combine_figures", [False, True])
+@pytest.mark.parametrize("use_subplots", [False, True])
 def test_compute_data_profile_files(
     tmp_path,
     minimization_problem_creator,
     target_values,
     algorithms_configurations,
     results,
-    combine_figures,
+    use_subplots,
 ):
     """Check the files of the data profiles of a problem configuration."""
     target_values.compute_target_hits_history = mock.Mock(
@@ -576,11 +576,11 @@ def test_compute_data_profile_files(
         algorithms_configurations,
         results,
         file_path=path,
-        combine_figures=combine_figures,
+        use_subplots=use_subplots,
     )
-    assert len(figures) == 1 if combine_figures else 2
+    assert len(figures) == 1 if use_subplots else 2
     assert path.is_file()
-    assert (tmp_path / "data_profile_time.png").is_file() is not combine_figures
+    assert (tmp_path / "data_profile_time.png").is_file() is not use_subplots
 
 
 @pytest.mark.parametrize(

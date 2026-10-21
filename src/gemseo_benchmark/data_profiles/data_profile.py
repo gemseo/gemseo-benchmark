@@ -178,7 +178,7 @@ class DataProfile:
         grid_settings: Mapping[str, str] = read_only_empty_dict,
         use_abscissa_log_scale: bool = False,
         use_time_log_scale: bool = False,
-        combine_figures: bool = False,
+        use_subplots: bool = False,
     ) -> list[Figure]:
         """Plot the data profiles of the required algorithms.
 
@@ -192,7 +192,7 @@ class DataProfile:
             show: If True, show the plot.
             file_path: The path where to save the plot.
                 If empty, the plot is not saved.
-                Unless `combine_figures` is `True`,
+                Unless `use_subplots` is `True`,
                 this path is the one of the data profiles
                 relative to the number of functions evaluations
                 and the data profiles relative to the elapsed time are saved
@@ -207,7 +207,7 @@ class DataProfile:
                 for the abscissa axis.
             use_time_log_scale: Whether to use a logarithmic scale
                 for the time axis.
-            combine_figures: Whether to plot the data profiles
+            use_subplots: Whether to plot the data profiles
                 relative to the number of functions evaluations
                 and relative to the elapsed time
                 side by side in a single figure.
@@ -216,7 +216,7 @@ class DataProfile:
             The figure of the data profiles
             relative to the number of functions evaluations
             and the figure of the data profiles relative to the elapsed time,
-            or the single figure gathering both if `combine_figures` is `True`.
+            or the single figure gathering both if `use_subplots` is `True`.
         """
         if algo_names is None:
             algo_names = ()
@@ -228,7 +228,7 @@ class DataProfile:
             if "markevery" not in settings:
                 settings["markevery"] = markevery
 
-        if combine_figures:
+        if use_subplots:
             figsize = matplotlib.rcParams["figure.figsize"]
             figure, (axes, time_axes) = plt.subplots(
                 1, 2, sharey="all", figsize=(figsize[0] * 2, figsize[1])

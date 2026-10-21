@@ -220,7 +220,7 @@ def test_plot_time_data_profiles(use_time_log_scale, snapshot_matplotlib):
 
 def test_plot_combined_figures(snapshot_matplotlib):
     """Check the figure combining the data profiles."""
-    figures = _create_data_profile().plot(show=False, combine_figures=True)
+    figures = _create_data_profile().plot(show=False, use_subplots=True)
     assert len(figures) == 1
     assert len(figures[0].axes) == 2
     assert figures[0] == snapshot_matplotlib
@@ -237,17 +237,17 @@ def test_plot_figures(show):
 
 
 @pytest.mark.parametrize(
-    ("combine_figures", "file_names"),
+    ("use_subplots", "file_names"),
     [
         (False, {"data_profile.png", "data_profile_time.png"}),
         (True, {"data_profile.png"}),
     ],
 )
-def test_plot_save_files(tmp_path, combine_figures, file_names):
+def test_plot_save_files(tmp_path, use_subplots, file_names):
     """Check the files of the data profiles."""
     _create_data_profile().plot(
         show=False,
         file_path=tmp_path / "data_profile.png",
-        combine_figures=combine_figures,
+        use_subplots=use_subplots,
     )
     assert {path.name for path in tmp_path.iterdir()} == file_names

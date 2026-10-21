@@ -109,13 +109,13 @@ class ProblemsGroup:
         grid_settings: Mapping[str, str] = read_only_empty_dict,
         use_abscissa_log_scale: bool = False,
         use_time_log_scale: bool = False,
-        combine_figures: bool = False,
+        use_subplots: bool = False,
     ) -> list[Figure]:
         """Generate the data profiles of given algorithms relative to the problems.
 
         The data profiles are plotted
         relative to the number of iterations and relative to the elapsed time,
-        in two separate figures unless `combine_figures` is `True`.
+        in two separate figures unless `use_subplots` is `True`.
 
         Args:
             algos_configurations: The algorithms configurations.
@@ -123,7 +123,7 @@ class ProblemsGroup:
             show: If `True`, show the plot.
             plot_path: The path where to save the plot.
                 If empty, the plot is not saved.
-                Unless `combine_figures` is `True`,
+                Unless `use_subplots` is `True`,
                 this path is the one of the data profiles
                 relative to the number of iterations
                 and the data profiles relative to the elapsed time are saved
@@ -139,7 +139,7 @@ class ProblemsGroup:
                 for the abscissa axis.
             use_time_log_scale: Whether to use a logarithmic scale
                 for the time axis.
-            combine_figures: Whether to plot the data profiles
+            use_subplots: Whether to plot the data profiles
                 relative to the number of iterations
                 and relative to the elapsed time
                 side by side in a single figure.
@@ -147,7 +147,7 @@ class ProblemsGroup:
         Returns:
             The figure of the data profiles relative to the number of iterations
             and the figure of the data profiles relative to the elapsed time,
-            or the single figure gathering both if `combine_figures` is `True`.
+            or the single figure gathering both if `use_subplots` is `True`.
         """
         data_profile = DataProfile({
             problem.name: problem.minimization_target_values
@@ -178,7 +178,7 @@ class ProblemsGroup:
             grid_settings=grid_settings,
             use_abscissa_log_scale=use_abscissa_log_scale,
             use_time_log_scale=use_time_log_scale,
-            combine_figures=combine_figures,
+            use_subplots=use_subplots,
         )
 
     def __len__(self) -> int:

@@ -210,7 +210,7 @@ class Figures:
             grid_settings=self.__GRID_SETTINGS,
             use_abscissa_log_scale=use_abscissa_log_scale,
             use_time_log_scale=use_time_log_scale,
-            combine_figures=True,
+            use_subplots=True,
         )
         return plot_path
 
@@ -494,7 +494,7 @@ class Figures:
             self.__GRID_SETTINGS,
             use_abscissa_log_scale,
             use_time_log_scale=use_time_log_scale,
-            combine_figures=True,
+            use_subplots=True,
         )
         return file_path
 

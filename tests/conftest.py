@@ -201,7 +201,7 @@ def side_effect(
     plot_settings=read_only_empty_dict,
     grid_settings=read_only_empty_dict,
     use_time_log_scale=False,
-    combine_figures=False,
+    use_subplots=False,
 ):
     """Side effect for the computation of a data profile."""
     shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(file_path))
@@ -260,7 +260,7 @@ def group(problem_a, problem_b) -> mock.Mock:
         grid_settings=read_only_empty_dict,
         use_abscissa_log_scale=False,
         use_time_log_scale=False,
-        combine_figures=False,
+        use_subplots=False,
     ):
         shutil.copyfile(str(Path(__file__).parent / "data_profile.png"), str(plot_path))
 

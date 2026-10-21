@@ -49,7 +49,7 @@ and this project adheres to
   When the figures are saved to a file, e.g. `data_profile.png`,
   the data profiles relative to the elapsed time are saved
   to `data_profile_time.png`.
-  The argument `combine_figures` (`False` by default) plots both data profiles
+  The argument `use_subplots` (`False` by default) plots both data profiles
   side by side in a single figure, saved to a single file,
   and the argument `use_time_log_scale` (`False` by default)
   uses a logarithmic scale for the time axis.
