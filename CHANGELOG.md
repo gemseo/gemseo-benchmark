@@ -59,6 +59,19 @@ and this project adheres to
   relative to the elapsed time
   next to their distributions relative to the number of iterations
   (or of discipline executions).
+- The argument `use_elapsed_time` (`False` by default) of
+  `PerformanceHistories.plot_performance_measure_distribution`,
+  `PerformanceHistories.plot_infeasibility_measure_distribution` and
+  `PerformanceHistories.plot_number_of_unsatisfied_constraints_distribution`
+  plots the distribution relative to the elapsed time
+  instead of the number of functions evaluations.
+  `PerformanceHistories.plot_centiles_range` and `PerformanceHistories.plot_median`
+  have an argument `abscissas` (the numbers of functions evaluations by default).
+- The argument `number_of_scalar_constraints` of
+  `PerformanceHistories.spread_over_time` and `PerformanceHistory.spread_over_timeline`
+  can be `None`:
+  the number of unsatisfied constraints is then unknown
+  before the first item of a history.
 
 ### Changed
 

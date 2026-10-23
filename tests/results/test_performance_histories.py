@@ -210,6 +210,76 @@ def test_spread_over_time(timed_performance_histories) -> None:
     check_spread_over_time(timed_performance_histories.spread_over_time(5))
 
 
+def test_spread_over_time_unknown_constraints(timed_performance_histories) -> None:
+    """Check the spreading over time with an unknown number of constraints."""
+    histories = timed_performance_histories.spread_over_time(None)
+    assert histories[1][0].n_unsatisfied_constraints is None
+    assert [item.n_unsatisfied_constraints for item in histories[1][1:]] == [0] * 3
+
+
+@pytest.fixture(scope="module")
+def timed_constrained_histories() -> PerformanceHistories:
+    """Performance histories with constraints and elapsed times."""
+    return PerformanceHistories(
+        PerformanceHistory(
+            [3, 2, 1],
+            [2, 0, 0],
+            n_unsatisfied_constraints=[1, 0, 0],
+            elapsed_times=[timedelta(seconds=s) for s in (1, 4, 6)],
+        ),
+        PerformanceHistory(
+            [4, 2, 0],
+            [4, 2, 0],
+            n_unsatisfied_constraints=[2, 1, 0],
+            elapsed_times=[timedelta(seconds=s) for s in (2, 3, 7)],
+        ),
+        PerformanceHistory(
+            [5, 1, -1],
+            [0, 0, 0],
+            n_unsatisfied_constraints=[0, 0, 0],
+            elapsed_times=[timedelta(seconds=s) for s in (1.5, 5, 8)],
+        ),
+    )
+
+
+@pytest.mark.parametrize("plot_all_histories", [False, True])
+def test_plot_performance_measure_distribution_over_time(
+    timed_constrained_histories, plot_all_histories, snapshot_matplotlib
+):
+    """Check the plot of the distribution of the performance measure over time."""
+    figure = matplotlib.pyplot.figure()
+    timed_constrained_histories.plot_performance_measure_distribution(
+        figure.gca(),
+        5,
+        float("nan"),
+        plot_all_histories,
+        use_elapsed_time=True,
+    )
+    assert figure == snapshot_matplotlib
+
+
+def test_plot_infeasibility_measure_distribution_over_time(
+    timed_constrained_histories, snapshot_matplotlib
+):
+    """Check the plot of the distribution of the infeasibility measure over time."""
+    figure = matplotlib.pyplot.figure()
+    timed_constrained_histories.plot_infeasibility_measure_distribution(
+        figure.gca(), use_elapsed_time=True
+    )
+    assert figure == snapshot_matplotlib
+
+
+def test_plot_number_of_unsatisfied_constraints_distribution_over_time(
+    timed_constrained_histories, snapshot_matplotlib
+):
+    """Check the plot of the distribution of the unsatisfied constraints over time."""
+    figure = matplotlib.pyplot.figure()
+    timed_constrained_histories.plot_number_of_unsatisfied_constraints_distribution(
+        figure.gca(), use_elapsed_time=True
+    )
+    assert figure == snapshot_matplotlib
+
+
 def test_get_numbers_of_discipline_executions(
     multidisciplinary_histories,
 ) -> None:

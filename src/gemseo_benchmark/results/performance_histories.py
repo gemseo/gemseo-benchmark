@@ -17,18 +17,20 @@
 from __future__ import annotations
 
 import collections.abc
+import datetime
 import statistics
 from typing import TYPE_CHECKING
 
 import numpy
+from matplotlib.ticker import FuncFormatter
 from matplotlib.ticker import MaxNLocator
 
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
-    import datetime
     from collections.abc import Callable
     from collections.abc import Mapping
+    from collections.abc import Sequence
 
     from matplotlib.axes import Axes
 
@@ -148,6 +150,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         infeasible_performance_measure: float,
         plot_all_histories: bool = False,
         performance_measure_is_minimized: bool = True,
+        use_elapsed_time: bool = False,
     ) -> None:
         """Plot the distribution of the performance measure.
 
@@ -159,7 +162,15 @@ class PerformanceHistories(collections.abc.MutableSequence):
             plot_all_histories: Whether to plot all the performance histories.
             performance_measure_is_minimized: Whether the performance measure
                 is minimized (rather than maximized).
+            use_elapsed_time: Whether to plot the distribution
+                relative to the elapsed time
+                (rather than relative to the number of functions evaluations).
         """
+        histories = (
+            self.spread_over_time(None)
+            if use_elapsed_time
+            else self.get_equal_size_histories()
+        )
         self.__plot_distribution(
             numpy.array([
                 [
@@ -168,52 +179,86 @@ class PerformanceHistories(collections.abc.MutableSequence):
                     else infeasible_performance_measure
                     for item in history
                 ]
-                for history in self.get_equal_size_histories()
+                for history in histories
             ]),
             axes,
             "Performance measure",
             extremal_feasible_performance,
             plot_all_histories,
             performance_measure_is_minimized,
+            self.__get_elapsed_seconds(use_elapsed_time),
         )
 
     def plot_infeasibility_measure_distribution(
-        self, axes: Axes, plot_all_histories: bool = False
+        self,
+        axes: Axes,
+        plot_all_histories: bool = False,
+        use_elapsed_time: bool = False,
     ) -> None:
         """Plot the distribution of the infeasibility measure.
 
         Args:
             axes: The axes of the plot.
             plot_all_histories: Whether to plot all the performance histories.
+            use_elapsed_time: Whether to plot the distribution
+                relative to the elapsed time
+                (rather than relative to the number of functions evaluations).
         """
+        histories = self.spread_over_time(None) if use_elapsed_time else self
         self.__plot_distribution(
-            numpy.array([history.infeasibility_measures for history in self]),
+            numpy.array([history.infeasibility_measures for history in histories]),
             axes,
             "Infeasibility measure",
             plot_all_histories=plot_all_histories,
+            elapsed_times=self.__get_elapsed_seconds(use_elapsed_time),
         )
 
     def plot_number_of_unsatisfied_constraints_distribution(
-        self, axes: Axes, plot_all_histories: bool = False
+        self,
+        axes: Axes,
+        plot_all_histories: bool = False,
+        use_elapsed_time: bool = False,
     ) -> None:
         """Plot the distribution of the number of unsatisfied constraints.
 
         Args:
             axes: The axes of the plot.
             plot_all_histories: Whether to plot all the performance histories.
+            use_elapsed_time: Whether to plot the distribution
+                relative to the elapsed time
+                (rather than relative to the number of functions evaluations).
         """
+        histories = self.spread_over_time(None) if use_elapsed_time else self
         self.__plot_distribution(
             numpy.array([
                 [
                     numpy.nan if n is None else n
                     for n in history.n_unsatisfied_constraints
                 ]
-                for history in self
+                for history in histories
             ]),
             axes,
             "Number of unsatisfied constraints",
             plot_all_histories=plot_all_histories,
+            elapsed_times=self.__get_elapsed_seconds(use_elapsed_time),
         )
+
+    def __get_elapsed_seconds(self, use_elapsed_time: bool) -> list[float]:
+        """Return the sorted elapsed times of all the history items in seconds.
+
+        Args:
+            use_elapsed_time: Whether the distribution is plotted
+                relative to the elapsed time.
+
+        Returns:
+            The sorted elapsed times in seconds,
+            or an empty list if the distribution is not plotted
+            relative to the elapsed time.
+        """
+        if not use_elapsed_time:
+            return []
+
+        return [time.total_seconds() for time in self.get_elapsed_times()]
 
     @staticmethod
     def __plot_distribution(
@@ -223,6 +268,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         infinity: float | None = None,
         plot_all_histories: bool = False,
         performance_measure_is_minimized: bool = True,
+        elapsed_times: Sequence[float] = (),
     ) -> None:
         """Plot the distribution of histories data.
 
@@ -234,8 +280,19 @@ class PerformanceHistories(collections.abc.MutableSequence):
             plot_all_histories: Whether to plot all the performance histories.
             performance_measure_is_minimized: Whether the performance measure
                 is minimized (rather than maximized).
+            elapsed_times: The elapsed times in seconds
+                to be used as abscissas.
+                If empty, use the numbers of functions evaluations.
         """
-        abscissas = range(1, histories.shape[1] + 1)
+        if elapsed_times:
+            abscissas = elapsed_times
+            drawstyle = "steps-post"
+            step = "post"
+        else:
+            abscissas = range(1, histories.shape[1] + 1)
+            drawstyle = "default"
+            step = None
+
         legend_handles_offset = 0
         if plot_all_histories:
             legend_handles_offset = histories.shape[0] - 1
@@ -245,29 +302,33 @@ class PerformanceHistories(collections.abc.MutableSequence):
                 color="black",
                 label="histories",
                 linestyle=":",
+                drawstyle=drawstyle,
             )
 
         PerformanceHistories.plot_centiles_range(
             histories,
             axes,
             (0, 100),
-            {"color": "lightgray", "label": "0th-100th centiles"},
+            {"color": "lightgray", "label": "0th-100th centiles", "step": step},
             infinity,
             performance_measure_is_minimized,
+            elapsed_times,
         )
         PerformanceHistories.plot_centiles_range(
             histories,
             axes,
             (25, 75),
-            {"color": "gray", "label": "25th-75th centiles"},
+            {"color": "gray", "label": "25th-75th centiles", "step": step},
             infinity,
             performance_measure_is_minimized,
+            elapsed_times,
         )
         PerformanceHistories.plot_median(
             histories,
             axes,
-            {"color": "black", "label": "median"},
+            {"color": "black", "label": "median", "drawstyle": drawstyle},
             performance_measure_is_minimized,
+            elapsed_times,
         )
         axes.plot(
             abscissas,
@@ -275,6 +336,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
             color="orange",
             label="mean",
             linestyle=":",
+            drawstyle=drawstyle,
         )
         # Reorder the legend
         axes.legend(
@@ -288,7 +350,16 @@ class PerformanceHistories(collections.abc.MutableSequence):
                 strict=False,
             )
         )
-        axes.set_xlabel("Number of functions evaluations")
+        if elapsed_times:
+            axes.set_xlabel("Elapsed time")
+            axes.xaxis.set_major_formatter(
+                FuncFormatter(
+                    lambda seconds, _: str(datetime.timedelta(seconds=seconds))
+                )
+            )
+        else:
+            axes.set_xlabel("Number of functions evaluations")
+
         axes.set_ylabel(y_label)
 
     @staticmethod
@@ -299,6 +370,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         fill_between_settings: Mapping[str, str],
         infinity: float | None,
         performance_measure_is_minimized: bool,
+        abscissas: Sequence[float] = (),
     ) -> None:
         """Plot a range of centiles of histories data.
 
@@ -311,7 +383,13 @@ class PerformanceHistories(collections.abc.MutableSequence):
             infinity: The substitute value for infinite ordinates.
             performance_measure_is_minimized: Whether the performance measure
                 is minimized (rather than maximized).
+            abscissas: The abscissas of the histories data.
+                If empty, use the numbers of functions evaluations.
         """
+        use_evaluations = not abscissas
+        if use_evaluations:
+            abscissas = range(1, histories.shape[1] + 1)
+
         method = "inverted_cdf"  # N.B. This method supports infinite values.
         histories = numpy.nan_to_num(
             histories,
@@ -330,7 +408,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
             len(centile),
         )
         axes.plot(  # hack to get same limits/ticks
-            range(1, first_index + 1),
+            abscissas[:first_index],
             numpy.full(
                 first_index,
                 centile[first_index] if first_index < len(centile) else numpy.nan,
@@ -345,12 +423,13 @@ class PerformanceHistories(collections.abc.MutableSequence):
                 lower_centile = numpy.nan_to_num(lower_centile, neginf=infinity)
 
         axes.fill_between(
-            range(first_index + 1, histories.shape[1] + 1),
+            abscissas[first_index:],
             lower_centile[first_index:],
             upper_centile[first_index:],
             **fill_between_settings,
         )
-        axes.xaxis.set_major_locator(MaxNLocator(integer=True))
+        if use_evaluations:
+            axes.xaxis.set_major_locator(MaxNLocator(integer=True))
 
     @staticmethod
     def plot_median(
@@ -358,6 +437,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         axes: Axes,
         plot_settings: Mapping[str, str | int | float],
         performance_measure_is_minimized: bool,
+        abscissas: Sequence[float] = (),
     ) -> None:
         """Plot a range of centiles of histories data.
 
@@ -367,7 +447,12 @@ class PerformanceHistories(collections.abc.MutableSequence):
             plot_settings: Keyword arguments for `matplotlib.axes.Axes.plot`.
             performance_measure_is_minimized: Whether the performance measure
                 is minimized (rather than maximized).
+            abscissas: The abscissas of the histories data.
+                If empty, use the numbers of functions evaluations.
         """
+        if not abscissas:
+            abscissas = range(1, histories.shape[1] + 1)
+
         median = numpy.median(
             numpy.nan_to_num(
                 histories,
@@ -381,7 +466,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
             histories.shape[1],
         )
         axes.plot(
-            range(first_index + 1, histories.shape[1] + 1),
+            abscissas[first_index:],
             median[first_index:],
             **plot_settings,
         )
@@ -400,13 +485,15 @@ class PerformanceHistories(collections.abc.MutableSequence):
         return sorted([item.elapsed_time for history in self for item in history])
 
     def spread_over_time(
-        self, number_of_scalar_constraints: int
+        self, number_of_scalar_constraints: int | None
     ) -> PerformanceHistories:
         """Spread the histories over all the elapsed times.
 
         Args:
             number_of_scalar_constraints: The number of scalar constraints
                 of the underlying problem.
+                If `None`, the number of unsatisfied constraints is unknown
+                before the first item of a history.
 
         Returns:
             The performance histories with has as many items as total elapsed times.
