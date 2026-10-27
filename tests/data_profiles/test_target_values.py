@@ -23,7 +23,6 @@ from __future__ import annotations
 
 import pytest
 from matplotlib import pyplot
-from matplotlib.testing.decorators import image_comparison
 from matplotlib.ticker import MaxNLocator
 
 from gemseo_benchmark.data_profiles.target_values import TargetValues
@@ -45,11 +44,10 @@ def feasible_target_values() -> TargetValues:
     return TargetValues([2.0, 1.0, 0.0])
 
 
-@image_comparison(baseline_images=["targets"], remove_text=True, extensions=["png"])
-def test_plot_targets(feasible_target_values):
+def test_plot_targets(feasible_target_values, snapshot_matplotlib):
     """Check the target values figure."""
-    pyplot.close("all")
-    feasible_target_values.plot(show=False)
+    figure = feasible_target_values.plot(show=False)
+    assert figure == snapshot_matplotlib(remove_text=True)
 
 
 @pytest.mark.parametrize("converter", [lambda _: _, str])
@@ -65,13 +63,14 @@ def test_plot_save(tmp_path, converter):
     assert path.is_file()
 
 
-@image_comparison(baseline_images=["feasible_targets"], extensions=["png"])
-def test_plot_on_axes(feasible_target_values) -> None:
+def test_plot_on_axes(feasible_target_values, snapshot_matplotlib) -> None:
     """Check the plotting of target value on specific axes."""
-    axes = pyplot.figure().gca()
+    figure = pyplot.figure()
+    axes = figure.gca()
     axes.plot(range(1, 6), range(4, -1, -1))
     axes.xaxis.set_major_locator(MaxNLocator(integer=True))
     feasible_target_values.plot_on_axes(axes)
+    assert figure == snapshot_matplotlib
 
 
 def test_plot_infeasible_targets():

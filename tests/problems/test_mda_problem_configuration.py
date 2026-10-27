@@ -18,13 +18,9 @@ from __future__ import annotations
 
 from unittest import mock
 
-from matplotlib.testing.decorators import image_comparison
-
 from gemseo_benchmark.benchmarker.mda_worker import MDAWorker
 from gemseo_benchmark.problems.mda_problem_configuration import MDAProblemConfiguration
 from tests.conftest import mda_create_problem
-from tests.problems.conftest import check_data_profiles_computation
-from tests.problems.conftest import check_data_profiles_computation_with_max_eval_number
 from tests.problems.conftest import check_default_starting_point
 from tests.problems.conftest import check_description
 from tests.problems.conftest import check_inconsistent_starting_points
@@ -44,6 +40,8 @@ from tests.problems.conftest import check_starting_points_saving
 from tests.problems.conftest import check_undefined_target_values
 from tests.problems.conftest import check_variable_space
 from tests.problems.conftest import check_worker_type
+from tests.problems.conftest import plot_data_profiles
+from tests.problems.conftest import plot_data_profiles_with_max_eval_number
 from tests.problems.conftest import test_compute_data_profiles_parametrize
 from tests.problems.conftest import test_description_parametrize
 
@@ -165,17 +163,16 @@ def test_dimension(mda_problem_configuration) -> None:
 
 
 @test_compute_data_profiles_parametrize
-@image_comparison(None, ["png"])
 def test_compute_data_profile(
-    baseline_images,
     multidisciplinary_variable_space,
     target_values,
     algorithms_configurations,
     results,
     use_abscissa_log_scale,
+    snapshot_matplotlib,
 ) -> None:
     """Check the computation of data profiles."""
-    check_data_profiles_computation(
+    figure = plot_data_profiles(
         MDAProblemConfiguration,
         mda_create_problem,
         target_values,
@@ -184,21 +181,18 @@ def test_compute_data_profile(
         use_abscissa_log_scale,
         multidisciplinary_variable_space,
     )
+    assert figure == snapshot_matplotlib
 
 
-@image_comparison(
-    baseline_images=["data_profiles_max_eval_number"],
-    remove_text=True,
-    extensions=["png"],
-)
 def test_compute_data_profile_max_eval_number(
     multidisciplinary_variable_space,
     target_values,
     algorithms_configurations,
     results,
+    snapshot_matplotlib,
 ) -> None:
     """Check the computation of data profiles when the evaluations number is limited."""
-    check_data_profiles_computation_with_max_eval_number(
+    figure = plot_data_profiles_with_max_eval_number(
         MDAProblemConfiguration,
         mda_create_problem,
         target_values,
@@ -206,6 +200,7 @@ def test_compute_data_profile_max_eval_number(
         results,
         multidisciplinary_variable_space,
     )
+    assert figure == snapshot_matplotlib(remove_text=True)
 
 
 def test_minimize_performance_measure(mda_problem_configuration) -> None:

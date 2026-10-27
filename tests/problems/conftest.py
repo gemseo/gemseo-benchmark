@@ -36,6 +36,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
 
     from gemseo.space import DesignSpace
+    from matplotlib.figure import Figure
 
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
@@ -366,18 +367,11 @@ def check_starting_point_loading(
 
 
 test_compute_data_profiles_parametrize = pytest.mark.parametrize(
-    ("baseline_images", "use_abscissa_log_scale"),
-    [
-        (
-            [f"data_profiles[use_abscissa_log_scale={use_abscissa_log_scale}]"],
-            use_abscissa_log_scale,
-        )
-        for use_abscissa_log_scale in [False, True]
-    ],
+    "use_abscissa_log_scale", [False, True]
 )
 
 
-def check_data_profiles_computation(
+def plot_data_profiles(
     problem_configuration_class: type[BaseProblemConfiguration],
     create_problem: Callable,
     target_values: TargetValues,
@@ -385,8 +379,8 @@ def check_data_profiles_computation(
     results: Results,
     use_abscissa_log_scale: bool,
     *args: Any,
-) -> None:
-    """Check the computation of data profiles.
+) -> Figure:
+    """Plot the data profiles of a problem configuration.
 
     Args:
         problem_configuration_class: The class of problem configuration.
@@ -397,8 +391,10 @@ def check_data_profiles_computation(
         use_abscissa_log_scale: Whether to use a logarithmic scale
                 for the abscissa axis.
         *args: Positional arguments for the class initialization.
+
+    Returns:
+        The figure of the data profiles.
     """
-    matplotlib.pyplot.close("all")
     target_values.compute_target_hits_history = mock.Mock(
         return_value=[0, 0, 0, 1, 1, 2]
     )
@@ -409,17 +405,18 @@ def check_data_profiles_computation(
         results,
         use_abscissa_log_scale=use_abscissa_log_scale,
     )
+    return matplotlib.pyplot.gcf()
 
 
-def check_data_profiles_computation_with_max_eval_number(
+def plot_data_profiles_with_max_eval_number(
     problem_configuration_class: type[BaseProblemConfiguration],
     create_problem: Callable,
     target_values: TargetValues,
     algorithm_configurations: AlgorithmsConfigurations,
     results: Results,
     *args: Any,
-) -> None:
-    """Check the computation of data profiles when the evaluations number is limited.
+) -> Figure:
+    """Plot the data profiles of a problem configuration with a limited budget.
 
     Args:
         problem_configuration_class: The class of problem configuration.
@@ -428,8 +425,10 @@ def check_data_profiles_computation_with_max_eval_number(
         algorithm_configurations: The algorithm configurations.
         results: The benchmarking results.
         *args: Positional arguments for the class initialization.
+
+    Returns:
+        The figure of the data profiles.
     """
-    matplotlib.pyplot.close("all")
     target_values.compute_target_hits_history = mock.Mock(return_value=[0, 0, 0, 1])
     bench_problem = problem_configuration_class(
         "Problem", create_problem, *args, target_values=target_values
@@ -437,6 +436,7 @@ def check_data_profiles_computation_with_max_eval_number(
     bench_problem.compute_data_profile(
         algorithm_configurations, results, max_iteration_number=4
     )
+    return matplotlib.pyplot.gcf()
 
 
 def check_variable_space(

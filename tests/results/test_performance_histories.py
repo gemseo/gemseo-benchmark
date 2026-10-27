@@ -20,7 +20,6 @@ from datetime import timedelta
 
 import matplotlib.pyplot
 import pytest
-from matplotlib.testing.decorators import image_comparison
 
 from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_histories import PerformanceHistories
@@ -116,89 +115,69 @@ def five_performance_histories() -> PerformanceHistories:
 
 @pytest.mark.parametrize(
     (
-        "baseline_images",
         "plot_all_histories",
         "extremal_feasible_performance",
         "performance_measure_is_minimized",
     ),
     [
-        (
-            [
-                (
-                    "performance_measure_distribution"
-                    f"[plot_all={plot_all_histories},extremum={extremal_feasible_performance},minimize={performance_measure_is_minimized}]"
-                )
-            ],
-            plot_all_histories,
-            extremal_feasible_performance,
-            performance_measure_is_minimized,
-        )
-        for (
-            plot_all_histories,
-            extremal_feasible_performance,
-            performance_measure_is_minimized,
-        ) in [
-            (False, -6, False),
-            (True, -6, False),
-            (False, -1, True),
-            (True, -1, True),
-        ]
+        (False, -6, False),
+        (True, -6, False),
+        (False, -1, True),
+        (True, -1, True),
     ],
 )
-@image_comparison(None, ["png"])
 def test_plot_performance_measure_distribution(
-    baseline_images,
     five_performance_histories,
     plot_all_histories,
     extremal_feasible_performance,
     performance_measure_is_minimized,
+    snapshot_matplotlib,
 ):
     """Check the plot of the distribution of the performance measure."""
-    matplotlib.pyplot.close("all")
+    figure = matplotlib.pyplot.figure()
     five_performance_histories.plot_performance_measure_distribution(
-        matplotlib.pyplot.figure().gca(),
+        figure.gca(),
         extremal_feasible_performance,
         float("nan"),
         plot_all_histories,
         performance_measure_is_minimized,
     )
+    assert figure == snapshot_matplotlib
 
 
-@image_comparison(["performance_measure_distribution_infeasible_centile"], ["png"])
-def test_plot_performance_measure_distribution_infeasible_centile():
+def test_plot_performance_measure_distribution_infeasible_centile(
+    snapshot_matplotlib,
+):
     """Check the plotting of an infeasible centile."""
-    matplotlib.pyplot.close("all")
+    figure = matplotlib.pyplot.figure()
     PerformanceHistories(
         PerformanceHistory([6, 5, 4], [1, 1, 1]),
         PerformanceHistory([5, 4, 3], [1, 1, 1]),
         PerformanceHistory([4, 3, 2], [1, 1, 1]),
         PerformanceHistory([3, 2, 1], [1, 1, 1]),
         PerformanceHistory([2, 1, 0], [1, 0, 0]),
-    ).plot_performance_measure_distribution(
-        matplotlib.pyplot.figure().gca(), 1, float("nan")
-    )
+    ).plot_performance_measure_distribution(figure.gca(), 1, float("nan"))
+    assert figure == snapshot_matplotlib
 
 
-@image_comparison(["infeasibility_measure_distribution"], ["png"])
 def test_plot_infeasibility_measure_distribution(
-    five_performance_histories,
+    five_performance_histories, snapshot_matplotlib
 ):
     """Check the plot of the distribution of the infeasibility measure."""
-    matplotlib.pyplot.close("all")
-    five_performance_histories.plot_infeasibility_measure_distribution(
-        matplotlib.pyplot.figure().gca()
-    )
+    figure = matplotlib.pyplot.figure()
+    five_performance_histories.plot_infeasibility_measure_distribution(figure.gca())
+    assert figure == snapshot_matplotlib
 
 
-@image_comparison(["number_of_unsatisfied_constraints_distribution"], ["png"])
 def test_plot_number_of_unsatisfied_constraints_distribution(
-    five_performance_histories,
+    five_performance_histories, snapshot_matplotlib
 ):
     """Check the plot of the distribution of the number of unsatisfied constraints."""
-    matplotlib.pyplot.close("all")
+    figure = matplotlib.pyplot.figure()
     five_performance_histories.plot_number_of_unsatisfied_constraints_distribution(
-        matplotlib.pyplot.figure().gca()
+        figure.gca()
     )
+    assert figure == snapshot_matplotlib
 
 
 def test_switch_performance_measure_sign() -> None:

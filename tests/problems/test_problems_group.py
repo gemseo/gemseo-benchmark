@@ -28,7 +28,6 @@ from gemseo.doe import CustomDOE_Settings
 from gemseo.optimization import L_BFGS_B_Settings
 from gemseo.problem.optimization.rosenbrock import Rosenbrock
 from matplotlib import pyplot
-from matplotlib.testing.decorators import image_comparison
 from numpy import zeros
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -61,23 +60,12 @@ def test_compute_target_values():
     assert isinstance(rosenbrock.target_values, TargetValues)
 
 
-@pytest.mark.parametrize(
-    ("baseline_images", "use_abscissa_log_scale"),
-    [
-        (
-            [f"data_profile[use_abscissa_log_scale={use_abscissa_log_scale}]"],
-            use_abscissa_log_scale,
-        )
-        for use_abscissa_log_scale in [False, True]
-    ],
-)
-@image_comparison(None, ["png"])
+@pytest.mark.parametrize("use_abscissa_log_scale", [False, True])
 def test_compute_data_profile(
-    baseline_images, problem_a, problem_b, results, use_abscissa_log_scale
+    problem_a, problem_b, results, use_abscissa_log_scale, snapshot_matplotlib
 ):
     """Check the computation of data profiles."""
     group = ProblemsGroup("A group", [problem_a, problem_b])
-    pyplot.close("all")
     group.compute_data_profile(
         algorithms_configurations,
         results,
@@ -85,6 +73,7 @@ def test_compute_data_profile(
         max_eval_number=5,
         use_abscissa_log_scale=use_abscissa_log_scale,
     )
+    assert pyplot.gcf() == snapshot_matplotlib
 
 
 def test_iter(problem_a, problem_b):
