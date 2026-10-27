@@ -149,12 +149,17 @@ class AlgorithmConfiguration:
         Returns:
             The settings of the algorithm
             updated with the options specific to the instance of the problem.
+            Without such options, the settings of the algorithm themselves,
+            which are not validated again.
 
         Raises:
             ValidationError: When an option specific to the instance
                 is not an option of the algorithm or has an invalid value.
         """
         settings = self.__algorithm_settings
+        if not self.__instance_algorithm_options:
+            return settings
+
         # The values of the explicitly-set fields are passed as they are,
         # so that the nested settings keep their class.
         return type(settings).model_validate({

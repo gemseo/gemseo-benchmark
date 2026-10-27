@@ -21,7 +21,6 @@
 
 from __future__ import annotations
 
-import re
 from unittest import mock
 
 import pytest
@@ -29,6 +28,7 @@ from gemseo.mda import MDAChain_Settings
 from gemseo.mda import MDANewtonRaphson_Settings
 from gemseo.optimization import SLSQP_Settings
 from gemseo.util.pydantic import BaseSettings
+from gemseo.util.testing.helper import assert_exception
 from pydantic import Field
 from pydantic import ValidationError
 
@@ -113,17 +113,9 @@ def test_from_dict():
     assert algorithm_configuration.algorithm_options == {"max_iter": 9}
 
 
-def test_from_dict_earlier_version():
+def test_from_dict_earlier_version(snapshot):
     """Check the import of an algorithm configuration saved by gemseo-benchmark 4."""
-    with pytest.raises(
-        ValueError,
-        match=(
-            r"^The algorithm configuration misses the keys "
-            r"'algorithm_settings_class' and 'algorithm_settings'; "
-            r"it was probably written by an earlier version "
-            r"of gemseo-benchmark and must be computed again\.$"
-        ),
-    ):
+    with assert_exception(ValueError, snapshot):
         AlgorithmConfiguration.from_dict({
             "configuration_name": "SciPy SLSQP",
             "algorithm_name": "SLSQP",
@@ -132,27 +124,13 @@ def test_from_dict_earlier_version():
 
 
 @pytest.mark.parametrize(
-    ("dictionary", "keys"),
-    [
-        (
-            {"configuration_name": "SLSQP", "algorithm_settings": {}},
-            "key 'algorithm_settings_class'",
-        ),
-        (
-            {},
-            (
-                "keys 'configuration_name', 'algorithm_settings_class' "
-                "and 'algorithm_settings'"
-            ),
-        ),
-    ],
+    "dictionary",
+    [{"configuration_name": "SLSQP", "algorithm_settings": {}}, {}],
+    ids=["one_key", "all_keys"],
 )
-def test_from_dict_missing_keys(dictionary, keys):
+def test_from_dict_missing_keys(dictionary, snapshot):
     """Check the error message when an algorithm configuration misses keys."""
-    with pytest.raises(
-        ValueError,
-        match=rf"^The algorithm configuration misses the {keys}; ",
-    ):
+    with assert_exception(ValueError, snapshot):
         AlgorithmConfiguration.from_dict(dictionary)
 
 
@@ -163,17 +141,9 @@ def test_from_dict_missing_keys(dictionary, keys):
         "gemseo.optimization.scipy_local.settings.slsqp.Unknown_Settings",
     ],
 )
-def test_from_dict_unknown_settings_class(settings_class):
+def test_from_dict_unknown_settings_class(settings_class, snapshot):
     """Check the import of an algorithm configuration with an unknown settings class."""
-    with pytest.raises(
-        ValueError,
-        match=(
-            rf"^The class of the algorithm settings '{re.escape(settings_class)}' "
-            r"cannot be imported; install the plugin providing the algorithm, "
-            r"or, if the results were written by an earlier version "
-            r"of gemseo-benchmark, compute them again\.$"
-        ),
-    ) as error:
+    with assert_exception(ValueError, snapshot) as error:
         AlgorithmConfiguration.from_dict({
             "configuration_name": "MMA",
             "algorithm_settings_class": settings_class,
@@ -204,12 +174,15 @@ def test_get_instance_settings():
 
 
 def test_get_instance_settings_without_instance_options():
-    """Check the settings of the algorithm without options specific to instances."""
+    """Check the settings of the algorithm without options specific to instances.
+
+    The settings are returned as they are, without being validated again.
+    """
     settings = SLSQP_Settings(max_iter=9)
     instance_settings = AlgorithmConfiguration(settings).get_instance_settings(
         mock.Mock(), 0
     )
-    assert instance_settings == settings
+    assert instance_settings is settings
     assert instance_settings.model_fields_set == {"max_iter"}
 
 
@@ -275,20 +248,14 @@ def test_get_instance_settings_coercion():
     assert instance_settings.model_fields_set == {"max_iter", "ftol_rel"}
 
 
-@pytest.mark.parametrize(
-    ("name", "value", "message"),
-    [
-        ("max_iters", 5, "max_iters"),
-        ("max_iter", "five", "max_iter"),
-    ],
-)
-def test_get_instance_settings_invalid_option(name, value, message):
+@pytest.mark.parametrize(("name", "value"), [("max_iters", 5), ("max_iter", "five")])
+def test_get_instance_settings_invalid_option(name, value, snapshot):
     """Check that an invalid option specific to an instance raises an error."""
     algorithm_configuration = AlgorithmConfiguration(
         SLSQP_Settings(),
         instance_algorithm_options={name: lambda problem_configuration, index: value},
     )
-    with pytest.raises(ValidationError, match=message):
+    with assert_exception(ValidationError, snapshot):
         algorithm_configuration.get_instance_settings(mock.Mock(), 0)
 
 
