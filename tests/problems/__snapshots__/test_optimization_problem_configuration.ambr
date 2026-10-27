@@ -1,0 +1,9 @@
+# serializer version: 1
+# name: test_compute_target_values_invalid_instance_option
+  '''
+  The options of algorithm configuration SLSQP for problem 1 of problem configuration Rosenbrock are invalid: 1 validation error for SLSQP_Settings
+  max_iter
+    Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='five', input_type=str]
+      For further information visit https://errors.pydantic.dev/X.Y/v/int_parsing
+  '''
+# ---

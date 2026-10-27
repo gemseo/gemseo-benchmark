@@ -147,21 +147,24 @@ class AlgorithmConfiguration:
             index: The 0-based index of the instance of the problem.
 
         Returns:
-            The settings of the algorithm
+            A new copy of the settings of the algorithm,
+            nested settings included,
             updated with the options specific to the instance of the problem.
-            Without such options, the settings of the algorithm themselves,
-            which are not validated again.
+            Without such options, the copy is not validated again.
 
         Raises:
             ValidationError: When an option specific to the instance
                 is not an option of the algorithm or has an invalid value.
         """
-        settings = self.__algorithm_settings
+        # The algorithm can change its settings while running,
+        # so that each execution needs its own settings.
+        settings = self.__algorithm_settings.model_copy(deep=True)
         if not self.__instance_algorithm_options:
             return settings
 
         # The values of the explicitly-set fields are passed as they are,
-        # so that the nested settings keep their class.
+        # so that the nested settings keep their class;
+        # they are copies, so that the instances do not share them.
         return type(settings).model_validate({
             **{name: getattr(settings, name) for name in settings.model_fields_set},
             **{
@@ -169,6 +172,30 @@ class AlgorithmConfiguration:
                 for name, function in self.__instance_algorithm_options.items()
             },
         })
+
+    def get_instance_settings_error_message(
+        self,
+        problem_configuration: BaseProblemConfiguration,
+        index: int,
+        error: Exception,
+    ) -> str:
+        """Return the message of an error raised by the settings of an instance.
+
+        Args:
+            problem_configuration: The problem configuration.
+            index: The 0-based index of the instance of the problem.
+            error: The error raised by `get_instance_settings`.
+
+        Returns:
+            The message of the error,
+            naming the algorithm configuration and the instance of the problem.
+        """
+        return (
+            f"The options of algorithm configuration {self.__configuration_name} "
+            f"for problem {index + 1} "
+            f"of problem configuration {problem_configuration.name} "
+            f"are invalid: {error}"
+        )
 
     def to_dict(self, skip_instance_algorithm_options: bool = False) -> dict[str, Any]:
         """Return the algorithm configuration as a dictionary.

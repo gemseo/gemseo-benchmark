@@ -31,10 +31,13 @@ and this project adheres to
 ### Added
 
 - The method `AlgorithmConfiguration.get_instance_settings` returns
-  the settings of the algorithm updated with the options specific
-  to an instance of a problem;
+  a new copy of the settings of the algorithm, nested settings included,
+  updated with the options specific to an instance of a problem;
   these options are validated by the settings model,
   so an unknown option or an invalid value raises a `ValidationError`.
+  The method `AlgorithmConfiguration.get_instance_settings_error_message`
+  returns the message of such an error,
+  naming the algorithm configuration and the instance of the problem.
 
 ### Changed
 
@@ -77,6 +80,9 @@ and this project adheres to
   the `instance_algorithm_options` of the algorithm configurations
   to each instance of the problem, as the benchmarking does;
   they were ignored.
+  When these options are invalid,
+  it raises a `ValueError` naming the algorithm configuration
+  and the instance of the problem.
 
 ## Version 5.0.0 (October 2026)
 

@@ -38,11 +38,10 @@ from gemseo_benchmark.results.results import Results
 if TYPE_CHECKING:
     from collections.abc import Callable
     from collections.abc import Iterable
+    from collections.abc import Sequence
     from concurrent.futures import Executor
     from concurrent.futures import Future
     from pathlib import Path
-
-    from gemseo.util.pydantic import BaseSettings
 
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
@@ -57,17 +56,17 @@ LOGGER = logging.getLogger(__name__)
 class _Execution(NamedTuple):
     """An execution of an algorithm configuration on a problem."""
 
-    algorithm_configuration_name: str
-    """The name of the algorithm configuration."""
+    algorithm_configuration: AlgorithmConfiguration
+    """The algorithm configuration with the settings of the algorithm for the problem.
+
+    These settings include the options specific to the problem.
+    """
 
     problem_configuration: BaseProblemConfiguration
     """The problem configuration."""
 
     index: int
     """The 0-based index of the problem."""
-
-    settings: BaseSettings
-    """The settings of the algorithm for the problem."""
 
     message: str
     """The message to log when solving the problem."""
@@ -165,7 +164,7 @@ class Benchmarker:
                 and their performance histories are saved before the error is raised.
         """
         problem_configurations = tuple(problem_configurations)
-        executions = self.__plan_executions(
+        executions, skipped_executions = self.__plan_executions(
             problem_configurations,
             algorithm_configurations,
             overwrite_histories,
@@ -188,6 +187,9 @@ class Benchmarker:
                 logger.addHandler(file_handler)
 
         try:
+            for execution_info in skipped_executions:
+                gemseo_logger.info("Skipping %s.", execution_info)
+
             future_to_path = {}
             failures: dict[str, BaseException] = {}
             executor_class = (
@@ -233,11 +235,11 @@ class Benchmarker:
 
     def __plan_executions(
         self,
-        problem_configurations: tuple[BaseProblemConfiguration, ...],
+        problem_configurations: Sequence[BaseProblemConfiguration],
         algorithm_configurations: AlgorithmsConfigurations,
         overwrite_histories: bool,
-    ) -> list[_Execution]:
-        """Return the executions to submit, in the order of submission.
+    ) -> tuple[list[_Execution], list[str]]:
+        """Return the executions to submit and the skipped ones.
 
         This is the only place that decides which problems are solved,
         and with which settings.
@@ -254,7 +256,9 @@ class Benchmarker:
                 histories.
 
         Returns:
-            The executions to submit.
+            The executions to submit, in the order of submission,
+            and the descriptions of the skipped executions,
+            to be logged.
 
         Raises:
             ValueError: If an algorithm is not available,
@@ -263,7 +267,12 @@ class Benchmarker:
                 or if an option specific to a problem
                 is not an option of the algorithm or has an invalid value.
         """
-        planned = []
+        executions = []
+        skipped_executions = []
+        messages = []
+        # The names of the algorithms to execute on each problem configuration,
+        # in the order of the problem configurations.
+        algorithm_names: list[dict[str, None]] = [{} for _ in problem_configurations]
         for algorithm_configuration in algorithm_configurations:
             for problem_index, problem_configuration in enumerate(
                 problem_configurations
@@ -274,58 +283,50 @@ class Benchmarker:
                         f"of problem configuration {problem_configuration.name} "
                         f"for algorithm configuration {algorithm_configuration.name}"
                     )
-                    if overwrite_histories or not self.__is_solved(
+                    if not overwrite_histories and self.__is_solved(
                         algorithm_configuration, problem_configuration, index
                     ):
-                        planned.append((
-                            algorithm_configuration,
-                            problem_index,
-                            index,
-                            f"Solving {execution_info}.",
-                        ))
+                        skipped_executions.append(execution_info)
+                        continue
+
+                    algorithm_names[problem_index][
+                        algorithm_configuration.algorithm_name
+                    ] = None
+                    try:
+                        settings = algorithm_configuration.get_instance_settings(
+                            problem_configuration, index
+                        )
+                    except Exception as error:  # ruff: ignore[blind-except]
+                        # Any error is reported,
+                        # as a callable defining an option specific to the problems
+                        # or a validator of the settings can raise any exception.
+                        messages.append(
+                            algorithm_configuration.get_instance_settings_error_message(
+                                problem_configuration, index, error
+                            )
+                        )
                     else:
-                        gemseo_logger.info("Skipping %s.", execution_info)
+                        executions.append(
+                            _Execution(
+                                AlgorithmConfiguration(
+                                    settings, algorithm_configuration.name, {}
+                                ),
+                                problem_configuration,
+                                index,
+                                f"Solving {execution_info}.",
+                            )
+                        )
 
-        self.__check_algorithms(problem_configurations, planned)
-        executions = []
-        messages = []
-        for algorithm_configuration, problem_index, index, message in planned:
-            problem_configuration = problem_configurations[problem_index]
-            try:
-                settings = algorithm_configuration.get_instance_settings(
-                    problem_configuration, index
-                )
-            except Exception as error:  # ruff: ignore[blind-except]
-                # Any error is reported,
-                # as a callable defining an option specific to the problems
-                # or a validator of the settings can raise any exception.
-                messages.append(
-                    f"The options of algorithm configuration "
-                    f"{algorithm_configuration.name} "
-                    f"for problem {index + 1} "
-                    f"of problem configuration {problem_configuration.name} "
-                    f"are invalid: {error}"
-                )
-            else:
-                executions.append(
-                    _Execution(
-                        algorithm_configuration.name,
-                        problem_configuration,
-                        index,
-                        settings,
-                        message,
-                    )
-                )
-
+        self.__check_algorithms(problem_configurations, algorithm_names)
         if messages:
             raise ValueError("\n".join(messages))
 
-        return executions
+        return executions, skipped_executions
 
     @staticmethod
     def __check_algorithms(
-        problem_configurations: tuple[BaseProblemConfiguration, ...],
-        planned: Iterable[tuple[AlgorithmConfiguration, int, int, str]],
+        problem_configurations: Sequence[BaseProblemConfiguration],
+        algorithm_names: Sequence[Iterable[str]],
     ) -> None:
         """Check the algorithms for the problem configurations to be solved.
 
@@ -333,26 +334,21 @@ class Benchmarker:
 
         Args:
             problem_configurations: The problem configurations.
-            planned: The algorithm configuration,
-                the 0-based index of the problem configuration,
-                the 0-based index of the problem
-                and the message to log
-                of each execution to submit.
+            algorithm_names: The names of the algorithms
+                to execute on each problem configuration,
+                in the order of the problem configurations.
 
         Raises:
             ValueError: If an algorithm is not available,
                 or is not suited to a problem configuration.
         """
-        algorithm_names = {index: {} for index in range(len(problem_configurations))}
-        for algorithm_configuration, problem_index, _, _ in planned:
-            algorithm_name = algorithm_configuration.algorithm_name
-            algorithm_names[problem_index][algorithm_name] = None
-
         messages = {}
-        for problem_index, problem_configuration in enumerate(problem_configurations):
+        for problem_configuration, names in zip(
+            problem_configurations, algorithm_names, strict=True
+        ):
             worker = problem_configuration.worker
             available_names = []
-            for algorithm_name in algorithm_names[problem_index]:
+            for algorithm_name in names:
                 message = Benchmarker.__get_error_message(
                     worker.check_algorithm_availability, algorithm_name
                 )
@@ -416,9 +412,7 @@ class Benchmarker:
             the name of the problem configuration
             and the path to the performance history.
         """
-        algorithm_configuration = AlgorithmConfiguration(
-            execution.settings, execution.algorithm_configuration_name, {}
-        )
+        algorithm_configuration = execution.algorithm_configuration
         problem_configuration = execution.problem_configuration
         problem_configuration_name = problem_configuration.name
         index = execution.index
@@ -455,7 +449,7 @@ class Benchmarker:
         )
         return future, (
             execution.message,
-            execution.algorithm_configuration_name,
+            algorithm_configuration.name,
             problem_configuration_name,
             performance_history_path,
         )

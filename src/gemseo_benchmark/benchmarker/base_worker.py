@@ -33,6 +33,8 @@ from gemseo import logger as gemseo_logger
 from gemseo.util.metaclass import ABCGoogleDocstringInheritanceMeta
 from gemseo.util.timer import Timer
 
+from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
+
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from pathlib import Path
@@ -40,9 +42,6 @@ if TYPE_CHECKING:
     from gemseo.core.algorithm.base_algorithm_factory import BaseAlgorithmFactory
     from gemseo.util.typing import RealArray
 
-    from gemseo_benchmark.algorithms.algorithm_configuration import (
-        AlgorithmConfiguration,
-    )
     from gemseo_benchmark.benchmarker._metrics import BaseMetrics
     from gemseo_benchmark.problems.base_problem_configuration import (
         BaseProblemConfiguration,
@@ -139,8 +138,16 @@ class BaseWorker(
             for logger in loggers:
                 logger.addHandler(file_handler)
 
+        # The algorithm can change its settings while running,
+        # so it runs with a copy of them
+        # and the performance history stores the settings as given.
+        executed_configuration = AlgorithmConfiguration(
+            algorithm_configuration.algorithm_settings.model_copy(deep=True),
+            algorithm_configuration.name,
+            algorithm_configuration.instance_algorithm_options,
+        )
         problem = cls._get_problem(
-            algorithm_configuration,
+            executed_configuration,
             problem_configuration,
             starting_point,
             hdf_file_path,
@@ -151,7 +158,7 @@ class BaseWorker(
         benchmarking_logger.info(gemseo_log_message)
         with Timer() as timer:
             cls._execute(
-                algorithm_configuration,
+                executed_configuration,
                 problem_configuration,
                 starting_point,
                 problem,

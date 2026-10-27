@@ -28,10 +28,12 @@ from unittest import mock
 
 import pytest
 from gemseo.doe import CustomDOE_Settings
+from gemseo.optimization import NLOPT_COBYLA_Settings
 from gemseo.optimization import OptimizationProblem
 from gemseo.optimization import SLSQP_Settings
 from gemseo.problem.optimization.rosenbrock import Rosenbrock
 from gemseo.space import DesignSpace
+from gemseo.util.testing.helper import assert_exception
 from numpy import array
 from numpy.testing import assert_allclose
 
@@ -298,6 +300,51 @@ def test_compute_target_values_instance_algorithm_options() -> None:
     assert [
         call.kwargs["settings_model"].max_iter for call in execute_algo.call_args_list
     ] == [2, 3]
+
+
+def test_compute_target_values_independent_settings() -> None:
+    """Check that each execution uses its own settings.
+
+    NLOPT_COBYLA sets its option `stop_crit_n_x` from the dimension of the problem,
+    so that the user's settings would be changed by the first execution
+    and the second one would use a wrong value.
+    """
+    settings = NLOPT_COBYLA_Settings(max_iter=10)
+    configurations = AlgorithmsConfigurations(AlgorithmConfiguration(settings))
+    with mock.patch.object(
+        optimization_problem_configuration,
+        "execute_algo",
+        wraps=optimization_problem_configuration.execute_algo,
+    ) as execute_algo:
+        for dimension in (2, 5):
+            OptimizationProblemConfiguration(
+                f"Rosenbrock {dimension}",
+                lambda dimension=dimension: Rosenbrock(dimension),
+            ).compute_target_values(1, configurations)
+
+    used_settings = [
+        call.kwargs["settings_model"] for call in execute_algo.call_args_list
+    ]
+    assert [settings.stop_crit_n_x for settings in used_settings] == [3, 6]
+    assert used_settings[0] is not used_settings[1]
+    assert all(used is not settings for used in used_settings)
+    assert settings.model_dump(exclude_unset=True) == {"max_iter": 10}
+
+
+def test_compute_target_values_invalid_instance_option(snapshot) -> None:
+    """Check the error raised by an invalid option specific to an instance."""
+    problem = OptimizationProblemConfiguration("Rosenbrock", Rosenbrock)
+    configurations = AlgorithmsConfigurations(
+        AlgorithmConfiguration(
+            SLSQP_Settings(),
+            "SLSQP",
+            instance_algorithm_options={
+                "max_iter": lambda configuration, index: "five"
+            },
+        )
+    )
+    with assert_exception(ValueError, snapshot):
+        problem.compute_target_values(1, configurations)
 
 
 def test_starting_points_non_2d_array(benchmarking_problem):

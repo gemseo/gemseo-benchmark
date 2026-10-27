@@ -171,15 +171,26 @@ class OptimizationProblemConfiguration(
 
         Returns:
             The generated target values.
+
+        Raises:
+            ValueError: If an option specific to a problem
+                is not an option of the algorithm or has an invalid value.
         """
         self.__targets_generator = TargetsGenerator()
         for configuration in algorithm_configurations:
             for index, instance in enumerate(self):
-                execute_algo(
-                    instance,
-                    "opt",
-                    settings_model=configuration.get_instance_settings(self, index),
-                )
+                try:
+                    settings = configuration.get_instance_settings(self, index)
+                except Exception as error:  # ruff: ignore[blind-except]
+                    # Any error is reported,
+                    # as a callable defining an option specific to the problems
+                    # or a validator of the settings can raise any exception.
+                    msg = configuration.get_instance_settings_error_message(
+                        self, index, error
+                    )
+                    raise ValueError(msg) from error
+
+                execute_algo(instance, "opt", settings_model=settings)
                 history = PerformanceHistory.from_problem(instance)
                 self.__targets_generator.add_history(history=history)
 

@@ -20,13 +20,16 @@ import logging
 from pathlib import Path
 
 import pytest
+from gemseo.optimization import NLOPT_COBYLA_Settings
 from gemseo.optimization import OptimizationProblem
 from gemseo.optimization.factory import OptimizationLibraryFactory
 from gemseo.util.testing.pytest_conftest import tmp_wd  # ruff: ignore[unused-import]
 from gemseo.util.timer import Timer
 from numpy.testing import assert_equal
 
+from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.benchmarker.optimization_worker import OptimizationWorker
+from gemseo_benchmark.results.performance_history import PerformanceHistory
 from tests.benchmarker.conftest import check_create_performance_history
 
 
@@ -95,6 +98,36 @@ def test_execution(
     assert performance_history_path.is_file()
     if save_data:
         assert hdf_file_path.is_file()
+
+
+def test_execution_settings(
+    tmp_wd,  # ruff: ignore[redefined-while-unused]
+    rosenbrock,
+) -> None:
+    """Check that the execution leaves the settings of the algorithm unchanged.
+
+    NLOPT_COBYLA sets its option `stop_crit_n_x` from the dimension of the problem;
+    the performance history shall store the settings as given.
+    """
+    settings = NLOPT_COBYLA_Settings(max_iter=3)
+    algorithm_configuration = AlgorithmConfiguration(settings)
+    performance_history_path = Path("performance_history.json")
+    OptimizationWorker().execute(
+        algorithm_configuration,
+        rosenbrock,
+        rosenbrock.create_problem().design_space.get_lower_bounds(),
+        "Solving.",
+        None,
+        performance_history_path,
+        None,
+        logging.getLogger(),
+    )
+    assert settings.model_dump(exclude_unset=True) == {"max_iter": 3}
+    history_configuration = PerformanceHistory.from_file(
+        performance_history_path
+    ).algorithm_configuration
+    assert history_configuration.name == "NLOPT_COBYLA_max_iter=3"
+    assert history_configuration.algorithm_options == {"max_iter": 3}
 
 
 def test_get_problem(algorithm_configuration, rosenbrock) -> None:

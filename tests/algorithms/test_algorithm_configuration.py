@@ -26,6 +26,7 @@ from unittest import mock
 import pytest
 from gemseo.mda import MDAChain_Settings
 from gemseo.mda import MDANewtonRaphson_Settings
+from gemseo.optimization import MNBI_Settings
 from gemseo.optimization import SLSQP_Settings
 from gemseo.util.pydantic import BaseSettings
 from gemseo.util.testing.helper import assert_exception
@@ -113,23 +114,24 @@ def test_from_dict():
     assert algorithm_configuration.algorithm_options == {"max_iter": 9}
 
 
-def test_from_dict_earlier_version(snapshot):
-    """Check the import of an algorithm configuration saved by gemseo-benchmark 4."""
-    with assert_exception(ValueError, snapshot):
-        AlgorithmConfiguration.from_dict({
+@pytest.mark.parametrize(
+    "dictionary",
+    [
+        {"configuration_name": "SLSQP", "algorithm_settings": {}},
+        {},
+        {
             "configuration_name": "SciPy SLSQP",
             "algorithm_name": "SLSQP",
             "algorithm_options": {"max_iter": 9},
-        })
-
-
-@pytest.mark.parametrize(
-    "dictionary",
-    [{"configuration_name": "SLSQP", "algorithm_settings": {}}, {}],
-    ids=["one_key", "all_keys"],
+        },
+    ],
+    ids=["one_key", "all_keys", "earlier_version"],
 )
 def test_from_dict_missing_keys(dictionary, snapshot):
-    """Check the error message when an algorithm configuration misses keys."""
+    """Check the error message when an algorithm configuration misses keys.
+
+    This is the case of an algorithm configuration saved by gemseo-benchmark 4.
+    """
     with assert_exception(ValueError, snapshot):
         AlgorithmConfiguration.from_dict(dictionary)
 
@@ -173,22 +175,44 @@ def test_get_instance_settings():
     assert settings.max_iter == 9
 
 
-def test_get_instance_settings_without_instance_options():
-    """Check the settings of the algorithm without options specific to instances.
+@pytest.mark.parametrize(
+    "instance_algorithm_options",
+    [{}, {"max_iter": lambda problem_configuration, index: index + 5}],
+    ids=["without_instance_options", "with_instance_options"],
+)
+def test_get_instance_settings_independent(instance_algorithm_options):
+    """Check that each call returns new settings, independent of the original ones.
 
-    The settings are returned as they are, without being validated again.
+    The algorithm can change its settings while running,
+    which is simulated by changing the returned settings.
     """
     settings = SLSQP_Settings(max_iter=9)
-    instance_settings = AlgorithmConfiguration(settings).get_instance_settings(
-        mock.Mock(), 0
+    algorithm_configuration = AlgorithmConfiguration(
+        settings, instance_algorithm_options=instance_algorithm_options
     )
-    assert instance_settings is settings
-    assert instance_settings.model_fields_set == {"max_iter"}
+    first_settings = algorithm_configuration.get_instance_settings(mock.Mock(), 0)
+    first_settings.ftol_rel = 0.5
+    second_settings = algorithm_configuration.get_instance_settings(mock.Mock(), 0)
+    assert first_settings is not settings
+    assert second_settings is not settings
+    assert second_settings is not first_settings
+    assert second_settings.model_fields_set == {"max_iter"}
+    assert second_settings.ftol_rel == settings.ftol_rel
+    assert settings.model_dump(exclude_unset=True) == {"max_iter": 9}
+    assert algorithm_configuration.algorithm_options == {"max_iter": 9}
+    assert algorithm_configuration.name == "SLSQP_max_iter=9"
 
 
-@pytest.mark.parametrize("instance_algorithm_options", [{}, {"max_mda_iter": 3}])
+@pytest.mark.parametrize(
+    "instance_algorithm_options",
+    [{}, {"max_mda_iter": 3}],
+    ids=["without_instance_options", "with_instance_options"],
+)
 def test_get_instance_settings_nested_settings(instance_algorithm_options):
-    """Check that the nested settings keep their class and their fields."""
+    """Check that the nested settings keep their class and their fields.
+
+    They are also copies of the original nested settings.
+    """
     settings = MDAChain_Settings(
         inner_mda_settings=MDANewtonRaphson_Settings(over_relaxation_factor=0.5)
     )
@@ -203,6 +227,7 @@ def test_get_instance_settings_nested_settings(instance_algorithm_options):
     inner_mda_settings = instance_settings.inner_mda_settings
     assert isinstance(inner_mda_settings, MDANewtonRaphson_Settings)
     assert inner_mda_settings.over_relaxation_factor == 0.5
+    assert inner_mda_settings is not settings.inner_mda_settings
     assert instance_settings.model_fields_set == {
         "inner_mda_settings",
         *instance_algorithm_options,
@@ -210,6 +235,28 @@ def test_get_instance_settings_nested_settings(instance_algorithm_options):
     assert instance_settings.max_mda_iter == instance_algorithm_options.get(
         "max_mda_iter", settings.max_mda_iter
     )
+
+
+def test_get_instance_settings_independent_nested_settings():
+    """Check that the instances do not share their nested settings."""
+    settings = MNBI_Settings(max_iter=100, sub_optim_algo_settings=SLSQP_Settings())
+    algorithm_configuration = AlgorithmConfiguration(
+        settings,
+        instance_algorithm_options={
+            "max_iter": lambda problem_configuration, index: 10 * (index + 1)
+        },
+    )
+    first_settings = algorithm_configuration.get_instance_settings(mock.Mock(), 0)
+    second_settings = algorithm_configuration.get_instance_settings(mock.Mock(), 1)
+    first_sub_settings = first_settings.sub_optim_algo_settings
+    second_sub_settings = second_settings.sub_optim_algo_settings
+    assert (first_settings.max_iter, second_settings.max_iter) == (10, 20)
+    assert isinstance(first_sub_settings, SLSQP_Settings)
+    assert first_sub_settings is not second_sub_settings
+    assert first_sub_settings is not settings.sub_optim_algo_settings
+    first_sub_settings.ftol_rel = 0.5
+    assert second_sub_settings.ftol_rel == settings.sub_optim_algo_settings.ftol_rel
+    assert settings.sub_optim_algo_settings.ftol_rel != 0.5
 
 
 class Other_Dummy_Settings(Dummy_Settings):  # ruff: ignore[invalid-class-name]

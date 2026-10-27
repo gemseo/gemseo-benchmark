@@ -1,9 +1,9 @@
 # serializer version: 1
-# name: test_from_dict_earlier_version
-  "The algorithm configuration misses the keys 'algorithm_settings_class' and 'algorithm_settings'; it was probably written by an earlier version of gemseo-benchmark and must be computed again."
-# ---
 # name: test_from_dict_missing_keys[all_keys]
   "The algorithm configuration misses the keys 'configuration_name', 'algorithm_settings_class' and 'algorithm_settings'; it was probably written by an earlier version of gemseo-benchmark and must be computed again."
+# ---
+# name: test_from_dict_missing_keys[earlier_version]
+  "The algorithm configuration misses the keys 'algorithm_settings_class' and 'algorithm_settings'; it was probably written by an earlier version of gemseo-benchmark and must be computed again."
 # ---
 # name: test_from_dict_missing_keys[one_key]
   "The algorithm configuration misses the key 'algorithm_settings_class'; it was probably written by an earlier version of gemseo-benchmark and must be computed again."

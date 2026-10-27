@@ -238,6 +238,26 @@ def test_is_problem_unsolved(
     )
 
 
+def test_skipping_logged_to_file(tmp_wd, rosenbrock) -> None:
+    """Check that the skipped problems are logged to the file shared by threads."""
+    results_path = tmp_wd / "results.json"
+    algorithm_configuration = AlgorithmConfiguration(L_BFGS_B_Settings())
+    for _ in range(2):
+        Benchmarker(tmp_wd, results_path).execute(
+            [rosenbrock],
+            AlgorithmsConfigurations(algorithm_configuration),
+            use_threading=True,
+            save_log=True,
+        )
+
+    log = (tmp_wd / "gemseo.log").read_text()
+    for index in (1, 2):
+        assert (
+            f"Skipping problem {index} of problem configuration {rosenbrock.name} "
+            f"for algorithm configuration {algorithm_configuration.name}."
+        ) in log
+
+
 @configurations
 @pytest.mark.parametrize("n_processes", [1, 2])
 @pytest.mark.parametrize("use_threading", [False, True])
@@ -716,7 +736,6 @@ def create_unknown_algorithm_configuration(algorithm_name: str, name: str) -> mo
     algorithm_configuration = mock.Mock()
     algorithm_configuration.algorithm_name = algorithm_name
     algorithm_configuration.name = name
-    algorithm_configuration.copy = mock.Mock(return_value=algorithm_configuration)
     return algorithm_configuration
 
 
