@@ -30,6 +30,7 @@ from unittest import mock
 import numpy
 import pytest
 from gemseo.optimization import SLSQP_Settings
+from gemseo.util.testing.helper import assert_exception
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.results.history_item import HistoryItem
@@ -232,46 +233,32 @@ def test_from_file():
     assert history.items[1].n_unsatisfied_constraints == 0
 
 
-def test_from_file_earlier_version(tmp_path):
+def test_from_file_earlier_version(tmp_path, monkeypatch, snapshot):
     """Check the reading of a performance history saved by gemseo-benchmark 4."""
-    file_path = tmp_path / "history.json"
+    # The file path is relative, so that the error message does not depend on it.
+    monkeypatch.chdir(tmp_path)
+    file_path = Path("history.json")
     file_path.write_text(
         '{"algorithm_configuration": {"configuration_name": "SciPy SLSQP", '
         '"algorithm_name": "SLSQP", "algorithm_options": {"max_iter": 9}}, '
         '"history_items": []}'
     )
-    with pytest.raises(
-        ValueError,
-        match=(
-            rf"^The performance history file {re.escape(str(file_path))} "
-            r"cannot be read: The algorithm configuration misses the keys "
-            r"'algorithm_settings_class' and 'algorithm_settings'; .* "
-            r"must be computed again\.$"
-        ),
-    ):
+    with assert_exception(ValueError, snapshot):
         PerformanceHistory.from_file(file_path)
 
 
-def test_from_file_unknown_settings_class(tmp_path):
+def test_from_file_unknown_settings_class(tmp_path, monkeypatch, snapshot):
     """Check the reading of a performance history with an unknown settings class."""
-    file_path = tmp_path / "history.json"
+    # The file path is relative, so that the error message does not depend on it.
+    monkeypatch.chdir(tmp_path)
+    file_path = Path("history.json")
     file_path.write_text(
         '{"algorithm_configuration": {"configuration_name": "MMA", '
         '"algorithm_settings_class": '
         '"gemseo.algos.opt.mma.settings.mma_settings.MMASVanberg_Settings", '
         '"algorithm_settings": {}}, "history_items": []}'
     )
-    with pytest.raises(
-        ValueError,
-        match=(
-            rf"^The performance history file {re.escape(str(file_path))} "
-            r"cannot be read: The class of the algorithm settings "
-            r"'gemseo\.algos\.opt\.mma\.settings\.mma_settings\.MMASVanberg_Settings' "
-            r"cannot be imported; install the plugin providing the algorithm, "
-            r"or, if the results were written by an earlier version "
-            r"of gemseo-benchmark, compute them again\.$"
-        ),
-    ):
+    with assert_exception(ValueError, snapshot):
         PerformanceHistory.from_file(file_path)
 
 
