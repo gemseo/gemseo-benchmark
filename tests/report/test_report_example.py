@@ -25,7 +25,7 @@ from pathlib import Path
 import pytest
 
 try:
-    import weasyprint  # noqa: F401
+    import weasyprint  # ruff: ignore[unused-import]
 except (ImportError, OSError):
     # WeasyPrint raises an OSError when its native libraries cannot be loaded.
     HAS_WEASYPRINT = False
