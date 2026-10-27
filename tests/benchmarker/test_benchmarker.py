@@ -778,14 +778,14 @@ def test_all_unavailable_algorithms_reported(tmp_path, rosenbrock) -> None:
 
 
 def test_unavailable_algorithm_and_invalid_option_reported(
-    tmp_path, rosenbrock, snapshot
+    tmp_wd, rosenbrock, snapshot
 ) -> None:
     """Check that an unavailable algorithm and an invalid option are reported at once.
 
     Nothing is executed.
     """
     with assert_exception(ValueError, snapshot):
-        Benchmarker(tmp_path).execute(
+        Benchmarker(tmp_wd).execute(
             [rosenbrock],
             AlgorithmsConfigurations(
                 create_unknown_algorithm_configuration("Algorithm", "Configuration"),
@@ -799,7 +799,7 @@ def test_unavailable_algorithm_and_invalid_option_reported(
             ),
         )
 
-    assert not list(tmp_path.rglob("*.json"))
+    assert not list(tmp_wd.rglob("*.json"))
 
 
 @pytest.mark.parametrize(

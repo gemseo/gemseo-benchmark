@@ -37,9 +37,20 @@ REPORT_DIRECTORY = ROOT / "docs" / "report"
 with tempfile.TemporaryDirectory() as directory:
     subprocess.run([sys.executable, str(EXAMPLE_PATH)], check=True, cwd=directory)
     build_directory = Path(directory) / "report" / "_build"
+    html_directory = build_directory / "html"
+    pdf_path = build_directory / "benchmarking_report.pdf"
+    # docs/report is changed only if the whole report was built,
+    # so that a partial build does not replace the committed report.
+    missing_paths = [path for path in (html_directory, pdf_path) if not path.exists()]
+    if missing_paths:
+        msg = (
+            "The report was not built completely; "
+            f"{' and '.join(str(path) for path in missing_paths)} "
+            f"{'does' if len(missing_paths) == 1 else 'do'} not exist, "
+            "so docs/report is left unchanged."
+        )
+        raise FileNotFoundError(msg)
+
     shutil.rmtree(REPORT_DIRECTORY / "html", ignore_errors=True)
-    shutil.copytree(build_directory / "html", REPORT_DIRECTORY / "html")
-    shutil.copy2(
-        build_directory / "benchmarking_report.pdf",
-        REPORT_DIRECTORY / "benchmarking_report.pdf",
-    )
+    shutil.copytree(html_directory, REPORT_DIRECTORY / "html")
+    shutil.copy2(pdf_path, REPORT_DIRECTORY / "benchmarking_report.pdf")

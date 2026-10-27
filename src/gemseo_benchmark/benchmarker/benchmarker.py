@@ -32,6 +32,9 @@ from gemseo import logger as gemseo_logger
 
 from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
+from gemseo_benchmark.algorithms.algorithm_configuration import (
+    _get_instance_settings_error_messages,
+)
 from gemseo_benchmark.benchmarker.benchmarking_error import BenchmarkingError
 from gemseo_benchmark.results.results import Results
 
@@ -271,7 +274,8 @@ class Benchmarker:
         """
         executions = []
         skipped_executions = []
-        settings_messages = []
+        # The errors raised when computing the settings of the instances.
+        settings_errors = []
         # The names of the algorithms to execute on each problem configuration,
         # in the order of the problem configurations.
         algorithm_names: list[dict[str, None]] = [{} for _ in problem_configurations]
@@ -300,7 +304,12 @@ class Benchmarker:
                                 problem_configuration, index
                             )
                         except ValueError as error:
-                            settings_messages.append(str(error))
+                            settings_errors.append((
+                                algorithm_configuration.name,
+                                problem_configuration.name,
+                                index,
+                                error.__cause__,
+                            ))
                             continue
                     else:
                         # The worker copies the settings before running the algorithm,
@@ -322,7 +331,7 @@ class Benchmarker:
 
         messages = [
             *self.__check_algorithms(problem_configurations, algorithm_names),
-            *settings_messages,
+            *_get_instance_settings_error_messages(settings_errors),
         ]
         if messages:
             raise ValueError("\n".join(messages))

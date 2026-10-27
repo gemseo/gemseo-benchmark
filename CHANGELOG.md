@@ -33,8 +33,9 @@ and this project adheres to
 - The method `AlgorithmConfiguration.get_instance_settings` returns
   a new copy of the settings of the algorithm, nested settings included,
   updated with the options specific to an instance of a problem;
-  only these options are validated by the settings model,
-  so an unknown option, an invalid value
+  the explicitly-set options are validated together by the settings model,
+  as when creating the settings,
+  so an unknown option, an invalid value, options that are not valid together
   or an error raised by the callable computing an option
   raises a `ValueError` naming the algorithm configuration
   and the instance of the problem.
@@ -57,7 +58,8 @@ and this project adheres to
   before any execution, when they check the algorithms:
   the `ValueError` listing the unavailable and unsuited algorithms
   also lists the instances whose options are invalid
-  or whose callables computing the options raised an error.
+  or whose callables computing the options raised an error,
+  with one line per algorithm configuration and error.
 - `AlgorithmConfiguration.from_dict` and `PerformanceHistory.from_file`
   can no longer read the algorithm configurations and the performance histories
   saved with an earlier version

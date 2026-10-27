@@ -33,6 +33,7 @@ from gemseo.util.constant import read_only_empty_dict
 from gemseo.util.string import pretty_repr
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from collections.abc import Mapping
 
     from gemseo.util.pydantic import BaseSettings
@@ -50,6 +51,62 @@ The mapping links the name of an algorithm option to a callable
 that takes the problem configuration and the 0-based index of the instance
 and returns the value of the option.
 """
+
+
+def _get_instance_settings_error_messages(
+    errors: Iterable[tuple[str, str, int, BaseException]],
+) -> list[str]:
+    """Return one message per algorithm configuration and error.
+
+    The instances of the problems sharing the same error
+    for the same algorithm configuration are named in the same message.
+
+    Args:
+        errors: The errors raised when computing the settings of algorithms
+            for instances of problems,
+            as tuples of the form
+            `(algorithm configuration name, problem configuration name,
+            0-based index of the instance, error)`.
+
+    Returns:
+        The messages, in the order of the first occurrence of each error.
+    """
+    # The 1-based indices of the instances,
+    # per problem configuration name,
+    # per algorithm configuration name and error message.
+    instances: dict[tuple[str, str], dict[str, list[int]]] = {}
+    for configuration_name, problem_name, index, error in errors:
+        instances.setdefault((configuration_name, str(error)), {}).setdefault(
+            problem_name, []
+        ).append(index + 1)
+
+    return [
+        f"The options of algorithm configuration {configuration_name} "
+        f"for {_describe_instances(problems)} are invalid: {message}"
+        for (configuration_name, message), problems in instances.items()
+    ]
+
+
+def _describe_instances(instances: Mapping[str, list[int]]) -> str:
+    """Describe instances of problems.
+
+    Args:
+        instances: The 1-based indices of the instances
+            per problem configuration name.
+
+    Returns:
+        The description of the instances,
+        e.g. `"problems 1 and 2 of problem configuration Rosenbrock"`.
+    """
+    descriptions = [
+        f"problem{'s' if len(indices) > 1 else ''} {pretty_repr(indices, sort=False)} "
+        f"of problem configuration {problem_name}"
+        for problem_name, indices in instances.items()
+    ]
+    if len(descriptions) == 1:
+        return descriptions[0]
+
+    return f"{', '.join(descriptions[:-1])}, and {descriptions[-1]}"
 
 
 class AlgorithmConfiguration:
@@ -150,12 +207,16 @@ class AlgorithmConfiguration:
             A new copy of the settings of the algorithm,
             nested settings included,
             updated with the options specific to the instance of the problem.
-            Only these options are validated;
-            the other values are kept as they are.
+            All the explicitly-set options are validated together,
+            as when creating the settings,
+            so that the validators of the settings see the final options;
+            the options not specific to the instance keep their values,
+            which their validators must accept as input.
 
         Raises:
             ValueError: When an option specific to the instance
                 is not an option of the algorithm or has an invalid value,
+                or when the options are not valid together,
                 or when the callable computing it raises an error;
                 the message names the algorithm configuration
                 and the instance of the problem.
@@ -163,27 +224,37 @@ class AlgorithmConfiguration:
         # The algorithm can change its settings while running,
         # so that each execution needs its own settings.
         settings = self.__algorithm_settings.model_copy(deep=True)
-        validator = type(settings).__pydantic_validator__
+        options = {name: getattr(settings, name) for name in settings.model_fields_set}
         try:
-            for name, function in self.__instance_algorithm_options.items():
-                # Only the value of this option is validated and coerced,
-                # and the option is marked as explicitly set.
-                validator.validate_assignment(
-                    settings, name, function(problem_configuration, index)
-                )
+            instance_options = {
+                name: function(problem_configuration, index)
+                for name, function in self.__instance_algorithm_options.items()
+            }
+            # One validation of all the options,
+            # as when creating the settings,
+            # so that the validators of the settings see the final options.
+            instance_settings = type(settings).model_validate({
+                **options,
+                **instance_options,
+            })
         except Exception as error:  # ruff: ignore[blind-except]
             # Any error is reported,
             # as a callable defining an option specific to the problems
             # or a validator of the settings can raise any exception.
-            msg = (
-                f"The options of algorithm configuration {self.__configuration_name} "
-                f"for problem {index + 1} "
-                f"of problem configuration {problem_configuration.name} "
-                f"are invalid: {error}"
-            )
+            msg = _get_instance_settings_error_messages([
+                (self.__configuration_name, problem_configuration.name, index, error)
+            ])[0]
             raise ValueError(msg) from error
 
-        return settings
+        # The other options keep the values validated when the settings were created,
+        # even if validating them again changed them.
+        return instance_settings.model_copy(
+            update={
+                name: value
+                for name, value in options.items()
+                if name not in instance_options
+            }
+        )
 
     def to_dict(self, skip_instance_algorithm_options: bool = False) -> dict[str, Any]:
         """Return the algorithm configuration as a dictionary.
@@ -242,8 +313,9 @@ class AlgorithmConfiguration:
             The algorithm configuration.
 
         Raises:
-            ValueError: If the dictionary misses a key
-                or if the class of the algorithm settings cannot be imported,
+            ValueError: If the dictionary misses a key,
+                if the class of the algorithm settings is not a string
+                or if it cannot be imported,
                 e.g. because the plugin providing the algorithm is not installed
                 or because it was written by an earlier version of gemseo-benchmark.
         """
@@ -267,6 +339,16 @@ class AlgorithmConfiguration:
             raise ValueError(msg)
 
         fqn = algorithm_configuration[cls.__ALGORITHM_SETTINGS_CLASS]
+        if not isinstance(fqn, str):
+            msg = (
+                f"The class of the algorithm settings {fqn!r} is not a string; "
+                "it must be the fully qualified name of a class, "
+                "e.g. 'gemseo.optimization.SLSQP_Settings'."
+            )
+            # A ValueError, like the other errors of a malformed configuration,
+            # so that the readers of the files can name the file.
+            raise ValueError(msg)  # ruff: ignore[type-check-without-type-error]
+
         module_name, _, class_name = fqn.rpartition(".")
         try:
             settings_class = getattr(importlib.import_module(module_name), class_name)

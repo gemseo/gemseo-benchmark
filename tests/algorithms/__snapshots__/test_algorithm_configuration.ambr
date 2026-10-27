@@ -8,6 +8,12 @@
 # name: test_from_dict_missing_keys[one_key]
   "The algorithm configuration misses the key 'algorithm_settings_class'; it was probably written by an earlier version of gemseo-benchmark and must be computed again."
 # ---
+# name: test_from_dict_settings_class_not_a_string[integer]
+  "The class of the algorithm settings 3 is not a string; it must be the fully qualified name of a class, e.g. 'gemseo.optimization.SLSQP_Settings'."
+# ---
+# name: test_from_dict_settings_class_not_a_string[null]
+  "The class of the algorithm settings None is not a string; it must be the fully qualified name of a class, e.g. 'gemseo.optimization.SLSQP_Settings'."
+# ---
 # name: test_from_dict_unknown_settings_class[missing_class]
   "The class of the algorithm settings 'gemseo.optimization.scipy_local.settings.slsqp.Unknown_Settings' cannot be imported; install the plugin providing the algorithm, or, if the results were written by an earlier version of gemseo-benchmark, compute them again."
 # ---
@@ -29,7 +35,7 @@
   '''
   The options of algorithm configuration SLSQP for problem 2 of problem configuration Rosenbrock are invalid: 1 validation error for SLSQP_Settings
   max_iters
-    Object has no attribute 'max_iters' [type=no_such_attribute, input_value=5, input_type=int]
-      For further information visit https://errors.pydantic.dev/X.Y/v/no_such_attribute
+    Extra inputs are not permitted [type=extra_forbidden, input_value=5, input_type=int]
+      For further information visit https://errors.pydantic.dev/X.Y/v/extra_forbidden
   '''
 # ---

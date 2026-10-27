@@ -21,6 +21,7 @@
 
 from __future__ import annotations
 
+from math import inf
 from typing import Any
 from unittest import mock
 
@@ -28,14 +29,20 @@ import pytest
 from gemseo.mda import MDAChain_Settings
 from gemseo.mda import MDANewtonRaphson_Settings
 from gemseo.optimization import MNBI_Settings
+from gemseo.optimization import NELDER_MEAD_Settings
 from gemseo.optimization import SLSQP_Settings
 from gemseo.util.pydantic import BaseSettings
 from gemseo.util.testing.helper import assert_exception
+from numpy import ndarray
+from numpy.testing import assert_equal
 from pydantic import Field
 from pydantic import ValidationError
 from pydantic import field_validator
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
+from gemseo_benchmark.algorithms.algorithm_configuration import (
+    _get_instance_settings_error_messages,
+)
 
 
 class Dummy_Settings(BaseSettings):  # ruff: ignore[invalid-class-name]
@@ -156,6 +163,20 @@ def test_from_dict_unknown_settings_class(settings_class, snapshot):
         })
 
     assert isinstance(error.value.__cause__, (ImportError, AttributeError))
+
+
+@pytest.mark.parametrize("settings_class", [None, 3], ids=["null", "integer"])
+def test_from_dict_settings_class_not_a_string(settings_class, snapshot):
+    """Check the import of an algorithm configuration with a malformed settings class.
+
+    This is the case of a JSON file whose settings class is not a string.
+    """
+    with assert_exception(ValueError, snapshot):
+        AlgorithmConfiguration.from_dict({
+            "configuration_name": "MMA",
+            "algorithm_settings_class": settings_class,
+            "algorithm_settings": {},
+        })
 
 
 def test_get_instance_settings():
@@ -334,15 +355,15 @@ def test_get_instance_settings_invalid_option(name, get_value, cause, snapshot):
     assert isinstance(error.value.__cause__, cause)
 
 
-class _StringOnly_Settings(Dummy_Settings):  # ruff: ignore[invalid-class-name]
-    """Settings of a fake algorithm whose option accepts only a string as input."""
+class _Prefixed_Settings(Dummy_Settings):  # ruff: ignore[invalid-class-name]
+    """Settings of a fake algorithm whose option changes at each validation."""
 
     label: str = Field(default="")
 
     @field_validator("label", mode="before")
     @classmethod
-    def check_label(cls, value: Any) -> str:
-        """Check that the label is given as a string of digits.
+    def prefix_label(cls, value: Any) -> str:
+        """Prefix the label by its type.
 
         Args:
             value: The label as given.
@@ -351,22 +372,22 @@ class _StringOnly_Settings(Dummy_Settings):  # ruff: ignore[invalid-class-name]
             The label prefixed by its type.
 
         Raises:
-            TypeError: When the label is not a string of digits.
+            TypeError: When the label is not a string.
         """
-        if not (isinstance(value, str) and value.isdigit()):
-            msg = "The label must be a string of digits."
+        if not isinstance(value, str):
+            msg = "The label must be a string."
             raise TypeError(msg)
 
         return f"label {value}"
 
 
-def test_get_instance_settings_no_revalidation():
-    """Check that only the options specific to an instance are validated.
+def test_get_instance_settings_other_values_kept():
+    """Check that the options not specific to an instance keep their values.
 
-    The other options keep the values validated when the settings were created,
-    even if their validator would not accept these values as input.
+    These are the values validated when the settings were created,
+    even if validating them again would change them.
     """
-    settings = _StringOnly_Settings(label="1")
+    settings = _Prefixed_Settings(label="1")
     algorithm_configuration = AlgorithmConfiguration(
         settings,
         instance_algorithm_options={
@@ -378,6 +399,122 @@ def test_get_instance_settings_no_revalidation():
     assert instance_settings.max_iter == 5
     assert instance_settings.model_fields_set == {"label", "max_iter"}
     assert settings.max_iter == 100
+
+
+def test_get_instance_settings_initial_simplex():
+    """Check that the model validators coerce the options specific to an instance.
+
+    The settings of the Nelder-Mead algorithm cast the initial simplex
+    as a NumPy array before validating the fields.
+    """
+    algorithm_configuration = AlgorithmConfiguration(
+        NELDER_MEAD_Settings(max_iter=9),
+        instance_algorithm_options={
+            "initial_simplex": lambda problem_configuration, index: [
+                [0.0, 0.0],
+                [1.0, 0.0],
+                [0.0, 1.0],
+            ]
+        },
+    )
+    instance_settings = algorithm_configuration.get_instance_settings(mock.Mock(), 0)
+    assert isinstance(instance_settings.initial_simplex, ndarray)
+    assert_equal(instance_settings.initial_simplex, [[0, 0], [1, 0], [0, 1]])
+    assert instance_settings.max_iter == 9
+
+
+@pytest.mark.parametrize(
+    "names",
+    [("store_jacobian", "kkt_tol_abs"), ("kkt_tol_abs", "store_jacobian")],
+    ids=["store_jacobian_first", "kkt_tol_abs_first"],
+)
+def test_get_instance_settings_options_checked_together(names):
+    """Check that the options are checked together, whatever their order.
+
+    The KKT options can be set only if the Jacobian is stored;
+    an option specific to an instance unsets the KKT option set by the user
+    and another one stops storing the Jacobian.
+    """
+    values = {"store_jacobian": False, "kkt_tol_abs": inf}
+    algorithm_configuration = AlgorithmConfiguration(
+        SLSQP_Settings(kkt_tol_abs=1.0),
+        instance_algorithm_options={
+            name: lambda problem_configuration, index, value=values[name]: value
+            for name in names
+        },
+    )
+    instance_settings = algorithm_configuration.get_instance_settings(mock.Mock(), 0)
+    assert not instance_settings.store_jacobian
+    assert instance_settings.kkt_tol_abs == inf
+
+
+@pytest.mark.parametrize(
+    ("errors", "messages"),
+    [
+        (
+            [("A", "P", 1, ValueError("Wrong."))],
+            ["for problem 2 of problem configuration P are invalid: Wrong."],
+        ),
+        (
+            [("A", "P", index, ValueError("Wrong.")) for index in range(3)],
+            ["for problems 1, 2 and 3 of problem configuration P are invalid: Wrong."],
+        ),
+        (
+            [
+                ("A", "P", 0, ValueError("Wrong.")),
+                ("A", "Q", 0, ValueError("Wrong.")),
+                ("A", "Q", 1, ValueError("Wrong.")),
+                ("A", "R", 2, ValueError("Wrong.")),
+            ],
+            [
+                (
+                    "for problem 1 of problem configuration P, "
+                    "problems 1 and 2 of problem configuration Q, "
+                    "and problem 3 of problem configuration R are invalid: Wrong."
+                )
+            ],
+        ),
+        (
+            [
+                ("A", "P", 0, ValueError("Wrong.")),
+                ("A", "P", 1, ValueError("Other.")),
+                ("A", "P", 2, ValueError("Wrong.")),
+            ],
+            [
+                "for problems 1 and 3 of problem configuration P are invalid: Wrong.",
+                "for problem 2 of problem configuration P are invalid: Other.",
+            ],
+        ),
+    ],
+    ids=[
+        "one_instance",
+        "same_error_one_problem_configuration",
+        "same_error_several_problem_configurations",
+        "different_errors",
+    ],
+)
+def test_get_instance_settings_error_messages(errors, messages):
+    """Check that the instances sharing an error are named in one message."""
+    assert _get_instance_settings_error_messages(errors) == [
+        f"The options of algorithm configuration A {message}" for message in messages
+    ]
+
+
+def test_get_instance_settings_error_messages_configurations():
+    """Check that the same error for two algorithm configurations gives two messages."""
+    assert _get_instance_settings_error_messages([
+        ("A", "P", 0, ValueError("Wrong.")),
+        ("B", "P", 0, ValueError("Wrong.")),
+    ]) == [
+        (
+            "The options of algorithm configuration A "
+            "for problem 1 of problem configuration P are invalid: Wrong."
+        ),
+        (
+            "The options of algorithm configuration B "
+            "for problem 1 of problem configuration P are invalid: Wrong."
+        ),
+    ]
 
 
 def test_copy(algorithm_configuration):
