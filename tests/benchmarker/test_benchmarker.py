@@ -361,16 +361,15 @@ def raise_index_error(problem_configuration, index):
     [lambda config, index: "x" if index == 1 else 5, raise_index_error],
     ids=["invalid_value", "callable_error"],
 )
-@pytest.mark.parametrize("raise_errors", [False, True])
 def test_invalid_problem_specific_algorithm_option(
-    tmp_path, rosenbrock, raise_errors, get_max_iter, snapshot
+    tmp_wd, rosenbrock, get_max_iter, snapshot
 ) -> None:
     """Check that an invalid problem-specific option stops before any execution.
 
     The option is invalid when its value is invalid
     or when the callable computing it raises an error.
     """
-    results_path = tmp_path / "results.json"
+    results_path = tmp_wd / "results.json"
     algorithm_configuration = AlgorithmConfiguration(
         L_BFGS_B_Settings(),
         "L-BFGS-B",
@@ -379,16 +378,15 @@ def test_invalid_problem_specific_algorithm_option(
     loggers = (logging.getLogger(Benchmarker.__module__), logging.getLogger("gemseo"))
     handlers = [list(logger.handlers) for logger in loggers]
     with assert_exception(ValueError, snapshot):
-        Benchmarker(tmp_path, results_path).execute(
+        Benchmarker(tmp_wd, results_path).execute(
             [rosenbrock],
             AlgorithmsConfigurations(algorithm_configuration),
             use_threading=True,
             save_log=True,
-            raise_errors=raise_errors,
         )
 
     assert not results_path.exists()
-    assert not (tmp_path / "L-BFGS-B").exists()
+    assert not (tmp_wd / "L-BFGS-B").exists()
     assert [list(logger.handlers) for logger in loggers] == handlers
 
 
@@ -777,6 +775,31 @@ def test_all_unavailable_algorithms_reported(tmp_path, rosenbrock) -> None:
         "The algorithm 'Algorithm' is not available.\n"
         "The algorithm 'Other algorithm' is not available."
     )
+
+
+def test_unavailable_algorithm_and_invalid_option_reported(
+    tmp_path, rosenbrock, snapshot
+) -> None:
+    """Check that an unavailable algorithm and an invalid option are reported at once.
+
+    Nothing is executed.
+    """
+    with assert_exception(ValueError, snapshot):
+        Benchmarker(tmp_path).execute(
+            [rosenbrock],
+            AlgorithmsConfigurations(
+                create_unknown_algorithm_configuration("Algorithm", "Configuration"),
+                AlgorithmConfiguration(
+                    L_BFGS_B_Settings(),
+                    "L-BFGS-B",
+                    instance_algorithm_options={
+                        "max_iter": lambda configuration, index: "x"
+                    },
+                ),
+            ),
+        )
+
+    assert not list(tmp_path.rglob("*.json"))
 
 
 @pytest.mark.parametrize(

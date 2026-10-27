@@ -138,38 +138,40 @@ class BaseWorker(
             for logger in loggers:
                 logger.addHandler(file_handler)
 
-        # The algorithm can change its settings while running,
-        # so it runs with a copy of them
-        # and the performance history stores the settings as given.
-        executed_configuration = AlgorithmConfiguration(
-            algorithm_configuration.algorithm_settings.model_copy(deep=True),
-            algorithm_configuration.name,
-            algorithm_configuration.instance_algorithm_options,
-        )
-        problem = cls._get_problem(
-            executed_configuration,
-            problem_configuration,
-            starting_point,
-            hdf_file_path,
-        )
-
-        metrics_listeners = cls._add_metrics_listeners(problem)
-
-        benchmarking_logger.info(gemseo_log_message)
-        with Timer() as timer:
-            cls._execute(
+        try:
+            # The algorithm can change its settings while running,
+            # so it runs with a copy of them
+            # and the performance history stores the settings as given.
+            executed_configuration = AlgorithmConfiguration(
+                algorithm_configuration.algorithm_settings.model_copy(deep=True),
+                algorithm_configuration.name,
+                algorithm_configuration.instance_algorithm_options,
+            )
+            problem = cls._get_problem(
                 executed_configuration,
                 problem_configuration,
                 starting_point,
-                problem,
+                hdf_file_path,
             )
 
-        # Stop writing in the log file.
-        if log_path is not None:
-            for logger in loggers:
-                logger.removeHandler(file_handler)
+            metrics_listeners = cls._add_metrics_listeners(problem)
 
-            file_handler.close()
+            benchmarking_logger.info(gemseo_log_message)
+            with Timer() as timer:
+                cls._execute(
+                    executed_configuration,
+                    problem_configuration,
+                    starting_point,
+                    problem,
+                )
+        finally:
+            # Stop writing in the log file, even if the execution failed,
+            # so that the next executions do not write in it.
+            if log_path is not None:
+                for logger in loggers:
+                    logger.removeHandler(file_handler)
+
+                file_handler.close()
 
         cls._create_performance_history(
             algorithm_configuration,

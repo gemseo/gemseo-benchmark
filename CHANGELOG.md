@@ -33,11 +33,11 @@ and this project adheres to
 - The method `AlgorithmConfiguration.get_instance_settings` returns
   a new copy of the settings of the algorithm, nested settings included,
   updated with the options specific to an instance of a problem;
-  these options are validated by the settings model,
-  so an unknown option or an invalid value raises a `ValidationError`.
-  The method `AlgorithmConfiguration.get_instance_settings_error_message`
-  returns the message of such an error,
-  naming the algorithm configuration and the instance of the problem.
+  only these options are validated by the settings model,
+  so an unknown option, an invalid value
+  or an error raised by the callable computing an option
+  raises a `ValueError` naming the algorithm configuration
+  and the instance of the problem.
 
 ### Changed
 
@@ -55,7 +55,8 @@ and this project adheres to
 - `Benchmarker.execute` and `Scenario.execute` also validate
   the options specific to the problem instances
   before any execution, when they check the algorithms:
-  a `ValueError` lists the instances whose options are invalid
+  the `ValueError` listing the unavailable and unsuited algorithms
+  also lists the instances whose options are invalid
   or whose callables computing the options raised an error.
 - `AlgorithmConfiguration.from_dict` and `PerformanceHistory.from_file`
   can no longer read the algorithm configurations and the performance histories
@@ -81,8 +82,9 @@ and this project adheres to
   to each instance of the problem, as the benchmarking does;
   they were ignored.
   When these options are invalid,
-  it raises a `ValueError` naming the algorithm configuration
-  and the instance of the problem.
+  it raises a `ValueError` naming the algorithm configurations
+  and the instances of the problem,
+  before any optimization.
 
 ## Version 5.0.0 (October 2026)
 

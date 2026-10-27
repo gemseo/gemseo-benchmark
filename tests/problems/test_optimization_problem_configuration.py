@@ -73,6 +73,7 @@ from tests.problems.conftest import test_description_parametrize
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from collections.abc import Iterator
 
 
 @pytest.fixture(scope="module")
@@ -252,25 +253,34 @@ def test_init_targets_computation(algorithms_configurations, minimize_objective)
     assert isinstance(problem.target_values, TargetValues)
 
 
+@pytest.fixture
+def execute_algo() -> Iterator[mock.Mock]:
+    """Spy on the function executing the algorithms to compute the target values.
+
+    Yields:
+        The spy of the function.
+    """
+    with mock.patch.object(
+        optimization_problem_configuration,
+        "execute_algo",
+        wraps=optimization_problem_configuration.execute_algo,
+    ) as spy:
+        yield spy
+
+
 class _ThreeIterationsSLSQPSettings(SLSQP_Settings):
     """SLSQP settings with three iterations by default."""
 
     _inherited_field_defaults: ClassVar[dict[str, Any]] = {"max_iter": 3}
 
 
-def test_compute_target_values_settings_defaults() -> None:
+def test_compute_target_values_settings_defaults(execute_algo) -> None:
     """Check that the target values use the settings model and its defaults."""
     problem = OptimizationProblemConfiguration("Rosenbrock", Rosenbrock)
     configurations = AlgorithmsConfigurations(
         AlgorithmConfiguration(_ThreeIterationsSLSQPSettings())
     )
-    with mock.patch.object(
-        optimization_problem_configuration,
-        "execute_algo",
-        wraps=optimization_problem_configuration.execute_algo,
-    ) as execute_algo:
-        problem.compute_target_values(1, configurations)
-
+    problem.compute_target_values(1, configurations)
     assert execute_algo.call_args_list
     for call in execute_algo.call_args_list:
         settings = call.kwargs["settings_model"]
@@ -278,7 +288,7 @@ def test_compute_target_values_settings_defaults() -> None:
         assert settings.max_iter == 3
 
 
-def test_compute_target_values_instance_algorithm_options() -> None:
+def test_compute_target_values_instance_algorithm_options(execute_algo) -> None:
     """Check that the target values use the options specific to the instances."""
     problem = OptimizationProblemConfiguration("Rosenbrock", Rosenbrock)
     problem.starting_points = [array([0.0, 0.0]), array([0.5, 0.5])]
@@ -290,19 +300,13 @@ def test_compute_target_values_instance_algorithm_options() -> None:
             },
         )
     )
-    with mock.patch.object(
-        optimization_problem_configuration,
-        "execute_algo",
-        wraps=optimization_problem_configuration.execute_algo,
-    ) as execute_algo:
-        problem.compute_target_values(1, configurations)
-
+    problem.compute_target_values(1, configurations)
     assert [
         call.kwargs["settings_model"].max_iter for call in execute_algo.call_args_list
     ] == [2, 3]
 
 
-def test_compute_target_values_independent_settings() -> None:
+def test_compute_target_values_independent_settings(execute_algo) -> None:
     """Check that each execution uses its own settings.
 
     NLOPT_COBYLA sets its option `stop_crit_n_x` from the dimension of the problem,
@@ -311,16 +315,11 @@ def test_compute_target_values_independent_settings() -> None:
     """
     settings = NLOPT_COBYLA_Settings(max_iter=10)
     configurations = AlgorithmsConfigurations(AlgorithmConfiguration(settings))
-    with mock.patch.object(
-        optimization_problem_configuration,
-        "execute_algo",
-        wraps=optimization_problem_configuration.execute_algo,
-    ) as execute_algo:
-        for dimension in (2, 5):
-            OptimizationProblemConfiguration(
-                f"Rosenbrock {dimension}",
-                lambda dimension=dimension: Rosenbrock(dimension),
-            ).compute_target_values(1, configurations)
+    for dimension in (2, 5):
+        OptimizationProblemConfiguration(
+            f"Rosenbrock {dimension}",
+            lambda dimension=dimension: Rosenbrock(dimension),
+        ).compute_target_values(1, configurations)
 
     used_settings = [
         call.kwargs["settings_model"] for call in execute_algo.call_args_list
@@ -331,20 +330,28 @@ def test_compute_target_values_independent_settings() -> None:
     assert settings.model_dump(exclude_unset=True) == {"max_iter": 10}
 
 
-def test_compute_target_values_invalid_instance_option(snapshot) -> None:
-    """Check the error raised by an invalid option specific to an instance."""
+def test_compute_target_values_invalid_instance_option(execute_algo, snapshot) -> None:
+    """Check the error raised by invalid options specific to the instances.
+
+    The errors of all the instances are reported before any optimization,
+    even if the algorithm configuration with these options is the last one.
+    """
     problem = OptimizationProblemConfiguration("Rosenbrock", Rosenbrock)
-    configurations = AlgorithmsConfigurations(
-        AlgorithmConfiguration(
-            SLSQP_Settings(),
-            "SLSQP",
-            instance_algorithm_options={
-                "max_iter": lambda configuration, index: "five"
-            },
-        )
+    problem.starting_points = [array([0.0, 0.0]), array([0.5, 0.5])]
+    valid_configuration = AlgorithmConfiguration(SLSQP_Settings(), "A SLSQP")
+    invalid_configuration = AlgorithmConfiguration(
+        SLSQP_Settings(),
+        "B SLSQP",
+        instance_algorithm_options={"max_iter": lambda configuration, index: "five"},
     )
+    configurations = AlgorithmsConfigurations(
+        invalid_configuration, valid_configuration
+    )
+    assert list(configurations)[-1] is invalid_configuration
     with assert_exception(ValueError, snapshot):
         problem.compute_target_values(1, configurations)
+
+    execute_algo.assert_not_called()
 
 
 def test_starting_points_non_2d_array(benchmarking_problem):

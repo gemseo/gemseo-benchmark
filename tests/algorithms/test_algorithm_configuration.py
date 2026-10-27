@@ -21,6 +21,7 @@
 
 from __future__ import annotations
 
+from typing import Any
 from unittest import mock
 
 import pytest
@@ -32,6 +33,7 @@ from gemseo.util.pydantic import BaseSettings
 from gemseo.util.testing.helper import assert_exception
 from pydantic import Field
 from pydantic import ValidationError
+from pydantic import field_validator
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 
@@ -142,6 +144,7 @@ def test_from_dict_missing_keys(dictionary, snapshot):
         "gemseo.algos.opt.mma.settings.mma_settings.MMASVanberg_Settings",
         "gemseo.optimization.scipy_local.settings.slsqp.Unknown_Settings",
     ],
+    ids=["missing_module", "missing_class"],
 )
 def test_from_dict_unknown_settings_class(settings_class, snapshot):
     """Check the import of an algorithm configuration with an unknown settings class."""
@@ -295,15 +298,86 @@ def test_get_instance_settings_coercion():
     assert instance_settings.model_fields_set == {"max_iter", "ftol_rel"}
 
 
-@pytest.mark.parametrize(("name", "value"), [("max_iters", 5), ("max_iter", "five")])
-def test_get_instance_settings_invalid_option(name, value, snapshot):
+def raise_index_error(problem_configuration, index):
+    """Raise an `IndexError`.
+
+    Args:
+        problem_configuration: The problem configuration.
+        index: The 0-based index of the problem.
+
+    Raises:
+        IndexError: Always.
+    """
+    msg = "There is no value for this problem."
+    raise IndexError(msg)
+
+
+@pytest.mark.parametrize(
+    ("name", "get_value", "cause"),
+    [
+        ("max_iters", lambda problem_configuration, index: 5, ValidationError),
+        ("max_iter", lambda problem_configuration, index: "five", ValidationError),
+        ("max_iter", raise_index_error, IndexError),
+    ],
+    ids=["unknown_option", "invalid_value", "callable_error"],
+)
+def test_get_instance_settings_invalid_option(name, get_value, cause, snapshot):
     """Check that an invalid option specific to an instance raises an error."""
     algorithm_configuration = AlgorithmConfiguration(
-        SLSQP_Settings(),
-        instance_algorithm_options={name: lambda problem_configuration, index: value},
+        SLSQP_Settings(), "SLSQP", instance_algorithm_options={name: get_value}
     )
-    with assert_exception(ValidationError, snapshot):
-        algorithm_configuration.get_instance_settings(mock.Mock(), 0)
+    problem_configuration = mock.Mock()
+    problem_configuration.name = "Rosenbrock"
+    with assert_exception(ValueError, snapshot) as error:
+        algorithm_configuration.get_instance_settings(problem_configuration, 1)
+
+    assert isinstance(error.value.__cause__, cause)
+
+
+class _StringOnly_Settings(Dummy_Settings):  # ruff: ignore[invalid-class-name]
+    """Settings of a fake algorithm whose option accepts only a string as input."""
+
+    label: str = Field(default="")
+
+    @field_validator("label", mode="before")
+    @classmethod
+    def check_label(cls, value: Any) -> str:
+        """Check that the label is given as a string of digits.
+
+        Args:
+            value: The label as given.
+
+        Returns:
+            The label prefixed by its type.
+
+        Raises:
+            TypeError: When the label is not a string of digits.
+        """
+        if not (isinstance(value, str) and value.isdigit()):
+            msg = "The label must be a string of digits."
+            raise TypeError(msg)
+
+        return f"label {value}"
+
+
+def test_get_instance_settings_no_revalidation():
+    """Check that only the options specific to an instance are validated.
+
+    The other options keep the values validated when the settings were created,
+    even if their validator would not accept these values as input.
+    """
+    settings = _StringOnly_Settings(label="1")
+    algorithm_configuration = AlgorithmConfiguration(
+        settings,
+        instance_algorithm_options={
+            "max_iter": lambda problem_configuration, index: index + 5
+        },
+    )
+    instance_settings = algorithm_configuration.get_instance_settings(mock.Mock(), 0)
+    assert instance_settings.label == "label 1"
+    assert instance_settings.max_iter == 5
+    assert instance_settings.model_fields_set == {"label", "max_iter"}
+    assert settings.max_iter == 100
 
 
 def test_copy(algorithm_configuration):

@@ -59,7 +59,9 @@ class _Execution(NamedTuple):
     algorithm_configuration: AlgorithmConfiguration
     """The algorithm configuration with the settings of the algorithm for the problem.
 
-    These settings include the options specific to the problem.
+    These settings include the options specific to the problem;
+    without such options, they are the settings of the user,
+    as the worker runs the algorithm with a copy of them.
     """
 
     problem_configuration: BaseProblemConfiguration
@@ -269,7 +271,7 @@ class Benchmarker:
         """
         executions = []
         skipped_executions = []
-        messages = []
+        settings_messages = []
         # The names of the algorithms to execute on each problem configuration,
         # in the order of the problem configurations.
         algorithm_names: list[dict[str, None]] = [{} for _ in problem_configurations]
@@ -292,32 +294,36 @@ class Benchmarker:
                     algorithm_names[problem_index][
                         algorithm_configuration.algorithm_name
                     ] = None
-                    try:
-                        settings = algorithm_configuration.get_instance_settings(
-                            problem_configuration, index
-                        )
-                    except Exception as error:  # ruff: ignore[blind-except]
-                        # Any error is reported,
-                        # as a callable defining an option specific to the problems
-                        # or a validator of the settings can raise any exception.
-                        messages.append(
-                            algorithm_configuration.get_instance_settings_error_message(
-                                problem_configuration, index, error
+                    if algorithm_configuration.instance_algorithm_options:
+                        try:
+                            settings = algorithm_configuration.get_instance_settings(
+                                problem_configuration, index
                             )
-                        )
+                        except ValueError as error:
+                            settings_messages.append(str(error))
+                            continue
                     else:
-                        executions.append(
-                            _Execution(
-                                AlgorithmConfiguration(
-                                    settings, algorithm_configuration.name, {}
-                                ),
-                                problem_configuration,
-                                index,
-                                f"Solving {execution_info}.",
-                            )
-                        )
+                        # The worker copies the settings before running the algorithm,
+                        # so that the executions can share the user's settings.
+                        settings = algorithm_configuration.algorithm_settings
 
-        self.__check_algorithms(problem_configurations, algorithm_names)
+                    # The options specific to the problems are not passed,
+                    # as they are already applied and may not be picklable.
+                    executions.append(
+                        _Execution(
+                            AlgorithmConfiguration(
+                                settings, algorithm_configuration.name, {}
+                            ),
+                            problem_configuration,
+                            index,
+                            f"Solving {execution_info}.",
+                        )
+                    )
+
+        messages = [
+            *self.__check_algorithms(problem_configurations, algorithm_names),
+            *settings_messages,
+        ]
         if messages:
             raise ValueError("\n".join(messages))
 
@@ -327,10 +333,8 @@ class Benchmarker:
     def __check_algorithms(
         problem_configurations: Sequence[BaseProblemConfiguration],
         algorithm_names: Sequence[Iterable[str]],
-    ) -> None:
+    ) -> list[str]:
         """Check the algorithms for the problem configurations to be solved.
-
-        All the mistakes are reported at once.
 
         Args:
             problem_configurations: The problem configurations.
@@ -338,9 +342,10 @@ class Benchmarker:
                 to execute on each problem configuration,
                 in the order of the problem configurations.
 
-        Raises:
-            ValueError: If an algorithm is not available,
-                or is not suited to a problem configuration.
+        Returns:
+            The messages of the errors, without duplicates,
+            for the algorithms that are not available
+            or not suited to a problem configuration.
         """
         messages = {}
         for problem_configuration, names in zip(
@@ -366,8 +371,7 @@ class Benchmarker:
                 if message:
                     messages[message] = None
 
-        if messages:
-            raise ValueError("\n".join(messages))
+        return list(messages)
 
     @staticmethod
     def __get_error_message(check: Callable[..., None], *args: Any) -> str:

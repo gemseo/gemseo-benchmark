@@ -174,22 +174,34 @@ class OptimizationProblemConfiguration(
 
         Raises:
             ValueError: If an option specific to a problem
-                is not an option of the algorithm or has an invalid value.
+                is not an option of the algorithm or has an invalid value,
+                or if the callable computing it raises an error.
+                This is checked for all the algorithm configurations
+                and all the instances of the problem before any optimization.
         """
-        self.__targets_generator = TargetsGenerator()
+        # The settings of all the executions are computed before any of them,
+        # so that all the mistakes are reported before any optimization.
+        configurations_settings = []
+        messages = []
         for configuration in algorithm_configurations:
-            for index, instance in enumerate(self):
+            configuration_settings = []
+            for index in range(len(self.starting_points)):
                 try:
-                    settings = configuration.get_instance_settings(self, index)
-                except Exception as error:  # ruff: ignore[blind-except]
-                    # Any error is reported,
-                    # as a callable defining an option specific to the problems
-                    # or a validator of the settings can raise any exception.
-                    msg = configuration.get_instance_settings_error_message(
-                        self, index, error
+                    configuration_settings.append(
+                        configuration.get_instance_settings(self, index)
                     )
-                    raise ValueError(msg) from error
+                except ValueError as error:
+                    messages.append(str(error))
 
+            configurations_settings.append(configuration_settings)
+
+        if messages:
+            raise ValueError("\n".join(messages))
+
+        self.__targets_generator = TargetsGenerator()
+        for configuration_settings in configurations_settings:
+            # Each algorithm configuration solves new instances of the problem.
+            for settings, instance in zip(configuration_settings, self, strict=True):
                 execute_algo(instance, "opt", settings_model=settings)
                 history = PerformanceHistory.from_problem(instance)
                 self.__targets_generator.add_history(history=history)

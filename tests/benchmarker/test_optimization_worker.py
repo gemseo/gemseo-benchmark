@@ -18,8 +18,11 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
+from typing import Any
+from unittest import mock
 
 import pytest
+from gemseo import logger as gemseo_logger
 from gemseo.optimization import NLOPT_COBYLA_Settings
 from gemseo.optimization import OptimizationProblem
 from gemseo.optimization.factory import OptimizationLibraryFactory
@@ -128,6 +131,60 @@ def test_execution_settings(
     ).algorithm_configuration
     assert history_configuration.name == "NLOPT_COBYLA_max_iter=3"
     assert history_configuration.algorithm_options == {"max_iter": 3}
+
+
+@pytest.mark.parametrize(
+    "method_name", ["_get_problem", "_execute"], ids=["problem_error", "solver_error"]
+)
+def test_execution_error_log_file(
+    tmp_wd,  # ruff: ignore[redefined-while-unused]
+    algorithm_configuration,
+    rosenbrock,
+    method_name,
+) -> None:
+    """Check that a failed execution stops writing in its log file."""
+    benchmarking_logger = logging.getLogger("test_execution_error_log_file")
+    loggers = (benchmarking_logger, gemseo_logger)
+    handlers = [list(logger.handlers) for logger in loggers]
+    file_handlers = []
+    create_file_handler = logging.FileHandler
+
+    def create_and_store_file_handler(*args: Any) -> logging.FileHandler:
+        """Create a file handler and store it.
+
+        Args:
+            *args: The arguments of the file handler.
+
+        Returns:
+            The file handler.
+        """
+        file_handler = create_file_handler(*args)
+        file_handlers.append(file_handler)
+        return file_handler
+
+    with (
+        mock.patch.object(
+            OptimizationWorker, method_name, side_effect=RuntimeError("Failure.")
+        ),
+        mock.patch.object(
+            logging, "FileHandler", side_effect=create_and_store_file_handler
+        ),
+        pytest.raises(RuntimeError, match=r"^Failure\.$"),
+    ):
+        OptimizationWorker().execute(
+            algorithm_configuration,
+            rosenbrock,
+            rosenbrock.create_problem().design_space.get_lower_bounds(),
+            "Solving.",
+            Path("gemseo.log"),
+            Path("performance_history.json"),
+            None,
+            benchmarking_logger,
+        )
+
+    assert [list(logger.handlers) for logger in loggers] == handlers
+    assert len(file_handlers) == 1
+    assert file_handlers[0].stream is None
 
 
 def test_get_problem(algorithm_configuration, rosenbrock) -> None:

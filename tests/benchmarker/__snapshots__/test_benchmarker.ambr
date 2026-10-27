@@ -1,8 +1,8 @@
 # serializer version: 1
-# name: test_invalid_problem_specific_algorithm_option[False-callable_error]
+# name: test_invalid_problem_specific_algorithm_option[callable_error]
   'The options of algorithm configuration L-BFGS-B for problem 2 of problem configuration Rosenbrock are invalid: There is no value for the second problem.'
 # ---
-# name: test_invalid_problem_specific_algorithm_option[False-invalid_value]
+# name: test_invalid_problem_specific_algorithm_option[invalid_value]
   '''
   The options of algorithm configuration L-BFGS-B for problem 2 of problem configuration Rosenbrock are invalid: 1 validation error for L_BFGS_B_Settings
   max_iter
@@ -10,11 +10,13 @@
       For further information visit https://errors.pydantic.dev/X.Y/v/int_parsing
   '''
 # ---
-# name: test_invalid_problem_specific_algorithm_option[True-callable_error]
-  'The options of algorithm configuration L-BFGS-B for problem 2 of problem configuration Rosenbrock are invalid: There is no value for the second problem.'
-# ---
-# name: test_invalid_problem_specific_algorithm_option[True-invalid_value]
+# name: test_unavailable_algorithm_and_invalid_option_reported
   '''
+  The algorithm 'Algorithm' is not available.
+  The options of algorithm configuration L-BFGS-B for problem 1 of problem configuration Rosenbrock are invalid: 1 validation error for L_BFGS_B_Settings
+  max_iter
+    Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='x', input_type=str]
+      For further information visit https://errors.pydantic.dev/X.Y/v/int_parsing
   The options of algorithm configuration L-BFGS-B for problem 2 of problem configuration Rosenbrock are invalid: 1 validation error for L_BFGS_B_Settings
   max_iter
     Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='x', input_type=str]

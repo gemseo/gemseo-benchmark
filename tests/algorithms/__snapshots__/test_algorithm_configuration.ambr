@@ -8,25 +8,28 @@
 # name: test_from_dict_missing_keys[one_key]
   "The algorithm configuration misses the key 'algorithm_settings_class'; it was probably written by an earlier version of gemseo-benchmark and must be computed again."
 # ---
-# name: test_from_dict_unknown_settings_class[gemseo.algos.opt.mma.settings.mma_settings.MMASVanberg_Settings]
-  "The class of the algorithm settings 'gemseo.algos.opt.mma.settings.mma_settings.MMASVanberg_Settings' cannot be imported; install the plugin providing the algorithm, or, if the results were written by an earlier version of gemseo-benchmark, compute them again."
-# ---
-# name: test_from_dict_unknown_settings_class[gemseo.optimization.scipy_local.settings.slsqp.Unknown_Settings]
+# name: test_from_dict_unknown_settings_class[missing_class]
   "The class of the algorithm settings 'gemseo.optimization.scipy_local.settings.slsqp.Unknown_Settings' cannot be imported; install the plugin providing the algorithm, or, if the results were written by an earlier version of gemseo-benchmark, compute them again."
 # ---
-# name: test_get_instance_settings_invalid_option[max_iter-five]
+# name: test_from_dict_unknown_settings_class[missing_module]
+  "The class of the algorithm settings 'gemseo.algos.opt.mma.settings.mma_settings.MMASVanberg_Settings' cannot be imported; install the plugin providing the algorithm, or, if the results were written by an earlier version of gemseo-benchmark, compute them again."
+# ---
+# name: test_get_instance_settings_invalid_option[callable_error]
+  'The options of algorithm configuration SLSQP for problem 2 of problem configuration Rosenbrock are invalid: There is no value for this problem.'
+# ---
+# name: test_get_instance_settings_invalid_option[invalid_value]
   '''
-  1 validation error for SLSQP_Settings
+  The options of algorithm configuration SLSQP for problem 2 of problem configuration Rosenbrock are invalid: 1 validation error for SLSQP_Settings
   max_iter
     Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='five', input_type=str]
       For further information visit https://errors.pydantic.dev/X.Y/v/int_parsing
   '''
 # ---
-# name: test_get_instance_settings_invalid_option[max_iters-5]
+# name: test_get_instance_settings_invalid_option[unknown_option]
   '''
-  1 validation error for SLSQP_Settings
+  The options of algorithm configuration SLSQP for problem 2 of problem configuration Rosenbrock are invalid: 1 validation error for SLSQP_Settings
   max_iters
-    Extra inputs are not permitted [type=extra_forbidden, input_value=5, input_type=int]
-      For further information visit https://errors.pydantic.dev/X.Y/v/extra_forbidden
+    Object has no attribute 'max_iters' [type=no_such_attribute, input_value=5, input_type=int]
+      For further information visit https://errors.pydantic.dev/X.Y/v/no_such_attribute
   '''
 # ---
