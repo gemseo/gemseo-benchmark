@@ -49,7 +49,11 @@ def test_report_example(tmp_wd):
     since it changes the global configuration of GEMSEO.
     """
     # The report is built by the properdocs executable of the environment of the tests.
-    path = os.pathsep.join((str(Path(sys.executable).parent), os.environ["PATH"]))
+    path = os.pathsep.join(
+        directory
+        for directory in (str(Path(sys.executable).parent), os.environ.get("PATH", ""))
+        if directory
+    )
     # The subprocess inherits the temporary working directory set by tmp_wd.
     subprocess.run(
         [sys.executable, str(EXAMPLE_PATH)],
