@@ -60,7 +60,9 @@ def test_compute_target_values():
     assert isinstance(rosenbrock.target_values, TargetValues)
 
 
-@pytest.mark.parametrize("use_abscissa_log_scale", [False, True])
+@pytest.mark.parametrize(
+    "use_abscissa_log_scale", [False, True], ids=["linear_scale", "log_scale"]
+)
 def test_compute_data_profile(
     problem_a, problem_b, results, use_abscissa_log_scale, snapshot_matplotlib
 ):

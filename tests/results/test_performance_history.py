@@ -233,30 +233,35 @@ def test_from_file():
     assert history.items[1].n_unsatisfied_constraints == 0
 
 
-def test_from_file_earlier_version(tmp_path, monkeypatch, snapshot):
-    """Check the reading of a performance history saved by gemseo-benchmark 4."""
+@pytest.mark.parametrize(
+    "algorithm_configuration",
+    [
+        (
+            '{"configuration_name": "SciPy SLSQP", '
+            '"algorithm_name": "SLSQP", "algorithm_options": {"max_iter": 9}}'
+        ),
+        (
+            '{"configuration_name": "MMA", '
+            '"algorithm_settings_class": '
+            '"gemseo.algos.opt.mma.settings.mma_settings.MMASVanberg_Settings", '
+            '"algorithm_settings": {}}'
+        ),
+    ],
+    ids=["earlier_version", "unknown_settings_class"],
+)
+def test_from_file_invalid_algorithm_configuration(
+    tmp_wd, algorithm_configuration, snapshot
+):
+    """Check the reading of a performance history with an invalid configuration.
+
+    The algorithm configuration is invalid
+    when it was saved by gemseo-benchmark 4
+    or when its settings class cannot be imported.
+    """
     # The file path is relative, so that the error message does not depend on it.
-    monkeypatch.chdir(tmp_path)
     file_path = Path("history.json")
     file_path.write_text(
-        '{"algorithm_configuration": {"configuration_name": "SciPy SLSQP", '
-        '"algorithm_name": "SLSQP", "algorithm_options": {"max_iter": 9}}, '
-        '"history_items": []}'
-    )
-    with assert_exception(ValueError, snapshot):
-        PerformanceHistory.from_file(file_path)
-
-
-def test_from_file_unknown_settings_class(tmp_path, monkeypatch, snapshot):
-    """Check the reading of a performance history with an unknown settings class."""
-    # The file path is relative, so that the error message does not depend on it.
-    monkeypatch.chdir(tmp_path)
-    file_path = Path("history.json")
-    file_path.write_text(
-        '{"algorithm_configuration": {"configuration_name": "MMA", '
-        '"algorithm_settings_class": '
-        '"gemseo.algos.opt.mma.settings.mma_settings.MMASVanberg_Settings", '
-        '"algorithm_settings": {}}, "history_items": []}'
+        f'{{"algorithm_configuration": {algorithm_configuration}, "history_items": []}}'
     )
     with assert_exception(ValueError, snapshot):
         PerformanceHistory.from_file(file_path)

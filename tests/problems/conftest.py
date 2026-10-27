@@ -367,7 +367,7 @@ def check_starting_point_loading(
 
 
 test_compute_data_profiles_parametrize = pytest.mark.parametrize(
-    "use_abscissa_log_scale", [False, True]
+    "use_abscissa_log_scale", [False, True], ids=["linear_scale", "log_scale"]
 )
 
 

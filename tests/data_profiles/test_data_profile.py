@@ -60,7 +60,9 @@ def test_compute_data_profiles():
     assert profiles["algo"] == [0.0, 0.0, 0.5, 0.5, 0.5, 1.0]
 
 
-@pytest.mark.parametrize("use_abscissa_log_scale", [False, True])
+@pytest.mark.parametrize(
+    "use_abscissa_log_scale", [False, True], ids=["linear_scale", "log_scale"]
+)
 def test_plot_data_profiles(use_abscissa_log_scale, snapshot_matplotlib):
     """Check the data profiles figure."""
     data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})

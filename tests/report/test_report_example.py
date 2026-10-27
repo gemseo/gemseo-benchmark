@@ -40,7 +40,7 @@ EXAMPLE_PATH = Path(__file__).parents[2] / "docs" / "examples" / "all" / "report
     not HAS_WEASYPRINT,
     reason="WeasyPrint or its system libraries are not installed.",
 )
-def test_report_example(tmp_path):
+def test_report_example(tmp_wd):
     """Check that the example generating the benchmarking report runs end-to-end.
 
     mkdocs-gallery does not execute this example
@@ -50,10 +50,10 @@ def test_report_example(tmp_path):
     """
     # The report is built by the properdocs executable of the environment of the tests.
     path = os.pathsep.join((str(Path(sys.executable).parent), os.environ["PATH"]))
+    # The subprocess inherits the temporary working directory set by tmp_wd.
     subprocess.run(
         [sys.executable, str(EXAMPLE_PATH)],
         check=True,
-        cwd=tmp_path,
         env={**os.environ, "PATH": path},
     )
-    assert (tmp_path / "report" / "_build" / "benchmarking_report.pdf").is_file()
+    assert (tmp_wd / "report" / "_build" / "benchmarking_report.pdf").is_file()

@@ -1,7 +1,7 @@
 # serializer version: 1
-# name: test_from_file_earlier_version
+# name: test_from_file_invalid_algorithm_configuration[earlier_version]
   "The performance history file history.json cannot be read: The algorithm configuration misses the keys 'algorithm_settings_class' and 'algorithm_settings'; it was probably written by an earlier version of gemseo-benchmark and must be computed again."
 # ---
-# name: test_from_file_unknown_settings_class
+# name: test_from_file_invalid_algorithm_configuration[unknown_settings_class]
   "The performance history file history.json cannot be read: The class of the algorithm settings 'gemseo.algos.opt.mma.settings.mma_settings.MMASVanberg_Settings' cannot be imported; install the plugin providing the algorithm, or, if the results were written by an earlier version of gemseo-benchmark, compute them again."
 # ---

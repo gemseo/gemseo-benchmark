@@ -125,6 +125,12 @@ def five_performance_histories() -> PerformanceHistories:
         (False, -1, True),
         (True, -1, True),
     ],
+    ids=[
+        "best_histories,extremum=-6,maximize",
+        "all_histories,extremum=-6,maximize",
+        "best_histories,extremum=-1,minimize",
+        "all_histories,extremum=-1,minimize",
+    ],
 )
 def test_plot_performance_measure_distribution(
     five_performance_histories,
