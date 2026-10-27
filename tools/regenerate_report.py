@@ -24,17 +24,22 @@ from __future__ import annotations
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).parents[1]
-EXAMPLE_DIRECTORY = ROOT / "docs" / "examples" / "all"
-BUILD_DIRECTORY = EXAMPLE_DIRECTORY / "report" / "_build"
+EXAMPLE_PATH = ROOT / "docs" / "examples" / "all" / "report.py"
 REPORT_DIRECTORY = ROOT / "docs" / "report"
 
-subprocess.run([sys.executable, "report.py"], check=True, cwd=EXAMPLE_DIRECTORY)
-shutil.rmtree(REPORT_DIRECTORY / "html", ignore_errors=True)
-shutil.copytree(BUILD_DIRECTORY / "html", REPORT_DIRECTORY / "html")
-shutil.copy2(
-    BUILD_DIRECTORY / "benchmarking_report.pdf",
-    REPORT_DIRECTORY / "benchmarking_report.pdf",
-)
+# The example writes its outputs in the current working directory,
+# so it runs in a fresh directory to start from scratch
+# and to keep the source tree clean.
+with tempfile.TemporaryDirectory() as directory:
+    subprocess.run([sys.executable, str(EXAMPLE_PATH)], check=True, cwd=directory)
+    build_directory = Path(directory) / "report" / "_build"
+    shutil.rmtree(REPORT_DIRECTORY / "html", ignore_errors=True)
+    shutil.copytree(build_directory / "html", REPORT_DIRECTORY / "html")
+    shutil.copy2(
+        build_directory / "benchmarking_report.pdf",
+        REPORT_DIRECTORY / "benchmarking_report.pdf",
+    )

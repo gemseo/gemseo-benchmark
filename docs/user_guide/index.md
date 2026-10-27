@@ -173,7 +173,7 @@ rosenbrock_5d = OptimizationProblemConfiguration(
     "Rosenbrock 5D",
     create_problem,
     target_values=target_values,
-    **doe_settings,
+    doe_settings=doe_settings,
     optimum=0.0,
 )
 ```

@@ -22,9 +22,24 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
+try:
+    import weasyprint  # noqa: F401
+except (ImportError, OSError):
+    # WeasyPrint raises an OSError when its native libraries cannot be loaded.
+    HAS_WEASYPRINT = False
+else:
+    HAS_WEASYPRINT = True
+
 EXAMPLE_PATH = Path(__file__).parents[2] / "docs" / "examples" / "all" / "report.py"
 
 
+@pytest.mark.slow
+@pytest.mark.skipif(
+    not HAS_WEASYPRINT,
+    reason="WeasyPrint or its system libraries are not installed.",
+)
 def test_report_example(tmp_path):
     """Check that the example generating the benchmarking report runs end-to-end.
 

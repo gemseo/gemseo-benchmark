@@ -34,6 +34,7 @@ from gemseo.optimization import L_BFGS_B_Settings
 from gemseo.optimization import TNC_Settings
 from gemseo.problem.optimization.power_2 import Power2
 from gemseo.util.platform import platform_is_windows
+from gemseo.util.testing.helper import assert_exception
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.algorithms.algorithms_configurations import (
@@ -315,29 +316,49 @@ def test_problem_specific_algorithm_options(
         )
 
 
+def raise_index_error(problem_configuration, index):
+    """Raise an `IndexError` for the second problem.
+
+    Args:
+        problem_configuration: The problem configuration.
+        index: The 0-based index of the problem.
+
+    Returns:
+        The maximum number of iterations.
+
+    Raises:
+        IndexError: For the second problem.
+    """
+    if index == 1:
+        msg = "There is no value for the second problem."
+        raise IndexError(msg)
+
+    return 5
+
+
+@pytest.mark.parametrize(
+    "get_max_iter",
+    [lambda config, index: "x" if index == 1 else 5, raise_index_error],
+    ids=["invalid_value", "callable_error"],
+)
 @pytest.mark.parametrize("raise_errors", [False, True])
 def test_invalid_problem_specific_algorithm_option(
-    tmp_path, rosenbrock, raise_errors
+    tmp_path, rosenbrock, raise_errors, get_max_iter, snapshot
 ) -> None:
-    """Check that an invalid problem-specific option stops before any execution."""
+    """Check that an invalid problem-specific option stops before any execution.
+
+    The option is invalid when its value is invalid
+    or when the callable computing it raises an error.
+    """
     results_path = tmp_path / "results.json"
     algorithm_configuration = AlgorithmConfiguration(
         L_BFGS_B_Settings(),
         "L-BFGS-B",
-        instance_algorithm_options={
-            "max_iter": lambda config, index: "x" if index == 1 else 5
-        },
+        instance_algorithm_options={"max_iter": get_max_iter},
     )
     loggers = (logging.getLogger(Benchmarker.__module__), logging.getLogger("gemseo"))
     handlers = [list(logger.handlers) for logger in loggers]
-    with pytest.raises(
-        ValueError,
-        match=(
-            r"(?s)^The options of algorithm configuration L-BFGS-B "
-            rf"for problem 2 of problem configuration {rosenbrock.name} "
-            r"are invalid: .*max_iter"
-        ),
-    ):
+    with assert_exception(ValueError, snapshot):
         Benchmarker(tmp_path, results_path).execute(
             [rosenbrock],
             AlgorithmsConfigurations(algorithm_configuration),
