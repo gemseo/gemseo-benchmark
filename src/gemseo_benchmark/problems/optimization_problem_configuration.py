@@ -21,15 +21,14 @@
 
 from __future__ import annotations
 
+from itertools import islice
 from typing import TYPE_CHECKING
 from typing import ClassVar
 from typing import Final
 
 from gemseo import execute_algo
 
-from gemseo_benchmark.algorithms.algorithm_configuration import (
-    _get_instance_settings_error_messages,
-)
+from gemseo_benchmark.algorithms.algorithm_configuration import _get_instances_settings
 from gemseo_benchmark.benchmarker.optimization_worker import OptimizationWorker
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
 from gemseo_benchmark.problems.base_problem_configuration import (
@@ -184,31 +183,27 @@ class OptimizationProblemConfiguration(
         """
         # The settings of all the executions are computed before any of them,
         # so that all the mistakes are reported before any optimization.
-        configurations_settings = []
-        errors = []
-        for configuration in algorithm_configurations:
-            configuration_settings = []
-            for index in range(len(self.starting_points)):
-                try:
-                    configuration_settings.append(
-                        configuration.get_instance_settings(self, index)
-                    )
-                except ValueError as error:
-                    errors.append((
-                        configuration.name,
-                        self.name,
-                        index,
-                        error.__cause__,
-                    ))
-
-            configurations_settings.append(configuration_settings)
-
-        if errors:
-            raise ValueError("\n".join(_get_instance_settings_error_messages(errors)))
+        # The settings are ordered by algorithm configuration, then by instance.
+        # Each execution gets its own settings,
+        # as the algorithm can change its settings while running.
+        all_settings, messages = _get_instances_settings(
+            (
+                (configuration, self, index)
+                for configuration in algorithm_configurations
+                for index in range(len(self.starting_points))
+            ),
+            copy_settings_without_instance_options=True,
+        )
+        if messages:
+            raise ValueError("\n".join(messages))
 
         self.__targets_generator = TargetsGenerator()
-        for configuration_settings in configurations_settings:
+        settings_iterator = iter(all_settings)
+        for _ in algorithm_configurations:
             # Each algorithm configuration solves new instances of the problem.
+            configuration_settings = islice(
+                settings_iterator, len(self.starting_points)
+            )
             for settings, instance in zip(configuration_settings, self, strict=True):
                 execute_algo(instance, "opt", settings_model=settings)
                 history = PerformanceHistory.from_problem(instance)

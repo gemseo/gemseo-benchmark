@@ -43,6 +43,7 @@ from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfigu
 from gemseo_benchmark.algorithms.algorithm_configuration import (
     _get_instance_settings_error_messages,
 )
+from gemseo_benchmark.algorithms.algorithm_configuration import _get_instances_settings
 
 
 class Dummy_Settings(BaseSettings):  # ruff: ignore[invalid-class-name]
@@ -176,6 +177,20 @@ def test_from_dict_settings_class_not_a_string(settings_class, snapshot):
             "configuration_name": "MMA",
             "algorithm_settings_class": settings_class,
             "algorithm_settings": {},
+        })
+
+
+@pytest.mark.parametrize("settings", [None, ["max_iter", 9]], ids=["null", "list"])
+def test_from_dict_settings_not_a_mapping(settings, snapshot):
+    """Check the import of an algorithm configuration with malformed settings.
+
+    This is the case of a JSON file whose algorithm settings are not an object.
+    """
+    with assert_exception(ValueError, snapshot):
+        AlgorithmConfiguration.from_dict({
+            "configuration_name": "SLSQP",
+            "algorithm_settings_class": "gemseo.optimization.SLSQP_Settings",
+            "algorithm_settings": settings,
         })
 
 
@@ -453,11 +468,35 @@ def test_get_instance_settings_options_checked_together(names):
     [
         (
             [("A", "P", 1, ValueError("Wrong."))],
-            ["for problem 2 of problem configuration P are invalid: Wrong."],
+            [
+                (
+                    "The options of algorithm configuration A "
+                    "for problem 2 of problem configuration P are invalid: Wrong."
+                )
+            ],
         ),
         (
             [("A", "P", index, ValueError("Wrong.")) for index in range(3)],
-            ["for problems 1, 2 and 3 of problem configuration P are invalid: Wrong."],
+            [
+                (
+                    "The options of algorithm configuration A "
+                    "for problems 1, 2 and 3 of problem configuration P "
+                    "are invalid: Wrong."
+                )
+            ],
+        ),
+        (
+            [
+                ("A", "P", 0, ValueError("Wrong.")),
+                ("A", "Q", 1, ValueError("Wrong.")),
+            ],
+            [
+                (
+                    "The options of algorithm configuration A "
+                    "for problem 1 of problem configuration P "
+                    "and problem 2 of problem configuration Q are invalid: Wrong."
+                )
+            ],
         ),
         (
             [
@@ -468,8 +507,9 @@ def test_get_instance_settings_options_checked_together(names):
             ],
             [
                 (
+                    "The options of algorithm configuration A "
                     "for problem 1 of problem configuration P, "
-                    "problems 1 and 2 of problem configuration Q, "
+                    "problems 1 and 2 of problem configuration Q "
                     "and problem 3 of problem configuration R are invalid: Wrong."
                 )
             ],
@@ -481,40 +521,166 @@ def test_get_instance_settings_options_checked_together(names):
                 ("A", "P", 2, ValueError("Wrong.")),
             ],
             [
-                "for problems 1 and 3 of problem configuration P are invalid: Wrong.",
-                "for problem 2 of problem configuration P are invalid: Other.",
+                (
+                    "The options of algorithm configuration A "
+                    "for problems 1 and 3 of problem configuration P "
+                    "are invalid: Wrong."
+                ),
+                (
+                    "The options of algorithm configuration A "
+                    "for problem 2 of problem configuration P are invalid: Other."
+                ),
+            ],
+        ),
+        (
+            [
+                ("A", "P", 0, ValueError("Wrong.")),
+                ("B", "P", 0, ValueError("Wrong.")),
+            ],
+            [
+                (
+                    "The options of algorithm configuration A "
+                    "for problem 1 of problem configuration P are invalid: Wrong."
+                ),
+                (
+                    "The options of algorithm configuration B "
+                    "for problem 1 of problem configuration P are invalid: Wrong."
+                ),
             ],
         ),
     ],
     ids=[
         "one_instance",
         "same_error_one_problem_configuration",
-        "same_error_several_problem_configurations",
+        "same_error_two_problem_configurations",
+        "same_error_three_problem_configurations",
         "different_errors",
+        "same_error_several_algorithm_configurations",
     ],
 )
 def test_get_instance_settings_error_messages(errors, messages):
     """Check that the instances sharing an error are named in one message."""
-    assert _get_instance_settings_error_messages(errors) == [
-        f"The options of algorithm configuration A {message}" for message in messages
-    ]
+    assert _get_instance_settings_error_messages(errors) == messages
 
 
-def test_get_instance_settings_error_messages_configurations():
-    """Check that the same error for two algorithm configurations gives two messages."""
-    assert _get_instance_settings_error_messages([
-        ("A", "P", 0, ValueError("Wrong.")),
-        ("B", "P", 0, ValueError("Wrong.")),
-    ]) == [
-        (
-            "The options of algorithm configuration A "
-            "for problem 1 of problem configuration P are invalid: Wrong."
-        ),
-        (
-            "The options of algorithm configuration B "
-            "for problem 1 of problem configuration P are invalid: Wrong."
-        ),
-    ]
+def test_get_instance_settings_without_instance_options():
+    """Check that the settings are not validated again without instance options."""
+    settings = SLSQP_Settings(max_iter=9)
+    algorithm_configuration = AlgorithmConfiguration(settings)
+    with mock.patch.object(
+        SLSQP_Settings, "model_validate", wraps=SLSQP_Settings.model_validate
+    ) as model_validate:
+        instance_settings = algorithm_configuration.get_instance_settings(
+            mock.Mock(), 0
+        )
+
+    model_validate.assert_not_called()
+    assert instance_settings is not settings
+    assert instance_settings == settings
+    assert instance_settings.model_fields_set == {"max_iter"}
+
+
+def test_get_instances_settings():
+    """Check the settings of algorithms for instances of problems.
+
+    The executions whose settings are invalid have no settings,
+    and the errors are grouped in the order of their first occurrence.
+    """
+    valid_configuration = AlgorithmConfiguration(SLSQP_Settings(max_iter=9), "A")
+    invalid_configuration = AlgorithmConfiguration(
+        SLSQP_Settings(),
+        "B",
+        instance_algorithm_options={"max_iter": lambda problem, index: "five"},
+    )
+    problem_configuration = mock.Mock()
+    problem_configuration.name = "P"
+    settings, messages = _get_instances_settings(
+        [
+            (invalid_configuration, problem_configuration, 0),
+            (valid_configuration, problem_configuration, 0),
+            (invalid_configuration, problem_configuration, 1),
+        ],
+        copy_settings_without_instance_options=True,
+    )
+    assert settings[0] is None
+    assert settings[1].max_iter == 9
+    assert settings[2] is None
+    assert len(messages) == 1
+    assert messages[0].startswith(
+        "The options of algorithm configuration B "
+        "for problems 1 and 2 of problem configuration P are invalid: "
+    )
+
+
+@pytest.mark.parametrize(
+    ("copy_settings", "with_instance_options", "shared"),
+    [
+        (False, False, True),
+        (True, False, False),
+        (False, True, False),
+        (True, True, False),
+    ],
+    ids=[
+        "no_copy_without_instance_options",
+        "copy_without_instance_options",
+        "no_copy_with_instance_options",
+        "copy_with_instance_options",
+    ],
+)
+def test_get_instances_settings_copy(copy_settings, with_instance_options, shared):
+    """Check when the executions share the settings of the algorithm configuration.
+
+    Only an algorithm configuration without options specific to the instances
+    shares its settings, and only when they are not to be copied.
+    """
+    algorithm_settings = SLSQP_Settings(max_iter=9)
+    instance_algorithm_options = (
+        {"max_iter": lambda problem, index: index + 5} if with_instance_options else {}
+    )
+    algorithm_configuration = AlgorithmConfiguration(
+        algorithm_settings, instance_algorithm_options=instance_algorithm_options
+    )
+    problem_configuration = mock.Mock()
+    problem_configuration.name = "P"
+    with mock.patch.object(
+        SLSQP_Settings, "model_validate", wraps=SLSQP_Settings.model_validate
+    ) as model_validate:
+        settings, messages = _get_instances_settings(
+            [
+                (algorithm_configuration, problem_configuration, 0),
+                (algorithm_configuration, problem_configuration, 1),
+            ],
+            copy_settings_without_instance_options=copy_settings,
+        )
+
+    assert not messages
+    assert (settings[0] is algorithm_settings) is shared
+    assert (settings[1] is algorithm_settings) is shared
+    assert (settings[0] is settings[1]) is shared
+    assert model_validate.called is with_instance_options
+
+
+def test_get_instances_settings_error_without_cause():
+    """Check the message of an error raised without a cause."""
+    algorithm_configuration = mock.Mock(
+        get_instance_settings=mock.Mock(side_effect=ValueError("Wrong.")),
+        instance_algorithm_options={"max_iter": mock.Mock()},
+    )
+    algorithm_configuration.name = "A"
+    problem_configuration = mock.Mock()
+    problem_configuration.name = "P"
+    assert _get_instances_settings(
+        [(algorithm_configuration, problem_configuration, 0)],
+        copy_settings_without_instance_options=True,
+    ) == (
+        [None],
+        [
+            (
+                "The options of algorithm configuration A "
+                "for problem 1 of problem configuration P are invalid: Wrong."
+            )
+        ],
+    )
 
 
 def test_copy(algorithm_configuration):

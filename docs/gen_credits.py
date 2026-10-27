@@ -39,11 +39,10 @@ project = pyproject["project"]
 project_name = project["name"]
 devdeps = [
     dep
-    for group_name, group in pyproject["dependency-groups"].items()
-    # The dev group includes other groups.
-    if group_name != "dev"
+    for group in pyproject["dependency-groups"].values()
     for dep in group
-    if not dep.startswith("-e")
+    # The tables including other groups are skipped.
+    if isinstance(dep, str) and not dep.startswith("-e")
 ]
 
 PackageMetadata = dict[str, str | Iterable[str]]

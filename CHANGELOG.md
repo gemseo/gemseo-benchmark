@@ -59,11 +59,12 @@ and this project adheres to
   the `ValueError` listing the unavailable and unsuited algorithms
   also lists the instances whose options are invalid
   or whose callables computing the options raised an error,
-  with one line per algorithm configuration and error.
+  with one message per algorithm configuration and error.
 - `AlgorithmConfiguration.from_dict` and `PerformanceHistory.from_file`
   can no longer read the algorithm configurations and the performance histories
-  saved with an earlier version
-  or whose algorithm settings class cannot be imported;
+  saved with an earlier version,
+  whose algorithm settings class cannot be imported
+  or whose algorithm settings are not a mapping;
   they raise a `ValueError` that says to compute these results again,
   or to install the plugin providing the algorithm
   when the algorithm settings class cannot be imported.

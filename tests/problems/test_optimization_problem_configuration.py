@@ -330,6 +330,22 @@ def test_compute_target_values_independent_settings(execute_algo) -> None:
     assert settings.model_dump(exclude_unset=True) == {"max_iter": 10}
 
 
+def test_compute_target_values_without_instance_options(execute_algo) -> None:
+    """Check that the settings are not validated again without instance options."""
+    settings = SLSQP_Settings(max_iter=3)
+    configurations = AlgorithmsConfigurations(AlgorithmConfiguration(settings))
+    problem = OptimizationProblemConfiguration("Rosenbrock", Rosenbrock)
+    with mock.patch.object(
+        SLSQP_Settings, "model_validate", wraps=SLSQP_Settings.model_validate
+    ) as model_validate:
+        problem.compute_target_values(1, configurations)
+
+    model_validate.assert_not_called()
+    used_settings = execute_algo.call_args.kwargs["settings_model"]
+    assert used_settings is not settings
+    assert used_settings.max_iter == 3
+
+
 def test_compute_target_values_invalid_instance_option(execute_algo, snapshot) -> None:
     """Check the error raised by invalid options specific to the instances.
 

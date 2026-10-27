@@ -31,6 +31,7 @@ from unittest import mock
 
 import pytest
 from gemseo.optimization import L_BFGS_B_Settings
+from gemseo.optimization import NLOPT_COBYLA_Settings
 from gemseo.optimization import TNC_Settings
 from gemseo.problem.optimization.power_2 import Power2
 from gemseo.util.platform import platform_is_windows
@@ -40,6 +41,7 @@ from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfigu
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
+from gemseo_benchmark.benchmarker import benchmarker
 from gemseo_benchmark.benchmarker.benchmarker import Benchmarker
 from gemseo_benchmark.benchmarker.benchmarking_error import BenchmarkingError
 from gemseo_benchmark.problems.mda_problem_configuration import MDAProblemConfiguration
@@ -285,6 +287,31 @@ def test_execution(
     path = histories_dir / f"{algo_config.name}.2.json"
     assert path.is_file()
     assert results.contains(algo_config.algorithm_name, pb_config.name, path)
+
+
+def test_execution_shared_settings(tmp_path, rosenbrock) -> None:
+    """Check the settings of an algorithm configuration without instance options.
+
+    The planned executions share the user's settings, without copying them,
+    as the worker copies them before running the algorithm,
+    so that the user's settings are left unchanged:
+    NLOPT_COBYLA sets its option `stop_crit_n_x` from the dimension of the problem.
+    """
+    settings = NLOPT_COBYLA_Settings(max_iter=3)
+    stop_crit_n_x = settings.stop_crit_n_x
+    with mock.patch.object(
+        benchmarker, "AlgorithmConfiguration", wraps=AlgorithmConfiguration
+    ) as planned_configuration:
+        Benchmarker(tmp_path).execute(
+            [rosenbrock], AlgorithmsConfigurations(AlgorithmConfiguration(settings))
+        )
+
+    assert planned_configuration.call_count == len(rosenbrock.starting_points)
+    for call in planned_configuration.call_args_list:
+        assert call.args[0] is settings
+
+    assert settings.model_dump(exclude_unset=True) == {"max_iter": 3}
+    assert settings.stop_crit_n_x == stop_crit_n_x
 
 
 @pytest.mark.parametrize(

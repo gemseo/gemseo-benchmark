@@ -32,9 +32,7 @@ from gemseo import logger as gemseo_logger
 
 from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
-from gemseo_benchmark.algorithms.algorithm_configuration import (
-    _get_instance_settings_error_messages,
-)
+from gemseo_benchmark.algorithms.algorithm_configuration import _get_instances_settings
 from gemseo_benchmark.benchmarker.benchmarking_error import BenchmarkingError
 from gemseo_benchmark.results.results import Results
 
@@ -272,10 +270,10 @@ class Benchmarker:
                 or if an option specific to a problem
                 is not an option of the algorithm or has an invalid value.
         """
-        executions = []
+        # The executions to submit, without their settings,
+        # as tuples (algorithm configuration, problem configuration, index, info).
+        planned_executions = []
         skipped_executions = []
-        # The errors raised when computing the settings of the instances.
-        settings_errors = []
         # The names of the algorithms to execute on each problem configuration,
         # in the order of the problem configurations.
         algorithm_names: list[dict[str, None]] = [{} for _ in problem_configurations]
@@ -298,40 +296,40 @@ class Benchmarker:
                     algorithm_names[problem_index][
                         algorithm_configuration.algorithm_name
                     ] = None
-                    if algorithm_configuration.instance_algorithm_options:
-                        try:
-                            settings = algorithm_configuration.get_instance_settings(
-                                problem_configuration, index
-                            )
-                        except ValueError as error:
-                            settings_errors.append((
-                                algorithm_configuration.name,
-                                problem_configuration.name,
-                                index,
-                                error.__cause__,
-                            ))
-                            continue
-                    else:
-                        # The worker copies the settings before running the algorithm,
-                        # so that the executions can share the user's settings.
-                        settings = algorithm_configuration.algorithm_settings
+                    planned_executions.append((
+                        algorithm_configuration,
+                        problem_configuration,
+                        index,
+                        execution_info,
+                    ))
 
-                    # The options specific to the problems are not passed,
-                    # as they are already applied and may not be picklable.
-                    executions.append(
-                        _Execution(
-                            AlgorithmConfiguration(
-                                settings, algorithm_configuration.name, {}
-                            ),
-                            problem_configuration,
-                            index,
-                            f"Solving {execution_info}.",
-                        )
-                    )
-
+        # The worker copies the settings before running the algorithm,
+        # so that the executions can share the settings
+        # of an algorithm configuration without options specific to the instances.
+        all_settings, settings_messages = _get_instances_settings(
+            (execution[:3] for execution in planned_executions),
+            copy_settings_without_instance_options=False,
+        )
+        # The options specific to the problems are not passed,
+        # as they are already applied and may not be picklable.
+        executions = [
+            _Execution(
+                AlgorithmConfiguration(settings, algorithm_configuration.name, {}),
+                problem_configuration,
+                index,
+                f"Solving {execution_info}.",
+            )
+            for settings, (
+                algorithm_configuration,
+                problem_configuration,
+                index,
+                execution_info,
+            ) in zip(all_settings, planned_executions, strict=True)
+            if settings is not None
+        ]
         messages = [
             *self.__check_algorithms(problem_configurations, algorithm_names),
-            *_get_instance_settings_error_messages(settings_errors),
+            *settings_messages,
         ]
         if messages:
             raise ValueError("\n".join(messages))

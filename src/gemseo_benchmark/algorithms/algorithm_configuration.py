@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import importlib
 from collections.abc import Callable
+from collections.abc import Mapping
 from collections.abc import MutableMapping
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -34,7 +35,7 @@ from gemseo.util.string import pretty_repr
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
-    from collections.abc import Mapping
+    from collections.abc import Sequence
 
     from gemseo.util.pydantic import BaseSettings
 
@@ -51,6 +52,64 @@ The mapping links the name of an algorithm option to a callable
 that takes the problem configuration and the 0-based index of the instance
 and returns the value of the option.
 """
+
+
+def _get_instances_settings(
+    executions: Iterable[tuple[AlgorithmConfiguration, BaseProblemConfiguration, int]],
+    *,
+    copy_settings_without_instance_options: bool,
+) -> tuple[list[BaseSettings | None], list[str]]:
+    """Return the settings of algorithms for instances of problems.
+
+    The settings of all the executions are computed
+    before reporting any error,
+    so that all the mistakes can be reported together.
+
+    Args:
+        executions: The executions,
+            as tuples of the form
+            `(algorithm configuration, problem configuration,
+            0-based index of the instance)`.
+        copy_settings_without_instance_options: Whether an algorithm configuration
+            without options specific to the instances
+            gets a new copy of its settings for each execution.
+            Otherwise, its executions share its settings,
+            which must then be copied before running the algorithm,
+            as the algorithm can change its settings while running.
+
+    Returns:
+        The settings of the algorithms, one per execution and in the same order,
+        `None` for an execution whose settings are invalid,
+        and the messages of the errors,
+        one per algorithm configuration and error,
+        in the order of the first occurrence of each error.
+    """
+    settings = []
+    errors = []
+    for algorithm_configuration, problem_configuration, index in executions:
+        if (
+            not copy_settings_without_instance_options
+            and not algorithm_configuration.instance_algorithm_options
+        ):
+            settings.append(algorithm_configuration.algorithm_settings)
+            continue
+
+        try:
+            settings.append(
+                algorithm_configuration.get_instance_settings(
+                    problem_configuration, index
+                )
+            )
+        except ValueError as error:
+            settings.append(None)
+            errors.append((
+                algorithm_configuration.name,
+                problem_configuration.name,
+                index,
+                error.__cause__ or error,
+            ))
+
+    return settings, _get_instance_settings_error_messages(errors)
 
 
 def _get_instance_settings_error_messages(
@@ -87,7 +146,7 @@ def _get_instance_settings_error_messages(
     ]
 
 
-def _describe_instances(instances: Mapping[str, list[int]]) -> str:
+def _describe_instances(instances: Mapping[str, Sequence[int]]) -> str:
     """Describe instances of problems.
 
     Args:
@@ -106,7 +165,7 @@ def _describe_instances(instances: Mapping[str, list[int]]) -> str:
     if len(descriptions) == 1:
         return descriptions[0]
 
-    return f"{', '.join(descriptions[:-1])}, and {descriptions[-1]}"
+    return f"{', '.join(descriptions[:-1])} and {descriptions[-1]}"
 
 
 class AlgorithmConfiguration:
@@ -207,7 +266,8 @@ class AlgorithmConfiguration:
             A new copy of the settings of the algorithm,
             nested settings included,
             updated with the options specific to the instance of the problem.
-            All the explicitly-set options are validated together,
+            Without such options, the settings are not validated again.
+            Otherwise, all the explicitly-set options are validated together,
             as when creating the settings,
             so that the validators of the settings see the final options;
             the options not specific to the instance keep their values,
@@ -224,6 +284,9 @@ class AlgorithmConfiguration:
         # The algorithm can change its settings while running,
         # so that each execution needs its own settings.
         settings = self.__algorithm_settings.model_copy(deep=True)
+        if not self.__instance_algorithm_options:
+            return settings
+
         options = {name: getattr(settings, name) for name in settings.model_fields_set}
         try:
             instance_options = {
@@ -317,7 +380,8 @@ class AlgorithmConfiguration:
                 if the class of the algorithm settings is not a string
                 or if it cannot be imported,
                 e.g. because the plugin providing the algorithm is not installed
-                or because it was written by an earlier version of gemseo-benchmark.
+                or because it was written by an earlier version of gemseo-benchmark,
+                or if the algorithm settings are not a mapping.
         """
         missing_keys = [
             key
@@ -361,7 +425,19 @@ class AlgorithmConfiguration:
             )
             raise ValueError(msg) from error
 
-        settings = settings_class(**algorithm_configuration[cls.__ALGORITHM_SETTINGS])
+        options = algorithm_configuration[cls.__ALGORITHM_SETTINGS]
+        if not isinstance(options, Mapping):
+            msg = (
+                f"The algorithm settings {options!r} are not a mapping "
+                "from the names of the options to their values; "
+                "if the results were written by an earlier version "
+                "of gemseo-benchmark, compute them again."
+            )
+            # A ValueError, like the other errors of a malformed configuration,
+            # so that the readers of the files can name the file.
+            raise ValueError(msg)  # ruff: ignore[type-check-without-type-error]
+
+        settings = settings_class(**options)
         return cls(
             settings,
             algorithm_configuration[cls.__CONFIGURATION_NAME],
