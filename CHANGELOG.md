@@ -39,8 +39,6 @@ and this project adheres to
 ### Changed
 
 - The plugin is compatible with GEMSEO 7 and no longer with GEMSEO 6.
-  Until GEMSEO 7 is released,
-  it uses the `develop` branch of GEMSEO.
 - The minimum Python version is 3.11.
 - The names of the algorithms are those of GEMSEO 7,
   e.g. `L_BFGS_B` instead of `L-BFGS-B`;

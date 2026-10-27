@@ -22,7 +22,7 @@ classifiers = [
 dynamic = ["version"]
 requires-python = ">=3.11, <3.15"
 dependencies = [
-    "gemseo[all]",
+    "gemseo[all] >=7.0.0rc0,<8",
     "matplotlib",
     "properdocs >=1.6,<2",
     "mkdocs-material >=9.7,<10",
@@ -99,6 +99,3 @@ cache-keys = [
 # The baseline images of the tests were made with matplotlib 3.10;
 # 3.11 renders them differently.
 constraint-dependencies = ["matplotlib <3.11"]
-
-[tool.uv.sources]
-gemseo = { git = "https://gitlab.com/gemseo/dev/gemseo.git", branch = "develop" }
