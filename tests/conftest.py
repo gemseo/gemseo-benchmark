@@ -278,8 +278,10 @@ def algorithm_configuration() -> mock.Mock:
     }
     algo_config.name = "SLSQP"
     algo_config.instance_algorithm_options = {}
+    settings = algo_config.algorithm_settings
+    # Each call returns new settings, like the real method.
     algo_config.get_instance_settings = mock.Mock(
-        return_value=algo_config.algorithm_settings
+        side_effect=lambda *args, **kwargs: settings.model_copy(deep=True)
     )
     algo_config._get_instance_settings = algo_config.get_instance_settings
     algo_config.to_dict = mock.Mock(
