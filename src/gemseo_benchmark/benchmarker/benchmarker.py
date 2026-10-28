@@ -251,6 +251,10 @@ class Benchmarker:
         The algorithms and their settings are checked before any execution,
         so that a mistake in the last algorithm configuration
         does not come after the execution of the other ones.
+        The algorithms are checked first,
+        and the settings are built only for the available algorithms,
+        so that the options specific to the problems
+        are not computed for an algorithm that cannot be executed.
 
         Args:
             problem_configurations: The problem configurations.
@@ -271,7 +275,8 @@ class Benchmarker:
                 is not an option of the algorithm or has an invalid value.
         """
         # The executions to submit, without their settings,
-        # as tuples (algorithm configuration, problem configuration, index, info).
+        # as tuples (algorithm configuration, problem configuration, index, info,
+        # index of the problem configuration).
         planned_executions = []
         skipped_executions = []
         # The names of the algorithms to execute on each problem configuration,
@@ -301,8 +306,21 @@ class Benchmarker:
                         problem_configuration,
                         index,
                         execution_info,
+                        problem_index,
                     ))
 
+        algorithm_messages, unavailable_names = self.__check_algorithms(
+            problem_configurations, algorithm_names
+        )
+        # The suitability check tells only which problem configuration
+        # some algorithms are not suited to, not which algorithms,
+        # so the settings of the unsuited algorithms are still built;
+        # unlike an unavailable algorithm, their options can be checked.
+        planned_executions = [
+            execution
+            for execution in planned_executions
+            if execution[0].algorithm_name not in unavailable_names[execution[4]]
+        ]
         # The worker copies the settings before running the algorithm,
         # so that the executions can share the settings
         # of an algorithm configuration without options specific to the instances.
@@ -324,13 +342,11 @@ class Benchmarker:
                 problem_configuration,
                 index,
                 execution_info,
+                _,
             ) in zip(all_settings, planned_executions, strict=True)
             if settings is not None
         ]
-        messages = [
-            *self.__check_algorithms(problem_configurations, algorithm_names),
-            *settings_messages,
-        ]
+        messages = [*algorithm_messages, *settings_messages]
         if messages:
             raise ValueError("\n".join(messages))
 
@@ -340,7 +356,7 @@ class Benchmarker:
     def __check_algorithms(
         problem_configurations: Sequence[BaseProblemConfiguration],
         algorithm_names: Sequence[Iterable[str]],
-    ) -> list[str]:
+    ) -> tuple[list[str], list[set[str]]]:
         """Check the algorithms for the problem configurations to be solved.
 
         Args:
@@ -352,20 +368,27 @@ class Benchmarker:
         Returns:
             The messages of the errors, without duplicates,
             for the algorithms that are not available
-            or not suited to a problem configuration.
+            or not suited to a problem configuration,
+            and the names of the algorithms that are not available
+            for each problem configuration,
+            in the order of the problem configurations.
         """
         messages = {}
+        all_unavailable_names = []
         for problem_configuration, names in zip(
             problem_configurations, algorithm_names, strict=True
         ):
             worker = problem_configuration.worker
             available_names = []
+            unavailable_names = set()
+            all_unavailable_names.append(unavailable_names)
             for algorithm_name in names:
                 message = Benchmarker.__get_error_message(
                     worker.check_algorithm_availability, algorithm_name
                 )
                 if message:
                     messages[message] = None
+                    unavailable_names.add(algorithm_name)
                 else:
                     available_names.append(algorithm_name)
 
@@ -378,7 +401,7 @@ class Benchmarker:
                 if message:
                     messages[message] = None
 
-        return list(messages)
+        return list(messages), all_unavailable_names
 
     @staticmethod
     def __get_error_message(check: Callable[..., None], *args: Any) -> str:

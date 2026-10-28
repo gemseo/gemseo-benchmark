@@ -59,7 +59,8 @@ and this project adheres to
   the `ValueError` listing the unavailable and unsuited algorithms
   also lists the instances whose options are invalid
   or whose callables computing the options raised an error,
-  with one message per algorithm configuration and error.
+  with one message per algorithm configuration and error;
+  the options of an unavailable algorithm are not computed.
 - `AlgorithmConfiguration.from_dict` and `PerformanceHistory.from_file`
   can no longer read the algorithm configurations and the performance histories
   saved with an earlier version,

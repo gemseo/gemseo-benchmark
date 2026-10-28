@@ -829,6 +829,32 @@ def test_unavailable_algorithm_and_invalid_option_reported(
     assert not list(tmp_wd.rglob("*.json"))
 
 
+class Unknown_Settings(L_BFGS_B_Settings):  # ruff: ignore[invalid-class-name]
+    """The settings of an algorithm unknown to GEMSEO."""
+
+
+def test_unavailable_algorithm_instance_options_not_computed(
+    tmp_wd, rosenbrock
+) -> None:
+    """Check that the options of an unavailable algorithm are not computed."""
+    get_max_iter = mock.Mock(return_value=3)
+    with pytest.raises(
+        ValueError, match=re.escape("The algorithm 'Unknown' is not available.")
+    ):
+        Benchmarker(tmp_wd).execute(
+            [rosenbrock],
+            AlgorithmsConfigurations(
+                AlgorithmConfiguration(
+                    Unknown_Settings(),
+                    "Unknown",
+                    instance_algorithm_options={"max_iter": get_max_iter},
+                )
+            ),
+        )
+
+    get_max_iter.assert_not_called()
+
+
 @pytest.mark.parametrize(
     ("settings", "message"),
     [
