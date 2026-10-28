@@ -658,14 +658,17 @@ def test_get_instances_settings_copy(copy_settings, with_instance_options, share
     assert model_validate.called is with_instance_options
 
 
-def test_get_instances_settings_error_without_cause():
-    """Check the message of an error raised without a cause."""
-    algorithm_configuration = mock.Mock(
-        get_instance_settings=mock.Mock(side_effect=ValueError("Wrong.")),
-        instance_algorithm_options={"max_iter": mock.Mock()},
+def test_get_instances_settings_any_error():
+    """Check the message of an error that is not a ValueError.
+
+    The message of the error is used as it is.
+    """
+    algorithm_configuration = AlgorithmConfiguration(
+        SLSQP_Settings(),
+        "A",
+        instance_algorithm_options={"max_iter": raise_index_error},
     )
-    algorithm_configuration.name = "A"
-    problem_configuration = mock.Mock()
+    problem_configuration = mock.Mock(spec=BaseProblemConfiguration)
     problem_configuration.name = "P"
     assert _get_instances_settings(
         [(algorithm_configuration, problem_configuration, 0)],
@@ -675,7 +678,8 @@ def test_get_instances_settings_error_without_cause():
         [
             (
                 "The options of algorithm configuration A "
-                "for problem 1 of problem configuration P are invalid: Wrong."
+                "for problem 1 of problem configuration P are invalid: "
+                "There is no value for this problem."
             )
         ],
     )

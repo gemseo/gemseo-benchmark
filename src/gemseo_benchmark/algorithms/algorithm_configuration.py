@@ -96,17 +96,20 @@ def _get_instances_settings(
 
         try:
             settings.append(
-                algorithm_configuration.get_instance_settings(
+                algorithm_configuration._get_instance_settings(
                     problem_configuration, index
                 )
             )
-        except ValueError as error:
+        except Exception as error:  # ruff: ignore[blind-except]
+            # Any error is reported,
+            # as a callable defining an option specific to the problems
+            # or a validator of the settings can raise any exception.
             settings.append(None)
             errors.append((
                 algorithm_configuration.name,
                 problem_configuration.name,
                 index,
-                error.__cause__ or error,
+                error,
             ))
 
     return settings, _get_instance_settings_error_messages(errors)
@@ -281,25 +284,8 @@ class AlgorithmConfiguration:
                 the message names the algorithm configuration
                 and the instance of the problem.
         """
-        # The algorithm can change its settings while running,
-        # so that each execution needs its own settings.
-        settings = self.__algorithm_settings.model_copy(deep=True)
-        if not self.__instance_algorithm_options:
-            return settings
-
-        options = {name: getattr(settings, name) for name in settings.model_fields_set}
         try:
-            instance_options = {
-                name: function(problem_configuration, index)
-                for name, function in self.__instance_algorithm_options.items()
-            }
-            # One validation of all the options,
-            # as when creating the settings,
-            # so that the validators of the settings see the final options.
-            instance_settings = type(settings).model_validate({
-                **options,
-                **instance_options,
-            })
+            return self._get_instance_settings(problem_configuration, index)
         except Exception as error:  # ruff: ignore[blind-except]
             # Any error is reported,
             # as a callable defining an option specific to the problems
@@ -309,6 +295,44 @@ class AlgorithmConfiguration:
             ])[0]
             raise ValueError(msg) from error
 
+    def _get_instance_settings(
+        self, problem_configuration: BaseProblemConfiguration, index: int
+    ) -> BaseSettings:
+        """Return the settings of the algorithm for an instance of a problem.
+
+        Args:
+            problem_configuration: The problem configuration.
+            index: The 0-based index of the instance of the problem.
+
+        Returns:
+            The settings of the algorithm for the instance of the problem,
+            as returned by `get_instance_settings`.
+
+        Raises:
+            Exception: Any error raised by a callable computing an option
+                specific to the instance
+                or by the validation of the settings,
+                without a message naming the algorithm configuration
+                and the instance of the problem.
+        """
+        # The algorithm can change its settings while running,
+        # so that each execution needs its own settings.
+        settings = self.__algorithm_settings.model_copy(deep=True)
+        if not self.__instance_algorithm_options:
+            return settings
+
+        options = {name: getattr(settings, name) for name in settings.model_fields_set}
+        instance_options = {
+            name: function(problem_configuration, index)
+            for name, function in self.__instance_algorithm_options.items()
+        }
+        # One validation of all the options,
+        # as when creating the settings,
+        # so that the validators of the settings see the final options.
+        instance_settings = type(settings).model_validate({
+            **options,
+            **instance_options,
+        })
         # The other options keep the values validated when the settings were created,
         # even if validating them again changed them.
         return instance_settings.model_copy(

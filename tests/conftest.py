@@ -281,6 +281,7 @@ def algorithm_configuration() -> mock.Mock:
     algo_config.get_instance_settings = mock.Mock(
         return_value=algo_config.algorithm_settings
     )
+    algo_config._get_instance_settings = algo_config.get_instance_settings
     algo_config.to_dict = mock.Mock(
         return_value={
             "configuration_name": "SLSQP",
