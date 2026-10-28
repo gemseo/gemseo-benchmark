@@ -91,16 +91,29 @@ with tempfile.TemporaryDirectory() as directory:
                     old_html_directory.replace(report_html_directory)
             except OSError as rollback_error:
                 keep_staging_directory = True
+                if old_html_directory.exists():
+                    restore_note = (
+                        "It holds the old HTML directory in old_html "
+                        "and the new report in html and benchmarking_report.pdf, "
+                        "except the ones already moved to docs/report. "
+                        "To restore the old HTML report by hand, "
+                        f"remove {report_html_directory} if it exists "
+                        "and move old_html there."
+                    )
+                else:
+                    restore_note = (
+                        "It holds the new report in html and benchmarking_report.pdf, "
+                        "except the ones already moved to docs/report. "
+                        "There was no old HTML report, "
+                        "so to restore the old state by hand, "
+                        f"remove {report_html_directory} if it exists."
+                    )
+
                 rollback_error.add_note(
                     "The old report could not be restored, "
                     "so docs/report may be inconsistent. "
                     f"The staging directory {staging_directory} is kept. "
-                    "It holds the old HTML directory in old_html "
-                    "and the new report in html and benchmarking_report.pdf, "
-                    "except the ones already moved to docs/report. "
-                    "To restore the old HTML report by hand, "
-                    f"remove {report_html_directory} if it exists "
-                    "and move old_html there."
+                    f"{restore_note}"
                 )
                 raise
 
