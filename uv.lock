@@ -983,10 +983,10 @@ test = [
 requires-dist = [
     { name = "gemseo", extras = ["all"], specifier = ">=7.0.0rc0,<8" },
     { name = "matplotlib" },
-    { name = "mkdocs-material" },
-    { name = "mkdocs-to-pdf" },
+    { name = "mkdocs-material", specifier = ">=9.7,<10" },
+    { name = "mkdocs-to-pdf", specifier = ">=0.11,<1" },
     { name = "numpy" },
-    { name = "properdocs" },
+    { name = "properdocs", specifier = ">=1.6,<2" },
 ]
 
 [package.metadata.requires-dev]
@@ -1022,7 +1022,7 @@ doc = [
     { name = "mkdocs-include-markdown-plugin" },
     { name = "mkdocs-literate-nav" },
     { name = "mkdocs-macros-plugin" },
-    { name = "mkdocs-material" },
+    { name = "mkdocs-material", specifier = ">=9.7,<10" },
     { name = "mkdocs-minify-plugin" },
     { name = "mkdocs-section-index" },
     { name = "mkdocstrings", extras = ["python"] },
