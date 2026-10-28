@@ -306,6 +306,40 @@ def test_compute_target_values_instance_algorithm_options(execute_algo) -> None:
     ] == [2, 3]
 
 
+def test_compute_target_values_settings_per_instance(execute_algo) -> None:
+    """Check that each instance of each configuration gets its own settings."""
+    problem = OptimizationProblemConfiguration("Rosenbrock", Rosenbrock)
+    problem.starting_points = [array([0.0, 0.0]), array([0.5, 0.5])]
+    configurations = AlgorithmsConfigurations(
+        AlgorithmConfiguration(
+            SLSQP_Settings(),
+            "A",
+            instance_algorithm_options={"max_iter": lambda _, index: 10 + index},
+        ),
+        AlgorithmConfiguration(
+            SLSQP_Settings(),
+            "B",
+            instance_algorithm_options={"max_iter": lambda _, index: 20 + index},
+        ),
+    )
+    problem.compute_target_values(1, configurations)
+    calls = execute_algo.call_args_list
+    assert [call.kwargs["settings_model"].max_iter for call in calls] == [
+        10,
+        11,
+        20,
+        21,
+    ]
+    # The first point of the database of an instance is its starting point.
+    assert [call.args[0].database.get_x_vect(1).tolist() for call in calls] == [
+        [0.0, 0.0],
+        [0.5, 0.5],
+        [0.0, 0.0],
+        [0.5, 0.5],
+    ]
+    assert len({id(call.args[0]) for call in calls}) == 4
+
+
 def test_compute_target_values_independent_settings(execute_algo) -> None:
     """Check that each execution uses its own settings.
 
