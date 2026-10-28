@@ -56,9 +56,11 @@ with tempfile.TemporaryDirectory() as directory:
     # so that a failed copy leaves docs/report unchanged
     # and the old files are then replaced by renaming,
     # which is fast and does not leave a half-written file.
-    # docs/report is inconsistent only between the renamings of the HTML directory
-    # and of the PDF file;
-    # if renaming the new HTML directory fails, the old one is restored.
+    # If renaming the new HTML directory or the new PDF file fails,
+    # the old HTML directory is restored before the error is raised again,
+    # so docs/report keeps either the whole old report or the whole new one.
+    # docs/report is inconsistent only while these renamings run
+    # or if restoring the old HTML directory fails too.
     staging_directory = Path(tempfile.mkdtemp(dir=REPORT_DIRECTORY.parent))
     try:
         new_html_directory = staging_directory / "html"
@@ -78,7 +80,18 @@ with tempfile.TemporaryDirectory() as directory:
 
             raise
 
-        new_pdf_path.replace(REPORT_DIRECTORY / "benchmarking_report.pdf")
+        try:
+            new_pdf_path.replace(REPORT_DIRECTORY / "benchmarking_report.pdf")
+        except OSError:
+            # The new HTML directory is put aside in the staging directory
+            # so that the old one can take its place again.
+            report_html_directory.replace(new_html_directory)
+            if old_html_directory.exists():
+                old_html_directory.replace(report_html_directory)
+
+            raise
     finally:
-        # The old HTML directory is removed with the staging directory.
+        # The staging directory is removed with what it still holds:
+        # the old HTML directory after a success,
+        # the new report after a failure.
         shutil.rmtree(staging_directory, ignore_errors=True)
