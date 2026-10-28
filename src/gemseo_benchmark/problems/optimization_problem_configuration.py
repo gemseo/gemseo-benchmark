@@ -21,6 +21,7 @@
 
 from __future__ import annotations
 
+from itertools import islice
 from typing import TYPE_CHECKING
 from typing import ClassVar
 from typing import Final
@@ -199,11 +200,11 @@ class OptimizationProblemConfiguration(
             raise ValueError("\n".join(messages))
 
         self.__targets_generator = TargetsGenerator()
-        for configuration_index in range(len(configurations)):
-            start = configuration_index * instances_number
+        settings_iterator = iter(all_settings)
+        for _ in configurations:
             # Each algorithm configuration solves new instances of the problem.
             for instance, settings in zip(
-                self, all_settings[start : start + instances_number], strict=True
+                self, islice(settings_iterator, instances_number), strict=True
             ):
                 execute_algo(instance, "opt", settings_model=settings)
                 history = PerformanceHistory.from_problem(instance)

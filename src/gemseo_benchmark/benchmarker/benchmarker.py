@@ -39,6 +39,7 @@ from gemseo_benchmark.results.results import Results
 if TYPE_CHECKING:
     from collections.abc import Callable
     from collections.abc import Iterable
+    from collections.abc import Mapping
     from collections.abc import Sequence
     from concurrent.futures import Executor
     from concurrent.futures import Future
@@ -71,8 +72,28 @@ class _Execution(NamedTuple):
     index: int
     """The 0-based index of the problem."""
 
-    message: str
-    """The message to log when solving the problem."""
+    description: str
+    """The description of the execution, e.g. `"Solving problem 1 of ..."`.
+
+    It is logged, followed by a period, when solving the problem,
+    and it names the execution if it fails.
+    """
+
+
+class _PlannedExecution(NamedTuple):
+    """An execution of an algorithm configuration on a problem, without settings."""
+
+    algorithm_configuration: AlgorithmConfiguration
+    """The algorithm configuration."""
+
+    problem_configuration: BaseProblemConfiguration
+    """The problem configuration."""
+
+    index: int
+    """The 0-based index of the problem."""
+
+    info: str
+    """The description of the execution."""
 
 
 class Benchmarker:
@@ -193,7 +214,8 @@ class Benchmarker:
             for execution_info in skipped_executions:
                 gemseo_logger.info("Skipping %s.", execution_info)
 
-            future_to_path = {}
+            # The execution and the path to the performance history of each future.
+            future_to_submission: dict[Future, tuple[_Execution, Path]] = {}
             failures: dict[str, BaseException] = {}
             executor_class = (
                 ThreadPoolExecutor if use_threading else ProcessPoolExecutor
@@ -203,16 +225,20 @@ class Benchmarker:
                     future, path = self.__submit(
                         executor, execution, save_log, use_threading
                     )
-                    future_to_path[future] = path
+                    future_to_submission[future] = (execution, path)
 
             # All the futures are done, as the executor has been shut down.
             # They are read in the order of submission, for a reproducible error.
-            for future in future_to_path:
+            for future, (execution, path) in future_to_submission.items():
                 exception = future.exception()
                 if exception is None:
-                    self._results.add_path(*future_to_path[future][1:])
+                    self._results.add_path(
+                        execution.algorithm_configuration.name,
+                        execution.problem_configuration.name,
+                        path,
+                    )
                 else:
-                    description = future_to_path[future][0][:-1]
+                    description = execution.description
                     failures[description] = exception
                     LOGGER.error(
                         "%s raised: %s", description, exception, exc_info=exception
@@ -224,11 +250,11 @@ class Benchmarker:
 
                 file_handler.close()
 
-        if future_to_path and self.__results_path:
+        if future_to_submission and self.__results_path:
             self._results.to_file(self.__results_path, 4)
 
         if failures:
-            error = BenchmarkingError(failures, len(future_to_path))
+            error = BenchmarkingError(failures, len(future_to_submission))
             if raise_errors:
                 raise error from next(iter(failures.values()))
 
@@ -274,18 +300,17 @@ class Benchmarker:
                 or if an option specific to a problem
                 is not an option of the algorithm or has an invalid value.
         """
-        # The executions to submit, without their settings,
-        # as tuples (algorithm configuration, problem configuration, index, info,
-        # index of the problem configuration).
-        planned_executions = []
+        # The executions to submit, without their settings.
+        planned_executions: list[_PlannedExecution] = []
         skipped_executions = []
         # The names of the algorithms to execute on each problem configuration,
         # in the order of the problem configurations.
-        algorithm_names: list[dict[str, None]] = [{} for _ in problem_configurations]
+        algorithm_names: dict[BaseProblemConfiguration, dict[str, None]] = {
+            problem_configuration: {}
+            for problem_configuration in problem_configurations
+        }
         for algorithm_configuration in algorithm_configurations:
-            for problem_index, problem_configuration in enumerate(
-                problem_configurations
-            ):
+            for problem_configuration in problem_configurations:
                 for index in range(len(problem_configuration.starting_points)):
                     execution_info = (
                         f"problem {index + 1} "
@@ -298,20 +323,19 @@ class Benchmarker:
                         skipped_executions.append(execution_info)
                         continue
 
-                    algorithm_names[problem_index][
+                    algorithm_names[problem_configuration][
                         algorithm_configuration.algorithm_name
                     ] = None
-                    planned_executions.append((
-                        algorithm_configuration,
-                        problem_configuration,
-                        index,
-                        execution_info,
-                        problem_index,
-                    ))
+                    planned_executions.append(
+                        _PlannedExecution(
+                            algorithm_configuration,
+                            problem_configuration,
+                            index,
+                            execution_info,
+                        )
+                    )
 
-        algorithm_messages, unavailable_names = self.__check_algorithms(
-            problem_configurations, algorithm_names
-        )
+        algorithm_messages, unavailable_names = self.__check_algorithms(algorithm_names)
         # The suitability check tells only which problem configuration
         # some algorithms are not suited to, not which algorithms,
         # so the settings of the unsuited algorithms are still built;
@@ -319,13 +343,21 @@ class Benchmarker:
         planned_executions = [
             execution
             for execution in planned_executions
-            if execution[0].algorithm_name not in unavailable_names[execution[4]]
+            if execution.algorithm_configuration.algorithm_name
+            not in unavailable_names[execution.problem_configuration]
         ]
         # The worker copies the settings before running the algorithm,
         # so that the executions can share the settings
         # of an algorithm configuration without options specific to the instances.
         all_settings, settings_messages = _get_instances_settings(
-            (execution[:3] for execution in planned_executions),
+            (
+                (
+                    execution.algorithm_configuration,
+                    execution.problem_configuration,
+                    execution.index,
+                )
+                for execution in planned_executions
+            ),
             copy_settings_without_instance_options=False,
         )
         # The options specific to the problems are not passed,
@@ -335,14 +367,13 @@ class Benchmarker:
                 AlgorithmConfiguration(settings, algorithm_configuration.name, {}),
                 problem_configuration,
                 index,
-                f"Solving {execution_info}.",
+                f"Solving {execution_info}",
             )
             for settings, (
                 algorithm_configuration,
                 problem_configuration,
                 index,
                 execution_info,
-                _,
             ) in zip(all_settings, planned_executions, strict=True)
             if settings is not None
         ]
@@ -354,13 +385,11 @@ class Benchmarker:
 
     @staticmethod
     def __check_algorithms(
-        problem_configurations: Sequence[BaseProblemConfiguration],
-        algorithm_names: Sequence[Iterable[str]],
-    ) -> tuple[list[str], list[set[str]]]:
+        algorithm_names: Mapping[BaseProblemConfiguration, Iterable[str]],
+    ) -> tuple[list[str], dict[BaseProblemConfiguration, set[str]]]:
         """Check the algorithms for the problem configurations to be solved.
 
         Args:
-            problem_configurations: The problem configurations.
             algorithm_names: The names of the algorithms
                 to execute on each problem configuration,
                 in the order of the problem configurations.
@@ -369,19 +398,16 @@ class Benchmarker:
             The messages of the errors, without duplicates,
             for the algorithms that are not available
             or not suited to a problem configuration,
+            in the order of the problem configurations,
             and the names of the algorithms that are not available
-            for each problem configuration,
-            in the order of the problem configurations.
+            for each problem configuration.
         """
         messages = {}
-        all_unavailable_names = []
-        for problem_configuration, names in zip(
-            problem_configurations, algorithm_names, strict=True
-        ):
+        all_unavailable_names = {}
+        for problem_configuration, names in algorithm_names.items():
             worker = problem_configuration.worker
             available_names = []
-            unavailable_names = set()
-            all_unavailable_names.append(unavailable_names)
+            unavailable_names = all_unavailable_names[problem_configuration] = set()
             for algorithm_name in names:
                 message = Benchmarker.__get_error_message(
                     worker.check_algorithm_availability, algorithm_name
@@ -428,7 +454,7 @@ class Benchmarker:
         execution: _Execution,
         save_log: bool,
         use_threading: bool,
-    ) -> tuple[Future, tuple[str, str, str, Path]]:
+    ) -> tuple[Future, Path]:
         """Submit an execution of an algorithm configuration on a problem.
 
         Args:
@@ -440,10 +466,7 @@ class Benchmarker:
                 to parallelize the execution.
 
         Returns:
-            The future of the execution,
-            and the message logged when solving the problem,
-            the name of the algorithm configuration,
-            the name of the problem configuration
+            The future of the execution
             and the path to the performance history.
         """
         algorithm_configuration = execution.algorithm_configuration
@@ -475,18 +498,13 @@ class Benchmarker:
             algorithm_configuration,
             problem_configuration,
             problem_configuration.starting_points[index],
-            execution.message,
+            f"{execution.description}.",
             gemseo_log_path,
             performance_history_path,
             hdf_file_path,
             gemseo_logger,
         )
-        return future, (
-            execution.message,
-            algorithm_configuration.name,
-            problem_configuration_name,
-            performance_history_path,
-        )
+        return future, performance_history_path
 
     def __is_solved(
         self,

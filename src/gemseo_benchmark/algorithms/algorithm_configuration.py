@@ -33,6 +33,7 @@ from typing import Final
 from gemseo.util.constant import read_only_empty_dict
 from gemseo.util.pydantic import BaseSettings
 from gemseo.util.string import pretty_repr
+from gemseo.util.string import pretty_str
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -159,15 +160,15 @@ def _describe_instances(instances: Mapping[str, Sequence[int]]) -> str:
         The description of the instances,
         e.g. `"problems 1 and 2 of problem configuration Rosenbrock"`.
     """
-    descriptions = [
-        f"problem{'s' if len(indices) > 1 else ''} {pretty_repr(indices, sort=False)} "
-        f"of problem configuration {problem_name}"
-        for problem_name, indices in instances.items()
-    ]
-    if len(descriptions) == 1:
-        return descriptions[0]
-
-    return f"{', '.join(descriptions[:-1])} and {descriptions[-1]}"
+    return pretty_str(
+        [
+            f"problem{'s' if len(indices) > 1 else ''} "
+            f"{pretty_repr(indices, sort=False)} "
+            f"of problem configuration {problem_name}"
+            for problem_name, indices in instances.items()
+        ],
+        sort=False,
+    )
 
 
 class AlgorithmConfiguration:
@@ -425,6 +426,9 @@ class AlgorithmConfiguration:
             )
             raise ValueError(msg)
 
+        # The checks below raise a ValueError, even for a value of a wrong type,
+        # like the other errors of a malformed configuration,
+        # so that the readers of the files can name the file.
         fqn = algorithm_configuration[cls.__ALGORITHM_SETTINGS_CLASS]
         if not isinstance(fqn, str):
             msg = (
@@ -432,8 +436,6 @@ class AlgorithmConfiguration:
                 "it must be the fully qualified name of a class, "
                 "e.g. 'gemseo.optimization.SLSQP_Settings'."
             )
-            # A ValueError, like the other errors of a malformed configuration,
-            # so that the readers of the files can name the file.
             raise ValueError(msg)  # ruff: ignore[type-check-without-type-error]
 
         module_name, _, class_name = fqn.rpartition(".")
@@ -464,8 +466,6 @@ class AlgorithmConfiguration:
                 "it must be the fully qualified name of such a class, "
                 "e.g. 'gemseo.optimization.SLSQP_Settings'."
             )
-            # A ValueError, like the other errors of a malformed configuration,
-            # so that the readers of the files can name the file.
             raise ValueError(msg)  # ruff: ignore[type-check-without-type-error]
 
         options = algorithm_configuration[cls.__ALGORITHM_SETTINGS]
@@ -476,8 +476,6 @@ class AlgorithmConfiguration:
                 "if the results were written by an earlier version "
                 "of gemseo-benchmark, compute them again."
             )
-            # A ValueError, like the other errors of a malformed configuration,
-            # so that the readers of the files can name the file.
             raise ValueError(msg)  # ruff: ignore[type-check-without-type-error]
 
         settings = settings_class(**options)

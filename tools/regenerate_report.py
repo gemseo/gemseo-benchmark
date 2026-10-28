@@ -27,6 +27,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+from gemseo.util.string import pretty_str
+
 ROOT = Path(__file__).parents[1]
 EXAMPLE_PATH = ROOT / "docs" / "examples" / "all" / "report.py"
 REPORT_DIRECTORY = ROOT / "docs" / "report"
@@ -45,7 +47,7 @@ with tempfile.TemporaryDirectory() as directory:
     if missing_paths:
         msg = (
             "The report was not built completely; "
-            f"{' and '.join(str(path) for path in missing_paths)} "
+            f"{pretty_str(missing_paths, sort=False)} "
             f"{'does' if len(missing_paths) == 1 else 'do'} not exist, "
             "so docs/report is left unchanged."
         )
@@ -91,19 +93,21 @@ with tempfile.TemporaryDirectory() as directory:
                     old_html_directory.replace(report_html_directory)
             except OSError as rollback_error:
                 keep_staging_directory = True
+                new_report_note = (
+                    "the new report in html and benchmarking_report.pdf, "
+                    "except the ones already moved to docs/report. "
+                )
                 if old_html_directory.exists():
                     restore_note = (
                         "It holds the old HTML directory in old_html "
-                        "and the new report in html and benchmarking_report.pdf, "
-                        "except the ones already moved to docs/report. "
+                        f"and {new_report_note}"
                         "To restore the old HTML report by hand, "
                         f"remove {report_html_directory} if it exists "
                         "and move old_html there."
                     )
                 else:
                     restore_note = (
-                        "It holds the new report in html and benchmarking_report.pdf, "
-                        "except the ones already moved to docs/report. "
+                        f"It holds {new_report_note}"
                         "There was no old HTML report, "
                         "so to restore the old state by hand, "
                         f"remove {report_html_directory} if it exists."
