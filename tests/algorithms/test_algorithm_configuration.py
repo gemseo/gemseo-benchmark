@@ -44,6 +44,9 @@ from gemseo_benchmark.algorithms.algorithm_configuration import (
     _get_instance_settings_error_messages,
 )
 from gemseo_benchmark.algorithms.algorithm_configuration import _get_instances_settings
+from gemseo_benchmark.problems.base_problem_configuration import (
+    BaseProblemConfiguration,
+)
 
 
 class Dummy_Settings(BaseSettings):  # ruff: ignore[invalid-class-name]
@@ -224,14 +227,26 @@ def test_get_instance_settings_independent(instance_algorithm_options):
 
     The algorithm can change its settings while running,
     which is simulated by changing the returned settings.
+    Without options specific to the instances,
+    the settings are not validated again.
     """
     settings = SLSQP_Settings(max_iter=9)
     algorithm_configuration = AlgorithmConfiguration(
         settings, instance_algorithm_options=instance_algorithm_options
     )
-    first_settings = algorithm_configuration.get_instance_settings(mock.Mock(), 0)
-    first_settings.ftol_rel = 0.5
-    second_settings = algorithm_configuration.get_instance_settings(mock.Mock(), 0)
+    problem_configuration = mock.Mock(spec=BaseProblemConfiguration)
+    with mock.patch.object(
+        SLSQP_Settings, "model_validate", wraps=SLSQP_Settings.model_validate
+    ) as model_validate:
+        first_settings = algorithm_configuration.get_instance_settings(
+            problem_configuration, 0
+        )
+        first_settings.ftol_rel = 0.5
+        second_settings = algorithm_configuration.get_instance_settings(
+            problem_configuration, 0
+        )
+
+    assert model_validate.called is bool(instance_algorithm_options)
     assert first_settings is not settings
     assert second_settings is not settings
     assert second_settings is not first_settings
@@ -563,23 +578,6 @@ def test_get_instance_settings_error_messages(errors, messages):
     assert _get_instance_settings_error_messages(errors) == messages
 
 
-def test_get_instance_settings_without_instance_options():
-    """Check that the settings are not validated again without instance options."""
-    settings = SLSQP_Settings(max_iter=9)
-    algorithm_configuration = AlgorithmConfiguration(settings)
-    with mock.patch.object(
-        SLSQP_Settings, "model_validate", wraps=SLSQP_Settings.model_validate
-    ) as model_validate:
-        instance_settings = algorithm_configuration.get_instance_settings(
-            mock.Mock(), 0
-        )
-
-    model_validate.assert_not_called()
-    assert instance_settings is not settings
-    assert instance_settings == settings
-    assert instance_settings.model_fields_set == {"max_iter"}
-
-
 def test_get_instances_settings():
     """Check the settings of algorithms for instances of problems.
 
@@ -592,7 +590,7 @@ def test_get_instances_settings():
         "B",
         instance_algorithm_options={"max_iter": lambda problem, index: "five"},
     )
-    problem_configuration = mock.Mock()
+    problem_configuration = mock.Mock(spec=BaseProblemConfiguration)
     problem_configuration.name = "P"
     settings, messages = _get_instances_settings(
         [
@@ -640,7 +638,7 @@ def test_get_instances_settings_copy(copy_settings, with_instance_options, share
     algorithm_configuration = AlgorithmConfiguration(
         algorithm_settings, instance_algorithm_options=instance_algorithm_options
     )
-    problem_configuration = mock.Mock()
+    problem_configuration = mock.Mock(spec=BaseProblemConfiguration)
     problem_configuration.name = "P"
     with mock.patch.object(
         SLSQP_Settings, "model_validate", wraps=SLSQP_Settings.model_validate
