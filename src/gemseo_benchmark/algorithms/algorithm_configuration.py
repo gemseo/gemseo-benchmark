@@ -204,10 +204,9 @@ class AlgorithmConfiguration:
                 and returns the value of the option.
         """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self.__algorithm_settings = algorithm_settings
-        algorithm_name = algorithm_settings.target_class_name
-        non_default_opts = algorithm_settings.model_dump(exclude_unset=True)
         self.__configuration_name = configuration_name or self.__get_configuration_name(
-            algorithm_name, non_default_opts
+            algorithm_settings.target_class_name,
+            algorithm_settings.model_dump(exclude_unset=True),
         )
         self.__instance_algorithm_options = instance_algorithm_options
 
@@ -450,7 +449,11 @@ class AlgorithmConfiguration:
             raise ValueError(msg) from error
 
         # The class is checked before calling it,
-        # so that a malformed or malicious file cannot call any other object.
+        # so that the only object of the file that is called
+        # is a class of settings of a GEMSEO algorithm.
+        # This does not prevent the import of the module named in the file,
+        # which runs the top-level code of this module;
+        # so, the results files must come from a trusted source.
         if not (
             isinstance(settings_class, type)
             and issubclass(settings_class, BaseSettings)

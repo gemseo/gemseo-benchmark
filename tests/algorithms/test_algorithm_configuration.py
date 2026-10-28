@@ -95,6 +95,14 @@ def test_name(input_name, output_name):
     assert algorithm_configuration.name == output_name
 
 
+def test_name_given_options_not_dumped():
+    """Check that the options are not used to build a name when one is given."""
+    settings = mock.Mock(spec=SLSQP_Settings)
+    algorithm_configuration = AlgorithmConfiguration(settings, "SciPy SLSQP")
+    settings.model_dump.assert_not_called()
+    assert algorithm_configuration.name == "SciPy SLSQP"
+
+
 def test_name_several_options():
     """Check the name of an algorithm configuration with several options."""
     algorithm_configuration = AlgorithmConfiguration(
@@ -281,26 +289,19 @@ def test_get_instance_settings_independent(instance_algorithm_options):
 
     The algorithm can change its settings while running,
     which is simulated by changing the returned settings.
-    Without options specific to the instances,
-    the settings are not validated again.
     """
     settings = SLSQP_Settings(max_iter=9)
     algorithm_configuration = AlgorithmConfiguration(
         settings, instance_algorithm_options=instance_algorithm_options
     )
     problem_configuration = mock.Mock(spec=BaseProblemConfiguration)
-    with mock.patch.object(
-        SLSQP_Settings, "model_validate", wraps=SLSQP_Settings.model_validate
-    ) as model_validate:
-        first_settings = algorithm_configuration.get_instance_settings(
-            problem_configuration, 0
-        )
-        first_settings.ftol_rel = 0.5
-        second_settings = algorithm_configuration.get_instance_settings(
-            problem_configuration, 0
-        )
-
-    assert model_validate.called is bool(instance_algorithm_options)
+    first_settings = algorithm_configuration.get_instance_settings(
+        problem_configuration, 0
+    )
+    first_settings.ftol_rel = 0.5
+    second_settings = algorithm_configuration.get_instance_settings(
+        problem_configuration, 0
+    )
     assert first_settings is not settings
     assert second_settings is not settings
     assert second_settings is not first_settings
@@ -309,6 +310,26 @@ def test_get_instance_settings_independent(instance_algorithm_options):
     assert settings.model_dump(exclude_unset=True) == {"max_iter": 9}
     assert algorithm_configuration.algorithm_options == {"max_iter": 9}
     assert algorithm_configuration.name == "SLSQP_max_iter=9"
+
+
+def test_get_instance_settings_without_instance_options():
+    """Check that the settings are only copied without instance options.
+
+    They are not validated again and the copy equals the original settings.
+    """
+    settings = SLSQP_Settings(max_iter=9)
+    algorithm_configuration = AlgorithmConfiguration(settings)
+    with mock.patch.object(
+        SLSQP_Settings, "model_validate", wraps=SLSQP_Settings.model_validate
+    ) as model_validate:
+        instance_settings = algorithm_configuration.get_instance_settings(
+            mock.Mock(spec=BaseProblemConfiguration), 0
+        )
+
+    model_validate.assert_not_called()
+    assert instance_settings is not settings
+    assert instance_settings == settings
+    assert instance_settings.model_fields_set == {"max_iter"}
 
 
 @pytest.mark.parametrize(
