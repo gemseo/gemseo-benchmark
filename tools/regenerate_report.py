@@ -51,6 +51,34 @@ with tempfile.TemporaryDirectory() as directory:
         )
         raise FileNotFoundError(msg)
 
-    shutil.rmtree(REPORT_DIRECTORY / "html", ignore_errors=True)
-    shutil.copytree(html_directory, REPORT_DIRECTORY / "html")
-    shutil.copy2(pdf_path, REPORT_DIRECTORY / "benchmarking_report.pdf")
+    # The new report is first copied next to docs/report,
+    # on the same file system,
+    # so that a failed copy leaves docs/report unchanged
+    # and the old files are then replaced by renaming,
+    # which is fast and does not leave a half-written file.
+    # docs/report is inconsistent only between the renamings of the HTML directory
+    # and of the PDF file;
+    # if renaming the new HTML directory fails, the old one is restored.
+    staging_directory = Path(tempfile.mkdtemp(dir=REPORT_DIRECTORY.parent))
+    try:
+        new_html_directory = staging_directory / "html"
+        new_pdf_path = staging_directory / "benchmarking_report.pdf"
+        shutil.copytree(html_directory, new_html_directory)
+        shutil.copy2(pdf_path, new_pdf_path)
+        old_html_directory = staging_directory / "old_html"
+        report_html_directory = REPORT_DIRECTORY / "html"
+        if report_html_directory.exists():
+            report_html_directory.replace(old_html_directory)
+
+        try:
+            new_html_directory.replace(report_html_directory)
+        except OSError:
+            if old_html_directory.exists():
+                old_html_directory.replace(report_html_directory)
+
+            raise
+
+        new_pdf_path.replace(REPORT_DIRECTORY / "benchmarking_report.pdf")
+    finally:
+        # The old HTML directory is removed with the staging directory.
+        shutil.rmtree(staging_directory, ignore_errors=True)
