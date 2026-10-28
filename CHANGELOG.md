@@ -133,11 +133,11 @@ and this project adheres to
 - Examples of HTML and PDF reports are available in the examples.
 - `BaseProblemConfiguration.minimization_target_values` raises a `ValueError` when the problem configuration has no target value, as `target_values` does; it used to return `None`.
 - API changes:
-  - The arguments `doe_name`, `doe_options` and `doe_size` of `BaseProblemConfiguration` and its subclasses
+    - The arguments `doe_name`, `doe_options` and `doe_size` of `BaseProblemConfiguration` and its subclasses
     have been replaced by `doe_settings` of type `BaseDOESettings`.
-  - The arguments `algorithm_name` and `**algorithm_options` of `AlgorithmConfiguration`
+    - The arguments `algorithm_name` and `**algorithm_options` of `AlgorithmConfiguration`
     have been replaced by `algorithm_settings` of type `BaseSettings`.
-  - The `to_dict` method of `AlgorithmConfiguration` returns a dictionary
+    - The `to_dict` method of `AlgorithmConfiguration` returns a dictionary
     containing
     the configuration name,
     the absolute path of the algorithm settings class
