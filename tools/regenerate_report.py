@@ -57,11 +57,15 @@ with tempfile.TemporaryDirectory() as directory:
     # and the old files are then replaced by renaming,
     # which is fast and does not leave a half-written file.
     # If renaming the new HTML directory or the new PDF file fails,
-    # the old HTML directory is restored before the error is raised again,
+    # the old HTML directory is put back before the error is raised again,
     # so docs/report keeps either the whole old report or the whole new one.
-    # docs/report is inconsistent only while these renamings run
-    # or if restoring the old HTML directory fails too.
+    # If putting the old HTML directory back fails too,
+    # docs/report can be inconsistent,
+    # but the staging directory is kept with the files not moved back yet
+    # and the error says where it is,
+    # so that no file is lost and the old report can be restored by hand.
     staging_directory = Path(tempfile.mkdtemp(dir=REPORT_DIRECTORY.parent))
+    keep_staging_directory = False
     try:
         new_html_directory = staging_directory / "html"
         new_pdf_path = staging_directory / "benchmarking_report.pdf"
@@ -74,24 +78,36 @@ with tempfile.TemporaryDirectory() as directory:
 
         try:
             new_html_directory.replace(report_html_directory)
-        except OSError:
-            if old_html_directory.exists():
-                old_html_directory.replace(report_html_directory)
-
-            raise
-
-        try:
             new_pdf_path.replace(REPORT_DIRECTORY / "benchmarking_report.pdf")
         except OSError:
-            # The new HTML directory is put aside in the staging directory
-            # so that the old one can take its place again.
-            report_html_directory.replace(new_html_directory)
-            if old_html_directory.exists():
-                old_html_directory.replace(report_html_directory)
+            try:
+                # If the new HTML directory is already in docs/report,
+                # it is put aside in the staging directory
+                # so that the old one can take its place again.
+                if not new_html_directory.exists():
+                    report_html_directory.replace(new_html_directory)
+
+                if old_html_directory.exists():
+                    old_html_directory.replace(report_html_directory)
+            except OSError as rollback_error:
+                keep_staging_directory = True
+                rollback_error.add_note(
+                    "The old report could not be restored, "
+                    "so docs/report may be inconsistent. "
+                    f"The staging directory {staging_directory} is kept. "
+                    "It holds the old HTML directory in old_html "
+                    "and the new report in html and benchmarking_report.pdf, "
+                    "except the ones already moved to docs/report. "
+                    "To restore the old HTML report by hand, "
+                    f"remove {report_html_directory} if it exists "
+                    "and move old_html there."
+                )
+                raise
 
             raise
     finally:
-        # The staging directory is removed with what it still holds:
-        # the old HTML directory after a success,
-        # the new report after a failure.
-        shutil.rmtree(staging_directory, ignore_errors=True)
+        # The staging directory is removed with what it still holds,
+        # that is the old HTML directory after a success
+        # and the new report after a failure whose rollback succeeded.
+        if not keep_staging_directory:
+            shutil.rmtree(staging_directory, ignore_errors=True)
