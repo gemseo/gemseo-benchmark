@@ -8,6 +8,21 @@
 # name: test_from_dict_missing_keys[one_key]
   "The algorithm configuration misses the key 'algorithm_settings_class'; it was probably written by an earlier version of gemseo-benchmark and must be computed again."
 # ---
+# name: test_from_dict_not_a_settings_class[builtin_class]
+  "The class of the algorithm settings 'builtins.dict' is not a class of settings of a GEMSEO algorithm; it must be the fully qualified name of such a class, e.g. 'gemseo.optimization.SLSQP_Settings'."
+# ---
+# name: test_from_dict_not_a_settings_class[builtin_function]
+  "The class of the algorithm settings 'math.sqrt' is not a class of settings of a GEMSEO algorithm; it must be the fully qualified name of such a class, e.g. 'gemseo.optimization.SLSQP_Settings'."
+# ---
+# name: test_from_dict_not_a_settings_class[class]
+  "The class of the algorithm settings 'tests.algorithms.test_algorithm_configuration.NotSettings' is not a class of settings of a GEMSEO algorithm; it must be the fully qualified name of such a class, e.g. 'gemseo.optimization.SLSQP_Settings'."
+# ---
+# name: test_from_dict_not_a_settings_class[function]
+  "The class of the algorithm settings 'tests.algorithms.test_algorithm_configuration.not_settings' is not a class of settings of a GEMSEO algorithm; it must be the fully qualified name of such a class, e.g. 'gemseo.optimization.SLSQP_Settings'."
+# ---
+# name: test_from_dict_not_a_settings_class[other_class]
+  "The class of the algorithm settings 'collections.OrderedDict' is not a class of settings of a GEMSEO algorithm; it must be the fully qualified name of such a class, e.g. 'gemseo.optimization.SLSQP_Settings'."
+# ---
 # name: test_from_dict_settings_class_not_a_string[integer]
   "The class of the algorithm settings 3 is not a string; it must be the fully qualified name of a class, e.g. 'gemseo.optimization.SLSQP_Settings'."
 # ---

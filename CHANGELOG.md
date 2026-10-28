@@ -67,7 +67,9 @@ and this project adheres to
   or whose algorithm settings are not a mapping;
   they raise a `ValueError` that says to compute these results again,
   or to install the plugin providing the algorithm
-  when the algorithm settings class cannot be imported.
+  when the algorithm settings class cannot be imported;
+  they also raise a `ValueError`, without calling it,
+  when the algorithm settings class is not a class of settings of a GEMSEO algorithm.
 - The documentation is generated using `mkdocs` instead of `properdocs`;
   the HTML and PDF reports are still generated using `properdocs`.
 - The dependencies `properdocs`, `mkdocs-material` and `mkdocs-to-pdf`

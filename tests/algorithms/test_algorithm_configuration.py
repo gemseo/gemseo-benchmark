@@ -55,6 +55,34 @@ class Dummy_Settings(BaseSettings):  # ruff: ignore[invalid-class-name]
     max_iter: int = Field(default=100)
 
 
+def not_settings(**options: Any) -> None:
+    """A function that is not a class of algorithm settings.
+
+    Args:
+        **options: The options.
+
+    Raises:
+        AssertionError: Always, as it must not be called.
+    """
+    msg = "The function must not be called."
+    raise AssertionError(msg)
+
+
+class NotSettings:
+    """A class that is not a class of algorithm settings."""
+
+    def __init__(self, **options: Any) -> None:
+        """
+        Args:
+            **options: The options.
+
+        Raises:
+            AssertionError: Always, as it must not be called.
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
+        msg = "The class must not be called."
+        raise AssertionError(msg)
+
+
 @pytest.mark.parametrize(
     ("input_name", "output_name"),
     [("SciPy SLSQP", "SciPy SLSQP"), (None, "SLSQP_max_iter=9")],
@@ -180,6 +208,32 @@ def test_from_dict_settings_class_not_a_string(settings_class, snapshot):
             "configuration_name": "MMA",
             "algorithm_settings_class": settings_class,
             "algorithm_settings": {},
+        })
+
+
+@pytest.mark.parametrize(
+    "settings_class",
+    [
+        "math.sqrt",
+        "builtins.dict",
+        "collections.OrderedDict",
+        f"{__name__}.not_settings",
+        f"{__name__}.NotSettings",
+    ],
+    ids=["builtin_function", "builtin_class", "other_class", "function", "class"],
+)
+def test_from_dict_not_a_settings_class(settings_class, snapshot):
+    """Check the import of an algorithm configuration with a wrong settings class.
+
+    The object is not called,
+    as calling the object named by a file could run any code.
+    The functions and classes of this module raise an AssertionError when called.
+    """
+    with assert_exception(ValueError, snapshot):
+        AlgorithmConfiguration.from_dict({
+            "configuration_name": "SLSQP",
+            "algorithm_settings_class": settings_class,
+            "algorithm_settings": {"max_iter": 9},
         })
 
 

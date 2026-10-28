@@ -31,13 +31,12 @@ from typing import Any
 from typing import Final
 
 from gemseo.util.constant import read_only_empty_dict
+from gemseo.util.pydantic import BaseSettings
 from gemseo.util.string import pretty_repr
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from collections.abc import Sequence
-
-    from gemseo.util.pydantic import BaseSettings
 
     from gemseo_benchmark.problems.base_problem_configuration import (
         BaseProblemConfiguration,
@@ -401,8 +400,9 @@ class AlgorithmConfiguration:
 
         Raises:
             ValueError: If the dictionary misses a key,
-                if the class of the algorithm settings is not a string
-                or if it cannot be imported,
+                if the class of the algorithm settings is not a string,
+                if it cannot be imported
+                or if it is not a class of settings of a GEMSEO algorithm,
                 e.g. because the plugin providing the algorithm is not installed
                 or because it was written by an earlier version of gemseo-benchmark,
                 or if the algorithm settings are not a mapping.
@@ -448,6 +448,22 @@ class AlgorithmConfiguration:
                 "of gemseo-benchmark, compute them again."
             )
             raise ValueError(msg) from error
+
+        # The class is checked before calling it,
+        # so that a malformed or malicious file cannot call any other object.
+        if not (
+            isinstance(settings_class, type)
+            and issubclass(settings_class, BaseSettings)
+        ):
+            msg = (
+                f"The class of the algorithm settings {fqn!r} "
+                "is not a class of settings of a GEMSEO algorithm; "
+                "it must be the fully qualified name of such a class, "
+                "e.g. 'gemseo.optimization.SLSQP_Settings'."
+            )
+            # A ValueError, like the other errors of a malformed configuration,
+            # so that the readers of the files can name the file.
+            raise ValueError(msg)  # ruff: ignore[type-check-without-type-error]
 
         options = algorithm_configuration[cls.__ALGORITHM_SETTINGS]
         if not isinstance(options, Mapping):
