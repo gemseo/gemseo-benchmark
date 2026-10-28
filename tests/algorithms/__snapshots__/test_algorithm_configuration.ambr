@@ -1,45 +1,45 @@
 # serializer version: 1
-# name: test_from_dict_missing_keys[all_keys]
-  "The algorithm configuration misses the keys 'configuration_name', 'algorithm_settings_class' and 'algorithm_settings'; it was probably written by an earlier version of gemseo-benchmark and must be computed again."
-# ---
-# name: test_from_dict_missing_keys[earlier_version]
-  "The algorithm configuration misses the keys 'algorithm_settings_class' and 'algorithm_settings'; it was probably written by an earlier version of gemseo-benchmark and must be computed again."
-# ---
-# name: test_from_dict_missing_keys[one_key]
-  "The algorithm configuration misses the key 'algorithm_settings_class'; it was probably written by an earlier version of gemseo-benchmark and must be computed again."
-# ---
-# name: test_from_dict_not_a_settings_class[builtin_class]
+# name: test_from_dict_malformed[builtin_class]
   "The class of the algorithm settings 'builtins.dict' is not a class of settings of a GEMSEO algorithm; it must be the fully qualified name of such a class, e.g. 'gemseo.optimization.SLSQP_Settings'."
 # ---
-# name: test_from_dict_not_a_settings_class[builtin_function]
+# name: test_from_dict_malformed[builtin_function]
   "The class of the algorithm settings 'math.sqrt' is not a class of settings of a GEMSEO algorithm; it must be the fully qualified name of such a class, e.g. 'gemseo.optimization.SLSQP_Settings'."
 # ---
-# name: test_from_dict_not_a_settings_class[class]
+# name: test_from_dict_malformed[class]
   "The class of the algorithm settings 'tests.algorithms.test_algorithm_configuration.NotSettings' is not a class of settings of a GEMSEO algorithm; it must be the fully qualified name of such a class, e.g. 'gemseo.optimization.SLSQP_Settings'."
 # ---
-# name: test_from_dict_not_a_settings_class[function]
+# name: test_from_dict_malformed[earlier_version]
+  "The algorithm configuration misses the keys 'algorithm_settings_class' and 'algorithm_settings'; it was probably written by an earlier version of gemseo-benchmark and must be computed again."
+# ---
+# name: test_from_dict_malformed[function]
   "The class of the algorithm settings 'tests.algorithms.test_algorithm_configuration.not_settings' is not a class of settings of a GEMSEO algorithm; it must be the fully qualified name of such a class, e.g. 'gemseo.optimization.SLSQP_Settings'."
 # ---
-# name: test_from_dict_not_a_settings_class[other_class]
-  "The class of the algorithm settings 'collections.OrderedDict' is not a class of settings of a GEMSEO algorithm; it must be the fully qualified name of such a class, e.g. 'gemseo.optimization.SLSQP_Settings'."
-# ---
-# name: test_from_dict_settings_class_not_a_string[integer]
+# name: test_from_dict_malformed[integer_settings_class]
   "The class of the algorithm settings 3 is not a string; it must be the fully qualified name of a class, e.g. 'gemseo.optimization.SLSQP_Settings'."
 # ---
-# name: test_from_dict_settings_class_not_a_string[null]
-  "The class of the algorithm settings None is not a string; it must be the fully qualified name of a class, e.g. 'gemseo.optimization.SLSQP_Settings'."
-# ---
-# name: test_from_dict_settings_not_a_mapping[list]
+# name: test_from_dict_malformed[list_settings]
   "The algorithm settings ['max_iter', 9] are not a mapping from the names of the options to their values; if the results were written by an earlier version of gemseo-benchmark, compute them again."
 # ---
-# name: test_from_dict_settings_not_a_mapping[null]
-  'The algorithm settings None are not a mapping from the names of the options to their values; if the results were written by an earlier version of gemseo-benchmark, compute them again.'
+# name: test_from_dict_malformed[missing_all_keys]
+  "The algorithm configuration misses the keys 'configuration_name', 'algorithm_settings_class' and 'algorithm_settings'; it was probably written by an earlier version of gemseo-benchmark and must be computed again."
 # ---
-# name: test_from_dict_unknown_settings_class[missing_class]
+# name: test_from_dict_malformed[missing_one_key]
+  "The algorithm configuration misses the key 'algorithm_settings_class'; it was probably written by an earlier version of gemseo-benchmark and must be computed again."
+# ---
+# name: test_from_dict_malformed[missing_settings_class]
   "The class of the algorithm settings 'gemseo.optimization.scipy_local.settings.slsqp.Unknown_Settings' cannot be imported; install the plugin providing the algorithm, or, if the results were written by an earlier version of gemseo-benchmark, compute them again."
 # ---
-# name: test_from_dict_unknown_settings_class[missing_module]
+# name: test_from_dict_malformed[missing_settings_module]
   "The class of the algorithm settings 'gemseo.algos.opt.mma.settings.mma_settings.MMASVanberg_Settings' cannot be imported; install the plugin providing the algorithm, or, if the results were written by an earlier version of gemseo-benchmark, compute them again."
+# ---
+# name: test_from_dict_malformed[null_settings]
+  'The algorithm settings None are not a mapping from the names of the options to their values; if the results were written by an earlier version of gemseo-benchmark, compute them again.'
+# ---
+# name: test_from_dict_malformed[null_settings_class]
+  "The class of the algorithm settings None is not a string; it must be the fully qualified name of a class, e.g. 'gemseo.optimization.SLSQP_Settings'."
+# ---
+# name: test_from_dict_malformed[other_class]
+  "The class of the algorithm settings 'collections.OrderedDict' is not a class of settings of a GEMSEO algorithm; it must be the fully qualified name of such a class, e.g. 'gemseo.optimization.SLSQP_Settings'."
 # ---
 # name: test_get_instance_settings_invalid_option[callable_error]
   'The options of algorithm configuration SLSQP for problem 2 of problem configuration Rosenbrock are invalid: There is no value for this problem.'

@@ -163,9 +163,32 @@ def test_from_dict():
     assert algorithm_configuration.algorithm_options == {"max_iter": 9}
 
 
+def _make_dictionary(
+    settings_class: Any,
+    settings: Any,
+    configuration_name: str = "SLSQP",
+) -> dict[str, Any]:
+    """Return the dictionary of an algorithm configuration.
+
+    Args:
+        settings_class: The class of the algorithm settings.
+        settings: The algorithm settings.
+        configuration_name: The name of the algorithm configuration.
+
+    Returns:
+        The dictionary of the algorithm configuration.
+    """
+    return {
+        "configuration_name": configuration_name,
+        "algorithm_settings_class": settings_class,
+        "algorithm_settings": settings,
+    }
+
+
 @pytest.mark.parametrize(
     "dictionary",
     [
+        # The case of an algorithm configuration saved by gemseo-benchmark 4.
         {"configuration_name": "SLSQP", "algorithm_settings": {}},
         {},
         {
@@ -173,14 +196,51 @@ def test_from_dict():
             "algorithm_name": "SLSQP",
             "algorithm_options": {"max_iter": 9},
         },
+        _make_dictionary(
+            "gemseo.algos.opt.mma.settings.mma_settings.MMASVanberg_Settings",
+            {},
+            configuration_name="MMA",
+        ),
+        _make_dictionary(
+            "gemseo.optimization.scipy_local.settings.slsqp.Unknown_Settings",
+            {},
+            configuration_name="MMA",
+        ),
+        # The case of a JSON file whose settings class is not a string.
+        _make_dictionary(None, {}, configuration_name="MMA"),
+        _make_dictionary(3, {}, configuration_name="MMA"),
+        # The object is not called,
+        # as calling the object named by a file could run any code.
+        # The functions and classes of this module raise an AssertionError
+        # when called.
+        _make_dictionary("math.sqrt", {"max_iter": 9}),
+        _make_dictionary("builtins.dict", {"max_iter": 9}),
+        _make_dictionary("collections.OrderedDict", {"max_iter": 9}),
+        _make_dictionary(f"{__name__}.not_settings", {"max_iter": 9}),
+        _make_dictionary(f"{__name__}.NotSettings", {"max_iter": 9}),
+        # The case of a JSON file whose algorithm settings are not an object.
+        _make_dictionary("gemseo.optimization.SLSQP_Settings", None),
+        _make_dictionary("gemseo.optimization.SLSQP_Settings", ["max_iter", 9]),
     ],
-    ids=["one_key", "all_keys", "earlier_version"],
+    ids=[
+        "missing_one_key",
+        "missing_all_keys",
+        "earlier_version",
+        "missing_settings_module",
+        "missing_settings_class",
+        "null_settings_class",
+        "integer_settings_class",
+        "builtin_function",
+        "builtin_class",
+        "other_class",
+        "function",
+        "class",
+        "null_settings",
+        "list_settings",
+    ],
 )
-def test_from_dict_missing_keys(dictionary, snapshot):
-    """Check the error message when an algorithm configuration misses keys.
-
-    This is the case of an algorithm configuration saved by gemseo-benchmark 4.
-    """
+def test_from_dict_malformed(dictionary, snapshot):
+    """Check the error message when an algorithm configuration is malformed."""
     with assert_exception(ValueError, snapshot):
         AlgorithmConfiguration.from_dict(dictionary)
 
@@ -193,70 +253,14 @@ def test_from_dict_missing_keys(dictionary, snapshot):
     ],
     ids=["missing_module", "missing_class"],
 )
-def test_from_dict_unknown_settings_class(settings_class, snapshot):
-    """Check the import of an algorithm configuration with an unknown settings class."""
-    with assert_exception(ValueError, snapshot) as error:
-        AlgorithmConfiguration.from_dict({
-            "configuration_name": "MMA",
-            "algorithm_settings_class": settings_class,
-            "algorithm_settings": {},
-        })
+def test_from_dict_unknown_settings_class_cause(settings_class):
+    """Check the cause of the error with an unknown settings class."""
+    with pytest.raises(ValueError) as error:
+        AlgorithmConfiguration.from_dict(
+            _make_dictionary(settings_class, {}, configuration_name="MMA")
+        )
 
     assert isinstance(error.value.__cause__, (ImportError, AttributeError))
-
-
-@pytest.mark.parametrize("settings_class", [None, 3], ids=["null", "integer"])
-def test_from_dict_settings_class_not_a_string(settings_class, snapshot):
-    """Check the import of an algorithm configuration with a malformed settings class.
-
-    This is the case of a JSON file whose settings class is not a string.
-    """
-    with assert_exception(ValueError, snapshot):
-        AlgorithmConfiguration.from_dict({
-            "configuration_name": "MMA",
-            "algorithm_settings_class": settings_class,
-            "algorithm_settings": {},
-        })
-
-
-@pytest.mark.parametrize(
-    "settings_class",
-    [
-        "math.sqrt",
-        "builtins.dict",
-        "collections.OrderedDict",
-        f"{__name__}.not_settings",
-        f"{__name__}.NotSettings",
-    ],
-    ids=["builtin_function", "builtin_class", "other_class", "function", "class"],
-)
-def test_from_dict_not_a_settings_class(settings_class, snapshot):
-    """Check the import of an algorithm configuration with a wrong settings class.
-
-    The object is not called,
-    as calling the object named by a file could run any code.
-    The functions and classes of this module raise an AssertionError when called.
-    """
-    with assert_exception(ValueError, snapshot):
-        AlgorithmConfiguration.from_dict({
-            "configuration_name": "SLSQP",
-            "algorithm_settings_class": settings_class,
-            "algorithm_settings": {"max_iter": 9},
-        })
-
-
-@pytest.mark.parametrize("settings", [None, ["max_iter", 9]], ids=["null", "list"])
-def test_from_dict_settings_not_a_mapping(settings, snapshot):
-    """Check the import of an algorithm configuration with malformed settings.
-
-    This is the case of a JSON file whose algorithm settings are not an object.
-    """
-    with assert_exception(ValueError, snapshot):
-        AlgorithmConfiguration.from_dict({
-            "configuration_name": "SLSQP",
-            "algorithm_settings_class": "gemseo.optimization.SLSQP_Settings",
-            "algorithm_settings": settings,
-        })
 
 
 def test_get_instance_settings():
