@@ -21,7 +21,6 @@
 
 from __future__ import annotations
 
-from itertools import islice
 from typing import TYPE_CHECKING
 from typing import ClassVar
 from typing import Final
@@ -183,31 +182,32 @@ class OptimizationProblemConfiguration(
         """
         # The settings of all the executions are computed before any of them,
         # so that all the mistakes are reported before any optimization.
-        # The settings are ordered by algorithm configuration, then by instance.
+        # The executions are ordered by algorithm configuration, then by instance.
         # Each execution gets its own settings,
         # as the algorithm can change its settings while running.
+        executions = [
+            (configuration, index)
+            for configuration in algorithm_configurations
+            for index in range(len(self.starting_points))
+        ]
         all_settings, messages = _get_instances_settings(
-            (
-                (configuration, self, index)
-                for configuration in algorithm_configurations
-                for index in range(len(self.starting_points))
-            ),
+            ((configuration, self, index) for configuration, index in executions),
             copy_settings_without_instance_options=True,
         )
         if messages:
             raise ValueError("\n".join(messages))
 
         self.__targets_generator = TargetsGenerator()
-        settings_iterator = iter(all_settings)
-        for _ in algorithm_configurations:
-            # Each algorithm configuration solves new instances of the problem.
-            configuration_settings = islice(
-                settings_iterator, len(self.starting_points)
-            )
-            for settings, instance in zip(configuration_settings, self, strict=True):
-                execute_algo(instance, "opt", settings_model=settings)
-                history = PerformanceHistory.from_problem(instance)
-                self.__targets_generator.add_history(history=history)
+        instances = iter(self)
+        for settings, (_, index) in zip(all_settings, executions, strict=True):
+            if index == 0:
+                # Each algorithm configuration solves new instances of the problem.
+                instances = iter(self)
+
+            instance = next(instances)
+            execute_algo(instance, "opt", settings_model=settings)
+            history = PerformanceHistory.from_problem(instance)
+            self.__targets_generator.add_history(history=history)
 
         target_values = self.__targets_generator.compute_target_values(
             targets_number,
