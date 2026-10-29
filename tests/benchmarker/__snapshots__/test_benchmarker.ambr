@@ -19,3 +19,6 @@
       For further information visit https://errors.pydantic.dev/X.Y/v/int_parsing
   '''
 # ---
+# name: test_unavailable_algorithm_instance_options_not_computed
+  "The algorithm 'Unknown' is not available."
+# ---

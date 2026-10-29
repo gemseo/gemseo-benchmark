@@ -289,7 +289,7 @@ def test_execution(
     assert results.contains(algo_config.algorithm_name, pb_config.name, path)
 
 
-def test_execution_shared_settings(tmp_path, rosenbrock) -> None:
+def test_execution_shared_settings(tmp_wd, rosenbrock) -> None:
     """Check the settings of an algorithm configuration without instance options.
 
     The planned executions share the user's settings, without copying them,
@@ -302,7 +302,7 @@ def test_execution_shared_settings(tmp_path, rosenbrock) -> None:
     with mock.patch.object(
         benchmarker, "AlgorithmConfiguration", wraps=AlgorithmConfiguration
     ) as planned_configuration:
-        Benchmarker(tmp_path).execute(
+        Benchmarker(tmp_wd).execute(
             [rosenbrock], AlgorithmsConfigurations(AlgorithmConfiguration(settings))
         )
 
@@ -834,13 +834,11 @@ class Unknown_Settings(L_BFGS_B_Settings):  # ruff: ignore[invalid-class-name]
 
 
 def test_unavailable_algorithm_instance_options_not_computed(
-    tmp_wd, rosenbrock
+    tmp_wd, rosenbrock, snapshot
 ) -> None:
     """Check that the options of an unavailable algorithm are not computed."""
     get_max_iter = mock.Mock(return_value=3)
-    with pytest.raises(
-        ValueError, match=re.escape("The algorithm 'Unknown' is not available.")
-    ):
+    with assert_exception(ValueError, snapshot):
         Benchmarker(tmp_wd).execute(
             [rosenbrock],
             AlgorithmsConfigurations(
