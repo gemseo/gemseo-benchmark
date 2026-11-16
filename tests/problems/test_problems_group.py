@@ -92,7 +92,7 @@ def test_compute_data_profile_files(
         plot_path=path,
         use_subplots=use_subplots,
     )
-    assert len(figures) == 1 if use_subplots else 2
+    assert len(figures) == (1 if use_subplots else 2)
     assert {path.name for path in tmp_path.iterdir()} == (
         {"data_profile.png"}
         if use_subplots
