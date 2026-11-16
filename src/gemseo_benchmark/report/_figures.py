@@ -29,8 +29,8 @@ from typing import Final
 import matplotlib.pyplot
 import numpy
 import pandas
-from gemseo.utils.matplotlib_figure import save_show_figure
-from gemseo.utils.string_tools import pretty_str
+from gemseo.util.matplotlib_figure import save_show_figure
+from gemseo.util.string import pretty_str
 from matplotlib.ticker import MaxNLocator
 
 from gemseo_benchmark import _get_configuration_plot_options
@@ -167,7 +167,7 @@ class Figures:
                 If 0, all the evaluations are displayed.
             plot_settings: The keyword arguments of `matplotlib.axes.Axes.plot`
                 for each algorithm configuration.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self.__algorithm_configurations = algorithm_configurations
         self.__directory_path = directory_path
         self.__group = group

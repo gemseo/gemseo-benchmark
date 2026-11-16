@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Final
 
-from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
+from gemseo.util.constant import read_only_empty_dict
 
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
@@ -63,7 +63,7 @@ class Scenario:
 
         Raises:
             ValueError: If the path to outputs directory does not exist.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         if not Path(outputs_path).is_dir():
             msg = f"The path to the outputs directory does not exist: {outputs_path}."
             raise NotADirectoryError(msg)
@@ -93,7 +93,7 @@ class Scenario:
         directory_path: Path | None = None,
         plot_only_median: bool = False,
         use_abscissa_log_scale: bool = False,
-        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = read_only_empty_dict,
         raise_errors: bool = False,
     ) -> Results:
         """Execute the benchmarking scenario.
@@ -145,7 +145,9 @@ class Scenario:
         Raises:
             ValueError: If an algorithm is not available,
                 or is not suited to a problem configuration when this can be told
-                before the execution.
+                before the execution,
+                or if an option specific to a problem
+                is not an option of the algorithm or has an invalid value.
             BenchmarkingError: If `raise_errors` is `True`
                 and some executions of the solvers raised exceptions.
                 The other executions are not interrupted
@@ -260,7 +262,7 @@ class Scenario:
         directory_path: Path | None = None,
         plot_only_median: bool = False,
         use_abscissa_log_scale: bool = False,
-        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = read_only_empty_dict,
     ) -> None:
         """Generate the benchmarking report.
 

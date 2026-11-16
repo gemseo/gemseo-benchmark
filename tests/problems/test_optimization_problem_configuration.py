@@ -22,23 +22,31 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from typing import Any
+from typing import ClassVar
 from unittest import mock
 
 import pytest
-from gemseo.algos.doe.custom_doe.settings.custom_doe_settings import CustomDOE_Settings
-from gemseo.algos.optimization_problem import OptimizationProblem
-from gemseo.problems.optimization.rosenbrock import Rosenbrock
-from matplotlib.testing.decorators import image_comparison
+from gemseo.doe import CustomDOE_Settings
+from gemseo.optimization import NLOPT_COBYLA_Settings
+from gemseo.optimization import OptimizationProblem
+from gemseo.optimization import SLSQP_Settings
+from gemseo.problem.optimization.rosenbrock import Rosenbrock
+from gemseo.space import DesignSpace
+from gemseo.util.testing.helper import assert_exception
 from numpy import array
 from numpy.testing import assert_allclose
 
+from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
+from gemseo_benchmark.algorithms.algorithms_configurations import (
+    AlgorithmsConfigurations,
+)
 from gemseo_benchmark.benchmarker.optimization_worker import OptimizationWorker
 from gemseo_benchmark.data_profiles.target_values import TargetValues
+from gemseo_benchmark.problems import optimization_problem_configuration
 from gemseo_benchmark.problems.optimization_problem_configuration import (
     OptimizationProblemConfiguration,
 )
-from tests.problems.conftest import check_data_profiles_computation
-from tests.problems.conftest import check_data_profiles_computation_with_max_eval_number
 from tests.problems.conftest import check_default_starting_point
 from tests.problems.conftest import check_description
 from tests.problems.conftest import check_inconsistent_starting_points
@@ -58,11 +66,14 @@ from tests.problems.conftest import check_starting_points_saving
 from tests.problems.conftest import check_undefined_target_values
 from tests.problems.conftest import check_variable_space
 from tests.problems.conftest import check_worker_type
+from tests.problems.conftest import plot_data_profiles
+from tests.problems.conftest import plot_data_profiles_with_max_eval_number
 from tests.problems.conftest import test_compute_data_profiles_parametrize
 from tests.problems.conftest import test_description_parametrize
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from collections.abc import Iterator
 
 
 @pytest.fixture(scope="module")
@@ -89,8 +100,8 @@ def benchmarking_problem(minimization_problem_creator):
 
 def test_undefined_starting_points() -> None:
     """Check the absence of starting points."""
-    variable_space = mock.Mock()
-    variable_space.has_current_value = False
+    variable_space = DesignSpace()
+    variable_space.add_variable("x", lower_bound=0.0, upper_bound=1.0)
 
     def create_problem() -> OptimizationProblem:
         """Create an optimization problem."""
@@ -242,6 +253,157 @@ def test_init_targets_computation(algorithms_configurations, minimize_objective)
     assert isinstance(problem.target_values, TargetValues)
 
 
+@pytest.fixture
+def execute_algo() -> Iterator[mock.Mock]:
+    """Spy on the function executing the algorithms to compute the target values.
+
+    Yields:
+        The spy of the function.
+    """
+    with mock.patch.object(
+        optimization_problem_configuration,
+        "execute_algo",
+        wraps=optimization_problem_configuration.execute_algo,
+    ) as spy:
+        yield spy
+
+
+class _ThreeIterationsSLSQPSettings(SLSQP_Settings):
+    """SLSQP settings with three iterations by default."""
+
+    _inherited_field_defaults: ClassVar[dict[str, Any]] = {"max_iter": 3}
+
+
+def test_compute_target_values_settings_defaults(execute_algo) -> None:
+    """Check that the target values use the settings model and its defaults."""
+    problem = OptimizationProblemConfiguration("Rosenbrock", Rosenbrock)
+    configurations = AlgorithmsConfigurations(
+        AlgorithmConfiguration(_ThreeIterationsSLSQPSettings())
+    )
+    problem.compute_target_values(1, configurations)
+    assert execute_algo.call_args_list
+    for call in execute_algo.call_args_list:
+        settings = call.kwargs["settings_model"]
+        assert isinstance(settings, _ThreeIterationsSLSQPSettings)
+        assert settings.max_iter == 3
+
+
+def test_compute_target_values_instance_algorithm_options(execute_algo) -> None:
+    """Check that the target values use the options specific to the instances."""
+    problem = OptimizationProblemConfiguration("Rosenbrock", Rosenbrock)
+    problem.starting_points = [array([0.0, 0.0]), array([0.5, 0.5])]
+    configurations = AlgorithmsConfigurations(
+        AlgorithmConfiguration(
+            SLSQP_Settings(max_iter=10),
+            instance_algorithm_options={
+                "max_iter": lambda configuration, index: configuration.dimension + index
+            },
+        )
+    )
+    problem.compute_target_values(1, configurations)
+    assert [
+        call.kwargs["settings_model"].max_iter for call in execute_algo.call_args_list
+    ] == [2, 3]
+
+
+def test_compute_target_values_settings_per_instance(execute_algo) -> None:
+    """Check that each instance of each configuration gets its own settings."""
+    problem = OptimizationProblemConfiguration("Rosenbrock", Rosenbrock)
+    problem.starting_points = [array([0.0, 0.0]), array([0.5, 0.5])]
+    configurations = AlgorithmsConfigurations(
+        AlgorithmConfiguration(
+            SLSQP_Settings(),
+            "A",
+            instance_algorithm_options={"max_iter": lambda _, index: 10 + index},
+        ),
+        AlgorithmConfiguration(
+            SLSQP_Settings(),
+            "B",
+            instance_algorithm_options={"max_iter": lambda _, index: 20 + index},
+        ),
+    )
+    problem.compute_target_values(1, configurations)
+    calls = execute_algo.call_args_list
+    assert [call.kwargs["settings_model"].max_iter for call in calls] == [
+        10,
+        11,
+        20,
+        21,
+    ]
+    # The first point of the database of an instance is its starting point.
+    assert [call.args[0].database.get_x_vect(1).tolist() for call in calls] == [
+        [0.0, 0.0],
+        [0.5, 0.5],
+        [0.0, 0.0],
+        [0.5, 0.5],
+    ]
+    assert len({id(call.args[0]) for call in calls}) == 4
+
+
+def test_compute_target_values_independent_settings(execute_algo) -> None:
+    """Check that each execution uses its own settings.
+
+    NLOPT_COBYLA sets its option `stop_crit_n_x` from the dimension of the problem,
+    so that the user's settings would be changed by the first execution
+    and the second one would use a wrong value.
+    """
+    settings = NLOPT_COBYLA_Settings(max_iter=10)
+    configurations = AlgorithmsConfigurations(AlgorithmConfiguration(settings))
+    for dimension in (2, 5):
+        OptimizationProblemConfiguration(
+            f"Rosenbrock {dimension}",
+            lambda dimension=dimension: Rosenbrock(dimension),
+        ).compute_target_values(1, configurations)
+
+    used_settings = [
+        call.kwargs["settings_model"] for call in execute_algo.call_args_list
+    ]
+    assert [settings.stop_crit_n_x for settings in used_settings] == [3, 6]
+    assert used_settings[0] is not used_settings[1]
+    assert all(used is not settings for used in used_settings)
+    assert settings.model_dump(exclude_unset=True) == {"max_iter": 10}
+
+
+def test_compute_target_values_without_instance_options(execute_algo) -> None:
+    """Check that the settings are not validated again without instance options."""
+    settings = SLSQP_Settings(max_iter=3)
+    configurations = AlgorithmsConfigurations(AlgorithmConfiguration(settings))
+    problem = OptimizationProblemConfiguration("Rosenbrock", Rosenbrock)
+    with mock.patch.object(
+        SLSQP_Settings, "model_validate", wraps=SLSQP_Settings.model_validate
+    ) as model_validate:
+        problem.compute_target_values(1, configurations)
+
+    model_validate.assert_not_called()
+    used_settings = execute_algo.call_args.kwargs["settings_model"]
+    assert used_settings is not settings
+    assert used_settings.max_iter == 3
+
+
+def test_compute_target_values_invalid_instance_option(execute_algo, snapshot) -> None:
+    """Check the error raised by invalid options specific to the instances.
+
+    The errors of all the instances are reported before any optimization,
+    even if the algorithm configuration with these options is the last one.
+    """
+    problem = OptimizationProblemConfiguration("Rosenbrock", Rosenbrock)
+    problem.starting_points = [array([0.0, 0.0]), array([0.5, 0.5])]
+    valid_configuration = AlgorithmConfiguration(SLSQP_Settings(), "A SLSQP")
+    invalid_configuration = AlgorithmConfiguration(
+        SLSQP_Settings(),
+        "B SLSQP",
+        instance_algorithm_options={"max_iter": lambda configuration, index: "five"},
+    )
+    configurations = AlgorithmsConfigurations(
+        invalid_configuration, valid_configuration
+    )
+    assert list(configurations)[-1] is invalid_configuration
+    with assert_exception(ValueError, snapshot):
+        problem.compute_target_values(1, configurations)
+
+    execute_algo.assert_not_called()
+
+
 def test_starting_points_non_2d_array(benchmarking_problem):
     """Check the setting of starting points as a non 2-dimensional NumPy array."""
     check_set_starting_points_as_non_2d_array(benchmarking_problem)
@@ -354,17 +516,16 @@ def test_dimension(benchmarking_problem):
 
 
 @test_compute_data_profiles_parametrize
-@image_comparison(None, ["png"])
 def test_compute_data_profile(
-    baseline_images,
     minimization_problem_creator,
     target_values,
     algorithms_configurations,
     results,
     use_abscissa_log_scale,
+    snapshot_matplotlib,
 ):
     """Check the computation of data profiles."""
-    check_data_profiles_computation(
+    figure = plot_data_profiles(
         OptimizationProblemConfiguration,
         minimization_problem_creator,
         target_values,
@@ -372,24 +533,25 @@ def test_compute_data_profile(
         results,
         use_abscissa_log_scale,
     )
+    assert figure == snapshot_matplotlib
 
 
-@image_comparison(
-    baseline_images=["data_profiles_max_eval_number"],
-    remove_text=True,
-    extensions=["png"],
-)
 def test_compute_data_profile_max_eval_number(
-    minimization_problem_creator, target_values, algorithms_configurations, results
+    minimization_problem_creator,
+    target_values,
+    algorithms_configurations,
+    results,
+    snapshot_matplotlib,
 ):
     """Check the computation of data profiles when the evaluations number is limited."""
-    check_data_profiles_computation_with_max_eval_number(
+    figure = plot_data_profiles_with_max_eval_number(
         OptimizationProblemConfiguration,
         minimization_problem_creator,
         target_values,
         algorithms_configurations,
         results,
     )
+    assert figure == snapshot_matplotlib(remove_text=True)
 
 
 @pytest.mark.parametrize(

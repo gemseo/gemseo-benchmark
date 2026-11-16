@@ -33,7 +33,7 @@ class Results:
         Args:
             path: The path to the JSON file from which to load the paths.
                 If `None`, the collection is initially empty.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self.__dict = {}
         if path:
             self.from_file(path)

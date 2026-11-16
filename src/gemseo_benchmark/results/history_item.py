@@ -54,7 +54,7 @@ class HistoryItem:
                 and if the infeasibility measure is positive it will be set to None.
             elapsed_time: The elapsed time of the item.
             number_of_discipline_executions: The number of discipline executions.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self.__elapsed_time = elapsed_time
         (
             self.__infeasibility_measure,

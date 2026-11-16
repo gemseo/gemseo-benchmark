@@ -21,8 +21,8 @@ from typing import TYPE_CHECKING
 from typing import ClassVar
 from typing import Final
 
-from gemseo.core.discipline.discipline import Discipline
-from gemseo.scenarios.mdo_scenario import MDOScenario
+from gemseo.discipline import Discipline
+from gemseo.scenario import MDOScenario
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.benchmarker.mdo_worker import MDOWorker
@@ -34,8 +34,8 @@ from gemseo_benchmark.report.axis_data import DisciplineData
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from gemseo.algos.design_space import DesignSpace
-    from gemseo.algos.doe.base_doe_settings import BaseDOESettings
+    from gemseo.doe.core.base_doe_settings import BaseDOESettings
+    from gemseo.space import DesignSpace
 
     from gemseo_benchmark.data_profiles.target_values import TargetValues
 
@@ -73,7 +73,7 @@ class MDOProblemConfiguration(
         Args:
             minimize_objective_value: Whether the objective function of the scenario
                 is to be minimized.
-        """  # noqa: D205, D212
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line]
         self.__minimize_objective_value = minimize_objective_value
         super().__init__(
             name,

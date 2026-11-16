@@ -20,7 +20,7 @@
 from __future__ import annotations
 
 import os
-import sys
+import tomllib
 from collections import defaultdict
 from collections.abc import Iterable
 from importlib.metadata import distributions
@@ -32,12 +32,6 @@ from jinja2 import StrictUndefined
 from jinja2.sandbox import SandboxedEnvironment
 from packaging.requirements import Requirement
 
-# YORE: EOL 3.10: Replace block with line 2.
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
-
 project_dir = Path(os.getenv("MKDOCS_CONFIG_DIR", "."))
 with project_dir.joinpath("pyproject.toml").open("rb") as pyproject_file:
     pyproject = tomllib.load(pyproject_file)
@@ -47,7 +41,8 @@ devdeps = [
     dep
     for group in pyproject["dependency-groups"].values()
     for dep in group
-    if not dep.startswith("-e")
+    # The tables including other groups are skipped.
+    if isinstance(dep, str) and not dep.startswith("-e")
 ]
 
 PackageMetadata = dict[str, str | Iterable[str]]

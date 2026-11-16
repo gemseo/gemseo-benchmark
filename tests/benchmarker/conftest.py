@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from typing import Any
 
     from gemseo.core.base_factory import BaseFactory
-    from gemseo.utils.timer import Timer
+    from gemseo.util.timer import Timer
 
     from gemseo_benchmark.algorithms.algorithm_configuration import (
         AlgorithmConfiguration,
@@ -67,7 +67,7 @@ def check_algorithm_availability(worker: BaseWorker) -> None:
 
 
 def check_execution(
-    tmp_wd,  # noqa: F811
+    tmp_wd,  # ruff: ignore[redefined-while-unused]
     algorithm_configuration: AlgorithmConfiguration,
     problem_configuration: BaseProblemConfiguration,
     save_gemseo_log: bool,

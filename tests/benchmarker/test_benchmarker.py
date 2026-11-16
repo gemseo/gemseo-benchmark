@@ -30,15 +30,18 @@ from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
-from gemseo.algos.opt.scipy_local.settings.lbfgsb import L_BFGS_B_Settings
-from gemseo.algos.opt.scipy_local.settings.tnc import TNC_Settings
-from gemseo.problems.optimization.power_2 import Power2
-from gemseo.utils.platform import PLATFORM_IS_WINDOWS
+from gemseo.optimization import L_BFGS_B_Settings
+from gemseo.optimization import NLOPT_COBYLA_Settings
+from gemseo.optimization import TNC_Settings
+from gemseo.problem.optimization.power_2 import Power2
+from gemseo.util.platform import platform_is_windows
+from gemseo.util.testing.helper import assert_exception
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 from gemseo_benchmark.algorithms.algorithms_configurations import (
     AlgorithmsConfigurations,
 )
+from gemseo_benchmark.benchmarker import benchmarker
 from gemseo_benchmark.benchmarker.benchmarker import Benchmarker
 from gemseo_benchmark.benchmarker.benchmarking_error import BenchmarkingError
 from gemseo_benchmark.problems.mda_problem_configuration import MDAProblemConfiguration
@@ -237,6 +240,26 @@ def test_is_problem_unsolved(
     )
 
 
+def test_skipping_logged_to_file(tmp_wd, rosenbrock) -> None:
+    """Check that the skipped problems are logged to the file shared by threads."""
+    results_path = tmp_wd / "results.json"
+    algorithm_configuration = AlgorithmConfiguration(L_BFGS_B_Settings())
+    for _ in range(2):
+        Benchmarker(tmp_wd, results_path).execute(
+            [rosenbrock],
+            AlgorithmsConfigurations(algorithm_configuration),
+            use_threading=True,
+            save_log=True,
+        )
+
+    log = (tmp_wd / "gemseo.log").read_text()
+    for index in (1, 2):
+        assert (
+            f"Skipping problem {index} of problem configuration {rosenbrock.name} "
+            f"for algorithm configuration {algorithm_configuration.name}."
+        ) in log
+
+
 @configurations
 @pytest.mark.parametrize("n_processes", [1, 2])
 @pytest.mark.parametrize("use_threading", [False, True])
@@ -264,6 +287,31 @@ def test_execution(
     path = histories_dir / f"{algo_config.name}.2.json"
     assert path.is_file()
     assert results.contains(algo_config.algorithm_name, pb_config.name, path)
+
+
+def test_execution_shared_settings(tmp_wd, rosenbrock) -> None:
+    """Check the settings of an algorithm configuration without instance options.
+
+    The planned executions share the user's settings, without copying them,
+    as the worker copies them before running the algorithm,
+    so that the user's settings are left unchanged:
+    NLOPT_COBYLA sets its option `stop_crit_n_x` from the dimension of the problem.
+    """
+    settings = NLOPT_COBYLA_Settings(max_iter=3)
+    stop_crit_n_x = settings.stop_crit_n_x
+    with mock.patch.object(
+        benchmarker, "AlgorithmConfiguration", wraps=AlgorithmConfiguration
+    ) as planned_configuration:
+        Benchmarker(tmp_wd).execute(
+            [rosenbrock], AlgorithmsConfigurations(AlgorithmConfiguration(settings))
+        )
+
+    assert planned_configuration.call_count == len(rosenbrock.starting_points)
+    for call in planned_configuration.call_args_list:
+        assert call.args[0] is settings
+
+    assert settings.model_dump(exclude_unset=True) == {"max_iter": 3}
+    assert settings.stop_crit_n_x == stop_crit_n_x
 
 
 @pytest.mark.parametrize(
@@ -315,6 +363,60 @@ def test_problem_specific_algorithm_options(
         )
 
 
+def raise_index_error(problem_configuration, index):
+    """Raise an `IndexError` for the second problem.
+
+    Args:
+        problem_configuration: The problem configuration.
+        index: The 0-based index of the problem.
+
+    Returns:
+        The maximum number of iterations.
+
+    Raises:
+        IndexError: For the second problem.
+    """
+    if index == 1:
+        msg = "There is no value for the second problem."
+        raise IndexError(msg)
+
+    return 5
+
+
+@pytest.mark.parametrize(
+    "get_max_iter",
+    [lambda config, index: "x" if index == 1 else 5, raise_index_error],
+    ids=["invalid_value", "callable_error"],
+)
+def test_invalid_problem_specific_algorithm_option(
+    tmp_wd, rosenbrock, get_max_iter, snapshot
+) -> None:
+    """Check that an invalid problem-specific option stops before any execution.
+
+    The option is invalid when its value is invalid
+    or when the callable computing it raises an error.
+    """
+    results_path = tmp_wd / "results.json"
+    algorithm_configuration = AlgorithmConfiguration(
+        L_BFGS_B_Settings(),
+        "L-BFGS-B",
+        instance_algorithm_options={"max_iter": get_max_iter},
+    )
+    loggers = (logging.getLogger(Benchmarker.__module__), logging.getLogger("gemseo"))
+    handlers = [list(logger.handlers) for logger in loggers]
+    with assert_exception(ValueError, snapshot):
+        Benchmarker(tmp_wd, results_path).execute(
+            [rosenbrock],
+            AlgorithmsConfigurations(algorithm_configuration),
+            use_threading=True,
+            save_log=True,
+        )
+
+    assert not results_path.exists()
+    assert not (tmp_wd / "L-BFGS-B").exists()
+    assert [list(logger.handlers) for logger in loggers] == handlers
+
+
 @configurations
 @pytest.mark.parametrize("n_processes", [1, 2])
 @pytest.mark.parametrize("use_threading", [False, True])
@@ -351,7 +453,7 @@ def test_log_to_file(
             for line in reference2.read().split("\n"):
                 assert line in file_contents
     else:
-        if PLATFORM_IS_WINDOWS:
+        if platform_is_windows:
             # FIXME: Support logging to file when multiprocessing on Windows.
             return
 
@@ -659,7 +761,6 @@ def create_unknown_algorithm_configuration(algorithm_name: str, name: str) -> mo
     algorithm_configuration = mock.Mock()
     algorithm_configuration.algorithm_name = algorithm_name
     algorithm_configuration.name = name
-    algorithm_configuration.copy = mock.Mock(return_value=algorithm_configuration)
     return algorithm_configuration
 
 
@@ -703,22 +804,71 @@ def test_all_unavailable_algorithms_reported(tmp_path, rosenbrock) -> None:
     )
 
 
+def test_unavailable_algorithm_and_invalid_option_reported(
+    tmp_wd, rosenbrock, snapshot
+) -> None:
+    """Check that an unavailable algorithm and an invalid option are reported at once.
+
+    Nothing is executed.
+    """
+    with assert_exception(ValueError, snapshot):
+        Benchmarker(tmp_wd).execute(
+            [rosenbrock],
+            AlgorithmsConfigurations(
+                create_unknown_algorithm_configuration("Algorithm", "Configuration"),
+                AlgorithmConfiguration(
+                    L_BFGS_B_Settings(),
+                    "L-BFGS-B",
+                    instance_algorithm_options={
+                        "max_iter": lambda configuration, index: "x"
+                    },
+                ),
+            ),
+        )
+
+    assert not list(tmp_wd.rglob("*.json"))
+
+
+class Unknown_Settings(L_BFGS_B_Settings):  # ruff: ignore[invalid-class-name]
+    """The settings of an algorithm unknown to GEMSEO."""
+
+
+def test_unavailable_algorithm_instance_options_not_computed(
+    tmp_wd, rosenbrock, snapshot
+) -> None:
+    """Check that the options of an unavailable algorithm are not computed."""
+    get_max_iter = mock.Mock(return_value=3)
+    with assert_exception(ValueError, snapshot):
+        Benchmarker(tmp_wd).execute(
+            [rosenbrock],
+            AlgorithmsConfigurations(
+                AlgorithmConfiguration(
+                    Unknown_Settings(),
+                    "Unknown",
+                    instance_algorithm_options={"max_iter": get_max_iter},
+                )
+            ),
+        )
+
+    get_max_iter.assert_not_called()
+
+
 @pytest.mark.parametrize(
     ("settings", "message"),
     [
         (
             (L_BFGS_B_Settings(),),
             (
-                "The algorithm 'L-BFGS-B' is not adapted to the problem configuration "
+                "The algorithm 'L_BFGS_B' is not adapted to the problem configuration "
                 "'Power2': it does not handle equality constraints."
             ),
         ),
         (
             (L_BFGS_B_Settings(), TNC_Settings()),
             (
-                "The algorithms 'L-BFGS-B', 'TNC' are not adapted "
+                "The algorithms 'L_BFGS_B', 'TNC' are not adapted "
                 "to the problem configuration 'Power2':\n"
-                "- 'L-BFGS-B': it does not handle equality constraints,\n"
+                "- 'L_BFGS_B': it does not handle equality constraints,\n"
                 "- 'TNC': it does not handle equality constraints."
             ),
         ),
@@ -805,7 +955,7 @@ def test_problem_creation_failure_not_raised(
 def test_benchmarking_error_pickle() -> None:
     """Check that a benchmarking error survives a pickle round trip."""
     error = BenchmarkingError({"x": RuntimeError("boom")}, 2)
-    unpickled = pickle.loads(pickle.dumps(error))  # noqa: S301
+    unpickled = pickle.loads(pickle.dumps(error))  # ruff: ignore[suspicious-pickle-usage]
     assert str(unpickled) == str(error)
     assert unpickled.number_of_executions == 2
     assert list(unpickled.exceptions) == ["x"]

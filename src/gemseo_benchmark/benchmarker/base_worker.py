@@ -29,20 +29,19 @@ from typing import Any
 from typing import Generic
 from typing import TypeVar
 
-from gemseo import LOGGER as GEMSEO_LOGGER
-from gemseo.utils.metaclasses import ABCGoogleDocstringInheritanceMeta
-from gemseo.utils.timer import Timer
+from gemseo import logger as gemseo_logger
+from gemseo.util.metaclass import ABCGoogleDocstringInheritanceMeta
+from gemseo.util.timer import Timer
+
+from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from pathlib import Path
 
-    from gemseo.algos.base_algo_factory import BaseAlgoFactory
-    from gemseo.typing import RealArray
+    from gemseo.core.algorithm.base_algorithm_factory import BaseAlgorithmFactory
+    from gemseo.util.typing import RealArray
 
-    from gemseo_benchmark.algorithms.algorithm_configuration import (
-        AlgorithmConfiguration,
-    )
     from gemseo_benchmark.benchmarker._metrics import BaseMetrics
     from gemseo_benchmark.problems.base_problem_configuration import (
         BaseProblemConfiguration,
@@ -69,7 +68,7 @@ class BaseWorker(
 
     @property
     @abstractmethod
-    def _algorithm_factory() -> BaseAlgoFactory:
+    def _algorithm_factory() -> BaseAlgorithmFactory:
         """The algorithm factory."""
 
     @classmethod
@@ -135,34 +134,44 @@ class BaseWorker(
         # Start writing in the log file.
         if log_path is not None:
             file_handler = logging.FileHandler(log_path, "w")
-            loggers = [benchmarking_logger, GEMSEO_LOGGER]
+            loggers = [benchmarking_logger, gemseo_logger]
             for logger in loggers:
                 logger.addHandler(file_handler)
 
-        problem = cls._get_problem(
-            algorithm_configuration,
-            problem_configuration,
-            starting_point,
-            hdf_file_path,
-        )
-
-        metrics_listeners = cls._add_metrics_listeners(problem)
-
-        benchmarking_logger.info(gemseo_log_message)
-        with Timer() as timer:
-            cls._execute(
-                algorithm_configuration,
+        try:
+            # The algorithm can change its settings while running,
+            # so it runs with a copy of them
+            # and the performance history stores the settings as given.
+            executed_configuration = AlgorithmConfiguration(
+                algorithm_configuration.algorithm_settings.model_copy(deep=True),
+                algorithm_configuration.name,
+                algorithm_configuration.instance_algorithm_options,
+            )
+            problem = cls._get_problem(
+                executed_configuration,
                 problem_configuration,
                 starting_point,
-                problem,
+                hdf_file_path,
             )
 
-        # Stop writing in the log file.
-        if log_path is not None:
-            for logger in loggers:
-                logger.removeHandler(file_handler)
+            metrics_listeners = cls._add_metrics_listeners(problem)
 
-            file_handler.close()
+            benchmarking_logger.info(gemseo_log_message)
+            with Timer() as timer:
+                cls._execute(
+                    executed_configuration,
+                    problem_configuration,
+                    starting_point,
+                    problem,
+                )
+        finally:
+            # Stop writing in the log file, even if the execution failed,
+            # so that the next executions do not write in it.
+            if log_path is not None:
+                for logger in loggers:
+                    logger.removeHandler(file_handler)
+
+                file_handler.close()
 
         cls._create_performance_history(
             algorithm_configuration,
