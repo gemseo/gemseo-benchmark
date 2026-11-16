@@ -25,8 +25,6 @@ import re
 from unittest import mock
 
 import pytest
-from matplotlib import pyplot
-from matplotlib.testing.decorators import image_comparison
 
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
 from gemseo_benchmark.results.history_item import HistoryItem
@@ -164,21 +162,17 @@ def test_best_target_not_reached():
 
 
 @pytest.mark.parametrize(
-    ("feasibility_statuses", "baseline_images"),
-    [
-        ([True, True], ["plot_histories"]),
-        ([False, True], ["plot_partially_infeasible_history"]),
-        ([False, False], ["plot_infeasible_history"]),
-    ],
+    "feasibility_statuses",
+    [[True, True], [False, True], [False, False]],
+    ids=["feasible", "partially_infeasible", "infeasible"],
 )
-@image_comparison(baseline_images=None, remove_text=True, extensions=["png"])
-def test_plot_histories(feasibility_statuses, baseline_images):
+def test_plot_histories(feasibility_statuses, snapshot_matplotlib):
     """Check the plotting of histories."""
     generator = TargetsGenerator()
     generator.add_history([2.0, 1.0])
     generator.add_history([3.0, 0.0], feasibility_statuses=feasibility_statuses)
-    pyplot.close("all")
-    generator.plot_histories(best_target_value=0.0, show=False)
+    figure = generator.plot_histories(best_target_value=0.0, show=False)
+    assert figure == snapshot_matplotlib(remove_text=True)
 
 
 def test_plot_histories_without_best_target_value():

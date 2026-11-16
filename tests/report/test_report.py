@@ -26,7 +26,7 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
-from gemseo.algos.opt.scipy_local.scipy_local import ScipyOpt
+from gemseo.optimization.scipy_local.scipy_local import ScipyOpt
 
 from gemseo_benchmark.report.report import Report
 from gemseo_benchmark.report.report import csv_to_md_table

@@ -20,7 +20,7 @@ import logging
 from typing import TYPE_CHECKING
 
 from gemseo import execute_algo
-from gemseo.algos.opt.factory import OptimizationLibraryFactory
+from gemseo.optimization.factory import OptimizationLibraryFactory
 
 from gemseo_benchmark.benchmarker._metrics import ElapsedTime
 from gemseo_benchmark.benchmarker.base_worker import BaseWorker
@@ -30,9 +30,9 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
     from pathlib import Path
 
-    from gemseo.algos.optimization_problem import OptimizationProblem
-    from gemseo.typing import RealArray
-    from gemseo.utils.timer import Timer
+    from gemseo.optimization import OptimizationProblem
+    from gemseo.util.timer import Timer
+    from gemseo.util.typing import RealArray
 
     from gemseo_benchmark.algorithms.algorithm_configuration import (
         AlgorithmConfiguration,
@@ -73,7 +73,7 @@ class OptimizationWorker(
         """
         try:
             problem = problem_configuration.create_problem()
-        except Exception as error:  # noqa: BLE001
+        except Exception as error:  # ruff: ignore[blind-except]
             LOGGER.warning(
                 "The suitability of the algorithms to the problem configuration %r "
                 "is not checked, as the problem cannot be created: %s",
@@ -86,11 +86,11 @@ class OptimizationWorker(
         reasons = {}
         for algorithm_name in algorithm_names:
             library_class = factory.get_class(
-                factory.algo_names_to_libraries[algorithm_name]
+                factory.algo_name_to_library[algorithm_name]
             )
             description = library_class.ALGORITHM_INFOS[algorithm_name]
             # There is no public accessor to the reason in GEMSEO.
-            reason = library_class._get_unsuitability_reason(  # noqa: SLF001
+            reason = library_class._get_unsuitability_reason(  # ruff: ignore[private-member-access]
                 description, problem
             )
             if reason:

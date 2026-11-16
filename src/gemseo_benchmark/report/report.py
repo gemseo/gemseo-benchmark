@@ -31,8 +31,8 @@ from typing import TYPE_CHECKING
 from typing import Any
 from typing import Final
 
-from gemseo.algos.opt.factory import OptimizationLibraryFactory
-from gemseo.utils.constants import READ_ONLY_EMPTY_DICT
+from gemseo.optimization.factory import OptimizationLibraryFactory
+from gemseo.util.constant import read_only_empty_dict
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 
@@ -113,7 +113,7 @@ class Report:
         histories_paths: Results,
         custom_algos_descriptions: Mapping[str, str] | None = None,
         max_eval_number_per_group: dict[str, int] | None = None,
-        plot_settings: Mapping[str, ConfigurationPlotOptions] = READ_ONLY_EMPTY_DICT,
+        plot_settings: Mapping[str, ConfigurationPlotOptions] = read_only_empty_dict,
     ) -> None:
         """
         Args:
@@ -136,7 +136,7 @@ class Report:
 
         Raises:
             ValueError: If an algorithm has no associated histories.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self.__plot_settings = plot_settings
         self.__root_directory = Path(root_directory_path)
         self.__docs_directory = self.__root_directory / "docs"

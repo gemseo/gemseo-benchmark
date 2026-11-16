@@ -26,17 +26,21 @@ from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import NamedTuple
 
-from gemseo import LOGGER as GEMSEO_LOGGER
+from gemseo import logger as gemseo_logger
 
 from gemseo_benchmark import join_substrings
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
+from gemseo_benchmark.algorithms.algorithm_configuration import _get_instances_settings
 from gemseo_benchmark.benchmarker.benchmarking_error import BenchmarkingError
 from gemseo_benchmark.results.results import Results
 
 if TYPE_CHECKING:
     from collections.abc import Callable
     from collections.abc import Iterable
+    from collections.abc import Mapping
+    from collections.abc import Sequence
     from concurrent.futures import Executor
     from concurrent.futures import Future
     from pathlib import Path
@@ -44,12 +48,52 @@ if TYPE_CHECKING:
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
     )
-    from gemseo_benchmark.benchmarker.base_worker import BaseWorker
     from gemseo_benchmark.problems.base_problem_configuration import (
         BaseProblemConfiguration,
     )
 
 LOGGER = logging.getLogger(__name__)
+
+
+class _Execution(NamedTuple):
+    """An execution of an algorithm configuration on a problem."""
+
+    algorithm_configuration: AlgorithmConfiguration
+    """The algorithm configuration with the settings of the algorithm for the problem.
+
+    These settings include the options specific to the problem;
+    without such options, they are the settings of the user,
+    as the worker runs the algorithm with a copy of them.
+    """
+
+    problem_configuration: BaseProblemConfiguration
+    """The problem configuration."""
+
+    index: int
+    """The 0-based index of the problem."""
+
+    description: str
+    """The description of the execution, e.g. `"Solving problem 1 of ..."`.
+
+    It is logged, followed by a period, when solving the problem,
+    and it names the execution if it fails.
+    """
+
+
+class _PlannedExecution(NamedTuple):
+    """An execution of an algorithm configuration on a problem, without settings."""
+
+    algorithm_configuration: AlgorithmConfiguration
+    """The algorithm configuration."""
+
+    problem_configuration: BaseProblemConfiguration
+    """The problem configuration."""
+
+    index: int
+    """The 0-based index of the problem."""
+
+    info: str
+    """The description of the execution."""
 
 
 class Benchmarker:
@@ -83,7 +127,7 @@ class Benchmarker:
                 If `None`, no performance history path will be saved.
             hdf_path: The path to the destination directory for the HDF files.
                 If `None`, no HDF file will be saved.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self.__hdf_path = hdf_path
         self.__histories_path = histories_path
         self.__results_path = results_path
@@ -132,7 +176,9 @@ class Benchmarker:
         Raises:
             ValueError: If an algorithm is not available,
                 or is not suited to a problem configuration when this can be told
-                before the execution.
+                before the execution,
+                or if an option specific to a problem
+                is not an option of the algorithm or has an invalid value.
                 This is checked for all the combinations
                 of algorithm configuration and problem configuration
                 before any of them is executed.
@@ -142,61 +188,73 @@ class Benchmarker:
                 and their performance histories are saved before the error is raised.
         """
         problem_configurations = tuple(problem_configurations)
-        self.__check_algorithms(
-            problem_configurations, algorithm_configurations, overwrite_histories
+        executions, skipped_executions = self.__plan_executions(
+            problem_configurations,
+            algorithm_configurations,
+            overwrite_histories,
         )
+        if overwrite_histories:
+            for algorithm_configuration in algorithm_configurations:
+                for problem_configuration in problem_configurations:
+                    self._results.remove_paths(
+                        algorithm_configuration.name, problem_configuration.name
+                    )
+
         if save_log and use_threading:
             # Set one file handler for all threads.
             file_handler = logging.FileHandler(
                 self.__histories_path / "gemseo.log", "w"
             )
             file_handler.setFormatter(logging.Formatter("%(threadName)s %(message)s"))
-            loggers = [LOGGER, GEMSEO_LOGGER]
+            loggers = [LOGGER, gemseo_logger]
             for logger in loggers:
                 logger.addHandler(file_handler)
 
-        executor_class = ThreadPoolExecutor if use_threading else ProcessPoolExecutor
-        with executor_class(max_workers=n_processes) as executor:
-            future_to_path = {}
-            for original_algorithm_configuration in algorithm_configurations:
-                algorithm_configuration = original_algorithm_configuration.copy()
-                for problem_configuration in problem_configurations:
-                    future_to_path.update(
-                        self.__execute(
-                            executor,
-                            problem_configuration.worker,
-                            algorithm_configuration,
-                            problem_configuration,
-                            overwrite_histories,
-                            save_log,
-                            use_threading,
-                        )
+        try:
+            for execution_info in skipped_executions:
+                gemseo_logger.info("Skipping %s.", execution_info)
+
+            # The execution and the path to the performance history of each future.
+            future_to_submission: dict[Future, tuple[_Execution, Path]] = {}
+            failures: dict[str, BaseException] = {}
+            executor_class = (
+                ThreadPoolExecutor if use_threading else ProcessPoolExecutor
+            )
+            with executor_class(max_workers=n_processes) as executor:
+                for execution in executions:
+                    future, path = self.__submit(
+                        executor, execution, save_log, use_threading
                     )
-        failures: dict[str, BaseException] = {}
-        # All the futures are done, as the executor has been shut down.
-        # They are read in the order of submission, for a reproducible error.
-        for future in future_to_path:
-            exception = future.exception()
-            if exception is None:
-                self._results.add_path(*future_to_path[future][1:])
-            else:
-                description = future_to_path[future][0][:-1]
-                failures[description] = exception
-                LOGGER.error(
-                    "%s raised: %s", description, exception, exc_info=exception
-                )
+                    future_to_submission[future] = (execution, path)
 
-        if save_log and use_threading:
-            for logger in loggers:
-                logger.removeHandler(file_handler)
+            # All the futures are done, as the executor has been shut down.
+            # They are read in the order of submission, for a reproducible error.
+            for future, (execution, path) in future_to_submission.items():
+                exception = future.exception()
+                if exception is None:
+                    self._results.add_path(
+                        execution.algorithm_configuration.name,
+                        execution.problem_configuration.name,
+                        path,
+                    )
+                else:
+                    description = execution.description
+                    failures[description] = exception
+                    LOGGER.error(
+                        "%s raised: %s", description, exception, exc_info=exception
+                    )
+        finally:
+            if save_log and use_threading:
+                for logger in loggers:
+                    logger.removeHandler(file_handler)
 
-            file_handler.close()
+                file_handler.close()
 
-        if future_to_path and self.__results_path:
+        if future_to_submission and self.__results_path:
             self._results.to_file(self.__results_path, 4)
 
         if failures:
-            error = BenchmarkingError(failures, len(future_to_path))
+            error = BenchmarkingError(failures, len(future_to_submission))
             if raise_errors:
                 raise error from next(iter(failures.values()))
 
@@ -204,22 +262,25 @@ class Benchmarker:
 
         return self._results
 
-    def __check_algorithms(
+    def __plan_executions(
         self,
-        problem_configurations: Iterable[BaseProblemConfiguration],
+        problem_configurations: Sequence[BaseProblemConfiguration],
         algorithm_configurations: AlgorithmsConfigurations,
         overwrite_histories: bool,
-    ) -> None:
-        """Check the algorithms for all the problem configurations.
+    ) -> tuple[list[_Execution], list[str]]:
+        """Return the executions to submit and the skipped ones.
 
-        Nothing is executed if an algorithm is unavailable
-        or not suited to a problem configuration,
+        This is the only place that decides which problems are solved,
+        and with which settings.
+        The problems whose performance histories already exist are skipped,
+        unless these histories are overwritten.
+        The algorithms and their settings are checked before any execution,
         so that a mistake in the last algorithm configuration
         does not come after the execution of the other ones.
-        All the mistakes are reported at once.
-        The combinations that will not be executed,
-        because all their performance histories already exist,
-        are not checked.
+        The algorithms are checked first,
+        and the settings are built only for the available algorithms,
+        so that the options specific to the problems
+        are not computed for an algorithm that cannot be executed.
 
         Args:
             problem_configurations: The problem configurations.
@@ -227,27 +288,133 @@ class Benchmarker:
             overwrite_histories: Whether to overwrite the existing performance
                 histories.
 
+        Returns:
+            The executions to submit, in the order of submission,
+            and the descriptions of the skipped executions,
+            to be logged.
+
         Raises:
             ValueError: If an algorithm is not available,
-                or is not suited to a problem configuration.
+                or is not suited to a problem configuration when this can be told
+                before the execution,
+                or if an option specific to a problem
+                is not an option of the algorithm or has an invalid value.
+        """
+        # The executions to submit, without their settings.
+        planned_executions: list[_PlannedExecution] = []
+        skipped_executions = []
+        # The names of the algorithms to execute on each problem configuration,
+        # in the order of the problem configurations.
+        algorithm_names: dict[BaseProblemConfiguration, dict[str, None]] = {
+            problem_configuration: {}
+            for problem_configuration in problem_configurations
+        }
+        for algorithm_configuration in algorithm_configurations:
+            for problem_configuration in problem_configurations:
+                for index in range(len(problem_configuration.starting_points)):
+                    execution_info = (
+                        f"problem {index + 1} "
+                        f"of problem configuration {problem_configuration.name} "
+                        f"for algorithm configuration {algorithm_configuration.name}"
+                    )
+                    if not overwrite_histories and self.__is_solved(
+                        algorithm_configuration, problem_configuration, index
+                    ):
+                        skipped_executions.append(execution_info)
+                        continue
+
+                    algorithm_names[problem_configuration][
+                        algorithm_configuration.algorithm_name
+                    ] = None
+                    planned_executions.append(
+                        _PlannedExecution(
+                            algorithm_configuration,
+                            problem_configuration,
+                            index,
+                            execution_info,
+                        )
+                    )
+
+        algorithm_messages, unavailable_names = self.__check_algorithms(algorithm_names)
+        # The suitability check tells only which problem configuration
+        # some algorithms are not suited to, not which algorithms,
+        # so the settings of the unsuited algorithms are still built;
+        # unlike an unavailable algorithm, their options can be checked.
+        planned_executions = [
+            execution
+            for execution in planned_executions
+            if execution.algorithm_configuration.algorithm_name
+            not in unavailable_names[execution.problem_configuration]
+        ]
+        # The worker copies the settings before running the algorithm,
+        # so that the executions can share the settings
+        # of an algorithm configuration without options specific to the instances.
+        all_settings, settings_messages = _get_instances_settings(
+            (
+                (
+                    execution.algorithm_configuration,
+                    execution.problem_configuration,
+                    execution.index,
+                )
+                for execution in planned_executions
+            ),
+            copy_settings_without_instance_options=False,
+        )
+        # The options specific to the problems are not passed,
+        # as they are already applied and may not be picklable.
+        executions = [
+            _Execution(
+                AlgorithmConfiguration(settings, algorithm_configuration.name, {}),
+                problem_configuration,
+                index,
+                f"Solving {execution_info}",
+            )
+            for settings, (
+                algorithm_configuration,
+                problem_configuration,
+                index,
+                execution_info,
+            ) in zip(all_settings, planned_executions, strict=True)
+            if settings is not None
+        ]
+        messages = [*algorithm_messages, *settings_messages]
+        if messages:
+            raise ValueError("\n".join(messages))
+
+        return executions, skipped_executions
+
+    @staticmethod
+    def __check_algorithms(
+        algorithm_names: Mapping[BaseProblemConfiguration, Iterable[str]],
+    ) -> tuple[list[str], dict[BaseProblemConfiguration, set[str]]]:
+        """Check the algorithms for the problem configurations to be solved.
+
+        Args:
+            algorithm_names: The names of the algorithms
+                to execute on each problem configuration,
+                in the order of the problem configurations.
+
+        Returns:
+            The messages of the errors, without duplicates,
+            for the algorithms that are not available
+            or not suited to a problem configuration,
+            in the order of the problem configurations,
+            and the names of the algorithms that are not available
+            for each problem configuration.
         """
         messages = {}
-        for problem_configuration in problem_configurations:
+        all_unavailable_names = {}
+        for problem_configuration, names in algorithm_names.items():
             worker = problem_configuration.worker
-            algorithm_names = tuple({
-                configuration.algorithm_name: None
-                for configuration in algorithm_configurations
-                if self.__has_unsolved_problem(
-                    configuration, problem_configuration, overwrite_histories
-                )
-            })
             available_names = []
-            for algorithm_name in algorithm_names:
+            unavailable_names = all_unavailable_names[problem_configuration] = set()
+            for algorithm_name in names:
                 message = Benchmarker.__get_error_message(
                     worker.check_algorithm_availability, algorithm_name
                 )
                 if message:
                     messages[message] = None
+                    unavailable_names.add(algorithm_name)
                 else:
                     available_names.append(algorithm_name)
 
@@ -260,8 +427,7 @@ class Benchmarker:
                 if message:
                     messages[message] = None
 
-        if messages:
-            raise ValueError("\n".join(messages))
+        return list(messages), all_unavailable_names
 
     @staticmethod
     def __get_error_message(check: Callable[..., None], *args: Any) -> str:
@@ -282,100 +448,63 @@ class Benchmarker:
 
         return ""
 
-    def __execute(
+    def __submit(
         self,
         executor: Executor,
-        worker: BaseWorker,
-        algorithm_configuration: AlgorithmConfiguration,
-        problem_configuration: BaseProblemConfiguration,
-        overwrite_histories: bool,
+        execution: _Execution,
         save_log: bool,
         use_threading: bool,
-    ) -> dict[Future, tuple[str, str, str, Path]]:
-        """Execute an algorithm configuration on a problem configuration.
+    ) -> tuple[Future, Path]:
+        """Submit an execution of an algorithm configuration on a problem.
 
         Args:
             executor: The executor for parallel execution.
-            worker: The worker of the problem configuration.
-            algorithm_configuration: The algorithm configuration.
-            problem_configuration: The problem configuration.
-            overwrite_histories: Whether to overwrite the existing performance
-                histories.
+            execution: The execution.
             save_log: Whether to save the log to a file
                 next to the performance history file.
             use_threading: Whether threads are used instead of processes
                 to parallelize the execution.
 
         Returns:
-            The executions.
+            The future of the execution
+            and the path to the performance history.
         """
-        future_to_path = {}
-        algorithm_configuration_name = algorithm_configuration.name
+        algorithm_configuration = execution.algorithm_configuration
+        problem_configuration = execution.problem_configuration
         problem_configuration_name = problem_configuration.name
-        if overwrite_histories:
-            self._results.remove_paths(
-                algorithm_configuration_name, problem_configuration_name
-            )
+        index = execution.index
+        performance_history_path = self.get_history_path(
+            algorithm_configuration, problem_configuration_name, index, True
+        )
+        if save_log and not use_threading:
+            gemseo_log_path = performance_history_path.with_suffix(".log")
+        else:
+            gemseo_log_path = None
 
-        for starting_point_index, starting_point in enumerate(
-            problem_configuration.starting_points
-        ):
-            gemseo_log_message = self.__is_problem_unsolved(
-                algorithm_configuration,
-                problem_configuration,
-                starting_point_index,
-                overwrite_histories,
-            )
-            if not gemseo_log_message:
-                continue
-
-            performance_history_path = self.get_history_path(
+        if self.__hdf_path is not None:
+            hdf_file_path = self._get_path(
+                self.__hdf_path,
                 algorithm_configuration,
                 problem_configuration_name,
-                starting_point_index,
+                index,
+                "h5",
                 True,
             )
+        else:
+            hdf_file_path = None
 
-            if save_log and not use_threading:
-                gemseo_log_path = performance_history_path.with_suffix(".log")
-            else:
-                gemseo_log_path = None
-
-            if self.__hdf_path is not None:
-                hdf_file_path = self._get_path(
-                    self.__hdf_path,
-                    algorithm_configuration,
-                    problem_configuration_name,
-                    starting_point_index,
-                    "h5",
-                    True,
-                )
-            else:
-                hdf_file_path = None
-            future_to_path[
-                executor.submit(
-                    worker.execute,
-                    self.__set_problem_algorithm_options(
-                        algorithm_configuration,
-                        problem_configuration,
-                        starting_point_index,
-                    ),
-                    problem_configuration,
-                    starting_point,
-                    gemseo_log_message,
-                    gemseo_log_path,
-                    performance_history_path,
-                    hdf_file_path,
-                    GEMSEO_LOGGER,
-                )
-            ] = (
-                gemseo_log_message,
-                algorithm_configuration_name,
-                problem_configuration_name,
-                performance_history_path,
-            )
-
-        return future_to_path
+        future = executor.submit(
+            problem_configuration.worker.execute,
+            algorithm_configuration,
+            problem_configuration,
+            problem_configuration.starting_points[index],
+            f"{execution.description}.",
+            gemseo_log_path,
+            performance_history_path,
+            hdf_file_path,
+            gemseo_logger,
+        )
+        return future, performance_history_path
 
     def __is_solved(
         self,
@@ -402,89 +531,6 @@ class Benchmarker:
             self.get_history_path(
                 algorithm_configuration, problem_configuration.name, index
             ),
-        )
-
-    def __has_unsolved_problem(
-        self,
-        algorithm_configuration: AlgorithmConfiguration,
-        problem_configuration: BaseProblemConfiguration,
-        overwrite_histories: bool,
-    ) -> bool:
-        """Check whether an algorithm configuration has problems left to solve.
-
-        Args:
-            algorithm_configuration: The algorithm configuration.
-            problem_configuration: The problem configuration.
-            overwrite_histories: Whether to overwrite existing histories.
-
-        Returns:
-            Whether at least one execution will not be skipped.
-        """
-        return overwrite_histories or any(
-            not self.__is_solved(algorithm_configuration, problem_configuration, index)
-            for index in range(len(problem_configuration.starting_points))
-        )
-
-    def __is_problem_unsolved(
-        self,
-        algorithm_configuration: AlgorithmConfiguration,
-        problem_configuration: BaseProblemConfiguration,
-        index: int,
-        overwrite_histories: bool,
-    ) -> str:
-        """Check whether a problem needs to be solved.
-
-        Args:
-            algorithm_configuration: The algorithm configuration.
-            problem_configuration: The problem configuration.
-            index: The index of the problem.
-            overwrite_histories: Whether to overwrite existing histories.
-
-        Returns:
-            The message to log when solving the problem.
-        """
-        problem_configuration_name = problem_configuration.name
-        execution_info = (
-            f"problem {index + 1} "
-            f"of problem configuration {problem_configuration_name} "
-            f"for algorithm configuration {algorithm_configuration.name}"
-        )
-
-        if overwrite_histories or not self.__is_solved(
-            algorithm_configuration, problem_configuration, index
-        ):
-            return f"Solving {execution_info}."
-
-        GEMSEO_LOGGER.info("Skipping %s.", execution_info)
-        return ""
-
-    @staticmethod
-    def __set_problem_algorithm_options(
-        algorithm_configuration: AlgorithmConfiguration,
-        problem_configuration: BaseProblemConfiguration,
-        index: int,
-    ) -> AlgorithmConfiguration:
-        """Return the algorithm configuration of a problem.
-
-        Args:
-            algorithm_configuration: The algorithm configuration.
-            problem_configuration: The problem configuration.
-            index: The 0-based index of the problem.
-
-        Returns:
-            The algorithm configuration of the problem.
-        """
-        instance_options = {
-            name: fn(problem_configuration, index)
-            for name, fn in algorithm_configuration.instance_algorithm_options.items()
-        }
-        updated_settings = algorithm_configuration.algorithm_settings.model_copy(
-            update=instance_options
-        )
-        return AlgorithmConfiguration(
-            updated_settings,
-            algorithm_configuration.name,
-            {},
         )
 
     def get_history_path(

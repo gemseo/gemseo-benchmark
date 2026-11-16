@@ -21,12 +21,14 @@
 
 from __future__ import annotations
 
+from itertools import islice
 from typing import TYPE_CHECKING
 from typing import ClassVar
 from typing import Final
 
 from gemseo import execute_algo
 
+from gemseo_benchmark.algorithms.algorithm_configuration import _get_instances_settings
 from gemseo_benchmark.benchmarker.optimization_worker import OptimizationWorker
 from gemseo_benchmark.data_profiles.targets_generator import TargetsGenerator
 from gemseo_benchmark.problems.base_problem_configuration import (
@@ -39,8 +41,8 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from collections.abc import Iterator
 
-    from gemseo.algos.doe.base_doe_settings import BaseDOESettings
-    from gemseo.algos.optimization_problem import OptimizationProblem
+    from gemseo.doe.core.base_doe_settings import BaseDOESettings
+    from gemseo.optimization import OptimizationProblem
 
     from gemseo_benchmark.algorithms.algorithms_configurations import (
         AlgorithmsConfigurations,
@@ -97,7 +99,7 @@ class OptimizationProblemConfiguration(
                 If `None`, the target values will not be computed.
                 N.B. the number of target values shall be the same for all the
                 problem configurations of a same group.
-        """  # noqa: D205, D212, D415
+        """  # ruff: ignore[missing-blank-line-after-summary, multi-line-summary-first-line, missing-terminal-punctuation]
         self.__optimization_problem = create_problem()
         super().__init__(
             name,
@@ -171,16 +173,40 @@ class OptimizationProblemConfiguration(
 
         Returns:
             The generated target values.
+
+        Raises:
+            ValueError: If an option specific to a problem
+                is not an option of the algorithm or has an invalid value,
+                or if the callable computing it raises an error.
+                This is checked for all the algorithm configurations
+                and all the instances of the problem before any optimization.
         """
+        # The settings of all the executions are computed before any of them,
+        # so that all the mistakes are reported before any optimization.
+        # The executions are ordered by algorithm configuration, then by instance.
+        # Each execution gets its own settings,
+        # as the algorithm can change its settings while running.
+        configurations = list(algorithm_configurations)
+        instances_number = len(self.starting_points)
+        all_settings, messages = _get_instances_settings(
+            (
+                (configuration, self, index)
+                for configuration in configurations
+                for index in range(instances_number)
+            ),
+            copy_settings_without_instance_options=True,
+        )
+        if messages:
+            raise ValueError("\n".join(messages))
+
         self.__targets_generator = TargetsGenerator()
-        for configuration in algorithm_configurations:
-            for instance in self:
-                execute_algo(
-                    instance,
-                    "opt",
-                    algo_name=configuration.algorithm_name,
-                    **configuration.algorithm_options,
-                )
+        settings_iterator = iter(all_settings)
+        for _ in configurations:
+            # Each algorithm configuration solves new instances of the problem.
+            for instance, settings in zip(
+                self, islice(settings_iterator, instances_number), strict=True
+            ):
+                execute_algo(instance, "opt", settings_model=settings)
                 history = PerformanceHistory.from_problem(instance)
                 self.__targets_generator.add_history(history=history)
 

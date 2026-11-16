@@ -24,8 +24,6 @@ from __future__ import annotations
 from unittest import mock
 
 import pytest
-from matplotlib import pyplot
-from matplotlib.testing.decorators import image_comparison
 
 from gemseo_benchmark.data_profiles.data_profile import DataProfile
 from gemseo_benchmark.data_profiles.target_values import TargetValues
@@ -63,25 +61,17 @@ def test_compute_data_profiles():
 
 
 @pytest.mark.parametrize(
-    ("baseline_images", "use_abscissa_log_scale"),
-    [
-        (
-            [f"data_profile[use_abscissa_log_scale={use_abscissa_log_scale}]"],
-            use_abscissa_log_scale,
-        )
-        for use_abscissa_log_scale in [False, True]
-    ],
+    "use_abscissa_log_scale", [False, True], ids=["linear_scale", "log_scale"]
 )
-@image_comparison(None, ["png"])
-def test_plot_data_profiles(baseline_images, use_abscissa_log_scale):
+def test_plot_data_profiles(use_abscissa_log_scale, snapshot_matplotlib):
     """Check the data profiles figure."""
     data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
     data_profile.add_history("problem", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
     data_profiles = data_profile.compute_data_profiles("algo")
-    pyplot.close("all")
-    data_profile._plot_data_profiles(
+    figure = data_profile._plot_data_profiles(
         data_profiles, use_abscissa_log_scale=use_abscissa_log_scale
     )
+    assert figure == snapshot_matplotlib
 
 
 @pytest.mark.parametrize("converter", [lambda _: _, str])
@@ -90,7 +80,7 @@ def test_plot_save(tmp_path, converter):
 
     Args:
         converter: The Path converter.
-    """  # noqa: D417
+    """  # ruff: ignore[undocumented-param]
     data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
     data_profile.add_history("problem", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
     path = tmp_path / "data_profile.png"
@@ -132,17 +122,14 @@ def test_unevenly_represented_problems():
         data_profile.compute_data_profiles()
 
 
-@image_comparison(
-    baseline_images=["two_data_profiles"], remove_text=True, extensions=["png"]
-)
-def test_different_sizes_data_profiles():
+def test_different_sizes_data_profiles(snapshot_matplotlib):
     """Check the plotting of data profiles of different sizes."""
     data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
     data_profile.add_history("problem", "algo1", [1.0, 1.0])
     data_profile.add_history("problem", "algo2", [2.0, 1.0, 0.0])
     profiles = data_profile.compute_data_profiles()
-    pyplot.close("all")
-    data_profile._plot_data_profiles(profiles)
+    figure = data_profile._plot_data_profiles(profiles)
+    assert figure == snapshot_matplotlib(remove_text=True)
 
 
 def test_plot_algo_names():

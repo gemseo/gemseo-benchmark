@@ -28,8 +28,51 @@ and this project adheres to
 
 ## Develop
 
+### Added
+
+- The method `AlgorithmConfiguration.get_instance_settings` returns
+  a new copy of the settings of the algorithm, nested settings included,
+  updated with the options specific to an instance of a problem;
+  the explicitly-set options are validated together by the settings model,
+  as when creating the settings,
+  so an unknown option, an invalid value, options that are not valid together
+  or an error raised by the callable computing an option
+  raises a `ValueError` naming the algorithm configuration
+  and the instance of the problem.
+
 ### Changed
 
+- The plugin is compatible with GEMSEO 7 and no longer with GEMSEO 6.
+- The minimum Python version is 3.11.
+- The names of the algorithms are those of GEMSEO 7,
+  e.g. `L_BFGS_B` instead of `L-BFGS-B`;
+  they name the algorithm configurations created from settings
+  without a configuration name,
+  the results directories and the log files;
+  so, when the name of its algorithm changed,
+  the results of such an algorithm configuration
+  produced with an earlier version are not found
+  and its executions run again.
+- `Benchmarker.execute` and `Scenario.execute` also validate
+  the options specific to the problem instances
+  before any execution, when they check the algorithms:
+  the `ValueError` listing the unavailable and unsuited algorithms
+  also lists the instances whose options are invalid
+  or whose callables computing the options raised an error,
+  with one message per algorithm configuration and error;
+  the options of an unavailable algorithm are not computed.
+- `AlgorithmConfiguration.from_dict` and `PerformanceHistory.from_file`
+  can no longer read the algorithm configurations and the performance histories
+  saved with an earlier version,
+  whose algorithm settings class cannot be imported
+  or whose algorithm settings are not a mapping;
+  they raise a `ValueError` that says to compute these results again,
+  or to install the plugin providing the algorithm
+  when the algorithm settings class cannot be imported;
+  they also raise a `ValueError`, without calling it,
+  when the algorithm settings class is not a class of settings of a GEMSEO algorithm.
+- The documentation is generated using `mkdocs` instead of `properdocs`;
+  the HTML and PDF reports are still generated using `properdocs`.
 - The dependencies `properdocs`, `mkdocs-material` and `mkdocs-to-pdf`
   are bounded: `properdocs >=1.6,<2`, `mkdocs-material >=9.7,<10`
   and `mkdocs-to-pdf >=0.11,<1`.
@@ -40,6 +83,14 @@ and this project adheres to
   from a generator of NumPy arrays no longer leaves it without starting points.
 - `AlgorithmsConfigurations.algorithms` lists each algorithm once
   when several algorithm configurations use it.
+- `OptimizationProblemConfiguration.compute_target_values` applies
+  the `instance_algorithm_options` of the algorithm configurations
+  to each instance of the problem, as the benchmarking does;
+  they were ignored.
+  When these options are invalid,
+  it raises a `ValueError` naming the algorithm configurations
+  and the instances of the problem,
+  before any optimization.
 
 ## Version 5.0.0 (October 2026)
 
@@ -82,11 +133,11 @@ and this project adheres to
 - Examples of HTML and PDF reports are available in the examples.
 - `BaseProblemConfiguration.minimization_target_values` raises a `ValueError` when the problem configuration has no target value, as `target_values` does; it used to return `None`.
 - API changes:
-  - The arguments `doe_name`, `doe_options` and `doe_size` of `BaseProblemConfiguration` and its subclasses
+    - The arguments `doe_name`, `doe_options` and `doe_size` of `BaseProblemConfiguration` and its subclasses
     have been replaced by `doe_settings` of type `BaseDOESettings`.
-  - The arguments `algorithm_name` and `**algorithm_options` of `AlgorithmConfiguration`
+    - The arguments `algorithm_name` and `**algorithm_options` of `AlgorithmConfiguration`
     have been replaced by `algorithm_settings` of type `BaseSettings`.
-  - The `to_dict` method of `AlgorithmConfiguration` returns a dictionary
+    - The `to_dict` method of `AlgorithmConfiguration` returns a dictionary
     containing
     the configuration name,
     the absolute path of the algorithm settings class
@@ -217,50 +268,50 @@ and this project adheres to
 - Method `Problem.plot_histories` was removed as it was redundant with `Figures.plot`.
   To obtain a figure similar to the one formerly returned by
 
-  ```python
-  problem.plot_histories(
-    algos_configurations,
-    results,
-    False,
-    file_path,
-    plot_all_histories,
-    alpha,
-    markevery,
-    infeasibility_tolerance,
-    max_eval_number,
-    use_log_scale
-  )
-  ```
+    ```python
+    problem.plot_histories(
+      algos_configurations,
+      results,
+      False,
+      file_path,
+      plot_all_histories,
+      alpha,
+      markevery,
+      infeasibility_tolerance,
+      max_eval_number,
+      use_log_scale
+    )
+    ```
 
-  one can make the following call instead:
+    one can make the following call instead:
 
-  ```python
-  Figures(
-    algos_configurations,
-    ProblemsGroup(problem.name, [problem]),
-    results,
-    file_path.parent,
-    infeasibility_tolerance,
-    max_eval_number,
-    {"alpha": alpha, "markevery": markevery}
-  ).plot(plot_all_histories, use_log_scale, False, False, False)
-  ```
+    ```python
+    Figures(
+      algos_configurations,
+      ProblemsGroup(problem.name, [problem]),
+      results,
+      file_path.parent,
+      infeasibility_tolerance,
+      max_eval_number,
+      {"alpha": alpha, "markevery": markevery}
+    ).plot(plot_all_histories, use_log_scale, False, False, False)
+    ```
 
 - Method `Problem.compute_performance` was removed as is was redundant with `PerformanceHistory.from_problem`.
   To obtain values similar to the former
 
-  ```python
-  objective_values, infeasibility_measures, feasibility_statuses = Problem.compute_performance(problem)
-  ```
+    ```python
+    objective_values, infeasibility_measures, feasibility_statuses = Problem.compute_performance(problem)
+    ```
 
-  one can use the following instructions instead:
+    one can use the following instructions instead:
 
-  ```python
-  performance_history = PerformanceHistory.from_problem(problem)
-  objective_values = performance_history.objective_values
-  infeasibility_measures = performance_history.infeasibility_measures
-  feasibility_statuses = [item.is_feasible for item in performance_history]
-  ```
+    ```python
+    performance_history = PerformanceHistory.from_problem(problem)
+    objective_values = performance_history.objective_values
+    infeasibility_measures = performance_history.infeasibility_measures
+    feasibility_statuses = [item.is_feasible for item in performance_history]
+    ```
 
 #### Results
 
@@ -269,38 +320,38 @@ and this project adheres to
   as they were redundant with `Figures.plot`.
   To obtain a figure similar to the one formerly returned by
 
-  ```python
-  performance_histories.plot_algorithm_histories(
-    axes,
-    algorithm_name,
-    max_feasible_objective,
-    plot_all,
-    color,
-    marker,
-    alpha,
-    markevery
-  )
-  ```
+    ```python
+    performance_histories.plot_algorithm_histories(
+      axes,
+      algorithm_name,
+      max_feasible_objective,
+      plot_all,
+      color,
+      marker,
+      alpha,
+      markevery
+    )
+    ```
 
-  one can use the following instructions instead:
+    one can use the following instructions instead:
 
-  ```python
-  results = Results()
-  for index, performance_history in enumerate(performance_histories):
-    path = f"{index}.json"
-    performance_history.to_file(path)
-    results.add_path(algorithm_name, problem.name, path)
+    ```python
+    results = Results()
+    for index, performance_history in enumerate(performance_histories):
+      path = f"{index}.json"
+      performance_history.to_file(path)
+      results.add_path(algorithm_name, problem.name, path)
 
-  Figures(
-    AlgorithmsConfigurations(AlgorithmConfiguration(algorithm_name)),
-    ProblemsGroup(problem.name, [problem]),
-    results,
-    ".",
-    0,
-    0,
-    {"color": color, "marker": marker, "alpha": alpha, "markevery": markevery}
-  ).plot(plot_all, False, False, False, False)
-  ```
+    Figures(
+      AlgorithmsConfigurations(AlgorithmConfiguration(algorithm_name)),
+      ProblemsGroup(problem.name, [problem]),
+      results,
+      ".",
+      0,
+      0,
+      {"color": color, "marker": marker, "alpha": alpha, "markevery": markevery}
+    ).plot(plot_all, False, False, False, False)
+    ```
 
 ## Version 3.0.0 (November 2024)
 
