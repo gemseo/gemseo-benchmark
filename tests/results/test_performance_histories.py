@@ -19,7 +19,9 @@ from __future__ import annotations
 from datetime import timedelta
 
 import matplotlib.pyplot
+import numpy
 import pytest
+from numpy.testing import assert_equal
 
 from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_histories import PerformanceHistories
@@ -278,6 +280,18 @@ def test_plot_number_of_unsatisfied_constraints_distribution_over_time(
         figure.gca(), use_elapsed_time=True
     )
     assert figure == snapshot_matplotlib
+
+
+def test_plot_with_array_abscissas():
+    """Check the plots of a centiles range and a median with an array of abscissas."""
+    histories = numpy.array([[3.0, 2.0, 1.0], [4.0, 2.0, 0.0]])
+    abscissas = numpy.array([1.0, 4.0, 6.0])
+    axes = matplotlib.pyplot.figure().gca()
+    PerformanceHistories.plot_centiles_range(
+        histories, axes, (0, 100), {}, None, True, abscissas
+    )
+    PerformanceHistories.plot_median(histories, axes, {}, True, abscissas)
+    assert_equal(axes.lines[-1].get_xdata(), abscissas)
 
 
 def test_get_numbers_of_discipline_executions(

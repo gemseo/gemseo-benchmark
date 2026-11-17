@@ -386,7 +386,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
             abscissas: The abscissas of the histories data.
                 If empty, use the numbers of functions evaluations.
         """
-        use_evaluations = not abscissas
+        use_evaluations = len(abscissas) == 0
         if use_evaluations:
             abscissas = range(1, histories.shape[1] + 1)
 
@@ -450,7 +450,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
             abscissas: The abscissas of the histories data.
                 If empty, use the numbers of functions evaluations.
         """
-        if not abscissas:
+        if len(abscissas) == 0:
             abscissas = range(1, histories.shape[1] + 1)
 
         median = numpy.median(
