@@ -21,6 +21,7 @@
 
 from __future__ import annotations
 
+import warnings
 from datetime import timedelta
 from unittest import mock
 
@@ -203,6 +204,22 @@ def test_compute_time_data_profiles_without_elapsed_times():
     data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
     data_profile.add_history("problem", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
     assert data_profile.compute_time_data_profiles() == {}
+
+
+def test_compute_time_data_profiles_with_untimed_history():
+    """Check that an algorithm with an untimed history is left out of the profiles."""
+    data_profile = _create_data_profile()
+    data_profile.add_history("problem", "algo1", [2.0, 0.0])
+    assert data_profile.compute_time_data_profiles().keys() == {"algo2"}
+
+
+def test_plot_time_data_profiles_log_scale_from_zero():
+    """Check that a time axis of logarithmic scale is not limited at zero."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        DataProfile._plot_time_data_profiles(
+            {"algo": ([0.0, 1.0, 2.0], [0.0, 0.5, 1.0])}, use_time_log_scale=True
+        )
 
 
 @pytest.mark.parametrize(

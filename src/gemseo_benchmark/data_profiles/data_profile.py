@@ -150,8 +150,8 @@ class DataProfile:
                 If `None` then feasibility is always assumed.
             elapsed_times: A history of elapsed times, in increasing order.
                 If empty,
-                the history is ignored
-                by the data profiles relative to the elapsed time.
+                the algorithm configuration is left out
+                of the data profiles relative to the elapsed time.
 
         Raises:
             ValueError: If the problem name is not the name of a reference problem.
@@ -351,7 +351,7 @@ class DataProfile:
 
         For each algorithm, compute the cumulative distribution function of the
         elapsed time required by the algorithm to reach a reference target.
-        The algorithms without elapsed times are left out.
+        The algorithms with a history without elapsed times are left out.
 
         Args:
             *algo_names: The names of the algorithms.
@@ -366,14 +366,21 @@ class DataProfile:
         data_profiles = {}
         for name in algo_names:
             algo_histories = self.__values_histories[name]
+            # An algorithm with a history without elapsed times is left out,
+            # as the times of the target hits of this history are unknown.
+            if any(
+                not any(item.elapsed_time for item in pb_history)
+                for pb_histories in algo_histories.values()
+                for pb_history in pb_histories
+            ):
+                continue
+
             times = sorted({
                 item.elapsed_time.total_seconds()
                 for pb_histories in algo_histories.values()
                 for pb_history in pb_histories
                 for item in pb_history
             })
-            if times == [0.0]:
-                continue
 
             total_hits_history = zeros(len(times))
             for pb_name, targets in self.__target_values.items():
@@ -556,7 +563,8 @@ class DataProfile:
         axes.set_xlabel(DataProfile.__time_label)
         min_time = min(times[0] for times, _ in data_profiles.values())
         max_time = max(times[-1] for times, _ in data_profiles.values())
-        if min_time < max_time:
+        # A logarithmic axis cannot start at zero.
+        if min_time < max_time and not (use_time_log_scale and min_time <= 0):
             axes.set_xlim([min_time, max_time])
 
         DataProfile.__set_ratio_axis(axes)

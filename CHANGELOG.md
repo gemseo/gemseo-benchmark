@@ -46,7 +46,7 @@ and this project adheres to
   `BaseProblemConfiguration.compute_data_profile` and `DataProfile.plot`
   plot the data profiles relative to the number of evaluations
   and relative to the elapsed time, in two figures, and return them.
-  The algorithm configurations without elapsed times
+  The algorithm configurations with a history without elapsed times
   are left out of the data profiles relative to the elapsed time.
   The argument `use_subplots` (`False` by default) plots both data profiles
   side by side in a single figure, saved to a single file,
