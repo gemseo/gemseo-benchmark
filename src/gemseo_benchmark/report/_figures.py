@@ -96,9 +96,6 @@ class Figures:
     __MATPLOTLIB_LOG_SCALE: Final[str] = "log"
     """The Matplotlib value for logarithmic scale."""
 
-    __MATPLOTLIB_SYMMETRIC_LOG_SCALE: Final[str] = "symlog"
-    """The Matplotlib value for symmetric logarithmic scale."""
-
     __plot_settings: Mapping[str, ConfigurationPlotOptions]
     """The keyword arguments of `matplotlib.axes.Axes.plot`
       for each algorithm configuration."""
