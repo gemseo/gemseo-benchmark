@@ -244,7 +244,9 @@ def timed_constrained_histories() -> PerformanceHistories:
     )
 
 
-@pytest.mark.parametrize("plot_all_histories", [False, True])
+@pytest.mark.parametrize(
+    "plot_all_histories", [False, True], ids=["statistics", "all_histories"]
+)
 def test_plot_performance_measure_distribution_over_time(
     timed_constrained_histories, plot_all_histories, snapshot_matplotlib
 ):

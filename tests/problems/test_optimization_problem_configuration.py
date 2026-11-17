@@ -68,6 +68,7 @@ from tests.problems.conftest import check_variable_space
 from tests.problems.conftest import check_worker_type
 from tests.problems.conftest import plot_data_profiles
 from tests.problems.conftest import plot_data_profiles_with_max_eval_number
+from tests.problems.conftest import test_compute_data_profile_files_parametrize
 from tests.problems.conftest import test_compute_data_profiles_parametrize
 from tests.problems.conftest import test_description_parametrize
 
@@ -556,7 +557,7 @@ def test_compute_data_profile_max_eval_number(
         assert figure == snapshot_matplotlib(remove_text=True)
 
 
-@pytest.mark.parametrize("use_subplots", [False, True])
+@test_compute_data_profile_files_parametrize
 def test_compute_data_profile_files(
     tmp_path,
     minimization_problem_creator,
@@ -564,6 +565,8 @@ def test_compute_data_profile_files(
     algorithms_configurations,
     results,
     use_subplots,
+    number_of_figures,
+    file_names,
 ):
     """Check the files of the data profiles of a problem configuration."""
     target_values.compute_target_hits_history = mock.Mock(
@@ -578,12 +581,8 @@ def test_compute_data_profile_files(
         file_path=path,
         use_subplots=use_subplots,
     )
-    assert len(figures) == (1 if use_subplots else 2)
-    assert {path.name for path in tmp_path.iterdir()} == (
-        {"data_profile.png"}
-        if use_subplots
-        else {"data_profile_eval.png", "data_profile_time.png"}
-    )
+    assert len(figures) == number_of_figures
+    assert {path.name for path in tmp_path.iterdir()} == file_names
 
 
 @pytest.mark.parametrize(

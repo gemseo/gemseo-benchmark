@@ -243,7 +243,7 @@ def test_plot_combined_figures(snapshot_matplotlib):
     assert figures[0] == snapshot_matplotlib
 
 
-@pytest.mark.parametrize("show", [False, True])
+@pytest.mark.parametrize("show", [False, True], ids=["no_show", "show"])
 def test_plot_figures(show):
     """Check the figures of the data profiles."""
     figures = _create_data_profile().plot(show=show)
@@ -259,6 +259,7 @@ def test_plot_figures(show):
         (False, {"data_profile_eval.png", "data_profile_time.png"}),
         (True, {"data_profile.png"}),
     ],
+    ids=["no_subplots", "subplots"],
 )
 def test_plot_save_files(tmp_path, use_subplots, file_names):
     """Check the files of the data profiles."""
@@ -270,7 +271,7 @@ def test_plot_save_files(tmp_path, use_subplots, file_names):
     assert {path.name for path in tmp_path.iterdir()} == file_names
 
 
-@pytest.mark.parametrize("use_subplots", [False, True])
+@pytest.mark.parametrize("use_subplots", [False, True], ids=["no_subplots", "subplots"])
 def test_plot_without_elapsed_times(tmp_path, use_subplots):
     """Check the data profiles of histories without elapsed times."""
     data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})

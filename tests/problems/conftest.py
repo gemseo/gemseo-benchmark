@@ -370,6 +370,16 @@ test_compute_data_profiles_parametrize = pytest.mark.parametrize(
 )
 
 
+test_compute_data_profile_files_parametrize = pytest.mark.parametrize(
+    ("use_subplots", "number_of_figures", "file_names"),
+    [
+        (False, 2, {"data_profile_eval.png", "data_profile_time.png"}),
+        (True, 1, {"data_profile.png"}),
+    ],
+    ids=["no_subplots", "subplots"],
+)
+
+
 def plot_data_profiles(
     problem_configuration_class: type[BaseProblemConfiguration],
     create_problem: Callable,

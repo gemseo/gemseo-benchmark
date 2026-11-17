@@ -38,6 +38,7 @@ from gemseo_benchmark.problems.optimization_problem_configuration import (
     OptimizationProblemConfiguration,
 )
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
+from tests.problems.conftest import test_compute_data_profile_files_parametrize
 
 algorithms_configurations = AlgorithmsConfigurations(
     AlgorithmConfiguration(L_BFGS_B_Settings())
@@ -79,9 +80,9 @@ def test_compute_data_profile(
         assert figure == snapshot_matplotlib
 
 
-@pytest.mark.parametrize("use_subplots", [False, True])
+@test_compute_data_profile_files_parametrize
 def test_compute_data_profile_files(
-    tmp_path, problem_a, problem_b, results, use_subplots
+    tmp_path, problem_a, problem_b, results, use_subplots, number_of_figures, file_names
 ):
     """Check the files of the data profiles of a group of problems."""
     path = tmp_path / "data_profile.png"
@@ -92,12 +93,8 @@ def test_compute_data_profile_files(
         plot_path=path,
         use_subplots=use_subplots,
     )
-    assert len(figures) == (1 if use_subplots else 2)
-    assert {path.name for path in tmp_path.iterdir()} == (
-        {"data_profile.png"}
-        if use_subplots
-        else {"data_profile_eval.png", "data_profile_time.png"}
-    )
+    assert len(figures) == number_of_figures
+    assert {path.name for path in tmp_path.iterdir()} == file_names
 
 
 def test_iter(problem_a, problem_b):
