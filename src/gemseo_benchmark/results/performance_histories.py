@@ -17,17 +17,17 @@
 from __future__ import annotations
 
 import collections.abc
-import datetime
 import statistics
 from typing import TYPE_CHECKING
 
 import numpy
-from matplotlib.ticker import FuncFormatter
 from matplotlib.ticker import MaxNLocator
 
+from gemseo_benchmark.report.axis_data import AxisData
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
+    import datetime
     from collections.abc import Callable
     from collections.abc import Mapping
     from collections.abc import Sequence
@@ -352,11 +352,7 @@ class PerformanceHistories(collections.abc.MutableSequence):
         )
         if elapsed_times:
             axes.set_xlabel("Elapsed time")
-            axes.xaxis.set_major_formatter(
-                FuncFormatter(
-                    lambda seconds, _: str(datetime.timedelta(seconds=seconds))
-                )
-            )
+            axes.xaxis.set_major_formatter(AxisData.time_tick_formatter)
         else:
             axes.set_xlabel("Number of functions evaluations")
 

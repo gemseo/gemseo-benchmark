@@ -21,7 +21,6 @@
 
 from __future__ import annotations
 
-import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import ClassVar
@@ -37,9 +36,11 @@ from numpy import searchsorted
 from numpy import zeros
 
 from gemseo_benchmark import _get_configuration_plot_options
+from gemseo_benchmark.report.axis_data import AxisData
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
+    import datetime
     from collections.abc import Iterable
     from collections.abc import Mapping
     from collections.abc import Sequence
@@ -552,11 +553,7 @@ class DataProfile:
         if use_time_log_scale:
             axes.set_xscale("log")
         else:
-            axes.xaxis.set_major_formatter(
-                matplotlib.ticker.FuncFormatter(
-                    lambda seconds, _: str(datetime.timedelta(seconds=seconds))
-                )
-            )
+            axes.xaxis.set_major_formatter(AxisData.time_tick_formatter)
 
         axes.tick_params(axis="x", labelrotation=90)
         axes.set_xlabel(DataProfile.__time_label)
