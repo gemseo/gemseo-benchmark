@@ -146,7 +146,11 @@ def test_plot_algo_names():
 
 
 def _create_data_profile() -> DataProfile:
-    """Return a data profile with timed histories of two algorithms."""
+    """Create a data profile with timed histories of two algorithms.
+
+    Returns:
+        A data profile with two timed histories for each of two algorithms.
+    """
     data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
     data_profile.add_history(
         "problem",
