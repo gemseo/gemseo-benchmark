@@ -25,7 +25,6 @@ import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import ClassVar
-from typing import Final
 from typing import TypeAlias
 
 import matplotlib
@@ -81,11 +80,11 @@ class DataProfile:
     for a given number of evaluations or a given elapsed time.
     """
 
-    __EVALUATIONS_FILE_NAME_SUFFIX: Final[str] = "_eval"
+    __evaluations_file_name_suffix: ClassVar[str] = "_eval"
     """The suffix appended to the file name of the data profiles
     relative to the number of evaluations."""
 
-    __TIME_FILE_NAME_SUFFIX: Final[str] = "_time"
+    __time_file_name_suffix: ClassVar[str] = "_time"
     """The suffix appended to the file name of the data profiles
     relative to the elapsed time."""
 
@@ -283,10 +282,10 @@ class DataProfile:
             if file_path:
                 file_path = Path(file_path)
                 evaluations_file_path = file_path.with_stem(
-                    f"{file_path.stem}{self.__EVALUATIONS_FILE_NAME_SUFFIX}"
+                    f"{file_path.stem}{self.__evaluations_file_name_suffix}"
                 )
                 time_file_path = file_path.with_stem(
-                    f"{file_path.stem}{self.__TIME_FILE_NAME_SUFFIX}"
+                    f"{file_path.stem}{self.__time_file_name_suffix}"
                 )
 
             figures_and_paths = [
