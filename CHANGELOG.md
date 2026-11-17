@@ -123,6 +123,12 @@ and this project adheres to
   are plotted relative to the number of discipline executions,
   as the figures that compare the algorithm configurations,
   instead of the number of iterations.
+- In the benchmarking report,
+  when the performance measure is plotted on a logarithmic scale,
+  the distributions of the performance measure of an algorithm configuration
+  use a symmetric logarithmic scale only if the performance measure is negative,
+  as the figures that compare the algorithm configurations;
+  they used a symmetric logarithmic scale in any case.
 
 ### Fixed
 
