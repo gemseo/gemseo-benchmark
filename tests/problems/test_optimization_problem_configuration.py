@@ -68,6 +68,7 @@ from tests.problems.conftest import check_variable_space
 from tests.problems.conftest import check_worker_type
 from tests.problems.conftest import plot_data_profiles
 from tests.problems.conftest import plot_data_profiles_with_max_eval_number
+from tests.problems.conftest import test_compute_data_profile_files_parametrize
 from tests.problems.conftest import test_compute_data_profiles_parametrize
 from tests.problems.conftest import test_description_parametrize
 
@@ -525,7 +526,7 @@ def test_compute_data_profile(
     snapshot_matplotlib,
 ):
     """Check the computation of data profiles."""
-    figure = plot_data_profiles(
+    figures = plot_data_profiles(
         OptimizationProblemConfiguration,
         minimization_problem_creator,
         target_values,
@@ -533,7 +534,8 @@ def test_compute_data_profile(
         results,
         use_abscissa_log_scale,
     )
-    assert figure == snapshot_matplotlib
+    for figure in figures:
+        assert figure == snapshot_matplotlib
 
 
 def test_compute_data_profile_max_eval_number(
@@ -544,14 +546,43 @@ def test_compute_data_profile_max_eval_number(
     snapshot_matplotlib,
 ):
     """Check the computation of data profiles when the evaluations number is limited."""
-    figure = plot_data_profiles_with_max_eval_number(
+    figures = plot_data_profiles_with_max_eval_number(
         OptimizationProblemConfiguration,
         minimization_problem_creator,
         target_values,
         algorithms_configurations,
         results,
     )
-    assert figure == snapshot_matplotlib(remove_text=True)
+    for figure in figures:
+        assert figure == snapshot_matplotlib(remove_text=True)
+
+
+@test_compute_data_profile_files_parametrize
+def test_compute_data_profile_files(
+    tmp_path,
+    minimization_problem_creator,
+    target_values,
+    algorithms_configurations,
+    results,
+    use_subplots,
+    number_of_figures,
+    file_names,
+):
+    """Check the files of the data profiles of a problem configuration."""
+    target_values.compute_target_hits_history = mock.Mock(
+        return_value=[0, 0, 0, 1, 1, 2]
+    )
+    path = tmp_path / "data_profile.png"
+    figures = OptimizationProblemConfiguration(
+        "Problem", minimization_problem_creator, target_values=target_values
+    ).compute_data_profile(
+        algorithms_configurations,
+        results,
+        file_path=path,
+        use_subplots=use_subplots,
+    )
+    assert len(figures) == number_of_figures
+    assert {path.name for path in tmp_path.iterdir()} == file_names
 
 
 @pytest.mark.parametrize(

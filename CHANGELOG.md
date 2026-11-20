@@ -39,6 +39,39 @@ and this project adheres to
   or an error raised by the callable computing an option
   raises a `ValueError` naming the algorithm configuration
   and the instance of the problem.
+- The data profiles can be computed relative to the elapsed time,
+  with the method `DataProfile.compute_time_data_profiles`.
+  `DataProfile.add_history` has an argument `elapsed_times`.
+- `ProblemsGroup.compute_data_profile`,
+  `BaseProblemConfiguration.compute_data_profile` and `DataProfile.plot`
+  plot the data profiles relative to the number of evaluations
+  and relative to the elapsed time, in two figures, and return them.
+  The algorithm configurations with a history without elapsed times
+  are left out of the data profiles relative to the elapsed time.
+  The argument `use_subplots` (`False` by default) plots both data profiles
+  side by side in a single figure, saved to a single file,
+  and the argument `use_time_log_scale` (`False` by default)
+  uses a logarithmic scale for the time axis.
+- The benchmarking report shows the data profiles relative to the elapsed time
+  next to the data profiles relative to the number of evaluations,
+  and the distributions of the performance measure, the infeasibility measure
+  and the number of unsatisfied constraints of each algorithm configuration
+  relative to the elapsed time
+  next to their distributions relative to the number of iterations
+  (or of discipline executions).
+- The argument `use_elapsed_time` (`False` by default) of
+  `PerformanceHistories.plot_performance_measure_distribution`,
+  `PerformanceHistories.plot_infeasibility_measure_distribution` and
+  `PerformanceHistories.plot_number_of_unsatisfied_constraints_distribution`
+  plots the distribution relative to the elapsed time
+  instead of the number of functions evaluations.
+  `PerformanceHistories.plot_centiles_range` and `PerformanceHistories.plot_median`
+  have an argument `abscissas` (the numbers of functions evaluations by default).
+- The argument `number_of_scalar_constraints` of
+  `PerformanceHistories.spread_over_time` and `PerformanceHistory.spread_over_timeline`
+  can be `None`:
+  the number of unsatisfied constraints is then unknown
+  before the first item of a history.
 
 ### Changed
 
@@ -76,6 +109,30 @@ and this project adheres to
 - The dependencies `properdocs`, `mkdocs-material` and `mkdocs-to-pdf`
   are bounded: `properdocs >=1.6,<2`, `mkdocs-material >=9.7,<10`
   and `mkdocs-to-pdf >=0.11,<1`.
+- When the data profiles are saved to a file, e.g. `data_profile.png`,
+  the data profiles relative to the number of evaluations
+  and relative to the elapsed time
+  are saved to `data_profile_eval.png` and `data_profile_time.png`,
+  unless `use_subplots` is `True`
+  or no algorithm configuration has elapsed times.
+- The horizontal axis of the data profiles is labelled "Number of evaluations"
+  instead of "Number of functions evaluations".
+- In the benchmarking report,
+  the distributions of the data of an algorithm configuration
+  on an MDO or MDA problem configuration
+  are plotted relative to the number of discipline executions,
+  as the figures that compare the algorithm configurations,
+  instead of the number of iterations.
+- In the benchmarking report,
+  when the performance measure is plotted on a logarithmic scale,
+  the distributions of the performance measure of an algorithm configuration
+  use a symmetric logarithmic scale only if the performance measure is negative,
+  as the figures that compare the algorithm configurations;
+  they used a symmetric logarithmic scale in any case.
+- `TargetValues.compute_target_hits_history`, and so the computation of the data profiles,
+  is faster:
+  each item of the history is compared with a few targets
+  instead of all of them.
 
 ### Fixed
 

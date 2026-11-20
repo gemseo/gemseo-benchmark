@@ -449,7 +449,8 @@ class Report:
             problems_group_name=problems.name,
             problems_group_description=problems.description,
             data_profile=self.__get_link_path(
-                plotter.plot_data_profiles(use_abscissa_log_scale), file_path
+                plotter.plot_data_profiles(use_abscissa_log_scale, use_time_log_scale),
+                file_path,
             ),
             problems_names=[problem.name for problem in problems],
             group_problems_paths=[

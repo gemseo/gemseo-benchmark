@@ -21,6 +21,7 @@
 
 from __future__ import annotations
 
+from math import isnan
 from types import MappingProxyType
 from typing import TYPE_CHECKING
 
@@ -66,10 +67,30 @@ class TargetValues(PerformanceHistory):
             The history of the number of target hits.
         """
         minimum_history = values_history.compute_cumulated_minimum()
-        return [
-            [minimum <= target for target in self].count(True)
-            for minimum in minimum_history
-        ]
+        if any(
+            isnan(item.performance_measure) or isnan(item.infeasibility_measure)
+            for item in (*self, *minimum_history)
+        ):
+            # The history items are not totally ordered.
+            return [
+                [minimum <= target for target in self].count(True)
+                for minimum in minimum_history
+            ]
+
+        # As the targets are sorted and the cumulated minimum never increases,
+        # the targets reached form a suffix of the sorted targets
+        # that only grows along the history.
+        targets = sorted(self)
+        number_of_targets = len(targets)
+        index = number_of_targets
+        hits_history = []
+        for minimum in minimum_history:
+            while index > 0 and minimum <= targets[index - 1]:
+                index -= 1
+
+            hits_history.append(number_of_targets - index)
+
+        return hits_history
 
     def plot(self, show: bool = True, file_path: str | Path = "") -> Figure:
         """Plot the target values.

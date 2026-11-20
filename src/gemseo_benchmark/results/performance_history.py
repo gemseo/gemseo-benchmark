@@ -572,7 +572,7 @@ class PerformanceHistory(collections.abc.Sequence):
             item.switch_performance_measure_sign()
 
     def spread_over_timeline(
-        self, timeline: Iterable[timedelta], number_of_scalar_constraints: int
+        self, timeline: Iterable[timedelta], number_of_scalar_constraints: int | None
     ) -> PerformanceHistory:
         """Spread the history over a timeline of elapsed times.
 
@@ -583,6 +583,8 @@ class PerformanceHistory(collections.abc.Sequence):
         Args:
             timeline: An increasing sequence of elapsed times.
             number_of_scalar_constraints: The number of scalar constraints.
+                If `None`, the number of unsatisfied constraints is unknown
+                before the first item of the history.
 
         Returns:
             The performance history with has as many items as elements in the timeline.
@@ -619,7 +621,7 @@ class PerformanceHistory(collections.abc.Sequence):
     def __spread_over_scale(
         self,
         scale: Iterable[datetime.timedelta] | Iterable[int],
-        number_of_scalar_constraints: int,
+        number_of_scalar_constraints: int | None,
         scale_property: property,
     ) -> PerformanceHistory:
         """Spread the history over a scale.

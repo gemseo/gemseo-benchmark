@@ -21,6 +21,8 @@
 
 from __future__ import annotations
 
+import warnings
+from datetime import timedelta
 from unittest import mock
 
 import pytest
@@ -141,3 +143,240 @@ def test_plot_algo_names():
         data_profile.plot(algo_names=["algo1"], show=False)
 
     assert plot_data_profiles.call_args.args[0].keys() == {"algo1"}
+
+
+def _create_data_profile() -> DataProfile:
+    """Create a data profile with timed histories of two algorithms.
+
+    Returns:
+        A data profile with two timed histories for each of two algorithms.
+    """
+    data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
+    data_profile.add_history(
+        "problem",
+        "algo1",
+        [2.0, 1.0, 0.0],
+        elapsed_times=[timedelta(seconds=t) for t in (1.0, 2.0, 4.0)],
+    )
+    data_profile.add_history(
+        "problem",
+        "algo1",
+        [2.0, 0.5],
+        elapsed_times=[timedelta(seconds=t) for t in (0.5, 3.0)],
+    )
+    data_profile.add_history(
+        "problem",
+        "algo2",
+        [1.0, 1.0],
+        elapsed_times=[timedelta(seconds=t) for t in (0.5, 1.5)],
+    )
+    data_profile.add_history(
+        "problem",
+        "algo2",
+        [2.0, 0.0],
+        elapsed_times=[timedelta(seconds=t) for t in (1.0, 2.5)],
+    )
+    return data_profile
+
+
+def test_compute_time_data_profiles():
+    """Check the computation of data profiles relative to the elapsed time."""
+    profiles = _create_data_profile().compute_time_data_profiles()
+    assert profiles == {
+        "algo1": ([0.5, 1.0, 2.0, 3.0, 4.0], [0.0, 0.0, 0.25, 0.5, 0.75]),
+        "algo2": ([0.5, 1.0, 1.5, 2.5], [0.25, 0.25, 0.25, 0.75]),
+    }
+
+
+def test_compute_time_data_profiles_algo_names():
+    """Check the computation of time data profiles of some algorithms."""
+    profiles = _create_data_profile().compute_time_data_profiles("algo2")
+    assert profiles.keys() == {"algo2"}
+
+
+def test_compute_time_data_profiles_end():
+    """Check that time and iteration data profiles end with the same ratios."""
+    data_profile = _create_data_profile()
+    profiles = data_profile.compute_data_profiles()
+    time_profiles = data_profile.compute_time_data_profiles()
+    for name, (_, ratios) in time_profiles.items():
+        assert ratios[-1] == profiles[name][-1]
+
+
+def test_compute_time_data_profiles_without_elapsed_times():
+    """Check the time data profiles of histories without elapsed times."""
+    data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
+    data_profile.add_history("problem", "algo", [2.0, 1.5, 1.0, 0.5, 0.1, 0.0])
+    assert data_profile.compute_time_data_profiles() == {}
+
+
+def test_compute_time_data_profiles_with_untimed_history():
+    """Check that an algorithm with an untimed history is left out of the profiles."""
+    data_profile = _create_data_profile()
+    data_profile.add_history("problem", "algo1", [2.0, 0.0])
+    assert data_profile.compute_time_data_profiles().keys() == {"algo2"}
+
+
+def test_plot_time_data_profiles_log_scale_from_zero():
+    """Check that a time axis of logarithmic scale is not limited at zero."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        DataProfile._plot_time_data_profiles(
+            {"algo": ([0.0, 1.0, 2.0], [0.0, 0.5, 1.0])}, use_time_log_scale=True
+        )
+
+
+@pytest.mark.parametrize(
+    "use_time_log_scale", [False, True], ids=["linear_scale", "log_scale"]
+)
+def test_plot_time_data_profiles(use_time_log_scale, snapshot_matplotlib):
+    """Check the figure of the data profiles relative to the elapsed time."""
+    data_profile = _create_data_profile()
+    profiles = data_profile.compute_time_data_profiles()
+    figure = data_profile._plot_time_data_profiles(
+        profiles, use_time_log_scale=use_time_log_scale
+    )
+    assert figure == snapshot_matplotlib
+
+
+def test_plot_combined_figures(snapshot_matplotlib):
+    """Check the figure combining the data profiles."""
+    figures = _create_data_profile().plot(show=False, use_subplots=True)
+    assert len(figures) == 1
+    assert len(figures[0].axes) == 2
+    assert figures[0] == snapshot_matplotlib
+
+
+@pytest.mark.parametrize("show", [False, True], ids=["no_show", "show"])
+def test_plot_figures(show):
+    """Check the figures of the data profiles."""
+    figures = _create_data_profile().plot(show=show)
+    assert [figure.axes[0].get_xlabel() for figure in figures] == [
+        "Number of evaluations",
+        "Elapsed time",
+    ]
+
+
+@pytest.mark.parametrize(
+    ("use_subplots", "file_names"),
+    [
+        (False, {"data_profile_eval.png", "data_profile_time.png"}),
+        (True, {"data_profile.png"}),
+    ],
+    ids=["no_subplots", "subplots"],
+)
+def test_plot_save_files(tmp_path, use_subplots, file_names):
+    """Check the files of the data profiles."""
+    _create_data_profile().plot(
+        show=False,
+        file_path=tmp_path / "data_profile.png",
+        use_subplots=use_subplots,
+    )
+    assert {path.name for path in tmp_path.iterdir()} == file_names
+
+
+@pytest.mark.parametrize("use_subplots", [False, True], ids=["no_subplots", "subplots"])
+def test_plot_without_elapsed_times(tmp_path, use_subplots):
+    """Check the data profiles of histories without elapsed times."""
+    data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
+    data_profile.add_history("problem", "algo", [2.0, 1.0, 0.0])
+    figures = data_profile.plot(
+        show=False, file_path=tmp_path / "data_profile.png", use_subplots=use_subplots
+    )
+    assert len(figures) == 1
+    assert len(figures[0].axes) == 1
+    assert {path.name for path in tmp_path.iterdir()} == {"data_profile.png"}
+
+
+def test_plot_options_without_elapsed_times():
+    """Check that a configuration keeps its options when another one has no times."""
+    data_profile = DataProfile({"problem": TargetValues([1.0, 0.0])})
+    data_profile.add_history("problem", "algo1", [2.0, 1.0])
+    data_profile.add_history(
+        "problem",
+        "algo2",
+        [2.0, 0.0],
+        elapsed_times=[timedelta(seconds=t) for t in (1.0, 2.0)],
+    )
+    figure, time_figure = data_profile.plot(show=False)
+    colors = {line.get_label(): line.get_color() for line in figure.axes[0].lines}
+    time_colors = {
+        line.get_label(): line.get_color() for line in time_figure.axes[0].lines
+    }
+    assert "algo1" not in time_colors
+    assert time_colors["algo2"] == colors["algo2"]
+
+
+def test_hits_computed_once():
+    """Check that plotting both data profiles counts the target hits once."""
+    data_profile = _create_data_profile()
+    with mock.patch.object(
+        TargetValues,
+        "compute_target_hits_history",
+        autospec=True,
+        side_effect=TargetValues.compute_target_hits_history,
+    ) as compute_target_hits_history:
+        data_profile.plot(show=False)
+
+    assert compute_target_hits_history.call_count == 4
+
+
+def test_hits_cache_add_history():
+    """Check that adding a history updates the data profiles."""
+    data_profile = _create_data_profile()
+    data_profile.compute_data_profiles()
+    data_profile.compute_time_data_profiles()
+    for _ in range(2):
+        data_profile.add_history(
+            "problem",
+            "algo1",
+            [0.0],
+            elapsed_times=[timedelta(seconds=0.1)],
+        )
+
+    assert data_profile.compute_data_profiles()["algo1"] == [0.5, 0.75, 0.875]
+    times, ratios = data_profile.compute_time_data_profiles()["algo1"]
+    assert times[0] == 0.1
+    assert ratios[0] == 0.5
+
+
+def test_hits_cache_target_values():
+    """Check that setting the target values updates the data profiles."""
+    data_profile = _create_data_profile()
+    profiles = data_profile.compute_data_profiles()
+    time_profiles = data_profile.compute_time_data_profiles()
+    data_profile.target_values = {"problem": TargetValues([3.0, 2.0])}
+    assert data_profile.compute_data_profiles() != profiles
+    assert data_profile.compute_time_data_profiles() != time_profiles
+    assert data_profile.compute_data_profiles()["algo1"] == [1.0, 1.0, 1.0]
+
+
+def _switch_targets_sign(target_values: dict[str, TargetValues]) -> None:
+    """Switch the sign of the target values of the problem in place.
+
+    Args:
+        target_values: The target values of each reference problem.
+    """
+    target_values["problem"].switch_performance_measure_sign()
+
+
+def _replace_targets(target_values: dict[str, TargetValues]) -> None:
+    """Replace the target values of the problem in the mapping.
+
+    Args:
+        target_values: The target values of each reference problem.
+    """
+    target_values["problem"] = TargetValues([3.0, 2.0])
+
+
+@pytest.mark.parametrize(
+    ("change_targets", "expected_profile"),
+    [(_switch_targets_sign, [0.0, 0.0, 0.25]), (_replace_targets, [1.0, 1.0, 1.0])],
+    ids=["changed_in_place", "replaced"],
+)
+def test_hits_cache_target_values_in_place(change_targets, expected_profile):
+    """Check that changing the target values in place updates the data profiles."""
+    data_profile = _create_data_profile()
+    data_profile.compute_data_profiles()
+    change_targets(data_profile.target_values)
+    assert data_profile.compute_data_profiles()["algo1"] == expected_profile

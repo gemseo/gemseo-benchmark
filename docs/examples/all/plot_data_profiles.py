@@ -152,8 +152,14 @@ results = scenario.execute([problems], skip_report=True)
 # ## Compute the datas profiles
 #
 # Now that the performances histories are generated for the reference problems,
-# the data profiles of the algorithms configurations can be computed.
+# the data profiles of the algorithms configurations can be computed,
+# relative to the number of evaluations and relative to the elapsed time.
 problems.compute_data_profile(algorithms_configurations, results, show=True)
+# %%
+# The two data profiles can also be plotted side by side in a single figure.
+problems.compute_data_profile(
+    algorithms_configurations, results, show=True, use_subplots=True
+)
 # %%
 # Here we remove the performances histories as we do not wish to keep them.
 shutil.rmtree(scenario_dir)
