@@ -140,6 +140,11 @@ and this project adheres to
   from a generator of NumPy arrays no longer leaves it without starting points.
 - `AlgorithmsConfigurations.algorithms` lists each algorithm once
   when several algorithm configurations use it.
+- The documentation states that a script calling `Scenario.execute`
+  or `Benchmarker.execute` with `n_processes > 1`
+  must protect the call with `if __name__ == "__main__":`,
+  as Python 3.14 starts the worker processes with `forkserver` instead of `fork` on Linux,
+  which makes them import the script.
 - `OptimizationProblemConfiguration.compute_target_values` applies
   the `instance_algorithm_options` of the algorithm configurations
   to each instance of the problem, as the benchmarking does;
