@@ -238,6 +238,15 @@ for two tasks:
 2. saving the performance histories to files, and storing their paths
     in [Results][gemseo_benchmark.results.results.Results].
 
+!!! warning
+    When `n_processes > 1`, the algorithms configurations are executed in worker processes
+    that may import the main script, depending on the start method of the processes:
+    this is the default one on Windows, macOS, and Linux from Python 3.14.
+    In a script, protect the call to the execution with `if __name__ == "__main__":`,
+    otherwise the workers fail.
+    The problem configurations must also be picklable,
+    i.e. built from functions defined at the module level, not lambdas.
+
 ## Datas profiles {#data-profiles}
 
 The [gemseo_benchmark.data_profiles][gemseo_benchmark.data_profiles]

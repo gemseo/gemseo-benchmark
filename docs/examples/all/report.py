@@ -163,7 +163,14 @@ configuration.enable_fast_mode()
 configuration.enable_progress_bar = False
 # %%
 # Let us execute the benchmarking scenario on our two groups of reference problems.
-scenario.execute([problems_2d, problems_5d], generate_pdf_report=True)
+#
+# Note:
+#     The execution is protected by `if __name__ == "__main__":`
+#     because the worker processes may import this script
+#     (this is the default start method of the processes on Windows, macOS,
+#     and Linux from Python 3.14).
+if __name__ == "__main__":
+    scenario.execute([problems_2d, problems_5d], generate_pdf_report=True)
 
 # %%
 # The HTML report path is [`current_dir/report/_build/html/index.html`](../../../../report/html/index.html)
