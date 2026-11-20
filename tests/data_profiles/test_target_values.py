@@ -21,6 +21,7 @@
 
 from __future__ import annotations
 
+import numpy
 import pytest
 from matplotlib import pyplot
 from matplotlib.ticker import MaxNLocator
@@ -36,6 +37,47 @@ def test_count_targets_hist():
         [0.0, -3.0, -1.0, 0.0, 1.0, -1.0], [2.0, 3.0, 1.0, 0.0, 0.0, 0.0]
     )
     assert targets.compute_target_hits_history(history) == [0, 0, 0, 2, 2, 3]
+
+
+def _count_target_hits(targets: TargetValues, history: PerformanceHistory) -> list[int]:
+    """Count the targets hit by a history by comparing every item with every target.
+
+    Args:
+        targets: The targets.
+        history: The history.
+
+    Returns:
+        The history of the number of target hits.
+    """
+    return [
+        [minimum <= target for target in targets].count(True)
+        for minimum in history.compute_cumulated_minimum()
+    ]
+
+
+@pytest.mark.parametrize("seed", range(10))
+def test_count_targets_hist_random(seed):
+    """Check the counting of target hits against a pairwise comparison."""
+    rng = numpy.random.default_rng(seed)
+    # Few distinct values to get ties between the items and the targets.
+    targets = TargetValues(
+        rng.integers(-3, 4, 5).tolist(), rng.choice([0.0, 0.0, 1.0, 2.0], 5).tolist()
+    )
+    history = PerformanceHistory(
+        rng.integers(-3, 4, 30).tolist(), rng.choice([0.0, 1.0, 2.0, 3.0], 30).tolist()
+    )
+    assert targets.compute_target_hits_history(history) == _count_target_hits(
+        targets, history
+    )
+
+
+def test_count_targets_hist_nan():
+    """Check the counting of target hits with a NaN performance measure."""
+    targets = TargetValues([2.0, 1.0, 0.0])
+    history = PerformanceHistory([3.0, float("nan"), 1.0, 0.0])
+    assert targets.compute_target_hits_history(history) == _count_target_hits(
+        targets, history
+    )
 
 
 @pytest.fixture(scope="module")

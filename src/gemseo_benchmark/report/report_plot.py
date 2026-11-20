@@ -101,7 +101,7 @@ class ReportPlot(metaclass=ABCGoogleDocstringInheritanceMeta):
         data: numpy.ndarray,
         centile_range: tuple[float, float],
         fill_between_kwargs: Mapping[str, str | float],
-        infinity_replacement: float,
+        infinity_replacement: float | None,
         data_is_minimized: bool,
         nan_replacement: float,
     ) -> None:
@@ -116,6 +116,8 @@ class ReportPlot(metaclass=ABCGoogleDocstringInheritanceMeta):
                 for `matplotlib.axes.Axes.fill_between`.
             infinity_replacement: The finite substitute value for infinite ordinates
                 to enable `matplotlib.axes.Axes.fill_between`.
+                If `None`, the largest finite float of the data type,
+                as with `numpy.nan_to_num`.
             data_is_minimized: Whether the data is minimized (rather than maximized).
             nan_replacement: The value to replace NaN history entries
                 to enable the computation of centiles.

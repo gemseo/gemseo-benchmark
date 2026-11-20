@@ -19,7 +19,9 @@ from __future__ import annotations
 from datetime import timedelta
 
 import matplotlib.pyplot
+import numpy
 import pytest
+from numpy.testing import assert_equal
 
 from gemseo_benchmark.results.history_item import HistoryItem
 from gemseo_benchmark.results.performance_histories import PerformanceHistories
@@ -208,6 +210,102 @@ def test_get_elapsed_times(timed_performance_histories) -> None:
 def test_spread_over_time(timed_performance_histories) -> None:
     """Check the spreading of performance histories over time."""
     check_spread_over_time(timed_performance_histories.spread_over_time(5))
+
+
+def test_spread_over_time_unknown_constraints(timed_performance_histories) -> None:
+    """Check the spreading over time with an unknown number of constraints."""
+    histories = timed_performance_histories.spread_over_time(None)
+    assert histories[1][0].n_unsatisfied_constraints is None
+    assert [item.n_unsatisfied_constraints for item in histories[1][1:]] == [0] * 3
+
+
+@pytest.fixture(scope="module")
+def timed_constrained_histories() -> PerformanceHistories:
+    """Performance histories with constraints and elapsed times."""
+    return PerformanceHistories(
+        PerformanceHistory(
+            [3, 2, 1],
+            [2, 0, 0],
+            n_unsatisfied_constraints=[1, 0, 0],
+            elapsed_times=[timedelta(seconds=s) for s in (1, 4, 6)],
+        ),
+        PerformanceHistory(
+            [4, 2, 0],
+            [4, 2, 0],
+            n_unsatisfied_constraints=[2, 1, 0],
+            elapsed_times=[timedelta(seconds=s) for s in (2, 3, 7)],
+        ),
+        PerformanceHistory(
+            [5, 1, -1],
+            [0, 0, 0],
+            n_unsatisfied_constraints=[0, 0, 0],
+            elapsed_times=[timedelta(seconds=s) for s in (1.5, 5, 8)],
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    "plot_all_histories", [False, True], ids=["statistics", "all_histories"]
+)
+def test_plot_performance_measure_distribution_over_time(
+    timed_constrained_histories, plot_all_histories, snapshot_matplotlib
+):
+    """Check the plot of the distribution of the performance measure over time."""
+    figure = matplotlib.pyplot.figure()
+    timed_constrained_histories.plot_performance_measure_distribution(
+        figure.gca(),
+        5,
+        float("nan"),
+        plot_all_histories,
+        use_elapsed_time=True,
+    )
+    assert figure == snapshot_matplotlib
+
+
+def test_plot_infeasibility_measure_distribution_over_time(
+    timed_constrained_histories, snapshot_matplotlib
+):
+    """Check the plot of the distribution of the infeasibility measure over time."""
+    figure = matplotlib.pyplot.figure()
+    timed_constrained_histories.plot_infeasibility_measure_distribution(
+        figure.gca(), use_elapsed_time=True
+    )
+    assert figure == snapshot_matplotlib
+
+
+def test_plot_number_of_unsatisfied_constraints_distribution_over_time(
+    timed_constrained_histories, snapshot_matplotlib
+):
+    """Check the plot of the distribution of the unsatisfied constraints over time."""
+    figure = matplotlib.pyplot.figure()
+    timed_constrained_histories.plot_number_of_unsatisfied_constraints_distribution(
+        figure.gca(), use_elapsed_time=True
+    )
+    assert figure == snapshot_matplotlib
+
+
+_histories_data = numpy.array([[3.0, 2.0, 1.0], [4.0, 2.0, 0.0]])
+"""The data of two histories."""
+
+_array_abscissas = numpy.array([1.0, 4.0, 6.0])
+"""An array of abscissas for the data of the histories."""
+
+
+def test_plot_centiles_range_with_array_abscissas():
+    """Check the plot of a centiles range with an array of abscissas."""
+    axes = matplotlib.pyplot.figure().gca()
+    PerformanceHistories.plot_centiles_range(
+        _histories_data, axes, (0, 100), {}, None, True, _array_abscissas
+    )
+    (path,) = axes.collections[0].get_paths()
+    assert_equal(numpy.unique(path.vertices[:, 0]), _array_abscissas)
+
+
+def test_plot_median_with_array_abscissas():
+    """Check the plot of a median with an array of abscissas."""
+    axes = matplotlib.pyplot.figure().gca()
+    PerformanceHistories.plot_median(_histories_data, axes, {}, True, _array_abscissas)
+    assert_equal(axes.lines[0].get_xdata(), _array_abscissas)
 
 
 def test_get_numbers_of_discipline_executions(

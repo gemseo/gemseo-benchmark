@@ -42,7 +42,7 @@ class RangePlot(ReportPlot):
         performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
         ordinate_data: OrdinateData,
         abscissa_data: AbscissaData,
-        infinity_replacement: float,
+        infinity_replacement: float | None,
         plot_only_median: bool,
         plot_all_histories: bool,
         data_is_minimized: bool,
@@ -59,6 +59,8 @@ class RangePlot(ReportPlot):
             abscissa_data: The data of the abscissa axis.
             infinity_replacement: The finite substitute value for infinite ordinates
                 to enable `matplotlib.axes.Axes.fill_between`.
+                If `None`, the largest finite float of the data type,
+                as with `numpy.nan_to_num`.
             plot_only_median: Whether to plot only the median and no other centile.
             plot_all_histories: Whether to plot all the performance histories.
             data_is_minimized: Whether the data is minimized (rather than maximized).

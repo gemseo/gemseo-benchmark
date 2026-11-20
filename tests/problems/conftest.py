@@ -20,7 +20,6 @@ from typing import TYPE_CHECKING
 from typing import Any
 from unittest import mock
 
-import matplotlib.pyplot
 import numpy
 import pytest
 from gemseo.doe import CustomDOE_Settings
@@ -371,6 +370,16 @@ test_compute_data_profiles_parametrize = pytest.mark.parametrize(
 )
 
 
+test_compute_data_profile_files_parametrize = pytest.mark.parametrize(
+    ("use_subplots", "number_of_figures", "file_names"),
+    [
+        (False, 2, {"data_profile_eval.png", "data_profile_time.png"}),
+        (True, 1, {"data_profile.png"}),
+    ],
+    ids=["no_subplots", "subplots"],
+)
+
+
 def plot_data_profiles(
     problem_configuration_class: type[BaseProblemConfiguration],
     create_problem: Callable,
@@ -379,7 +388,7 @@ def plot_data_profiles(
     results: Results,
     use_abscissa_log_scale: bool,
     *args: Any,
-) -> Figure:
+) -> list[Figure]:
     """Plot the data profiles of a problem configuration.
 
     Args:
@@ -389,23 +398,23 @@ def plot_data_profiles(
         algorithm_configurations: The algorithm configurations.
         results: The benchmarking results.
         use_abscissa_log_scale: Whether to use a logarithmic scale
-                for the abscissa axis.
+                for the abscissa axis and for the time axis.
         *args: Positional arguments for the class initialization.
 
     Returns:
-        The figure of the data profiles.
+        The figures of the data profiles.
     """
     target_values.compute_target_hits_history = mock.Mock(
         return_value=[0, 0, 0, 1, 1, 2]
     )
-    problem_configuration_class(
+    return problem_configuration_class(
         "Problem", create_problem, *args, target_values=target_values
     ).compute_data_profile(
         algorithm_configurations,
         results,
         use_abscissa_log_scale=use_abscissa_log_scale,
+        use_time_log_scale=use_abscissa_log_scale,
     )
-    return matplotlib.pyplot.gcf()
 
 
 def plot_data_profiles_with_max_eval_number(
@@ -415,7 +424,7 @@ def plot_data_profiles_with_max_eval_number(
     algorithm_configurations: AlgorithmsConfigurations,
     results: Results,
     *args: Any,
-) -> Figure:
+) -> list[Figure]:
     """Plot the data profiles of a problem configuration with a limited budget.
 
     Args:
@@ -427,16 +436,15 @@ def plot_data_profiles_with_max_eval_number(
         *args: Positional arguments for the class initialization.
 
     Returns:
-        The figure of the data profiles.
+        The figures of the data profiles.
     """
     target_values.compute_target_hits_history = mock.Mock(return_value=[0, 0, 0, 1])
     bench_problem = problem_configuration_class(
         "Problem", create_problem, *args, target_values=target_values
     )
-    bench_problem.compute_data_profile(
+    return bench_problem.compute_data_profile(
         algorithm_configurations, results, max_iteration_number=4
     )
-    return matplotlib.pyplot.gcf()
 
 
 def check_variable_space(

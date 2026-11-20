@@ -27,7 +27,6 @@ import pytest
 from gemseo.doe import CustomDOE_Settings
 from gemseo.optimization import L_BFGS_B_Settings
 from gemseo.problem.optimization.rosenbrock import Rosenbrock
-from matplotlib import pyplot
 from numpy import zeros
 
 from gemseo_benchmark.algorithms.algorithm_configuration import AlgorithmConfiguration
@@ -39,6 +38,7 @@ from gemseo_benchmark.problems.optimization_problem_configuration import (
     OptimizationProblemConfiguration,
 )
 from gemseo_benchmark.problems.problems_group import ProblemsGroup
+from tests.problems.conftest import test_compute_data_profile_files_parametrize
 
 algorithms_configurations = AlgorithmsConfigurations(
     AlgorithmConfiguration(L_BFGS_B_Settings())
@@ -68,14 +68,33 @@ def test_compute_data_profile(
 ):
     """Check the computation of data profiles."""
     group = ProblemsGroup("A group", [problem_a, problem_b])
-    group.compute_data_profile(
+    figures = group.compute_data_profile(
         algorithms_configurations,
         results,
         show=False,
         max_eval_number=5,
         use_abscissa_log_scale=use_abscissa_log_scale,
+        use_time_log_scale=use_abscissa_log_scale,
     )
-    assert pyplot.gcf() == snapshot_matplotlib
+    for figure in figures:
+        assert figure == snapshot_matplotlib
+
+
+@test_compute_data_profile_files_parametrize
+def test_compute_data_profile_files(
+    tmp_path, problem_a, problem_b, results, use_subplots, number_of_figures, file_names
+):
+    """Check the files of the data profiles of a group of problems."""
+    path = tmp_path / "data_profile.png"
+    figures = ProblemsGroup("A group", [problem_a, problem_b]).compute_data_profile(
+        algorithms_configurations,
+        results,
+        show=False,
+        plot_path=path,
+        use_subplots=use_subplots,
+    )
+    assert len(figures) == number_of_figures
+    assert {path.name for path in tmp_path.iterdir()} == file_names
 
 
 def test_iter(problem_a, problem_b):

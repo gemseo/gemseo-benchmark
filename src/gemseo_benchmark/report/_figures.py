@@ -40,11 +40,13 @@ from gemseo_benchmark.report.axis_data import InfeasibilityData
 from gemseo_benchmark.report.axis_data import PerformanceData
 from gemseo_benchmark.report.axis_data import TimeAbscissaData
 from gemseo_benchmark.report.axis_data import TimeOrdinateData
+from gemseo_benchmark.report.distribution_plot import DistributionPlot
 from gemseo_benchmark.report.range_plot import RangePlot
 from gemseo_benchmark.results.performance_histories import PerformanceHistories
 from gemseo_benchmark.results.performance_history import PerformanceHistory
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from collections.abc import Iterable
     from collections.abc import Mapping
 
@@ -59,6 +61,7 @@ if TYPE_CHECKING:
         BaseProblemConfiguration,
     )
     from gemseo_benchmark.problems.problems_group import ProblemsGroup
+    from gemseo_benchmark.report.axis_data import OrdinateData
     from gemseo_benchmark.results.history_item import HistoryItem
     from gemseo_benchmark.results.results import Results
 
@@ -92,9 +95,6 @@ class Figures:
 
     __MATPLOTLIB_LOG_SCALE: Final[str] = "log"
     """The Matplotlib value for logarithmic scale."""
-
-    __MATPLOTLIB_SYMMETRIC_LOG_SCALE: Final[str] = "symlog"
-    """The Matplotlib value for symmetric logarithmic scale."""
 
     __plot_settings: Mapping[str, ConfigurationPlotOptions]
     """The keyword arguments of `matplotlib.axes.Axes.plot`
@@ -178,12 +178,19 @@ class Figures:
         )
         self.__results = results
 
-    def plot_data_profiles(self, use_abscissa_log_scale: bool = False) -> Path:
+    def plot_data_profiles(
+        self, use_abscissa_log_scale: bool = False, use_time_log_scale: bool = False
+    ) -> Path:
         """Plot the data profiles of the group of problems.
+
+        The data profiles relative to the number of evaluations
+        and relative to the elapsed time are plotted side by side.
 
         Args:
             use_abscissa_log_scale: Whether to use a logarithmic scale
                 for the abscissa axis.
+            use_time_log_scale: Whether to use a logarithmic scale
+                for the time axis.
 
         Returns:
             The path to the figure.
@@ -199,6 +206,8 @@ class Figures:
             plot_settings=self.__plot_settings,
             grid_settings=self.__GRID_SETTINGS,
             use_abscissa_log_scale=use_abscissa_log_scale,
+            use_time_log_scale=use_time_log_scale,
+            use_subplots=True,
         )
         return plot_path
 
@@ -371,7 +380,10 @@ class Figures:
         )
         figures = {
             self._FigureFileName.DATA_PROFILE: self.__plot_data_profiles(
-                problem_configuration, directory_path, use_abscissa_log_scale
+                problem_configuration,
+                directory_path,
+                use_abscissa_log_scale,
+                use_time_log_scale,
             )
         }
         (
@@ -429,10 +441,12 @@ class Figures:
                 performance_histories,
                 extremal_feasible_performance,
                 infeasible_performance_measure,
+                maximal_infeasibility,
                 directory_path,
                 use_abscissa_log_scale,
                 use_performance_log_scale,
                 plot_all_histories,
+                use_time_log_scale,
             )
         )
         return figures
@@ -442,6 +456,7 @@ class Figures:
         problem_configuration: BaseProblemConfiguration,
         directory_path: Path,
         use_abscissa_log_scale: bool,
+        use_time_log_scale: bool,
     ) -> Path:
         """Plot the data profiles for a problem configuration.
 
@@ -450,6 +465,8 @@ class Figures:
             directory_path: The destination directory for the figure.
             use_abscissa_log_scale: Whether to use a logarithmic scale
                 for the abscissa axis.
+            use_time_log_scale: Whether to use a logarithmic scale
+                for the time axis.
 
         Returns:
             The path to the figure.
@@ -460,7 +477,7 @@ class Figures:
             if file_path.is_file():
                 return file_path
 
-            return self.plot_data_profiles(use_abscissa_log_scale)
+            return self.plot_data_profiles(use_abscissa_log_scale, use_time_log_scale)
 
         file_path = directory_path / self._FigureFileName.DATA_PROFILE.value
         problem_configuration.compute_data_profile(
@@ -473,6 +490,8 @@ class Figures:
             self.__plot_settings,
             self.__GRID_SETTINGS,
             use_abscissa_log_scale,
+            use_time_log_scale=use_time_log_scale,
+            use_subplots=True,
         )
         return file_path
 
@@ -837,15 +856,21 @@ class Figures:
     def __get_algorithms_plots(
         self,
         problem_configuration: BaseProblemConfiguration,
-        performance_histories: Mapping[str, PerformanceHistories],
+        performance_histories: Mapping[AlgorithmConfiguration, PerformanceHistories],
         extremal_feasible_performance: float | None,
         infeasible_performance_measure: float,
+        maximal_infeasibility: float,
         directory_path: Path,
         use_abscissa_log_scale: bool,
         use_performance_log_scale: bool,
         plot_all_histories: bool,
+        use_time_log_scale: bool,
     ) -> dict[str, dict[_FigureFileName, Path]]:
         """Return the figures associated with algorithm configurations for a problem.
+
+        The distributions of the data of each algorithm configuration are plotted
+        relative to the abscissa data of the problem configuration
+        and relative to the elapsed time, side by side.
 
         Args:
             problem_configuration: The problem configuration.
@@ -854,152 +879,236 @@ class Figures:
             extremal_feasible_performance: The extremal feasible performance measure.
             infeasible_performance_measure: The value to replace the performance measure
                 of infeasible history items when computing statistics.
+            maximal_infeasibility: The maximal infeasibility measure.
             directory_path: The path to the directory where to save the figures.
             use_abscissa_log_scale: Whether to use a logarithmic scale
                 for the abscissa axis.
             use_performance_log_scale: Whether to use a logarithmic scale
                 for the performance measure axis.
             plot_all_histories: Whether to plot all the performance histories.
+            use_time_log_scale: Whether to use a logarithmic scale
+                for the time axis.
 
         Returns:
             The paths to the figures for each algorithm configuration.
         """
         figures = {}
-        # Plot the performance measure distribution for each configuration
-        performance_figures = {}
+        configuration_dirs = {}
         for configuration in self.__algorithm_configurations:
-            figure, axes = matplotlib.pyplot.subplots()
-            performance_histories[configuration].plot_performance_measure_distribution(
-                axes,
-                extremal_feasible_performance,
-                infeasible_performance_measure,
-                plot_all_histories,
-                problem_configuration.minimize_performance_measure,
-            )
-            if use_performance_log_scale:
-                axes.set_yscale(self.__MATPLOTLIB_SYMMETRIC_LOG_SCALE)
-
-            if use_abscissa_log_scale:
-                axes.set_xscale(self.__MATPLOTLIB_LOG_SCALE)
-
-            axes.grid(**self.__GRID_SETTINGS)
-            performance_figures[configuration] = figure
-
-        self.__set_common_limits(performance_figures.values())
-
-        for configuration, figure in performance_figures.items():
-            # Add the target values and save the figure
-            problem_configuration.target_values.plot_on_axes(
-                figure.gca(), self.__TARGET_VALUES_PLOT_SETTINGS
-            )
             configuration_dir = directory_path / join_substrings(configuration.name)
             configuration_dir.mkdir()
-            file_path = (
-                configuration_dir / self._FigureFileName.PERFORMANCE_MEASURE.value
+            configuration_dirs[configuration] = configuration_dir
+            figures[configuration.name] = {}
+
+        plot_distributions = functools.partial(
+            self.__plot_distributions,
+            problem_configuration=problem_configuration,
+            plot_all_histories=plot_all_histories,
+            use_abscissa_log_scale=use_abscissa_log_scale,
+            use_time_log_scale=use_time_log_scale,
+        )
+        # Plot the performance measure distribution for each configuration
+        minimize_performance_measure = (
+            problem_configuration.minimize_performance_measure
+        )
+        performance_figures = {
+            configuration: plot_distributions(
+                performance_histories=performance_histories[configuration],
+                ordinate_data_type=functools.partial(
+                    PerformanceData,
+                    infeasible_performance_measure=infeasible_performance_measure,
+                    label=problem_configuration.performance_measure_label,
+                ),
+                infinity_replacement=extremal_feasible_performance,
+                data_is_minimized=minimize_performance_measure,
+                nan_replacement=float("inf")
+                if minimize_performance_measure
+                else -float("inf"),
+                use_ordinate_log_scale=use_performance_log_scale,
             )
-            save_show_figure(figure, False, file_path)
-            figures[configuration.name] = {
-                self._FigureFileName.PERFORMANCE_MEASURE: file_path
-            }
-            # Focus on the targets qnd save another figure
-            performance_axes, targets_axes = figure.axes
-            performance_axes.autoscale(enable=True, axis="y", tight=True)
-            if problem_configuration.minimize_performance_measure:
-                performance_axes.set_ylim(
-                    top=max(problem_configuration.target_values).performance_measure
-                )
-            else:
-                performance_axes.set_ylim(
-                    bottom=min(problem_configuration.target_values).performance_measure
+            for configuration in self.__algorithm_configurations
+        }
+        self.__set_common_limits(performance_figures.values())
+        for configuration, figure in performance_figures.items():
+            # Add the target values and save the figure
+            for axes in figure.axes:
+                problem_configuration.target_values.plot_on_axes(
+                    axes,
+                    self.__TARGET_VALUES_PLOT_SETTINGS,
+                    set_ylabel_settings={"rotation": 270, "labelpad": 20},
                 )
 
-            targets_axes.set_ylim(performance_axes.get_ylim())
+            figure.tight_layout()
             file_path = (
-                configuration_dir / self._FigureFileName.PERFORMANCE_MEASURE_FOCUS.value
+                configuration_dirs[configuration]
+                / self._FigureFileName.PERFORMANCE_MEASURE.value
+            )
+            save_show_figure(figure, False, file_path, close=False)
+            figures[configuration.name][self._FigureFileName.PERFORMANCE_MEASURE] = (
+                file_path
+            )
+            # Focus on the targets and save another figure
+            for performance_axes, targets_axes in zip(
+                figure.axes[:2], figure.axes[2:], strict=True
+            ):
+                self.__focus_on_targets(
+                    problem_configuration,
+                    [performance_histories[configuration]],
+                    performance_axes,
+                    targets_axes,
+                )
+
+            figure.tight_layout()
+            file_path = (
+                configuration_dirs[configuration]
+                / self._FigureFileName.PERFORMANCE_MEASURE_FOCUS.value
             )
             save_show_figure(figure, False, file_path)
             figures[configuration.name][
                 self._FigureFileName.PERFORMANCE_MEASURE_FOCUS
             ] = file_path
 
-        if problem_configuration.number_of_scalar_constraints:
-            # Plot the infeasibility measure distribution for each configuration
-            infeasibility_figures = {}
-            for configuration in self.__algorithm_configurations:
-                figure, axes = matplotlib.pyplot.subplots()
-                performance_histories[
-                    configuration
-                ].plot_infeasibility_measure_distribution(axes, plot_all_histories)
-                axes.set_yscale(self.__MATPLOTLIB_LOG_SCALE)
-                if use_abscissa_log_scale:
-                    axes.set_xscale(self.__MATPLOTLIB_LOG_SCALE)
+        if not problem_configuration.number_of_scalar_constraints:
+            return figures
 
-                axes.grid(**self.__GRID_SETTINGS)
-                infeasibility_figures[configuration] = figure
-
-            self.__set_common_limits(infeasibility_figures.values())
-
-            for configuration, figure in infeasibility_figures.items():
-                file_path = (
-                    directory_path
-                    / join_substrings(configuration.name)
-                    / self._FigureFileName.INFEASIBILITY_MEASURE.value
+        number_of_scalar_constraints = (
+            problem_configuration.number_of_scalar_constraints
+        )
+        for file_name, ordinate_data_type, kwargs in (
+            (
+                self._FigureFileName.INFEASIBILITY_MEASURE,
+                InfeasibilityData,
+                {
+                    "infinity_replacement": maximal_infeasibility,
+                    "nan_replacement": float("inf"),
+                    "use_ordinate_log_scale": True,
+                },
+            ),
+            (
+                self._FigureFileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS,
+                ConstraintData,
+                {
+                    "infinity_replacement": number_of_scalar_constraints,
+                    "nan_replacement": number_of_scalar_constraints,
+                    "use_ordinate_log_scale": False,
+                },
+            ),
+        ):
+            constraint_figures = {
+                configuration: plot_distributions(
+                    performance_histories=performance_histories[configuration],
+                    ordinate_data_type=ordinate_data_type,
+                    data_is_minimized=True,
+                    **kwargs,
                 )
+                for configuration in self.__algorithm_configurations
+            }
+            self.__set_common_limits(constraint_figures.values())
+            for configuration, figure in constraint_figures.items():
+                figure.tight_layout()
+                file_path = configuration_dirs[configuration] / file_name.value
                 save_show_figure(figure, False, file_path)
-                figures[configuration.name][
-                    self._FigureFileName.INFEASIBILITY_MEASURE
-                ] = file_path
-
-            constraints_figures = {}
-            for configuration in self.__algorithm_configurations:
-                figure, axes = matplotlib.pyplot.subplots()
-                performance_histories[
-                    configuration
-                ].plot_number_of_unsatisfied_constraints_distribution(
-                    axes, plot_all_histories
-                )
-                axes.yaxis.set_major_locator(MaxNLocator(integer=True))  # TODO: move
-                if use_abscissa_log_scale:
-                    axes.set_xscale(self.__MATPLOTLIB_LOG_SCALE)
-
-                axes.grid(**self.__GRID_SETTINGS)
-                constraints_figures[configuration] = figure
-
-            self.__set_common_limits(constraints_figures.values())
-
-            for configuration, figure in constraints_figures.items():
-                file_path = (
-                    directory_path
-                    / join_substrings(configuration.name)
-                    / self._FigureFileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS.value
-                )
-                save_show_figure(figure, False, file_path)
-                figures[configuration.name][
-                    self._FigureFileName.NUMBER_OF_UNSATISFIED_CONSTRAINTS
-                ] = file_path
+                figures[configuration.name][file_name] = file_path
 
         return figures
 
-    def __set_common_limits(self, figures: Iterable[matplotlib.Figure]) -> None:
-        """Set common limits to figures.
+    def __plot_distributions(
+        self,
+        problem_configuration: BaseProblemConfiguration,
+        performance_histories: PerformanceHistories,
+        ordinate_data_type: Callable[[matplotlib.axes.Axes], OrdinateData],
+        infinity_replacement: float | None,
+        plot_all_histories: bool,
+        data_is_minimized: bool,
+        nan_replacement: float,
+        use_ordinate_log_scale: bool,
+        use_abscissa_log_scale: bool,
+        use_time_log_scale: bool,
+    ) -> matplotlib.figure.Figure:
+        """Plot the distribution of the data of an algorithm configuration.
+
+        The distribution is plotted relative to the abscissa data
+        of the problem configuration and relative to the elapsed time, side by side.
+
+        Args:
+            problem_configuration: The problem configuration.
+            performance_histories: The performance histories
+                of the algorithm configuration.
+            ordinate_data_type: The type of ordinate data.
+            infinity_replacement: The finite substitute value for infinite ordinates
+                to enable `matplotlib.axes.Axes.fill_between`.
+            plot_all_histories: Whether to plot all the performance histories.
+            data_is_minimized: Whether the data is minimized (rather than maximized).
+            nan_replacement: The value to replace NaN history entries
+                to enable the computation of centiles.
+            use_ordinate_log_scale: Whether to use a logarithmic scale
+                for the ordinate axis.
+            use_abscissa_log_scale: Whether to use a logarithmic scale
+                for the abscissa axis.
+            use_time_log_scale: Whether to use a logarithmic scale
+                for the time axis.
+
+        Returns:
+            The figure.
+        """
+        figsize = matplotlib.rcParams["figure.figsize"]
+        figure, axes_array = matplotlib.pyplot.subplots(
+            1, 2, sharey="all", figsize=(figsize[0] * 2, figsize[1])
+        )
+        distribution_plot = DistributionPlot(
+            self.__plot_settings,
+            self.__GRID_SETTINGS,
+            self.__ALPHA,
+            self.__MATPLOTLIB_LOG_SCALE,
+        )
+        for axes, abscissa_data_type, use_log_scale in zip(
+            axes_array,
+            (problem_configuration.abscissa_data_type, TimeAbscissaData),
+            (use_abscissa_log_scale, use_time_log_scale),
+            strict=True,
+        ):
+            distribution_plot.plot(
+                axes,
+                performance_histories,
+                ordinate_data_type(axes),
+                abscissa_data_type(
+                    axes,
+                    problem_configuration.number_of_scalar_constraints,
+                    use_log_scale,
+                ),
+                infinity_replacement,
+                plot_all_histories,
+                data_is_minimized,
+                nan_replacement,
+                use_ordinate_log_scale,
+            )
+
+        return figure
+
+    @staticmethod
+    def __set_common_limits(figures: Iterable[matplotlib.figure.Figure]) -> None:
+        """Set common limits to the axes of figures with the same layout.
 
         Args:
             figures: The figures.
         """
-        xlim = [float("inf"), -float("inf")]
-        ylim = [float("inf"), -float("inf")]
-        for figure in figures:
-            for lim, get_lim in (
-                (xlim, figure.gca().get_xlim),
-                (ylim, figure.gca().get_ylim),
+        figures = list(figures)
+        for all_axes in zip(*(figure.axes for figure in figures), strict=True):
+            for get_lim, set_lim in (
+                (
+                    matplotlib.axes.Axes.get_xlim,
+                    matplotlib.axes.Axes.set_xlim,
+                ),
+                (
+                    matplotlib.axes.Axes.get_ylim,
+                    matplotlib.axes.Axes.set_ylim,
+                ),
             ):
-                lim_min, lim_max = get_lim()
-                lim[0] = min(lim[0], lim_min)
-                lim[1] = max(lim[1], lim_max)
-
-        for figure in figures:
-            figure.gca().set_xlim(*xlim)
-            figure.gca().set_ylim(*ylim)
+                limits = [get_lim(axes) for axes in all_axes]
+                lower = min(lower for lower, _ in limits)
+                upper = max(upper for _, upper in limits)
+                for axes in all_axes:
+                    set_lim(axes, lower, upper)
 
     @classmethod
     def __get_problem_tables(
