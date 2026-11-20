@@ -165,7 +165,7 @@ configuration.enable_progress_bar = False
 # Let us execute the benchmarking scenario on our two groups of reference problems.
 #
 # Note:
-#     The execution is protected by ``if __name__ == "__main__":``
+#     The execution is protected by `if __name__ == "__main__":`
 #     because the worker processes may import this script
 #     (this is the default start method of the processes on Windows, macOS,
 #     and Linux from Python 3.14).
