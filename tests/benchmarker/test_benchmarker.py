@@ -624,15 +624,18 @@ def test_worker_raised_exception(
     assert module == "gemseo_benchmark.benchmarker.benchmarker"
     assert level == logging.ERROR
     assert caplog.records[0].exc_info[1] is exception
-    assert message in {
-        (
-            f"Solving problem 1 of problem configuration {pb_config.name} "
-            f"for algorithm configuration {algo_config.name} "
-            f"raised: Can't {verb} local object "
-            f"'{ill_problem_configuration}.<locals>.<lambda>'"
-        )
-        for verb in {"get", "pickle"}
-    }
+    # The error message of the pickling depends on the Python version:
+    # the representation of the function is quoted before 3.14, and detailed after.
+    prefix = (
+        f"Solving problem 1 of problem configuration {pb_config.name} "
+        f"for algorithm configuration {algo_config.name} raised: Can't "
+    )
+    assert message.startswith(prefix)
+    assert re.search(
+        rf"(get|pickle) local object .*{re.escape(ill_problem_configuration)}"
+        r"\.<locals>\.<lambda>",
+        message[len(prefix) :],
+    )
 
 
 @ill_configurations
